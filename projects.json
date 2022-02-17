@@ -2,15 +2,19 @@
   "Libraries": [
     {
       "text": ".Net SDK",
-      "link": "https://github.com/CardanoSharp/cardanosharp-koios)"
+      "link": "https://github.com/koios-official/cardanosharp-koios"
     },
     {
-      "text": "Go Library and CLI",
-      "link": "https://github.com/howijd/koios-rest-go-client"
+      "text": "Go CLI",
+      "link": "https://github.com/cardano-community/koios-cli"
+    },
+    {
+      "text": "Go Client",
+      "link": "https://github.com/cardano-community/koios-go-client"
     },
     {
       "text": "Java client",
-      "link": "https://github.com/edridudi/koios-java-client"
+      "link": "https://github.com/cardano-community/koios-java-client"
     }
   ],
   "Builder Tools": [
