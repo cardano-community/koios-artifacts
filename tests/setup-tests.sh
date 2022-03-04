@@ -4,7 +4,8 @@ python3 -m pip install virtualenv
 export PATH=$PATH:~/.local/bin/
 virtualenv koios-tests
 source koios-tests/bin/activate
-pip3 install schemathesis
+python3 -m pip install schemathesis
+curl -sfL https://raw.githubusercontent.com/cardano-community/koios-artifacts/master/tests/not_empty_response.py -o not_empty_response.py
 echo " To run the current test, use the below:"
 echo "    schemathesis --pre-run not_empty_response run --request-timeout 5000 --hypothesis-seed 1 https://guild.koios.rest/koiosapi.yaml --hypothesis-phases=explicit -v --hypothesis-verbosity quiet -b http://127.0.0.1:8053/api/v0 -c not_empty_response"
 echo "        where http://127.0.0.1:8053/api/v0 is the URL of instance you want to test, and guild.koios.rest is the enviornment you want to test against" 
