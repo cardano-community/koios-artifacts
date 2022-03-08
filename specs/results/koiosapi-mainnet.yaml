@@ -328,11 +328,11 @@ paths:
       summary: Block List
       description: Get summarised details about all blocks (paginated - latest first)
   /block_info: #RPC
-    get:
+    post:
       tags:
         - Block
-      parameters:
-        - $ref: "#/components/parameters/_block_hash"
+      requestBody:
+        $ref: "#/components/requestBodies/block_info"
       responses:
         "200":
           description: Array of detailed block information
@@ -531,7 +531,7 @@ paths:
       tags:
         - Address
       parameters:
-        - $ref: "#/components/parameters/_address"
+        - $ref: "#/components/parameters/_address_assets"
       responses:
         "200":
           description: Array of address-owned assets
@@ -935,7 +935,7 @@ paths:
       summary: Pool Stake, Block and Reward History
       description: >-
         Return information about pool stake, block and reward history in a given epoch _epoch_no
-        (or all epochs that pool existed for, in descending order if no _epoch_no was provided)        
+        (or all epochs that pool existed for, in descending order if no _epoch_no was provided)
   /pool_updates: #RPC
     get:
       tags:
@@ -990,23 +990,40 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Pool Metadata
       description: Metadata(on & off-chain) for all currently registered/retiring (not retired) pools
-  /script_list: #RPC
+  /native_script_list: #RPC
     get:
       tags:
         - Script
       responses:
         "200":
-          description: List of script and creation tx hash pairs
+          description: List of native script and creation tx hash pairs
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/script_list"
+                $ref: "#/components/schemas/native_script_list"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
-      summary: Script List
-      description: List of all existing script hashes along with their creation transaction hashes
+      summary: Native Script List
+      description: List of all existing native script hashes along with their creation transaction hashes
+  /plutus_script_list: #RPC
+    get:
+      tags:
+        - Script
+      responses:
+        "200":
+          description: List of Plutus script and creation tx hash pairs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/plutus_script_list"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Plutus Script List
+      description: List of all existing Plutus script hashes along with their creation transaction hashes
   /script_redeemers: #RPC
     get:
       tags:
@@ -1085,7 +1102,7 @@ components:
       description: Block Hash in hex format
       schema:
         type: string
-        example: f75fea40852ed7d7f539d008e45255725daef8553ae7162750836f279570813a
+        example: f6192a1aaa6d3d05b4703891a6b66cd757801c61ace86cbe5ab0d66e07f601ab
       in: query
       required: true
       allowEmptyValue: false
@@ -1095,7 +1112,7 @@ components:
       description: Epoch Number to fetch details for
       schema:
         type: string
-        example: 195
+        example: 320
       in: query
       required: false
       allowEmptyValue: true
@@ -1105,7 +1122,7 @@ components:
       description: Filter for earned rewards Epoch Number
       schema:
         type: string
-        example: 195
+        example: 320
       in: query
       required: false
       allowEmptyValue: true
@@ -1115,7 +1132,7 @@ components:
       description: Cardano payment or staking address in bech32 format
       schema:
         type: string
-        example: addr_test1qqn5x72yymml6aka0cmkew3jynqgld7xlnwtlsen9ln5tfll0dw5r75vk42mv3ykq8vyjeaanvpytg79xqzymqy5acmqqhx2n7
+        example: stake1u8yxtugdv63wxafy9d00nuz6hjyyp4qnggvc9a3vxh8yl0ckml2uz
       in: query
       required: true
       allowEmptyValue: false
@@ -1125,7 +1142,17 @@ components:
       description: Cardano payment address in bech32 format
       schema:
         type: string
-        example: ##_adress_param##
+        example: addr1qyp9kz50sh9c53hpmk3l4ewj9ur794t2hdqpngsjn3wkc5sztv9glpwt3frwrhdrltjaytc8ut2k4w6qrx3p98zad3fq07xe9g
+      in: query
+      required: true
+      allowEmptyValue: false
+    _address_assets:
+      deprecated: false
+      name: _address
+      description: Cardano payment address in bech32 format
+      schema:
+        type: string
+        example: addr1q8h22z0n3zqecr9n4q9ysds2m2ms3dqesz575accjpc3jclw55yl8zypnsxt82q2fqmq4k4hpz6pnq9fafm33yr3r93sgnpdw6
       in: query
       required: true
       allowEmptyValue: false
@@ -1135,7 +1162,7 @@ components:
       description: Cardano staking address (reward account) in bech32 format
       schema:
         type: string
-        example: stake_test1uqqzl36c3vk850wk22yqgum9l0upy0y8588hcvsjq9m6j4cxw3qau
+        example: stake1u8yxtugdv63wxafy9d00nuz6hjyyp4qnggvc9a3vxh8yl0ckml2uz
       in: query
       required: true
       allowEmptyValue: false
@@ -1145,7 +1172,7 @@ components:
       description: Asset Policy ID in hexadecimal format (hex)
       schema:
         type: string
-        example: 000327a9e427a3a3256eb6212ae26b7f53f7969b8e62d37ea9138a7b
+        example: d3501d9531fcc25e3ca4b6429318c2cc374dbdbcf5e99c1c1e5da1ff
       in: query
       required: true
       allowEmptyValue: false
@@ -1155,7 +1182,7 @@ components:
       description: Asset Name in hexadecimal format (hex)
       schema:
         type: string
-        example: 54735465737431
+        example: 444f4e545350414d
       in: query
       required: true
       allowEmptyValue: false
@@ -1165,7 +1192,7 @@ components:
       description: Pool ID in bech32 format
       schema:
         type: string
-        example: pool102llj7e7a0mmxssjvjkv2d6lppuh6cz6q9xwc3tsksn0jqwz9eh
+        example: pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc
       in: query
       required: true
       allowEmptyValue: false
@@ -1175,7 +1202,7 @@ components:
       description: Pool ID in bech32 format (optional)
       schema:
         type: string
-        example: pool102llj7e7a0mmxssjvjkv2d6lppuh6cz6q9xwc3tsksn0jqwz9eh
+        example: pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc
       in: query
       required: false
       allowEmptyValue: true
@@ -1190,6 +1217,24 @@ components:
       required: true
       allowEmptyValue: false
   requestBodies:
+    block_info:
+      content:
+        application/json:
+          schema:
+            required:
+              - _block_hashes
+            type: object
+            properties:
+              _block_hashes:
+                format: text
+                type: array
+                items:
+                  $ref: "#/components/schemas/blocks/items/properties/hash"
+            example:
+              _block_hashes:
+                - fb9087c9f1408a7bbd7b022fd294ab565fec8dd3a8ef091567482722a1fa4e30
+                - 60188a8dcb6db0d80628815be2cf626c4d17cb3e826cebfca84adaff93ad492a
+                - c6646214a1f377aa461a0163c213fc6b86a559a2d6ebd647d54c4eb00aaab015
     address_txs:
       content:
         application/json:
@@ -1210,9 +1255,9 @@ components:
                 description: Only fetch information after specific block height
             example:
               _addresses:
-                - addr_test1qzx9hu8j4ah3auytk0mwcupd69hpc52t0cw39a65ndrah86djs784u92a3m5w475w3w35tyd6v3qumkze80j8a6h5tuqq5xe8y
-                - addr_test1qrk7920v35zukhcch4kyydy6rxnhqdcvetkvngeqrvtgavw8tpzdklse3kwer7urhrlfg962m9fc8cznfcdpka5pd07sgf8n0w
-              _after_block_height: 2342661
+                - addr1qyp9kz50sh9c53hpmk3l4ewj9ur794t2hdqpngsjn3wkc5sztv9glpwt3frwrhdrltjaytc8ut2k4w6qrx3p98zad3fq07xe9g
+                - addr1qyfldpcvte8nkfpyv0jdc8e026cz5qedx7tajvupdu2724tlj8sypsq6p90hl40ya97xamkm9fwsppus2ru8zf6j8g9sm578cu
+              _after_block_height: 6238675
     credential_txs:
       content:
         application/json:
@@ -1233,9 +1278,9 @@ components:
                 description: Only fetch information after specific block height
             example:
               _payment_credentials:
-                - 00003fac863dc2267d0cd90768c4af653572d719a79ca3b01957fa79
-                - 000056d48603bf7daada30c9c175be9c93172d36f82fba0ca972c245
-              _after_block_height: 2342661
+                - 025b0a8f85cb8a46e1dda3fae5d22f07e2d56abb4019a2129c5d6c52
+                - 13f6870c5e4f3b242463e4dc1f2f56b02a032d3797d933816f15e555
+              _after_block_height: 6238675
     tx_ids:
       content:
         application/json:
@@ -1252,15 +1297,15 @@ components:
                 description: Array of Cardano Transaction hashes
             example:
               _tx_hashes:
-                - 928052b80bfc23801da525a6bf8f805da36f22fa0fd5fec2198b0746eb82b72b
-                - c7e96e4cd6aa9e3afbc7b32d1e8023daf4197931f1ea61d2bdfc7a2e5e017cf1
+                - f144a8264acf4bdfe2e1241170969c930d64ab6b0996a4a45237b623f1dd670e
+                - 0b8ba3bed976fa4913f19adc9f6dd9063138db5b4dd29cecde369456b5155e94
     txbin:
       content:
         application/cbor:
           schema:
             type: string
             format: binary
-            example: 928052b80bfc23801da525a6bf8f805da36f22fa0fd5fec2198b0746eb82b72b
+            example: f144a8264acf4bdfe2e1241170969c930d64ab6b0996a4a45237b623f1dd670e
     pool_ids:
       content:
         application/json:
@@ -1277,9 +1322,9 @@ components:
                 description: Array of Cardano pool IDs (bech32 format)
             example:
               _pool_bech32_ids:
-                - pool102llj7e7a0mmxssjvjkv2d6lppuh6cz6q9xwc3tsksn0jqwz9eh
-                - pool102x86jz7uus6p6mlw02fdw2s805kng7g6ujs6s342t5msk36tch
-                - pool103qt58f9xlsr7y9anz3lnyq6cph4xh2yr4qrrtc356ldzz6ktqz
+                - pool100wj94uzf54vup2hdzk0afng4dhjaqggt7j434mtgm8v2gfvfgp
+                - pool102s2nqtea2hf5q0s4amj0evysmfnhrn4apyyhd4azcmsclzm96m
+                - pool102vsulhfx8ua2j9fwl2u7gv57fhhutc3tp6juzaefgrn7ae35wm
   securitySchemes: {}
   schemas:
     tip:
@@ -1290,7 +1335,7 @@ components:
             type: string
             description: Block Hash in hex
             example: 3cc8cfdb2d68fdb2a467292bf0acda7b91ab677741e3e1c1dc111f5be0cef0fe
-          epoch:
+          epoch_no:
             type: integer
             description: Epoch number
             example: 294
@@ -1390,6 +1435,310 @@ components:
             type: string
             description: Total Reserves yet to be unlocked on chain
             example: 11771504387608670
+    pool_list:
+      type: array
+      items:
+        properties:
+          pool_id_bech32:
+            type: string
+            nullable: true
+            description: Bech32 representation of pool ID
+            example: pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt
+          ticker:
+            type: string
+            description: Pool ticker
+            example: JAZZ
+    pool_history_info:
+      type: array
+      items:
+        type: object
+        properties:
+          epoch_no:
+            type: integer
+            description: Epoch for which the pool history data is shown
+            example: 312
+          active_stake:
+            type: string
+            description: Amount of delegated stake to this pool at the time of epoch snapshot (in lovelaces)
+            example: "31235800000"
+          active_stake_pct:
+            type: number
+            description: Active stake for the pool, expressed as a percentage of total active stake on network
+            example: 13.512182543475783
+          saturation_pct:
+            type: number
+            description: Saturation percentage of a pool at the time of snapshot (2 decimals)
+            example: 45.32
+          block_cnt:
+            type: integer
+            nullable: true
+            description: Number of blocks pool created in that epoch
+            example: 14
+          delegator_cnt:
+            type: integer
+            description: Number of delegators to the pool for that epoch snapshot
+            example: 1432
+          margin:
+            type: number
+            description: Margin (decimal format)
+            example: 0.125
+          fixed_cost:
+            type: string
+            description: Pool fixed cost per epoch (in lovelaces)
+            example: "340000000"
+          pool_fees:
+            type: string
+            description: Total amount of fees earned by pool owners in that epoch (in lovelaces)
+            example: "123327382"
+          deleg_rewards:
+            type: string
+            description: Total amount of rewards earned by delegators in that epoch (in lovelaces)
+            example: "123456789123"
+          epoch_ros:
+            type: number
+            description: Annualized ROS (return on staking) for delegators for this epoch
+            example: 3.000340466
+    pool_info:
+      type: array
+      items:
+        type: object
+        properties:
+          pool_id_bech32:
+            type: string
+            description: Pool ID (bech32 format)
+            example: pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc
+          pool_id_hex:
+            type: string
+            description: Pool ID (Hex format)
+            example: a532904ca60e13e88437b58e7c6ff66b8d5e7ec8d3f4b9e4be7820ec
+          active_epoch_no:
+            type: integer
+            description: Block number on chain where transaction was included
+            example: 6354154
+          vrf_key_hash:
+            type: string
+            description: Pool VRF key hash
+            example: 25efdad1bc12944d38e4e3c26c43565bec84973a812737b163b289e87d0d5ed3
+          margin:
+            type: number
+            description: Margin (decimal format)
+            example: 0.1
+          fixed_cost:
+            type: string
+            description: Pool fixed cost per epoch
+            example: "500000000"
+          pledge:
+            type: string
+            description: Pool pledge in lovelace
+            example: "64000000000000"
+          reward_addr:
+            type: string
+            description: Pool reward address
+            example: stake1uy6yzwsxxc28lfms0qmpxvyz9a7y770rtcqx9y96m42cttqwvp4m5
+          owners:
+            type: array
+            items:
+              type: string
+              description: Pool (co)owner address
+              example: stake1u8088wvudd7dp3rxl0v9xgng8r3j50s65ge3l3jvgd94keqfm3nv3
+          relays:
+            type: array
+            items:
+              type: object
+              properties:
+                dns:
+                  type: string
+                  nullable: true
+                  description: DNS name of the relay (nullable)
+                  example: relays-new.cardano-mainnet.iohk.io
+                srv:
+                  type: string
+                  nullable: true
+                  description: DNS service name of the relay (nullable)
+                  example: biostakingpool3.hopto.org
+                ipv4:
+                  type: string
+                  nullable: true
+                  description: IPv4 address of the relay (nullable)
+                  example: "54.220.20.40"
+                ipv6:
+                  type: string
+                  nullable: true
+                  description: IPv6 address of the relay (nullable)
+                  example: 2604:ed40:1000:1711:6082:78ff:fe0c:ebf
+                port:
+                  type: number
+                  nullable: true
+                  description: Port number of the relay (nullable)
+                  example: 6000
+          meta_url:
+            type: string
+            description: Pool metadata URL
+            nullable: true
+            example: https://pools.iohk.io/IOGP.json
+          meta_hash:
+            type: string
+            description: Pool metadata hash
+            nullable: true
+            example: 37eb004c0dd8a221ac3598ca1c6d6257fb5207ae9857b7c163ae0f39259d6cc0
+          meta_json:
+            type: object
+            nullable: true
+            properties:
+              name:
+                type: string
+                description: Pool name
+                example: Input Output Global (IOHK) - Private
+              ticker:
+                type: string
+                description: Pool ticker
+                example: IOGP
+              homepage:
+                type: string
+                description: Pool homepage URL
+                example: https://iohk.io
+              description:
+                type: string
+                description: Pool description
+                example: Our mission is to provide economic identity to the billions of people who lack it. IOHK will not use the IOHK ticker.
+          pool_status:
+            type: string
+            description: Pool status
+            enum: ["registered", "retiring", "retired"]
+            example: registered
+          retiring_epoch:
+            type: integer
+            description: Announced retiring epoch (nullable)
+            example: null
+            nullable: true
+          op_cert:
+            type: string
+            nullable: true
+            description: Pool latest operational certificate hash
+            example: 37eb004c0dd8a221ac3598ca1c6d6257fb5207ae9857b7c163ae0f39259d6cc0
+          op_cert_counter:
+            type: integer
+            nullable: true
+            description: Pool latest operational certificate counter value
+            example: 8
+          active_stake:
+            type: string
+            description: Pool active stake
+            example: "64328627680963"
+          block_count:
+            type: integer
+            nullable: true
+            description: Total pool blocks on chain
+            example: 4509
+          live_pledge:
+            type: string
+            description: Summary of account balance for all pool owner's
+            example: "64328594406327"
+          live_stake:
+            type: string
+            description: Pool live stake
+            example: "64328627680963"
+          live_delegators:
+            type: integer
+            description: Pool live delegator count
+            example: 5
+          live_saturation:
+            type: number
+            description: Pool live saturation (decimal format)
+            example: 94.52
+    pool_delegators:
+      type: array
+      nullable: true
+      items:
+        type: object
+        properties:
+          stake_address:
+            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+          amount:
+            type: string
+            description: Current delegator live stake (in lovelace)
+            example: 64328591517480
+          epoch_no:
+            $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+    pool_blocks:
+      type: array
+      nullable: true
+      items:
+        type: object
+        properties:
+          epoch_no:
+            $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+          epoch_slot:
+            $ref: "#/components/schemas/blocks/items/properties/epoch_slot"
+          abs_slot:
+            $ref: "#/components/schemas/blocks/items/properties/abs_slot"
+          block_height:
+            $ref: "#/components/schemas/blocks/items/properties/block_height"
+          block_hash:
+            $ref: "#/components/schemas/blocks/items/properties/hash"
+          block_time:
+            $ref: "#/components/schemas/blocks/items/properties/block_time"
+    pool_updates:
+      type: array
+      items:
+        type: object
+        properties:
+          tx_hash:
+            $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+          block_time:
+            $ref: "#/components/schemas/blocks/items/properties/block_time"
+          pool_id_bech32:
+            $ref: "#/components/schemas/pool_info/items/properties/pool_id_bech32"
+          pool_id_hex:
+            $ref: "#/components/schemas/pool_info/items/properties/pool_id_hex"
+          active_epoch_no:
+            type: integer
+            description: Epoch number in which the update becomes active
+            example: 324
+          vrf_key_hash:
+            $ref: "#/components/schemas/pool_info/items/properties/vrf_key_hash"
+          margin:
+            $ref: "#/components/schemas/pool_info/items/properties/margin"
+          fixed_cost:
+            $ref: "#/components/schemas/pool_info/items/properties/fixed_cost"
+          pledge:
+            $ref: "#/components/schemas/pool_info/items/properties/pledge"
+          reward_addr:
+            $ref: "#/components/schemas/pool_info/items/properties/reward_addr"
+          owners:
+            $ref: "#/components/schemas/pool_info/items/properties/owners"
+          relays:
+            $ref: "#/components/schemas/pool_info/items/properties/relays"
+          meta_url:
+            $ref: "#/components/schemas/pool_info/items/properties/meta_url"
+          meta_hash:
+            $ref: "#/components/schemas/pool_info/items/properties/meta_hash"
+          pool_status:
+            $ref: "#/components/schemas/pool_info/items/properties/pool_status"
+          retiring_epoch:
+            $ref: "#/components/schemas/pool_info/items/properties/retiring_epoch"
+    pool_relays:
+      type: array
+      items:
+        type: object
+        properties:
+          pool_id_bech32:
+            $ref: "#/components/schemas/pool_info/items/properties/pool_id_bech32"
+          relays:
+            $ref: "#/components/schemas/pool_info/items/properties/relays"
+    pool_metadata:
+      type: array
+      items:
+        type: object
+        properties:
+          pool_id_bech32:
+            $ref: "#/components/schemas/pool_info/items/properties/pool_id_bech32"
+          meta_url:
+            $ref: "#/components/schemas/pool_info/items/properties/meta_url"
+          meta_hash:
+            $ref: "#/components/schemas/pool_info/items/properties/meta_hash"
+          meta_json:
+            $ref: "#/components/schemas/pool_info/items/properties/meta_json"
     epoch_info:
       type: array
       items:
@@ -1415,6 +1764,14 @@ components:
             type: integer
             description: Number of blocks created in epoch
             example: 17321
+          start_time:
+            type: string
+            description: Timestamp of the epoch start
+            example: "2021-10-02T21:44:51"
+          end_time:
+            type: string
+            description: Timestamp of the epoch end
+            example: "2021-10-02T21:44:51"
           first_block_time:
             type: string
             description: Timestamp for first block created in epoch
@@ -1495,6 +1852,7 @@ components:
             type: string
             description: The hash of 32-byte string of extra random-ness added into the protocol's entropy pool
             example: d982e06fd33e7440b43cefad529b7ecafbaa255e38178ad4189a37e4ce9bf1fa
+            nullable: true
           protocol_major:
             type: integer
             description: The protocol major version
@@ -1574,7 +1932,7 @@ components:
             type: string
             description: Hash of the block
             example: e8c6992d52cd74b577b79251e0351be25070797a0dbc486b2c284d0bf7aeea9c
-          epoch:
+          epoch_no:
             type: integer
             description: Epoch number of the block
             example: 321
@@ -1586,11 +1944,11 @@ components:
             type: integer
             description: Slot number of the block in epoch
             example: 75442
-          height:
+          block_height:
             type: integer
             description: Block height
             example: 42325043
-          size:
+          block_size:
             type: integer
             description: Block size in bytes
             example: 79109
@@ -1621,16 +1979,16 @@ components:
         properties:
           hash:
             $ref: "#/components/schemas/blocks/items/properties/hash"
-          epoch:
-            $ref: "#/components/schemas/blocks/items/properties/epoch"
+          epoch_no:
+            $ref: "#/components/schemas/blocks/items/properties/epoch_no"
           abs_slot:
             $ref: "#/components/schemas/blocks/items/properties/abs_slot"
           epoch_slot:
             $ref: "#/components/schemas/blocks/items/properties/epoch_slot"
-          height:
-            $ref: "#/components/schemas/blocks/items/properties/height"
-          size:
-            $ref: "#/components/schemas/blocks/items/properties/size"
+          block_height:
+            $ref: "#/components/schemas/blocks/items/properties/block_height"
+          block_size:
+            $ref: "#/components/schemas/blocks/items/properties/block_size"
           block_time:
             $ref: "#/components/schemas/blocks/items/properties/block_time"
           tx_count:
@@ -1645,6 +2003,16 @@ components:
             $ref: "#/components/schemas/blocks/items/properties/op_cert_counter"
           pool:
             $ref: "#/components/schemas/blocks/items/properties/pool"
+          total_output:
+            type: string
+            description: Total output of the block (in lovelace)
+            example: 92384672389
+            nullable: true
+          total_fees:
+            type: string
+            description: Total fees of the block (in lovelace)
+            example: 2346834
+            nullable: true
           parent_hash:
             type: string
             description: Hash of the parent of this block
@@ -1671,6 +2039,10 @@ components:
             example: 10723473983
           stake_address:
             $ref: "#/components/schemas/account_history/items/properties/stake_address"
+          script_address:
+            type: boolean
+            description: Signifies whether the address is a script address
+            example: true
           utxo_set:
             type: array
             items:
@@ -1680,8 +2052,14 @@ components:
                   $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/tx_hash"
                 tx_index:
                   $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/tx_index"
+                block_height:
+                  $ref: "#/components/schemas/blocks/items/properties/block_height"
+                block_time:
+                  $ref: "#/components/schemas/blocks/items/properties/block_time"
                 value:
                   $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/value"
+                datum_hash:
+                  $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_hash"
                 asset_list:
                   $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/asset_list"
     address_txs:
@@ -1691,6 +2069,10 @@ components:
         properties:
           tx_hash:
             $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+          block_height:
+            $ref: "#/components/schemas/blocks/items/properties/block_height"
+          block_time:
+            $ref: "#/components/schemas/blocks/items/properties/block_time"
     address_assets:
       $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/asset_list"
     credential_txs:
@@ -1830,7 +2212,7 @@ components:
             type: integer
             description: Block number on chain where transaction was included
             example: 6354154
-          epoch:
+          epoch_no:
             type: integer
             description: Epoch number
             example: 295
@@ -1869,14 +2251,66 @@ components:
           invalid_before:
             type: integer
             description: Slot before which transaction cannot be validated (if supplied, else null)
+            nullable: true
           invalid_after:
             type: integer
             description: Slot after which transaction cannot be validated
             example: 42332172
+            nullable: true
           collaterals:
-            type: string
+            type: array
             description: An array of collateral inputs needed when dealing with smart contracts (same json schema as inputs)
-            example: "[]"
+            nullable: true
+            items:
+              type: object
+              nullable: true
+              properties:
+                payment_addr:
+                  type: object
+                  properties:
+                    bech32:
+                      type: string
+                      description: A Cardano payment/base address (bech32 encoded) for transaction's input UTxO
+                      example: addr1qxkfe8s6m8qt5436lec3f0320hrmpppwqgs2gah4360krvyssntpwjcz303mx3h4avg7p29l3zd8u3jyglmewds9ezrqdc3cxp
+                    cred:
+                      type: string
+                      description: Payment credential
+                      example: ac9c9e1ad9c0ba563afe7114be2a7dc7b0842e0220a476f58e9f61b0
+                stake_addr:
+                  type: string
+                  nullable: true
+                  description: A Cardano staking address (reward account, bech32 encoded) for transaction's input UTxO
+                  example: stake1uxggf4shfvpghcangm67ky0q4zlc3xn7gezy0auhxczu3pslm9wrj
+                tx_hash:
+                  type: string
+                  description: Hash of Transaction for input UTxO
+                  example: f144a8264acf4bdfe2e1241170969c930d64ab6b0996a4a45237b623f1dd670e
+                tx_index:
+                  type: integer
+                  description: Index of input UTxO on the mentioned address used for input
+                  example: 0
+                value:
+                  type: string
+                  description: Balance on the selected input transaction
+                  example: 158005617
+                asset_list:
+                  type: array
+                  nullable: true
+                  description: An array of assets contained on input UTxO
+                  items:
+                    properties:
+                      policy_id:
+                        type: string
+                        description: Asset Policy ID (hex)
+                        example: 6cf6b5cf0fefbe9e69d640d8be84912bb2c9e132671954548790bcfb
+                      asset_name:
+                        type: string
+                        description: Asset Name (hex)
+                        example: 6d65736d6572697a65723038353436
+                      quantity:
+                        type: string
+                        description: Asset balance on the selected input transaction
+                        example: 1
           inputs:
             type: array
             description: An array with details about inputs used in a transaction
@@ -1896,6 +2330,7 @@ components:
                       example: ac9c9e1ad9c0ba563afe7114be2a7dc7b0842e0220a476f58e9f61b0
                 stake_addr:
                   type: string
+                  nullable: true
                   description: A Cardano staking address (reward account, bech32 encoded) for transaction's input UTxO
                   example: stake1uxggf4shfvpghcangm67ky0q4zlc3xn7gezy0auhxczu3pslm9wrj
                 tx_hash:
@@ -1912,6 +2347,7 @@ components:
                   example: 158005617
                 asset_list:
                   type: array
+                  nullable: true
                   description: An array of assets contained on input UTxO
                   items:
                     properties:
@@ -1946,6 +2382,7 @@ components:
                       example: de3c1c527e8826b9cd2030f88f75fc44cd4ce519b9ded9eb794b3794
                 stake_addr:
                   type: string
+                  nullable: true
                   description: A Cardano staking address (reward account, bech32 encoded) for transaction's output UTxO
                   example: stake1uxggf4shfvpghcangm67ky0q4zlc3xn7gezy0auhxczu3pslm9wrj
                 tx_hash:
@@ -1962,24 +2399,29 @@ components:
                   example: 157832856
                 asset_list:
                   type: array
+                  nullable: true
                   description: An array of assets to be included in output UTxO
                   items:
                     properties:
                       policy_id:
                         type: string
+                        nullable: true
                         description: Asset Policy ID (hex)
                         example: 6cf6b5cf0fefbe9e69d640d8be84912bb2c9e132671954548790bcfb
                       asset_name:
                         type: string
+                        nullable: true
                         description: Asset Name (hex)
                         example: 6d65736d6572697a65723038353436
                       quantity:
                         type: string
+                        nullable: true
                         description: Sum of assets for output UTxO
                         example: 1
           withdrawals:
             type: array
-            description: Array of withdrawals with-in a transaction (if any)
+            description: Array of withdrawals with-in a transaction
+            nullable: true
             items:
               type: object
               properties:
@@ -1996,7 +2438,8 @@ components:
                       example: stake1uxggf4shfvpghcangm67ky0q4zlc3xn7gezy0auhxczu3pslm9wrj
           assets_minted:
             type: array
-            description: Array of minted assets with-in a transaction (if any)
+            description: Array of minted assets with-in a transaction
+            nullable: true
             items:
               properties:
                 policy_id:
@@ -2013,6 +2456,7 @@ components:
                   example: 1
           metadata:
             type: array
+            nullable: true
             description: Metadata present with-in a transaction (if any)
             items:
               properties:
@@ -2021,8 +2465,9 @@ components:
                   description: Metadata key (index)
                   example: 0
                 json:
-                  type: string
+                  type: object
                   description: A JSON containing details about metadata within transaction
+                  nullable: true
                   example:
                     {
                       "721":
@@ -2036,11 +2481,13 @@ components:
                     }
           certificates:
             type: array
+            nullable: true
             description: Certificates present with-in a transaction (if any)
             items:
               properties:
                 index:
                   type: integer
+                  nullable: true
                   description: Certificate index
                   example: 0
                 type:
@@ -2048,13 +2495,106 @@ components:
                   description: Type of certificate (could be delegation, stake_registration, stake_deregistraion, pool_update, pool_retire, param_proposal, reserve_MIR, treasury_MIR)
                   example: delegation
                 info:
-                  type: string
+                  type: object
                   description: A JSON array containing information from the certificate
+                  nullable: true
                   example:
                     {
                       "stake_address": "stake1uxggf4shfvpghcangm67ky0q4zlc3xn7gezy0auhxczu3pslm9wrj",
                       "pool": "pool1k53pf4wzn263c08e3wr3gttndfecm9f4uzekgctcx947vt7fh2p",
                     }
+          native_scripts:
+            type: array
+            nullable: true
+            description: Native scripts present in a transaction (if any)
+            items:
+              properties:
+                script_hash:
+                  $ref: "#/components/schemas/plutus_script_list/items/properties/script_hash"
+                script_json:
+                  type: object
+                  description: JSON representation of the timelock script (null for other script types)
+                  example:
+                    {
+                      "type": "all",
+                      "scripts":
+                        [
+                          {
+                            "type": "sig",
+                            "keyHash": "a96da581c39549aeda81f539ac3940ac0cb53657e774ca7e68f15ed9",
+                          },
+                          {
+                            "type": "sig",
+                            "keyHash": "ccfcb3fed004562be1354c837a4a4b9f4b1c2b6705229efeedd12d4d",
+                          },
+                          {
+                            "type": "sig",
+                            "keyHash": "74fcd61aecebe36aa6b6cd4314027282fa4b41c3ce8af17d9b77d0d1",
+                          },
+                        ],
+                    }
+          plutus_contracts:
+            type: array
+            nullable: true
+            description: Plutus contracts present in transaction (if any)
+            items:
+              properties:
+                address:
+                  type: string
+                  description: Plutus script address
+                  example: addr1w999n67e86jn6xal07pzxtrmqynspgx0fwmcmpua4wc6yzsxpljz3
+                script_hash:
+                  $ref: "#/components/schemas/plutus_script_list/items/properties/script_hash"
+                bytecode:
+                  type: string
+                  description: CBOR-encoded Plutus script data
+                  example: 5911ea010000332333222332233223322332232323332223233322232333333332222222232333222323333222232323322323332223233322232323322332232323333322222332233223322332233223322223223223232533530333330083333573466e1cd55cea8032400046460a000264646464646666ae68cdc39aab9d5004480008cccc8888cccc16c01000c008004dd71aba15004375c6ae85400cdd71aba15002375a6ae84d5d1280111a8279a982819ab9c491035054310005149926135744a00226ae8940044d55cf280089baa001357426aae79401c8d4124d4c128cd5ce2481035054310004b499263333573466e1d40112002205323333573466e1d40152000205523504a35304b335738921035054310004c49926498cccd5cd19b8735573aa004900011980599191919191919191919191999ab9a3370e6aae754029200023333333333019335027232323333573466e1cd55cea8012400046603e60746ae854008c0b0d5d09aba2500223505935305a3357389201035054310005b49926135573ca00226ea8004d5d0a80519a8138141aba150093335502e75ca05a6ae854020ccd540b9d728169aba1500733502704335742a00c66a04e66aa0a8098eb4d5d0a8029919191999ab9a3370e6aae754009200023350213232323333573466e1cd55cea80124000466a05266a084eb4d5d0a80118239aba135744a00446a0ba6a60bc66ae712401035054310005f49926135573ca00226ea8004d5d0a8011919191999ab9a3370e6aae7540092000233502733504275a6ae854008c11cd5d09aba2500223505d35305e3357389201035054310005f49926135573ca00226ea8004d5d09aba2500223505935305a3357389201035054310005b49926135573ca00226ea8004d5d0a80219a813bae35742a00666a04e66aa0a8eb88004d5d0a801181c9aba135744a00446a0aa6a60ac66ae71241035054310005749926135744a00226ae8940044d5d1280089aba25001135744a00226ae8940044d5d1280089aba25001135573ca00226ea8004d5d0a8011919191999ab9a3370ea00290031180f181d9aba135573ca00646666ae68cdc3a801240084603a608a6ae84d55cf280211999ab9a3370ea00690011180e98181aba135573ca00a46666ae68cdc3a80224000460406eb8d5d09aab9e50062350503530513357389201035054310005249926499264984d55cea80089baa001357426ae8940088d4124d4c128cd5ce249035054310004b49926104a1350483530493357389201035054350004a4984d55cf280089baa001135573a6ea80044dd50009109198008018011000911111111109199999999980080580500480400380300280200180110009109198008018011000891091980080180109000891091980080180109000891091980080180109000909111180200290911118018029091111801002909111180080290008919118011bac0013200135503b2233335573e0024a01c466a01a60086ae84008c00cd5d100101991919191999ab9a3370e6aae75400d200023330073232323333573466e1cd55cea8012400046601a60626ae854008cd404c0b4d5d09aba25002235036353037335738921035054310003849926135573ca00226ea8004d5d0a801999aa805bae500a35742a00466a01eeb8d5d09aba25002235032353033335738921035054310003449926135744a00226aae7940044dd50009110919980080200180110009109198008018011000899aa800bae75a224464460046eac004c8004d540d488c8cccd55cf80112804919a80419aa81898031aab9d5002300535573ca00460086ae8800c0b84d5d08008891001091091198008020018900089119191999ab9a3370ea002900011a80418029aba135573ca00646666ae68cdc3a801240044a01046a0526a605466ae712401035054310002b499264984d55cea80089baa001121223002003112200112001232323333573466e1cd55cea8012400046600c600e6ae854008dd69aba135744a00446a0466a604866ae71241035054310002549926135573ca00226ea80048848cc00400c00880048c8cccd5cd19b8735573aa002900011bae357426aae7940088d407cd4c080cd5ce24810350543100021499261375400224464646666ae68cdc3a800a40084a00e46666ae68cdc3a8012400446a014600c6ae84d55cf280211999ab9a3370ea00690001280511a8111a981199ab9c490103505431000244992649926135573aa00226ea8004484888c00c0104488800844888004480048c8cccd5cd19b8750014800880188cccd5cd19b8750024800080188d4068d4c06ccd5ce249035054310001c499264984d55ce9baa0011220021220012001232323232323333573466e1d4005200c200b23333573466e1d4009200a200d23333573466e1d400d200823300b375c6ae854014dd69aba135744a00a46666ae68cdc3a8022400c46601a6eb8d5d0a8039bae357426ae89401c8cccd5cd19b875005480108cc048c050d5d0a8049bae357426ae8940248cccd5cd19b875006480088c050c054d5d09aab9e500b23333573466e1d401d2000230133016357426aae7940308d407cd4c080cd5ce2481035054310002149926499264992649926135573aa00826aae79400c4d55cf280109aab9e500113754002424444444600e01044244444446600c012010424444444600a010244444440082444444400644244444446600401201044244444446600201201040024646464646666ae68cdc3a800a400446660106eb4d5d0a8021bad35742a0066eb4d5d09aba2500323333573466e1d400920002300a300b357426aae7940188d4040d4c044cd5ce2490350543100012499264984d55cea80189aba25001135573ca00226ea80048488c00800c888488ccc00401401000c80048c8c8cccd5cd19b875001480088c018dd71aba135573ca00646666ae68cdc3a80124000460106eb8d5d09aab9e500423500a35300b3357389201035054310000c499264984d55cea80089baa001212230020032122300100320011122232323333573466e1cd55cea80124000466aa016600c6ae854008c014d5d09aba25002235007353008335738921035054310000949926135573ca00226ea8004498480048004448848cc00400c008448004848c0040088004888848cccc00401401000c00880044880084880048004448c8c00400488cc00cc008008004c8ccc888c8c8cc88cc88ccc888c8c8c8c8cc88c8c8cc88c8cccc8888c8c8c8c8c8c8c8c8ccc888c8ccc888ccc888cccccccc88888888cc88ccccc88888cccc8888cc88cc88cc88ccc888cc88cc88cc88cc88cc88c8c8c8cc88c8c8c8c8c8c8cc88c8c8c8c8c8c8cc888c888c8c94cd4c1240104cc0352401297369676e617475726520646f6573206e6f74206d617463682063726561746f7220696e20646174756d0033223530200022222222222533535032333553068120015027253353079333573466e3c0300041ec1e84d40d4004540d000c841ec41e54008c04540144cc054cc03524012f65787065637465642063726561746f7220746f2067657420616c6c206f66207768617420736865206f72646572656400330153350133335500e305c12001504f350481223335501b2253353070333505006353353502a3235302900122335304c0022350300012502f300e00221001132635300b335738920117696e76616c6964207075626c6963206b657920686173680000c498c05540244cc010c0340080044004004c8d4c08400488888888880254010ccd41354138c1894014c04920c08db7013350133335500e305c12001504f350481223335501b22533530703005002133004335506500d30100020011001001300d5004333504d504e30625005333504d504e533535026301a00321300a300d0011630124830236dc04cc0352401276f6e6c79206d617463686573206f66207061697273206f66206f726465727320616c6c6f77656400533535063350481223335501b225335307030050021330040020011001001300d50041306a162215335350650011306c16221533535067001107222130701623253353502732353024001222001500121333504e223530280022235302a0032232335304e0052335304f004253353077333573466e3c0080041e41e05400c41e081e08cd4c13c01081e094cd4c1dcccd5cd19b8f002001079078150031078153353502e0032153353502f00221335304c0022335304d002233530510022335305200223306d002001207b23353052002207b23306d00200122207b222335304f004207b2225335307c333573466e1c01800c1f81f454cd4c1f0ccd5cd19b8700500207e07d1333573466e1c0100041f81f441f441f441d854cd4d40b8004841d841d8c03140094cd4d40a0c07001484cd54190034c03c0045841b84c0300044d4c068004880084d4c02800480044800480048d4c0680048880088d4c06400488800c8d4c05000488888888880288d4c05400488004894cd4c184004418c4cd5ce001031089119aa8011a82600090009091800801100091a982c0009111002119a82999aa82b245003350533355056489000015054505412233355304b120013500550032353550560012233355304e120013500850062353550590012233353550490012330614800000488cc1880080048cc184005200000133040002001133500400105a22533530590021001105a123350492233353500400322002002001353500200122001122123300100300212001112232001320013550582253353504e00110032213300600230040012353003001223530070022222222222533335302600b21501b21501b21501b2133355305012001500f2353015001225335306353353063333573466e3cd4c0bc00888008d4c0bc010880081941904ccd5cd19b8735302f0022200135302f00422001065064106413501f0031501e00b13350432253353500d002210031001500c2212330010030022001222222222212333333333300100b00a009008007006005004003002200122123300100300220012221233300100400300220012212330010030022001121223002003112200112001122123300100300212001122123300100300212001122123300100300212001121222300300411222002112220011200121222230040052122223003005212222300200521222230010052001221233001003002200121222222230070082212222222330060090082122222223005008122222220041222222200322122222223300200900822122222223300100900820012122300200322212233300100500400320012122300200321223001003200112335001501d501e1220021220012001120011200113002012133500b2233300301300200150162223355300e1200123535501a00122335501d002335530111200123535501d001223355020002333535500d00123300a4800000488cc02c0080048cc028005200000133004002001223355300c1200123535501800122335501b00233353550080012335530101200123535501c00122335501f00235500f001001223335550080150020012335530101200123535501c00122335501f00235500d0010013335550030100020011112223335530041200150153355300c1200123535501800122335501b00235500b0013335530041200122353550190022253353021333553011120013500d33500f22533530230021025100102223535501c001223300a0020050061003133501900400350160013355300c120012353550180012232335501c00330010053200135502322533535019001135500b0032213535501e00222533530263300c00200813355010007001130060030023200135501c221122253353501500110022213300500233355300712001005004001112122230030041122122233002005004112122230010041120011233500722333535004003220020020013535002001220011221233001003002120013200135501422112253353500c0011500e22133500f3004002335530061200100400132001355013221122253353500c00113535006003220012213335350080052200230040023335530071200100500400112212330010030021200122333573466e3c00800404404088cdc000100088911801000919991119a80319aa80480199a80319aa804801000a803a8039a980380091110019a980380091110011a98038009111000889100109109119800802001890008891091980080180108900091110919998008028020018011000900211199ab9a3371000400200800a244004244002400222464600200244660066004004003
+                size:
+                  type: integer
+                  description: The size of the CBOR serialised script (in bytes)
+                  example: 234895
+                valid_contract:
+                  type: boolean
+                  description: True if the contract is valid or there is no contract
+                  example: true
+                input:
+                  type: object
+                  properties:
+                    redeemer:
+                      type: object
+                      properties:
+                        purpose:
+                          $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/purpose"
+                        fee:
+                          $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/fee"
+                        unit:
+                          type: object
+                          properties:
+                            steps:
+                              $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/unit_steps"
+                            mem:
+                              $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/unit_mem"
+                        datum:
+                          type: object
+                          properties:
+                            hash:
+                              $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_hash"
+                            value:
+                              $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_value"
+                    datum:
+                      type: object
+                      properties:
+                        hash:
+                          $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_hash"
+                        value:
+                          $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_value"
+                output:
+                  type: object
+                  properties:
+                    hash:
+                      $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_hash"
+                    value:
+                      $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_value"
     tx_utxos:
       type: array
       items:
@@ -2082,6 +2622,7 @@ components:
                       example: ac9c9e1ad9c0ba563afe7114be2a7dc7b0842e0220a476f58e9f61b0
                 stake_addr:
                   type: string
+                  nullable: true
                   description: A Cardano staking address (reward account, bech32 encoded) for transaction's input UTxO
                   example: stake1uxggf4shfvpghcangm67ky0q4zlc3xn7gezy0auhxczu3pslm9wrj
                 tx_hash:
@@ -2132,6 +2673,7 @@ components:
                       example: de3c1c527e8826b9cd2030f88f75fc44cd4ce519b9ded9eb794b3794
                 stake_addr:
                   type: string
+                  nullable: true
                   description: A Cardano staking address (reward account, bech32 encoded) for transaction's output UTxO
                   example: stake1uxggf4shfvpghcangm67ky0q4zlc3xn7gezy0auhxczu3pslm9wrj
                 tx_hash:
@@ -2165,6 +2707,7 @@ components:
                         example: 1
     tx_metadata:
       type: array
+      nullable: true
       items:
         properties:
           tx_hash:
@@ -2172,7 +2715,8 @@ components:
             description: Hash of the transaction for which details are being shown
             example: f144a8264acf4bdfe2e1241170969c930d64ab6b0996a4a45237b623f1dd670e
           metadata:
-            type: string
+            type: object
+            nullable: true
             description: A JSON array containing details about metadata within transaction
             example:
               {
@@ -2197,6 +2741,7 @@ components:
             type: integer
             description: Number of block confirmations
             example: 17
+            nullable: true
     tx_metalabels:
       type: array
       items:
@@ -2285,11 +2830,24 @@ components:
             type: string
             description: The CIP14 fingerprint of the asset
             example: asset1ua6pz3yd5mdka946z8jw2fld3f8d0mmxt75gv9
+          minting_tx_hash:
+            type: string
+            description: Hash of the first mint transaction
+            example: cb07b7e51b77079776c4a78f2daf8f14f9945d2b047da7bfcb71d7fbb9f86712
+          mint_cnt:
+            type: integer
+            description: Count of total mint transactions
+            example: 1
+          burn_cnt:
+            type: integer
+            description: Count of total burn transactions
+            example: 5
           minting_tx_metadata:
             type: object
+            nullable: true
             properties:
               key:
-                type: string
+                type: number
                 description: The metadata key
                 example: 721
               json:
@@ -2305,6 +2863,7 @@ components:
           token_registry_metadata:
             type: object
             description: Asset metadata registered on the Cardano Token Registry
+            nullable: true
             properties:
               name:
                 type: string
@@ -2346,6 +2905,7 @@ components:
           minting_txs:
             type: array
             description: Array of all mint/burn transactions for an asset
+            nullable: true
             items:
               type: object
               properties:
@@ -2384,9 +2944,10 @@ components:
                   example: asset1ua6pz3yd5mdka946z8jw2fld3f8d0mmxt75gv9
                 minting_tx_metadata:
                   type: object
+                  nullable: true
                   properties:
                     key:
-                      type: string
+                      type: number
                       description: The metadata key
                       example: 721
                     json:
@@ -2402,6 +2963,7 @@ components:
                 token_registry_metadata:
                   type: object
                   description: Asset metadata registered on the Cardano Token Registry
+                  nullable: true
                   properties:
                     name:
                       type: string
@@ -2444,301 +3006,27 @@ components:
           tx_hashes:
             type: array
             description: List of Tx hashes
+            nullable: true
             example:
               [
                 "17377b1978c8be190d31b418d1999d8b5c2748709580ded896163440e70face1",
                 "a50b2bbb40b25b6fc19b56c2b3d7887086d0df5a03414e1097d9fba852134bb4",
                 "c418d9c874aff0a163218ffdb5ba9189202473cdc16d7dfe66420e95fa398ee9",
               ]
-    pool_list:
+    native_script_list:
       type: array
       items:
         properties:
-          pool_id_bech32:
+          script_hash:
+            $ref: "#/components/schemas/plutus_script_list/items/properties/script_hash"
+          creation_tx_hash:
+            $ref: "#/components/schemas/plutus_script_list/items/properties/creation_tx_hash"
+          type:
             type: string
-            description: Bech32 representation of pool ID
-            example: pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt
-          ticker:
-            type: string
-            description: Pool ticker
-            example: JAZZ
-    pool_info:
-      type: array
-      items:
-        type: object
-        properties:
-          pool_id_bech32:
-            type: string
-            description: Pool ID (bech32 format)
-            example: pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc
-          pool_id_hex:
-            type: string
-            description: Pool ID (Hex format)
-            example: a532904ca60e13e88437b58e7c6ff66b8d5e7ec8d3f4b9e4be7820ec
-          active_epoch_no:
-            type: integer
-            description: Block number on chain where transaction was included
-            example: 6354154
-          vrf_key_hash:
-            type: string
-            description: Pool VRF key hash
-            example: 25efdad1bc12944d38e4e3c26c43565bec84973a812737b163b289e87d0d5ed3
-          margin:
-            type: number
-            description: Margin (decimal format)
-            example: 0.1
-          fixed_cost:
-            type: string
-            description: Pool fixed cost per epoch
-            example: "500000000"
-          pledge:
-            type: string
-            description: Pool pledge in lovelace
-            example: "64000000000000"
-          reward_addr:
-            type: string
-            description: Pool reward address
-            example: stake1uy6yzwsxxc28lfms0qmpxvyz9a7y770rtcqx9y96m42cttqwvp4m5
-          owners:
-            type: array
-            items:
-              type: string
-              description: Pool (co)owner address
-              example: stake1u8088wvudd7dp3rxl0v9xgng8r3j50s65ge3l3jvgd94keqfm3nv3
-          relays:
-            type: array
-            items:
-              type: object
-              properties:
-                dns:
-                  type: string
-                  description: DNS name of the relay (nullable)
-                  example: relays-new.cardano-mainnet.iohk.io
-                srv:
-                  type: string
-                  description: DNS service name of the relay (nullable)
-                  example: biostakingpool3.hopto.org
-                ipv4:
-                  type: string
-                  description: IPv4 address of the relay (nullable)
-                  example: "54.220.20.40"
-                ipv6:
-                  type: string
-                  description: IPv6 address of the relay (nullable)
-                  example: 2604:ed40:1000:1711:6082:78ff:fe0c:ebf
-                port:
-                  type: string
-                  description: Port number of the relay (nullable)
-                  example: 6000
-          meta_url:
-            type: string
-            description: Pool metadata URL
-            example: https://pools.iohk.io/IOGP.json
-          meta_hash:
-            type: string
-            description: Pool metadata hash
-            example: 37eb004c0dd8a221ac3598ca1c6d6257fb5207ae9857b7c163ae0f39259d6cc0
-          meta_json:
-            type: object
-            properties:
-              name:
-                type: string
-                description: Pool name
-                example: Input Output Global (IOHK) - Private
-              ticker:
-                type: string
-                description: Pool ticker
-                example: IOGP
-              homepage:
-                type: string
-                description: Pool homepage URL
-                example: https://iohk.io
-              description:
-                type: string
-                description: Pool description
-                example: Our mission is to provide economic identity to the billions of people who lack it. IOHK will not use the IOHK ticker.
-          pool_status:
-            type: string
-            description: Pool status
-            enum: ["registered", "retiring", "retired"]
-            example: registered
-          retiring_epoch:
-            type: integer
-            description: Announced retiring epoch (nullable)
-            example: null
-          op_cert:
-            type: string
-            description: Pool latest operational certificate hash
-            example: 37eb004c0dd8a221ac3598ca1c6d6257fb5207ae9857b7c163ae0f39259d6cc0
-          op_cert_counter:
-            type: integer
-            description: Pool latest operational certificate counter value
-            example: 8
-          active_stake:
-            type: string
-            description: Pool active stake
-            example: "64328627680963"
-          block_count:
-            type: integer
-            description: Total pool blocks on chain
-            example: 4509
-          live_pledge:
-            type: string
-            description: Summary of account balance for all pool owner's
-            example: "64328594406327"
-          live_stake:
-            type: string
-            description: Pool live stake
-            example: "64328627680963"
-          live_delegators:
-            type: integer
-            description: Pool live delegator count
-            example: 5
-          live_saturation:
-            type: number
-            description: Pool live saturation (decimal format)
-            example: 94.52
-    pool_history_info:
-      type: array
-      items:
-        type: object
-        properties:
-          epoch_no:
-            type: integer
-            description: Epoch for which the pool history data is shown
-            example: 312
-          active_stake:
-            type: string
-            description: Amount of delegated stake to this pool at the time of epoch snapshot (in lovelaces)
-            example: "31235800000"
-          active_stake_pct:
-            type: number
-            description: Active stake for the pool, expressed as a percentage of total active stake on network
-            example: 13.512182543475783
-          saturation_pct:
-            type: number
-            description: Saturation percentage of a pool at the time of snapshot (2 decimals)
-            example: 45.32
-          block_cnt:
-            type: integer
-            description: Number of blocks pool created in that epoch
-            example: 14
-          delegator_cnt:
-            type: integer
-            description: Number of delegators to the pool for that epoch snapshot
-            example: 1432
-          margin:
-            type: number
-            description: Margin (decimal format)
-            example: 0.125
-          fixed_cost:
-            type: string
-            description: Pool fixed cost per epoch (in lovelaces)
-            example: "340000000"
-          pool_fees:
-            type: string
-            description: Total amount of fees earned by pool owners in that epoch (in lovelaces)
-            example: "123327382"
-          deleg_rewards:
-            type: string
-            description: Total amount of rewards earned by delegators in that epoch (in lovelaces)
-            example: "123456789123"
-          epoch_ros:
-            type: number
-            description: Annualized ROS (return on staking) for delegators for this epoch
-            example: 3.000340466
-    pool_delegators:
-      type: array
-      items:
-        type: object
-        properties:
-          stake_address:
-            $ref: "#/components/schemas/account_history/items/properties/stake_address"
-          amount:
-            type: string
-            description: Current delegator live stake (in lovelace)
-            example: 64328591517480
-          epoch_no:
-            $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
-    pool_blocks:
-      type: array
-      items:
-        type: object
-        properties:
-          epoch_no:
-            $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
-          epoch_slot:
-            $ref: "#/components/schemas/blocks/items/properties/epoch_slot"
-          abs_slot:
-            $ref: "#/components/schemas/blocks/items/properties/abs_slot"
-          height:
-            $ref: "#/components/schemas/blocks/items/properties/height"
-          block_hash:
-            $ref: "#/components/schemas/blocks/items/properties/hash"
-          block_time:
-            $ref: "#/components/schemas/blocks/items/properties/block_time"
-    pool_updates:
-      type: array
-      items:
-        type: object
-        properties:
-          tx_hash:
-            $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
-          block_time:
-            $ref: "#/components/schemas/blocks/items/properties/block_time"
-          pool_id_bech32:
-            $ref: "#/components/schemas/pool_info/items/properties/pool_id_bech32"
-          pool_id_hex:
-            $ref: "#/components/schemas/pool_info/items/properties/pool_id_hex"
-          active_epoch_no:
-            type: integer
-            description: Epoch number in which the update becomes active
-            example: 324
-          vrf_key_hash:
-            $ref: "#/components/schemas/pool_info/items/properties/vrf_key_hash"
-          margin:
-            $ref: "#/components/schemas/pool_info/items/properties/margin"
-          fixed_cost:
-            $ref: "#/components/schemas/pool_info/items/properties/fixed_cost"
-          pledge:
-            $ref: "#/components/schemas/pool_info/items/properties/pledge"
-          reward_addr:
-            $ref: "#/components/schemas/pool_info/items/properties/reward_addr"
-          owners:
-            $ref: "#/components/schemas/pool_info/items/properties/owners"
-          relays:
-            $ref: "#/components/schemas/pool_info/items/properties/relays"
-          meta_url:
-            $ref: "#/components/schemas/pool_info/items/properties/meta_url"
-          meta_hash:
-            $ref: "#/components/schemas/pool_info/items/properties/meta_hash"
-          pool_status:
-            $ref: "#/components/schemas/pool_info/items/properties/pool_status"
-          retiring_epoch:
-            $ref: "#/components/schemas/pool_info/items/properties/retiring_epoch"
-    pool_relays:
-      type: array
-      items:
-        type: object
-        properties:
-          pool_id_bech32:
-            $ref: "#/components/schemas/pool_info/items/properties/pool_id_bech32"
-          relays:
-            $ref: "#/components/schemas/pool_info/items/properties/relays"
-    pool_metadata:
-      type: array
-      items:
-        type: object
-        properties:
-          pool_id_bech32:
-            $ref: "#/components/schemas/pool_info/items/properties/pool_id_bech32"
-          meta_url:
-            $ref: "#/components/schemas/pool_info/items/properties/meta_url"
-          meta_hash:
-            $ref: "#/components/schemas/pool_info/items/properties/meta_hash"
-          meta_json:
-            $ref: "#/components/schemas/pool_info/items/properties/meta_json"
-    script_list:
+            description: Type of the script
+            enum: ["timelock", "multisig"]
+            example: timelock
+    plutus_script_list:
       type: array
       items:
         properties:
@@ -2773,24 +3061,34 @@ components:
                   description: The index of the redeemer pointer in the transaction
                   example: 0
                 unit_mem:
-                  type: integer
                   description: The budget in Memory to run a script
                   example: 520448
+                  nullable: true
+                  additionalProperties:
+                    oneOf:
+                      - type: string
+                      - type: integer
                 unit_steps:
-                  type: integer
                   description: The budget in Cpu steps to run a script
                   example: 211535239
+                  nullable: true
+                  additionalProperties:
+                    oneOf:
+                      - type: string
+                      - type: integer
                 fee:
                   type: string
                   description: The budget in fees to run a script - the fees depend on the ExUnits and the current prices
                   example: 45282
                 purpose:
                   type: string
-                  description: What kind of validation this redeemer is used for, it can be one of 'spend', 'mint', 'cert', 'reward'
+                  description: What kind of validation this redeemer is used for
+                  enum: ["spend", "mint", "cert", "reward"]
                   example: spend
                 datum_hash:
                   type: string
                   description: The Hash of the Plutus Data
+                  nullable: true
                   example: 5a595ce795815e81d22a1a522cf3987d546dc5bb016de61b002edd63a5413ec4
                 datum_value:
                   type: object

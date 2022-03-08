@@ -3,22 +3,27 @@
     "_block_hash": {
       "m": "f6192a1aaa6d3d05b4703891a6b66cd757801c61ace86cbe5ab0d66e07f601ab",
       "t": "f75fea40852ed7d7f539d008e45255725daef8553ae7162750836f279570813a",
-      "g": "af2f6f7dd4e4ea6765103a1e38e023da3edd2b3c7fea2aa367222564dbe01cfd"
+      "g": "bddbbc6df0ad09567a513349bafd56d8ec5c8fcd9ee9db12173624b896350d57"
     },
     "_epoch_no": {
       "m": "320",
-      "t": "195",
+      "t": "185",
       "g": "1950"
     },
     "_earned_epoch_no": {
       "m": "320",
-      "t": "195",
+      "t": "185",
       "g": "1950"
     },
     "_any_address": {
       "m": "stake1u8yxtugdv63wxafy9d00nuz6hjyyp4qnggvc9a3vxh8yl0ckml2uz",
       "t": "addr_test1qqn5x72yymml6aka0cmkew3jynqgld7xlnwtlsen9ln5tfll0dw5r75vk42mv3ykq8vyjeaanvpytg79xqzymqy5acmqqhx2n7",
-      "g": "stake_test1uzljtr5092ad3mhwln29fh8e4hvyaljhy58tf49wq8r4xuquc8zvz"
+      "g": "stake_test17zt9x005zkd2usz2vhvktyzqsuwz25gmgnaqdka5hcj9m2qfg2py2"
+    },
+    "_address_assets": {
+      "m": "addr1q8h22z0n3zqecr9n4q9ysds2m2ms3dqesz575accjpc3jclw55yl8zypnsxt82q2fqmq4k4hpz6pnq9fafm33yr3r93sgnpdw6",
+      "t": "addr_test1qzd9gtea50mqv60k3mq9txxtq2ynqwsxcnlx9ltvv3lh0rk9q2x2l6wv8fcr4wpgwmrcwhucsp80ycfw5ensx038hlfsp6lsxj",
+      "g": "addr_test1qzmtfv43a8ncx6ve92ja6yy25npn9raz9pu5a2tfxsqv9gy9ktf0pu6yu4zjh9r37fzx3h4tsxqdjhu3t4d5ffdsfz9s6ska3z"
     },
     "_address": {
       "m": "addr1qyp9kz50sh9c53hpmk3l4ewj9ur794t2hdqpngsjn3wkc5sztv9glpwt3frwrhdrltjaytc8ut2k4w6qrx3p98zad3fq07xe9g",
@@ -28,7 +33,7 @@
     "_stake_address": {
       "m": "stake1u8yxtugdv63wxafy9d00nuz6hjyyp4qnggvc9a3vxh8yl0ckml2uz",
       "t": "stake_test1uqqzl36c3vk850wk22yqgum9l0upy0y8588hcvsjq9m6j4cxw3qau",
-      "g": "stake_test1uzljtr5092ad3mhwln29fh8e4hvyaljhy58tf49wq8r4xuquc8zvz"
+      "g": "stake_test17zt9x005zkd2usz2vhvktyzqsuwz25gmgnaqdka5hcj9m2qfg2py2"
     },
     "_asset_policy": {
       "m": "d3501d9531fcc25e3ca4b6429318c2cc374dbdbcf5e99c1c1e5da1ff",
@@ -41,6 +46,11 @@
       "g": "41484c636f696e"
     },
     "_pool_bech32": {
+      "m": "pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc",
+      "t": "pool102llj7e7a0mmxssjvjkv2d6lppuh6cz6q9xwc3tsksn0jqwz9eh",
+      "g": "pool1xc9eywck4e20tydz4yvh5vfe0ep8whawvwz8wqkc9k046a2ypp4"
+    },
+    "_pool_bech32_optional": {
       "m": "pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc",
       "t": "pool102llj7e7a0mmxssjvjkv2d6lppuh6cz6q9xwc3tsksn0jqwz9eh",
       "g": "pool1xc9eywck4e20tydz4yvh5vfe0ep8whawvwz8wqkc9k046a2ypp4"
@@ -66,6 +76,21 @@
       "m": "6238675",
       "t": "2342661",
       "g": "120000"
+    },
+    "block_info1": {
+      "m": "fb9087c9f1408a7bbd7b022fd294ab565fec8dd3a8ef091567482722a1fa4e30",
+      "t": "f75fea40852ed7d7f539d008e45255725daef8553ae7162750836f279570813a",
+      "g": "af2f6f7dd4e4ea6765103a1e38e023da3edd2b3c7fea2aa367222564dbe01cfd"
+    },
+    "block_info2": {
+      "m": "60188a8dcb6db0d80628815be2cf626c4d17cb3e826cebfca84adaff93ad492a",
+      "t": "ff9f0c7fb1136de2cd6f10c9a140af2887f1d3614cc949bfeb262266d4c202b7",
+      "g": "bddbbc6df0ad09567a513349bafd56d8ec5c8fcd9ee9db12173624b896350d57"
+    },
+    "block_info3": {
+      "m": "c6646214a1f377aa461a0163c213fc6b86a559a2d6ebd647d54c4eb00aaab015",
+      "t": "5ef645ee519cde94a82f0aa880048c37978374f248f11e408ac0571a9054d9d3",
+      "g": "732bf9bbc3780e6cd7ad57a3889dd5904f6e8a27d54eabf43eb0dbc485323f04"
     },
     "credential_txs_payment_credentials1": {
       "m": "025b0a8f85cb8a46e1dda3fae5d22f07e2d56abb4019a2129c5d6c52",
