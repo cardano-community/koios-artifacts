@@ -1,0 +1,879 @@
+openapi: 3.0.2
+#!info!#
+servers:
+  - url: https://api.koios.rest/api/v0
+  - url: https://guild.koios.rest/api/v0
+  - url: https://testnet.koios.rest/api/v0
+paths:
+  /tip: #RPC
+    get:
+      tags:
+        - Network
+      responses:
+        "200":
+          description: Array of block summary (limit+paginated)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tip"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Query Chain Tip
+      description: Get the tip info about the latest block seen by chain
+  /genesis:
+    get:
+      tags:
+        - Network
+      responses:
+        "200":
+          description: Array of genesis parameters used to start each era on chain
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/genesis"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Get Genesis info
+      description: Get the Genesis parameters used to start specific era on chain
+  /totals: #RPC
+    get:
+      tags:
+        - Network
+      parameters:
+        - $ref: "#/components/parameters/_epoch_no"
+      responses:
+        "200":
+          description: Array of supply/reserves/utxo/fees/treasury stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/totals"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Get historical tokenomic stats
+      description: >-
+        Get the circulating utxo, treasury, rewards, supply and reserves in
+        lovelace for specified epoch, all epochs if empty
+  /epoch_info: #RPC
+    get:
+      tags:
+        - Epoch
+      parameters:
+        - $ref: "#/components/parameters/_epoch_no"
+      responses:
+        "200":
+          description: Array of detailed summary for each epoch
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/epoch_info"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Epoch Information
+      description: Get the epoch information, all epochs if no epoch specified
+  /epoch_params: #RPC
+    get:
+      tags:
+        - Epoch
+      parameters:
+        - $ref: "#/components/parameters/_epoch_no"
+      responses:
+        "200":
+          description: Array of protocol parameters for each epoch
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/epoch_params"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Epoch's Protocol Parameters
+      description: >-
+        Get the protocol parameters for specific epoch, returns information
+        about all epochs if no epoch specified
+  /blocks:
+    get:
+      tags:
+        - Block
+      responses:
+        "200":
+          description: Array of block information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/blocks"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Block List
+      description: Get summarised details about all blocks (paginated - latest first)
+  /block_info: #RPC
+    post:
+      tags:
+        - Block
+      requestBody:
+        $ref: "#/components/requestBodies/block_info"
+      responses:
+        "200":
+          description: Array of detailed block information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/block_info"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Block Information
+      description: Get detailed information about a specific block
+  /block_txs: #RPC
+    get:
+      tags:
+        - Block
+      parameters:
+        - $ref: "#/components/parameters/_block_hash"
+      responses:
+        "200":
+          description: Array of transactions hashes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/block_txs"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Block Transactions
+      description: Get a list of all transactions included in a provided block
+  /tx_info: #RPC
+    post:
+      tags:
+        - Transactions
+      requestBody:
+        $ref: "#/components/requestBodies/tx_ids"
+      responses:
+        "200":
+          description: Array of detailed information about transaction(s)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tx_info"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Transaction Information
+      description: Get detailed information about transaction(s)
+  /tx_utxos: #RPC
+    post:
+      tags:
+        - Transactions
+      requestBody:
+        $ref: "#/components/requestBodies/tx_ids"
+      responses:
+        "200":
+          description: Array of inputs and outputs for given transaction(s)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tx_utxos"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Transaction UTxOs
+      description: Get UTxO set (inputs/outputs) of transactions.
+  /tx_metadata: #RPC
+    post:
+      tags:
+        - Transactions
+      requestBody:
+        $ref: "#/components/requestBodies/tx_ids"
+      responses:
+        "200":
+          description: Array of metadata information present in each of the transactions queried
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tx_metadata"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Transaction Metadata
+      description: Get metadata information (if any) for given transaction(s)
+  /tx_metalabels:
+    get:
+      tags:
+        - Transactions
+      responses:
+        "200":
+          description: Array of known metadata labels
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tx_metalabels"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Transaction Metadata Labels
+      description: Get a list of all transaction metalabels
+  /submittx: #submit-api
+    post:
+      tags:
+        - Transactions
+      requestBody:
+        $ref: "#/components/requestBodies/txbin"
+      x-code-samples:
+        - lang: "Shell"
+          source: |
+            # Assuming ${data} is a raw binary serialized transaction on the file-system.
+            # If using a CLI-generated tx file, please ensure to deserialise (using `xxd -p -r <<< $(jq .cborHex ${tx.signed}) > ${data}`) first before submitting.
+            curl -X POST \
+                --header "Content-Type: application/cbor" \
+                --data-binary ${data} https://api.koios.rest/api/v0/submittx
+      responses:
+        "202":
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: The transaction id.
+                type: string
+                format: hex
+                minLength: 64
+                maxLength: 64
+                example: 92bcd06b25dfbd89b578d536b4d3b7dd269b7c2aa206ed518012cffe0444d67f
+        "400":
+          description: An error occured while submitting transaction.
+      summary: Submit Transaction
+      description: Submit an already serialized transaction to the network.
+  /tx_status: #RPC
+    post:
+      tags:
+        - Transactions
+      requestBody:
+        $ref: "#/components/requestBodies/tx_ids"
+      responses:
+        "200":
+          description: Array of transaction confirmation counts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tx_status"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Transaction Status (Block Confirmations)
+      description: Get the number of block confirmations for a given transaction hash list
+  /address_info: #RPC
+    get:
+      tags:
+        - Address
+      parameters:
+        - $ref: "#/components/parameters/_address"
+      responses:
+        "200":
+          description: Array of address information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/address_info"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Address Information
+      description: Get address info - balance, associated stake address (if any) and UTxO set
+  /address_txs: #RPC
+    post:
+      tags:
+        - Address
+      requestBody:
+        $ref: "#/components/requestBodies/address_txs"
+      responses:
+        "200":
+          description: Array of transaction hashes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/address_txs"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Address Transactions
+      description: Get the transaction hash list of input address array, optionally filtering after specified block height (inclusive)
+  /address_assets: #RPC
+    get:
+      tags:
+        - Address
+      parameters:
+        - $ref: "#/components/parameters/_address_assets"
+      responses:
+        "200":
+          description: Array of address-owned assets
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/address_assets"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Address Assets
+      description: Get the list of all the assets (policy, name and quantity) for a given address
+  /credential_txs: #RPC
+    post:
+      tags:
+        - Address
+      requestBody:
+        $ref: "#/components/requestBodies/credential_txs"
+      responses:
+        "200":
+          description: Array of transaction hashes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/credential_txs"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Transactions from payment credentials
+      description: Get the transaction hash list of input payment credential array, optionally filtering after specified block height (inclusive)
+  /account_list:
+    get:
+      tags:
+        - Account
+      responses:
+        "200":
+          description: Array of account (stake address) IDs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account_list"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Account List
+      description: Get a list of all accounts
+  /account_info: #RPC
+    get:
+      tags:
+        - Account
+      parameters:
+        - $ref: "#/components/parameters/_any_address"
+      responses:
+        "200":
+          description: Array of account information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account_info"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Account Information
+      description: Get the account info of any (payment or staking) address
+  /account_rewards: #RPC
+    get:
+      tags:
+        - Account
+      parameters:
+        - $ref: "#/components/parameters/_stake_address"
+        - $ref: "#/components/parameters/_earned_epoch_no"
+      responses:
+        "200":
+          description: Array of reward history information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account_rewards"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Account Rewards
+      description: >-
+        Get the full rewards history (including MIR) for a stake address, or
+        certain epoch if specified
+  /account_updates: #RPC
+    get:
+      tags:
+        - Account
+      parameters:
+        - $ref: "#/components/parameters/_stake_address"
+      responses:
+        "200":
+          description: Array of account updates information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account_updates"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Account Updates
+      description: >-
+        Get the account updates (registration, deregistration, delegation and
+        withdrawals)
+  /account_addresses: #RPC
+    get:
+      tags:
+        - Account
+      parameters:
+        - $ref: "#/components/parameters/_any_address"
+      responses:
+        "200":
+          description: Array of payment addresses
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account_addresses"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Account Addresses
+      description: Get all addresses associated with an account
+  /account_assets: #RPC
+    get:
+      tags:
+        - Account
+      parameters:
+        - $ref: "#/components/parameters/_any_address"
+      responses:
+        "200":
+          description: Array of assets owned by account
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account_assets"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Account Assets
+      description: Get the native asset balance of an account
+  /account_history: #RPC
+    get:
+      tags:
+        - Account
+      parameters:
+        - $ref: "#/components/parameters/_any_address"
+      responses:
+        "200":
+          description: Array of active stake values per epoch
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account_history"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Account History
+      description: Get the staking history of an account
+  /asset_list:
+    get:
+      tags:
+        - Asset
+      responses:
+        "200":
+          description: Array of policy IDs and asset names
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/asset_list"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Asset List
+      description: Get the list of all native assets (paginated)
+  /asset_address_list: #RPC
+    get:
+      tags:
+        - Asset
+      parameters:
+        - $ref: "#/components/parameters/_asset_policy"
+        - $ref: "#/components/parameters/_asset_name"
+      responses:
+        "200":
+          description: Array of payment addresses holding the given token (including balances)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/asset_address_list"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Asset Address List
+      description: Get the list of all addresses holding a given asset
+  /asset_info: #RPC
+    get:
+      tags:
+        - Asset
+      parameters:
+        - $ref: "#/components/parameters/_asset_policy"
+        - $ref: "#/components/parameters/_asset_name"
+      responses:
+        "200":
+          description: Array of detailed asset information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/asset_info"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Asset Information
+      description: Get the information of an asset including first minting & token registry metadata
+  /asset_history: #RPC
+    get:
+      tags:
+        - Asset
+      parameters:
+        - $ref: "#/components/parameters/_asset_policy"
+        - $ref: "#/components/parameters/_asset_name"
+      responses:
+        "200":
+          description: Array of asset mint/burn history
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/asset_history"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Asset History
+      description: Get the mint/burn history of an asset
+  /asset_policy_info: #RPC
+    get:
+      tags:
+        - Asset
+      parameters:
+        - $ref: "#/components/parameters/_asset_policy"
+      responses:
+        "200":
+          description: Array of detailed information of assets under the same policy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/asset_policy_info"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Asset Policy Information
+      description: Get the information for all assets under the same policy
+  /asset_summary: #RPC
+    get:
+      tags:
+        - Asset
+      parameters:
+        - $ref: "#/components/parameters/_asset_policy"
+        - $ref: "#/components/parameters/_asset_name"
+      responses:
+        "200":
+          description: Array of asset summary information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/asset_summary"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Asset Summary
+      description: Get the summary of an asset (total transactions exclude minting/total wallets include only wallets with asset balance)
+  /asset_txs: #RPC
+    get:
+      tags:
+        - Asset
+      parameters:
+        - $ref: "#/components/parameters/_asset_policy"
+        - $ref: "#/components/parameters/_asset_name"
+      responses:
+        "200":
+          description: Array of Tx hashes that included the given asset
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/asset_txs"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Asset Transaction History
+      description: Get the list of all asset transaction hashes (newest first)
+  /pool_list: #RPC
+    get:
+      tags:
+        - Pool
+      responses:
+        "200":
+          description: Array of pool IDs and tickers
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_list"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Pool List
+      description: A list of all currently registered/retiring (not retired) pools
+  /pool_info: #RPC
+    post:
+      tags:
+        - Pool
+      requestBody:
+        $ref: "#/components/requestBodies/pool_ids"
+      responses:
+        "200":
+          description: Array of pool information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_info"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Pool Information
+      description: Current pool statuses and details for a specified list of pool ids
+  /pool_delegators: #RPC
+    get:
+      tags:
+        - Pool
+      parameters:
+        - $ref: "#/components/parameters/_pool_bech32"
+        - $ref: "#/components/parameters/_epoch_no"
+      responses:
+        "200":
+          description: Array of pool delegator information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_delegators"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Pool Delegators List
+      description: Return information about delegators by a given pool and optional epoch (current if omitted)
+  /pool_blocks: #RPC
+    get:
+      tags:
+        - Pool
+      parameters:
+        - $ref: "#/components/parameters/_pool_bech32"
+        - $ref: "#/components/parameters/_epoch_no"
+      responses:
+        "200":
+          description: Array of blocks created by pool
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_blocks"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Pool Blocks
+      description: >-
+        Return information about blocks minted by a given pool in current epoch
+        (or _epoch_no if provided)
+  /pool_history: #RPC
+    get:
+      tags:
+        - Pool
+      parameters:
+        - $ref: "#/components/parameters/_pool_bech32"
+        - $ref: "#/components/parameters/_epoch_no"
+      responses:
+        "200":
+          description: Array of pool history information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_history_info"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Pool Stake, Block and Reward History
+      description: >-
+        Return information about pool stake, block and reward history in a given epoch _epoch_no
+        (or all epochs that pool existed for, in descending order if no _epoch_no was provided)
+  /pool_updates: #RPC
+    get:
+      tags:
+        - Pool
+      parameters:
+        - $ref: "#/components/parameters/_pool_bech32_optional"
+          required: false
+      responses:
+        "200":
+          description: Array of historical pool updates
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_updates"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Pool Updates (History)
+      description: Return all pool updates for all pools or only updates for specific pool if specified
+  /pool_relays: #RPC
+    get:
+      tags:
+        - Pool
+      responses:
+        "200":
+          description: Array of pool relay information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_relays"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Pool Relays
+      description: A list of registered relays for all currently registered/retiring (not retired) pools
+  /pool_metadata: #RPC
+    get:
+      tags:
+        - Pool
+      responses:
+        "200":
+          description: Array of pool metadata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_metadata"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Pool Metadata
+      description: Metadata(on & off-chain) for all currently registered/retiring (not retired) pools
+  /native_script_list: #RPC
+    get:
+      tags:
+        - Script
+      responses:
+        "200":
+          description: List of native script and creation tx hash pairs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/native_script_list"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Native Script List
+      description: List of all existing native script hashes along with their creation transaction hashes
+  /plutus_script_list: #RPC
+    get:
+      tags:
+        - Script
+      responses:
+        "200":
+          description: List of Plutus script and creation tx hash pairs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/plutus_script_list"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Plutus Script List
+      description: List of all existing Plutus script hashes along with their creation transaction hashes
+  /script_redeemers: #RPC
+    get:
+      tags:
+        - Script
+      parameters:
+        - $ref: "#/components/parameters/_script_hash"
+      responses:
+        "200":
+          description: List of all redeemers for a given script hash
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/script_redeemers"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Script Redeemers
+      description: List of all redeemers for a given script hash
+components:
+  #!params!#
+  #!requestBodies!#
+  securitySchemes: {}
+  #!schemas!#
+  headers: {}
+  responses:
+    OK:
+      description: Success!
+    NotFound:
+      description: The server does not recognise the combination of endpoint and parameters provided
+    Unauthorized:
+      description: The selected server has restricted the endpoint to be only usable via authentication. The authentication supplied was not authorized to access the endpoint
+    PartialContent:
+      description: The result was truncated
+tags:
+  - name: Network
+    description: Query information about the network
+    x-tag-expanded: false
+  - name: Epoch
+    description: Query epoch-specific details
+    x-tag-expanded: false
+  - name: Block
+    description: Query information about particular block on chain
+    x-tag-expanded: false
+  - name: Transactions
+    description: Query blockchain transaction details
+    x-tag-expanded: false
+  - name: Address
+    description: Query information about specific address(es)
+    x-tag-expanded: false
+  - name: Account
+    description: Query details about specific stake account addresses
+    x-tag-expanded: false
+  - name: Asset
+    description: Query Asset related informations
+    x-tag-expanded: false
+  - name: Pool
+    description: Query information about specific pools
+    x-tag-expanded: false
+  - name: Script
+    description: Query information about specific scripts (Smart Contracts)
+    x-tag-expanded: false
+security: []

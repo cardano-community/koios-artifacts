@@ -1,0 +1,172 @@
+parameters:
+    select:
+      name: select
+      description: Filtering Columns
+      schema:
+        type: string
+      in: query
+      required: false
+    on_conflict:
+      name: on_conflict
+      description: On Conflict
+      schema:
+        type: string
+      in: query
+      required: false
+    order:
+      name: order
+      description: Ordering
+      schema:
+        type: string
+      in: query
+      required: false
+    range:
+      name: Range
+      description: Limiting and Pagination
+      schema:
+        type: string
+      in: header
+      required: false
+    rangeUnit:
+      name: Range-Unit
+      description: Limiting and Pagination
+      schema:
+        default: items
+        type: string
+      in: header
+      required: false
+    offset:
+      name: offset
+      description: Limiting and Pagination
+      schema:
+        type: string
+      in: query
+      required: false
+    limit:
+      name: limit
+      description: Limiting and Pagination
+      schema:
+        type: string
+      in: query
+      required: false
+      example: 10
+    _block_hash:
+      deprecated: false
+      name: _block_hash
+      description: Block Hash in hex format
+      schema:
+        type: string
+        example: ##_block_hash_param##
+      in: query
+      required: true
+      allowEmptyValue: false
+    _epoch_no:
+      deprecated: false
+      name: _epoch_no
+      description: Epoch Number to fetch details for
+      schema:
+        type: string
+        example: ##_epoch_no_param##
+      in: query
+      required: false
+      allowEmptyValue: true
+    _earned_epoch_no:
+      deprecated: false
+      name: _epoch_no
+      description: Filter for earned rewards Epoch Number
+      schema:
+        type: string
+        example: ##_earned_epoch_no_param##
+      in: query
+      required: false
+      allowEmptyValue: true
+    _any_address:
+      deprecated: false
+      name: _address
+      description: Cardano payment or staking address in bech32 format
+      schema:
+        type: string
+        example: ##_any_address_param##
+      in: query
+      required: true
+      allowEmptyValue: false
+    _address:
+      deprecated: false
+      name: _address
+      description: Cardano payment address in bech32 format
+      schema:
+        type: string
+        example: ##_address_param##
+      in: query
+      required: true
+      allowEmptyValue: false
+    _address_assets:
+      deprecated: false
+      name: _address
+      description: Cardano payment address in bech32 format
+      schema:
+        type: string
+        example: ##_address_assets_param##
+      in: query
+      required: true
+      allowEmptyValue: false
+    _stake_address:
+      deprecated: false
+      name: _stake_address
+      description: Cardano staking address (reward account) in bech32 format
+      schema:
+        type: string
+        example: ##_stake_address_param##
+      in: query
+      required: true
+      allowEmptyValue: false
+    _asset_policy:
+      deprecated: false
+      name: _asset_policy
+      description: Asset Policy ID in hexadecimal format (hex)
+      schema:
+        type: string
+        example: ##_asset_policy_param##
+      in: query
+      required: true
+      allowEmptyValue: false
+    _asset_name:
+      deprecated: false
+      name: _asset_name
+      description: Asset Name in hexadecimal format (hex)
+      schema:
+        type: string
+        example: ##_asset_name_param##
+      in: query
+      required: true
+      allowEmptyValue: false
+    _pool_bech32:
+      deprecated: false
+      name: _pool_bech32
+      description: Pool ID in bech32 format
+      schema:
+        type: string
+        example: ##_pool_bech32_param##
+      in: query
+      required: true
+      allowEmptyValue: false
+    _pool_bech32_optional:
+      deprecated: false
+      name: _pool_bech32
+      description: Pool ID in bech32 format (optional)
+      schema:
+        type: string
+        example: ##_pool_bech32_optional_param##
+      in: query
+      required: false
+      allowEmptyValue: true
+    _script_hash:
+      deprecated: false
+      name: _script_hash
+      description: Script hash in hexadecimal format (hex)
+      schema:
+        type: string
+        example: ##_script_hash_param##
+      in: query
+      required: true
+      allowEmptyValue: false

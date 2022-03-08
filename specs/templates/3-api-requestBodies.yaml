@@ -1,0 +1,109 @@
+requestBodies:
+    block_info:
+      content:
+        application/json:
+          schema:
+            required:
+              - _block_hashes
+            type: object
+            properties:
+              _block_hashes:
+                format: text
+                type: array
+                items:
+                  $ref: "#/components/schemas/blocks/items/properties/hash"
+            example:
+              _block_hashes:
+                - ##block_info1_rb##
+                - ##block_info2_rb##
+                - ##block_info3_rb##
+    address_txs:
+      content:
+        application/json:
+          schema:
+            required:
+              - _addresses
+            type: object
+            properties:
+              _addresses:
+                format: text
+                type: array
+                items:
+                  type: string
+                description: Array of Cardano payment address(es) in bech32 format
+              _after_block_height:
+                format: integer
+                type: integer
+                description: Only fetch information after specific block height
+            example:
+              _addresses:
+                - ##address_txs_addresses1_rb##
+                - ##address_txs_addresses2_rb##
+              _after_block_height: ##address_txs_after_block_height_rb##
+    credential_txs:
+      content:
+        application/json:
+          schema:
+            required:
+              - _payment_credentials
+            type: object
+            properties:
+              _payment_credentials:
+                format: text
+                type: array
+                items:
+                  type: string
+                description: Array of Cardano payment credential(s) in hex format
+              _after_block_height:
+                format: integer
+                type: integer
+                description: Only fetch information after specific block height
+            example:
+              _payment_credentials:
+                - ##credential_txs_payment_credentials1_rb##
+                - ##credential_txs_payment_credentials2_rb##
+              _after_block_height: ##address_txs_after_block_height_rb##
+    tx_ids:
+      content:
+        application/json:
+          schema:
+            required:
+              - _tx_hashes
+            type: object
+            properties:
+              _tx_hashes:
+                format: text
+                type: array
+                items:
+                  type: string
+                description: Array of Cardano Transaction hashes
+            example:
+              _tx_hashes:
+                - ##tx_ids_tx_hashes1_rb##
+                - ##tx_ids_tx_hashes2_rb##
+    txbin:
+      content:
+        application/cbor:
+          schema:
+            type: string
+            format: binary
+            example: ##txbin_rb##
+    pool_ids:
+      content:
+        application/json:
+          schema:
+            required:
+              - _pool_bech32_ids
+            type: object
+            properties:
+              _pool_bech32_ids:
+                format: text
+                type: array
+                items:
+                  type: string
+                description: Array of Cardano pool IDs (bech32 format)
+            example:
+              _pool_bech32_ids:
+                - ##pool_ids_pool_bech32_ids1_rb##
+                - ##pool_ids_pool_bech32_ids2_rb##
+                - ##pool_ids_pool_bech32_ids3_rb##
