@@ -20,5 +20,5 @@ def post_request(endpoint="", data={}, is_local=True):
     else:
         url = compare_url + endpoint
 
-    response = requests.post(url, data)
+    response = requests.post(url, json=data)
     return response
