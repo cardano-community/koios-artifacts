@@ -1,8 +1,6 @@
-import schemathesis
 import random
-from helpers import get_request, post_request
-
-schema = schemathesis.from_uri("https://guild.koios.rest/koiosapi.yaml")
+from helpers.requests import get_request, post_request
+from helpers.api_schema import schema
 
 
 def test_native_script_list_endpoint():

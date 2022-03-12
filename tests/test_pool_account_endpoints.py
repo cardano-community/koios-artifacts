@@ -1,8 +1,7 @@
-import schemathesis
 import random
-from helpers import get_request, post_request
+from helpers.requests import get_request, post_request
+from helpers.api_schema import schema
 
-schema = schemathesis.from_uri("https://guild.koios.rest/koiosapi.yaml")
 pool_reward_address = ""
 
 

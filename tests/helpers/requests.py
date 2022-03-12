@@ -1,7 +1,6 @@
 import requests
 
-local_url = "http://127.0.0.1:8053/api/v0/"
-compare_url = "https://guild.koios.rest/api/v0/"
+from helpers.test_urls import local_url, compare_url
 
 
 def get_request(endpoint="", is_local=True):
