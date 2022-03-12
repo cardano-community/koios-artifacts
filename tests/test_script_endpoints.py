@@ -5,7 +5,7 @@ from helpers import get_request, post_request
 schema = schemathesis.from_uri("https://guild.koios.rest/koiosapi.yaml")
 
 
-def test_native_script_endpoint():
+def test_native_script_list_endpoint():
     script_response = get_request("native_script_list")
     schema["/native_script_list"]["GET"].validate_response(script_response)
 
@@ -27,6 +27,3 @@ def test_native_script_endpoint():
     )
 
     assert block_response.json() == compare_block_response.json()
-
-def test_plutus_script_endpoint():
-    # empty
