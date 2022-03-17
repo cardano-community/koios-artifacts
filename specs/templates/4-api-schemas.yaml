@@ -295,7 +295,8 @@ schemas:
             example: 8
           active_stake:
             type: string
-            description: Pool active stake
+            nullable: true
+            description: Pool active stake (will be null post epoch transition until dbsync calculation is complete)
             example: "64328627680963"
           block_count:
             type: integer
