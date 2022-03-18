@@ -20,19 +20,19 @@ def test_asset_list_endpoint():
     )
 
     asset_info_response = get_request(
-        f"asset_info?_asset_policy={random_asset_policy}&_asset_name: {random_asset_name}"
+        f"asset_info?_asset_policy={random_asset_policy}&_asset_name={random_asset_name}"
     )
     schema["/asset_info"]["GET"].validate_response(asset_info_response)
 
     compare_asset_info_response = get_request(
-        f"asset_info?_asset_policy={random_asset_policy}&_asset_name: {random_asset_name}",
+        f"asset_info?_asset_policy={random_asset_policy}&_asset_name={random_asset_name}",
         is_local=False,
     )
 
     assert asset_info_response.json() == compare_asset_info_response.json()
 
     asset_address_list_response = get_request(
-        f"asset_address_list?_asset_policy={random_asset_policy}&_asset_name: {random_asset_name}"
+        f"asset_address_list?_asset_policy={random_asset_policy}&_asset_name={random_asset_name}"
     )
 
     random_asset_address = random.choice(asset_address_list_response.json())
