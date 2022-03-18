@@ -454,8 +454,9 @@ schemas:
             example: "2021-10-02T21:50:11"
           active_stake:
             type: string
-            description: Rewards accumulated as of given epoch (in lovelaces)
+            description: Total active stake in epoch stake snapshot (null for pre-Shelley epochs)
             example: 23395112387185880
+            nullable: true
     epoch_params:
       type: array
       items:
