@@ -5,6 +5,7 @@ from helpers.api_schema import schema
 pool_reward_address = ""
 
 
+@pytest.mark.order(1)
 def test_pool_list_endpoint():
     global pool_reward_address
 
@@ -28,6 +29,7 @@ def test_pool_list_endpoint():
     pool_reward_address = pool_info_response.json()[0]["reward_addr"]
 
 
+@pytest.mark.order(2)
 def test_account_info_endpoint():
     global pool_reward_address
 

@@ -5,6 +5,7 @@ from helpers.api_schema import schema
 random_asset_address = ""
 
 
+@pytest.mark.order(1)
 def test_asset_list_endpoint():
     global random_asset_address
 
@@ -36,6 +37,7 @@ def test_asset_list_endpoint():
     random_asset_address = random.choice(asset_address_list_response.json())
 
 
+@pytest.mark.order(2)
 def test_address_info_endpoint():
     global random_asset_address
 

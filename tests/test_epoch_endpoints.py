@@ -5,6 +5,7 @@ from helpers.api_schema import schema
 random_epoch_no = ""
 
 
+@pytest.mark.order(1)
 def test_epoch_info_endpoint():
     global random_epoch_no
 
@@ -19,6 +20,7 @@ def test_epoch_info_endpoint():
     assert random_epoch == compare_epoch_info_response.json()[0]
 
 
+@pytest.mark.order(2)
 def test_epoch_params_endpoint():
     global random_epoch_no
 
