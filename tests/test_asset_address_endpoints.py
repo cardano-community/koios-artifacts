@@ -16,7 +16,7 @@ def test_asset_list_endpoint():
     random_asset = random.choice(asset_list_response.json())
     random_asset_policy, random_asset_name = (
         random_asset["policy_id"],
-        random_asset["asset_names"]["hex"],
+        random_asset["asset_names"]["hex"][0],
     )
 
     asset_info_response = get_request(
