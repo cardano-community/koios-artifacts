@@ -1,4 +1,6 @@
+import pytest
 import random
+
 from helpers.requests import get_request
 from helpers.api_schema import schema
 
