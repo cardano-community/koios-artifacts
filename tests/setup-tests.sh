@@ -13,3 +13,4 @@ echo "        where http://127.0.0.1:8053/api/v0 is the URL of instance you want
 echo "    *[Not Ready] - Schema output format matching is not yet ready, but if you'd like to still run all the tests, you can use '-c all' in the above command"
 
 echo " To quit from Python virtualenv, you can run 'deactivate' "
+echo " To execute data validation tests locally, edit the 'helpers/test_urls.py' to the correct local instance "

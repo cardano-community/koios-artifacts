@@ -1,3 +1,3 @@
 import schemathesis
 
-schema = schemathesis.from_uri("https://guild.koios.rest/koiosapi.yaml")
+schema = schemathesis.from_path("../specs/results/koiosapi-guild.yaml")
