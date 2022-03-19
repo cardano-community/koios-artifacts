@@ -19,5 +19,7 @@ def post_request(endpoint="", data={}, is_local=True):
     else:
         url = compare_url + endpoint
 
-    response = requests.post(url, json=data)
+    headers = {"Content-Type": "application/json", "Accept": "application/json"}
+    response = requests.post(url, json=data, headers=headers)
+
     return response
