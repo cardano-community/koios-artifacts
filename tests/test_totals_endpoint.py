@@ -14,4 +14,4 @@ def test_totals_endpoint():
         f"totals?epoch_no=eq.{random_totals_epoch}", is_local=False
     )
 
-    assert random_totals == compare_totals_response.json()
+    assert [random_totals] == compare_totals_response.json()
