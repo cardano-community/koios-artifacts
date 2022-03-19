@@ -1967,8 +1967,9 @@ components:
             example: "vrf_vk1pmxyz8efuyj6eq6zkk373f28u47v06nwp5t59jr5fcmcusaazlmqhxu8k2"
           pool:
             type: string
-            description: Pool ID in bech32 format
+            description: Pool ID in bech32 format (null for pre-Shelley blocks)
             example: pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc
+            nullable: true
           op_cert_counter:
             type: integer
             description: Counter value of the operational certificate used to create this block
