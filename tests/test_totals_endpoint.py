@@ -11,7 +11,7 @@ def test_totals_endpoint():
     random_totals_epoch = random_totals["epoch_no"]
 
     compare_totals_response = get_request(
-        f"genesis?epoch_no.eq.{random_totals_epoch}", is_local=False
+        f"totals?epoch_no.eq.{random_totals_epoch}", is_local=False
     )
 
     assert random_totals == compare_totals_response.json()
