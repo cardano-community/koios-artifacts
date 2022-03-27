@@ -3,16 +3,21 @@
 Various Artifacts related to [Koios project](https://www.koios.rest) management and assets that are used for website, monitoring services as well as public-facing topology files.
 
 ## Repository Map
-
+```
 .
-├── html                    # HTML Page(s) used for https://api.koios.rest website
-├── images                  # Images (logos, Design diagram, etc) used for Koios
-├── projects                # List of projects (in JSON format) that are using/powered by Koios
-├── specs                   # Templates used for creation of API Specs, examples to populate - as well as a python script to generate network specific results
-├── tests                   # Schemathesis setup and template that can be used for testing specific or all endpoint(s)
+├── grafana-dashboards/ # Grafana dashboards used for monitoring Koios nodes
+├── html/               # HTML Page(s) used for https://api.koios.rest website
+├── images/             # Images (logos, Design diagram, etc) used for Koios
+├── specs/              # Files used for creation of API Specs with examples
+├── tests/              # Test suites for Koios nodes
+├── topology/           # Topology files of public Koios nodes
+    ├── topology-guild.json
+    ├── topology-mainnet.json
+    └── topology-testnet.json
 ├── LICENSE                 # License for use of artifacts within this repository
-└── README.md               # This file
-
+├── README.md               # This file
+└── projects.json           # List of projects (in JSON format) that are using Koios
+```
 ## Project Management
 
 Koios team operates gRest layer in a transparent manner and progress/millestones can be accessed at any time (accessible [here](https://github.com/orgs/cardano-community/projects/1))
