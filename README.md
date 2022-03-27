@@ -34,4 +34,4 @@ The specs can be browsed for each network using below:
 
 ## Further discussions
 
-You can connect and discuss with Koios teams on [Telegram](https://t.me/+WPvfGGHr7QVjOTBl), or feel free to contribute to any of the repositories.
+You can connect and discuss with Koios teams on [Telegram](https://t.me/+zE4Lce_QUepiY2U1), or feel free to contribute to any of the repositories.
