@@ -1134,9 +1134,9 @@ schemas:
             items:
               properties:
                 key:
-                  type: integer
+                  type: string
                   description: Metadata key (index)
-                  example: 0
+                  example: "0"
                 json:
                   type: object
                   description: A JSON containing details about metadata within transaction
@@ -1520,9 +1520,9 @@ schemas:
             nullable: true
             properties:
               key:
-                type: number
+                type: string
                 description: The metadata key
-                example: 721
+                example: "721"
               json:
                 type: object
                 description: The minting Tx JSON payload if it can be decoded as JSON
@@ -1620,9 +1620,9 @@ schemas:
                   nullable: true
                   properties:
                     key:
-                      type: number
+                      type: string
                       description: The metadata key
-                      example: 721
+                      example: "721"
                     json:
                       type: object
                       description: The minting Tx JSON payload if it can be decoded as JSON
