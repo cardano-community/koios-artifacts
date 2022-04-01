@@ -764,9 +764,11 @@ paths:
       summary: Pool Relays
       description: A list of registered relays for all currently registered/retiring (not retired) pools
   /pool_metadata: #RPC
-    get:
+    post:
       tags:
         - Pool
+      requestBody:
+        $ref: "#/components/requestBodies/pool_ids_optional"
       responses:
         "200":
           description: Array of pool metadata
@@ -779,7 +781,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Pool Metadata
-      description: Metadata(on & off-chain) for all currently registered/retiring (not retired) pools
+      description: Metadata (on & off-chain) for all currently registered/retiring (not retired) pools
   /native_script_list: #RPC
     get:
       tags:
