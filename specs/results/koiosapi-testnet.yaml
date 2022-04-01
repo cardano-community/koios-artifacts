@@ -1652,10 +1652,12 @@ components:
             example: 4509
           live_pledge:
             type: string
+            nullable: true
             description: Summary of account balance for all pool owner's
             example: "64328594406327"
           live_stake:
             type: string
+            nullable: true
             description: Pool live stake
             example: "64328627680963"
           live_delegators:
@@ -1664,6 +1666,7 @@ components:
             example: 5
           live_saturation:
             type: number
+            nullable: true
             description: Pool live saturation (decimal format)
             example: 94.52
     pool_delegators:
