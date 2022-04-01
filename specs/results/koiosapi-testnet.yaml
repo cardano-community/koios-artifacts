@@ -978,7 +978,7 @@ paths:
       tags:
         - Pool
       requestBody:
-        $ref: "#/components/requestBodies/pool_ids"
+        $ref: "#/components/requestBodies/pool_ids_optional"
       responses:
         "200":
           description: Array of pool metadata
@@ -991,7 +991,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Pool Metadata
-      description: Metadata(on & off-chain) for all currently registered/retiring (not retired) pools
+      description: Metadata (on & off-chain) for all currently registered/retiring (not retired) pools
   /native_script_list: #RPC
     get:
       tags:
@@ -1314,6 +1314,23 @@ components:
           schema:
             required:
               - _pool_bech32_ids
+            type: object
+            properties:
+              _pool_bech32_ids:
+                format: text
+                type: array
+                items:
+                  type: string
+                description: Array of Cardano pool IDs (bech32 format)
+            example:
+              _pool_bech32_ids:
+                - pool102llj7e7a0mmxssjvjkv2d6lppuh6cz6q9xwc3tsksn0jqwz9eh
+                - pool102x86jz7uus6p6mlw02fdw2s805kng7g6ujs6s342t5msk36tch
+                - pool103qt58f9xlsr7y9anz3lnyq6cph4xh2yr4qrrtc356ldzz6ktqz
+    pool_ids_optional:
+      content:
+        application/json:
+          schema:
             type: object
             properties:
               _pool_bech32_ids:
