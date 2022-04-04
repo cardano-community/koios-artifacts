@@ -4,10 +4,10 @@ import schemathesis
 
 def pytest_addoption(parser):
     parser.addoption(
-        "--local-url", action="store", default="http://127.0.0.1:8453/api/v0/"
+        "--local-url", action="store", default="http://127.0.0.1:8453/api/v0"
     )
     parser.addoption(
-        "--compare-url", action="store", default="https://guild.koios.rest/api/v0/"
+        "--compare-url", action="store", default="https://guild.koios.rest/api/v0"
     )
     parser.addoption(
         "--api-schema-file",
