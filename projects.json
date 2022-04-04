@@ -2,7 +2,7 @@
   "Libraries": [
     {
       "text": ".Net SDK",
-      "link": "https://github.com/koios-official/cardanosharp-koios"
+      "link": "https://github.com/cardano-community/cardanosharp-koios"
     },
     {
       "text": "Go CLI",

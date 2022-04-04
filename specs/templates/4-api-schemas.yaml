@@ -295,7 +295,8 @@ schemas:
             example: 8
           active_stake:
             type: string
-            description: Pool active stake
+            nullable: true
+            description: Pool active stake (will be null post epoch transition until dbsync calculation is complete)
             example: "64328627680963"
           block_count:
             type: integer
@@ -304,10 +305,12 @@ schemas:
             example: 4509
           live_pledge:
             type: string
+            nullable: true
             description: Summary of account balance for all pool owner's
             example: "64328594406327"
           live_stake:
             type: string
+            nullable: true
             description: Pool live stake
             example: "64328627680963"
           live_delegators:
@@ -316,6 +319,7 @@ schemas:
             example: 5
           live_saturation:
             type: number
+            nullable: true
             description: Pool live saturation (decimal format)
             example: 94.52
     pool_delegators:
@@ -1135,9 +1139,9 @@ schemas:
             items:
               properties:
                 key:
-                  type: integer
+                  type: string
                   description: Metadata key (index)
-                  example: 0
+                  example: "0"
                 json:
                   type: object
                   description: A JSON containing details about metadata within transaction
@@ -1521,9 +1525,9 @@ schemas:
             nullable: true
             properties:
               key:
-                type: number
+                type: string
                 description: The metadata key
-                example: 721
+                example: "721"
               json:
                 type: object
                 description: The minting Tx JSON payload if it can be decoded as JSON
@@ -1621,9 +1625,9 @@ schemas:
                   nullable: true
                   properties:
                     key:
-                      type: number
+                      type: string
                       description: The metadata key
-                      example: 721
+                      example: "721"
                     json:
                       type: object
                       description: The minting Tx JSON payload if it can be decoded as JSON

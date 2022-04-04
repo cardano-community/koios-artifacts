@@ -206,7 +206,7 @@ info:
     Yes, there is a setup script (expect you to read carefully the help section) and instructions [here](https://cardano-community.github.io/guild-operators/Build/grest/). Should you need any assistance, feel free to hop in to the [discussion group](https://t.me/joinchat/+zE4Lce_QUepiY2U1).
 
     ### Too much reading, I want to discuss in person
-    There are bi-weekly calls held that anyone is free to join - or you can drop in to the [telegram group](https://t.me/joinchat/+zE4Lce_QUepiY2U1) and start a discussion from there.
+    There are bi-weekly calls held that anyone is free to join - or you can drop in to the [telegram group](https://t.me/+zE4Lce_QUepiY2U1) and start a discussion from there.
 
   x-logo:
     url: "https://api.koios.rest/koios.png"
@@ -974,9 +974,11 @@ paths:
       summary: Pool Relays
       description: A list of registered relays for all currently registered/retiring (not retired) pools
   /pool_metadata: #RPC
-    get:
+    post:
       tags:
         - Pool
+      requestBody:
+        $ref: "#/components/requestBodies/pool_ids_optional"
       responses:
         "200":
           description: Array of pool metadata
@@ -989,7 +991,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Pool Metadata
-      description: Metadata(on & off-chain) for all currently registered/retiring (not retired) pools
+      description: Metadata (on & off-chain) for all currently registered/retiring (not retired) pools
   /native_script_list: #RPC
     get:
       tags:
@@ -1325,6 +1327,23 @@ components:
                 - pool100wj94uzf54vup2hdzk0afng4dhjaqggt7j434mtgm8v2gfvfgp
                 - pool102s2nqtea2hf5q0s4amj0evysmfnhrn4apyyhd4azcmsclzm96m
                 - pool102vsulhfx8ua2j9fwl2u7gv57fhhutc3tp6juzaefgrn7ae35wm
+    pool_ids_optional:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              _pool_bech32_ids:
+                format: text
+                type: array
+                items:
+                  type: string
+                description: Array of Cardano pool IDs (bech32 format)
+            example:
+              _pool_bech32_ids:
+                - pool100wj94uzf54vup2hdzk0afng4dhjaqggt7j434mtgm8v2gfvfgp
+                - pool102s2nqtea2hf5q0s4amj0evysmfnhrn4apyyhd4azcmsclzm96m
+                - pool102vsulhfx8ua2j9fwl2u7gv57fhhutc3tp6juzaefgrn7ae35wm
   securitySchemes: {}
   schemas:
     tip:
@@ -1623,7 +1642,8 @@ components:
             example: 8
           active_stake:
             type: string
-            description: Pool active stake
+            nullable: true
+            description: Pool active stake (will be null post epoch transition until dbsync calculation is complete)
             example: "64328627680963"
           block_count:
             type: integer
@@ -1632,10 +1652,12 @@ components:
             example: 4509
           live_pledge:
             type: string
+            nullable: true
             description: Summary of account balance for all pool owner's
             example: "64328594406327"
           live_stake:
             type: string
+            nullable: true
             description: Pool live stake
             example: "64328627680963"
           live_delegators:
@@ -1644,6 +1666,7 @@ components:
             example: 5
           live_saturation:
             type: number
+            nullable: true
             description: Pool live saturation (decimal format)
             example: 94.52
     pool_delegators:
@@ -2463,9 +2486,9 @@ components:
             items:
               properties:
                 key:
-                  type: integer
+                  type: string
                   description: Metadata key (index)
-                  example: 0
+                  example: "0"
                 json:
                   type: object
                   description: A JSON containing details about metadata within transaction
@@ -2849,9 +2872,9 @@ components:
             nullable: true
             properties:
               key:
-                type: number
+                type: string
                 description: The metadata key
-                example: 721
+                example: "721"
               json:
                 type: object
                 description: The minting Tx JSON payload if it can be decoded as JSON
@@ -2949,9 +2972,9 @@ components:
                   nullable: true
                   properties:
                     key:
-                      type: number
+                      type: string
                       description: The metadata key
-                      example: 721
+                      example: "721"
                     json:
                       type: object
                       description: The minting Tx JSON payload if it can be decoded as JSON
