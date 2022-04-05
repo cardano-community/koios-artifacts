@@ -1465,6 +1465,7 @@ components:
             example: pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt
           ticker:
             type: string
+            nullable: true
             description: Pool ticker
             example: JAZZ
     pool_history_info:
@@ -1805,8 +1806,9 @@ components:
             example: "2021-10-02T21:50:11"
           active_stake:
             type: string
-            description: Rewards accumulated as of given epoch (in lovelaces)
+            description: Total active stake in epoch stake snapshot (null for pre-Shelley epochs)
             example: 23395112387185880
+            nullable: true
     epoch_params:
       type: array
       items:
@@ -1989,8 +1991,9 @@ components:
             example: "vrf_vk1pmxyz8efuyj6eq6zkk373f28u47v06nwp5t59jr5fcmcusaazlmqhxu8k2"
           pool:
             type: string
-            description: Pool ID in bech32 format
+            description: Pool ID in bech32 format (null for pre-Shelley blocks)
             example: pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc
+            nullable: true
           op_cert_counter:
             type: integer
             description: Counter value of the operational certificate used to create this block
