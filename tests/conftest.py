@@ -1,10 +1,11 @@
+#!/usr/bin/env python3
 import pytest
 import schemathesis
 
 
 def pytest_addoption(parser):
     parser.addoption(
-        "--local-url", action="store", default="http://127.0.0.1:8453/api/v0"
+        "--local-url", action="store", default="http://127.0.0.1:8053/api/v0"
     )
     parser.addoption(
         "--compare-url", action="store", default="https://guild.koios.rest/api/v0"

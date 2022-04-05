@@ -1465,6 +1465,7 @@ components:
             example: pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt
           ticker:
             type: string
+            nullable: true
             description: Pool ticker
             example: JAZZ
     pool_history_info:
