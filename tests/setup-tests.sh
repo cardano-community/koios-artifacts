@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-sudo apt-get install python3 python3-pip >/dev/null
+sudo apt-get install python3 python3-pip -y >/dev/null
 python3 -m pip install virtualenv >/dev/null
 export PATH=$PATH:~/.local/bin/
 virtualenv koios-tests >/dev/null
 source koios-tests/bin/activate
-python3 -m pip install schemathesis pytest-order > /dev/null
+python3 -m pip install schemathesis pytest-order >/dev/null
 curl -sfL https://raw.githubusercontent.com/cardano-community/koios-artifacts/master/tests/not_empty_response.py -o not_empty_response.py >/dev/null
 
 cat <<-EOF
