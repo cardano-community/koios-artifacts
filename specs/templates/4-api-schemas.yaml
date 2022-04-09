@@ -1426,9 +1426,9 @@ schemas:
       items:
         properties:
           metalabel:
-            type: number
+            type: string
             description: A distinct known metalabel
-            example: 721
+            example: "721"
     asset_list:
       type: array
       description: Array of policy IDs and asset names
