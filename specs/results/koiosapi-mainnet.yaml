@@ -174,19 +174,23 @@ info:
 
     A big thank you to the following projects who are already starting to use Koios from early days:
 
+    ## CLI
+
+      - [Koios CLI in GoLang](https://github.com/cardano-community/koios-cli)
+
     ## Libraries
 
       - [.Net SDK](https://github.com/CardanoSharp/cardanosharp-koios)
       - [Go Client](https://github.com/cardano-community/koios-go-client)
-      - [Go CLI](https://github.com/cardano-community/koios-cli)
       - [Java Client](https://github.com/cardano-community/koios-java-client)
 
     ## Builder Tools
 
       - [Building On Cardano](https://buildingoncardano.com)
-      - [CCVault](https://ccvault.io/)
+      - [CardaStat](cardastat.info)
       - [CNTools](https://cardano-community.github.io/guild-operators/Scripts/cntools/)
       - [Dandelion](https://dandelion.link)
+      - [Eternl](https://eternl.io/)
       - [PoolPeek](https://poolpeek.com)
 
     # FAQ
@@ -2196,7 +2200,7 @@ components:
           asset_policy:
             $ref: "#/components/schemas/asset_summary/items/properties/policy_id"
           asset_name:
-            $ref: "#/components/schemas/asset_summary/items/properties/asset_name"
+            $ref: "#/components/schemas/asset_info/items/properties/asset_name_ascii"
           quantity:
             type: string
             description: Asset quantity owned by account
