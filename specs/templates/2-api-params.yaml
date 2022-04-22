@@ -138,8 +138,8 @@ parameters:
         type: string
         example: ##_asset_name_param##
       in: query
-      required: true
-      allowEmptyValue: false
+      required: false
+      allowEmptyValue: true
     _pool_bech32:
       deprecated: false
       name: _pool_bech32

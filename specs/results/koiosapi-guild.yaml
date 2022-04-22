@@ -1184,8 +1184,8 @@ components:
         type: string
         example: 41484c636f696e
       in: query
-      required: true
-      allowEmptyValue: false
+      required: false
+      allowEmptyValue: true
     _pool_bech32:
       deprecated: false
       name: _pool_bech32
@@ -2920,77 +2920,69 @@ components:
                   example: "-10"
     asset_policy_info:
       type: array
+      description: List of policy assets
       items:
         properties:
-          policy_id:
+          asset_name:
             type: string
-            description: Asset Policy ID (hex)
-            example: d3501d9531fcc25e3ca4b6429318c2cc374dbdbcf5e99c1c1e5da1ff
-          assets:
-            type: array
-            description: List of policy assets
-            items:
-              properties:
-                asset_name:
-                  type: string
-                  description: Asset Name (hex)
-                  example: 444f4e545350414d
-                asset_name_ascii:
-                  type: string
-                  description: Asset Name (ASCII)
-                  example: DONTSPAM
-                fingerprint:
-                  type: string
-                  description: The CIP14 fingerprint of the asset
-                  example: asset1ua6pz3yd5mdka946z8jw2fld3f8d0mmxt75gv9
-                minting_tx_metadata:
-                  type: object
-                  nullable: true
-                  properties:
-                    key:
-                      type: string
-                      description: The metadata key
-                      example: "721"
-                    json:
-                      type: object
-                      description: The minting Tx JSON payload if it can be decoded as JSON
-                      example:
-                        {
-                          "image": "ipfs://QmVHpTQL4Furw6fFNhSHdT3AWGbDE9Vs341JHJhQF1bAEA",
-                          "pattern": "08",
-                          "collection": "ccvault.io - the mesmerizer 2021",
-                          "description": "Thanks for supporting ccvault.io development!",
-                        }
-                token_registry_metadata:
-                  type: object
-                  description: Asset metadata registered on the Cardano Token Registry
-                  nullable: true
-                  properties:
-                    name:
-                      type: string
-                      example: Rackmob
-                    description:
-                      type: string
-                      example: Metaverse Blockchain Cryptocurrency.
-                    ticker:
-                      type: string
-                      example: MOB
-                    url:
-                      type: string
-                      example: https://www.rackmob.com/
-                    logo:
-                      type: string
-                      description: A PNG image file as a byte string
-                      example: iVBORw0KGgoAAAANSUhEUgAAAPoAAAD6CAYAAACI7Fo9AAAACXBIWXMAAA7EAAAOxAGVKw4bAAADnmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSfvu78nIGlkPSdXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQnPz4KPHg6eG1wbWV0YSB4bWxuczp4PSdhZG9iZTpuczptZXRhLyc
-                    decimals:
-                      type: integer
-                      example: 0
-                total_supply:
-                  type: string
-                  example: "35000"
-                creation_time:
-                  type: string
-                  example: "2021-10-10T18:42:14"
+            description: Asset Name (hex)
+            example: 444f4e545350414d
+          asset_name_ascii:
+            type: string
+            description: Asset Name (ASCII)
+            example: DONTSPAM
+          fingerprint:
+            type: string
+            description: The CIP14 fingerprint of the asset
+            example: asset1ua6pz3yd5mdka946z8jw2fld3f8d0mmxt75gv9
+          minting_tx_metadata:
+            type: object
+            nullable: true
+            properties:
+              key:
+                type: string
+                description: The metadata key
+                example: "721"
+              json:
+                type: object
+                description: The minting Tx JSON payload if it can be decoded as JSON
+                example:
+                  {
+                    "image": "ipfs://QmVHpTQL4Furw6fFNhSHdT3AWGbDE9Vs341JHJhQF1bAEA",
+                    "pattern": "08",
+                    "collection": "ccvault.io - the mesmerizer 2021",
+                    "description": "Thanks for supporting ccvault.io development!",
+                  }
+          token_registry_metadata:
+            type: object
+            description: Asset metadata registered on the Cardano Token Registry
+            nullable: true
+            properties:
+              name:
+                type: string
+                example: Rackmob
+              description:
+                type: string
+                example: Metaverse Blockchain Cryptocurrency.
+              ticker:
+                type: string
+                example: MOB
+              url:
+                type: string
+                example: https://www.rackmob.com/
+              logo:
+                type: string
+                description: A PNG image file as a byte string
+                example: iVBORw0KGgoAAAANSUhEUgAAAPoAAAD6CAYAAACI7Fo9AAAACXBIWXMAAA7EAAAOxAGVKw4bAAADnmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSfvu78nIGlkPSdXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQnPz4KPHg6eG1wbWV0YSB4bWxuczp4PSdhZG9iZTpuczptZXRhLyc
+              decimals:
+                type: integer
+                example: 0
+          total_supply:
+            type: string
+            example: "35000"
+          creation_time:
+            type: string
+            example: "2021-10-10T18:42:14"
     asset_txs:
       type: array
       description: An array of Tx hashes that included the given asset (latest first)
