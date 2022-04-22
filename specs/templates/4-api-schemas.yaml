@@ -118,6 +118,7 @@ schemas:
             example: pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt
           ticker:
             type: string
+            nullable: true
             description: Pool ticker
             example: JAZZ
     pool_history_info:
@@ -305,10 +306,12 @@ schemas:
             example: 4509
           live_pledge:
             type: string
+            nullable: true
             description: Summary of account balance for all pool owner's
             example: "64328594406327"
           live_stake:
             type: string
+            nullable: true
             description: Pool live stake
             example: "64328627680963"
           live_delegators:
@@ -317,6 +320,7 @@ schemas:
             example: 5
           live_saturation:
             type: number
+            nullable: true
             description: Pool live saturation (decimal format)
             example: 94.52
     pool_delegators:
@@ -455,8 +459,9 @@ schemas:
             example: "2021-10-02T21:50:11"
           active_stake:
             type: string
-            description: Rewards accumulated as of given epoch (in lovelaces)
+            description: Total active stake in epoch stake snapshot (null for pre-Shelley epochs)
             example: 23395112387185880
+            nullable: true
     epoch_params:
       type: array
       items:
@@ -639,8 +644,9 @@ schemas:
             example: "vrf_vk1pmxyz8efuyj6eq6zkk373f28u47v06nwp5t59jr5fcmcusaazlmqhxu8k2"
           pool:
             type: string
-            description: Pool ID in bech32 format
+            description: Pool ID in bech32 format (null for pre-Shelley blocks)
             example: pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc
+            nullable: true
           op_cert_counter:
             type: integer
             description: Counter value of the operational certificate used to create this block
@@ -843,7 +849,7 @@ schemas:
           asset_policy:
             $ref: "#/components/schemas/asset_summary/items/properties/policy_id"
           asset_name:
-            $ref: "#/components/schemas/asset_summary/items/properties/asset_name"
+            $ref: "#/components/schemas/asset_info/items/properties/asset_name_ascii"
           quantity:
             type: string
             description: Asset quantity owned by account
@@ -1420,9 +1426,9 @@ schemas:
       items:
         properties:
           metalabel:
-            type: number
+            type: string
             description: A distinct known metalabel
-            example: 721
+            example: "721"
     asset_list:
       type: array
       description: Array of policy IDs and asset names

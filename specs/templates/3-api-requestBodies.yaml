@@ -107,3 +107,20 @@ requestBodies:
                 - ##pool_ids_pool_bech32_ids1_rb##
                 - ##pool_ids_pool_bech32_ids2_rb##
                 - ##pool_ids_pool_bech32_ids3_rb##
+    pool_ids_optional:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              _pool_bech32_ids:
+                format: text
+                type: array
+                items:
+                  type: string
+                description: Array of Cardano pool IDs (bech32 format)
+            example:
+              _pool_bech32_ids:
+                - ##pool_ids_pool_bech32_ids1_rb##
+                - ##pool_ids_pool_bech32_ids2_rb##
+                - ##pool_ids_pool_bech32_ids3_rb##
