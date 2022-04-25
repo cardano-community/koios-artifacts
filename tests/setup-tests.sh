@@ -22,7 +22,7 @@ cat <<-EOF
 	  pytest --local-url http://127.0.0.1:8053/api/v0 --compare-url https://guild.koios.rest/api/v0 --api-schema-file ../specs/results/koiosapi-guild.yaml -x -v
 	
 	  Arguments:
-	      local-run		:	URL of instance you want to test"
+	      local-url		:	URL of instance you want to test"
 	      compare-url	:	Source-of-truth instance to compare returned data against"
 	      api-schema-file	:	The API specs/schema file you want to use as input for validation"
 	
