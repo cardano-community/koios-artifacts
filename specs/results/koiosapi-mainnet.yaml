@@ -51,11 +51,11 @@ info:
     ``` bash
     curl "https://api.koios.rest/api/v0/tip"
 
-    # [{"hash":"4d44c8a453e677f933c3df42ebcf2fe45987c41268b9cfc9b42ae305e8c3d99a","epoch":317,"abs_slot":51700871,"epoch_slot":120071,"block_no":6806994,"block_time":"2022-01-27T07:06:02"}]
+    # [{"hash":"4d44c8a453e677f933c3df42ebcf2fe45987c41268b9cfc9b42ae305e8c3d99a","epoch":317,"abs_slot":51700871,"epoch_slot":120071,"block_height":6806994,"block_time":"2022-01-27T07:06:02"}]
 
-    curl "https://api.koios.rest/api/v0/blocks?select=epoch,epoch_slot,block_no"
+    curl "https://api.koios.rest/api/v0/blocks?select=epoch,epoch_slot,block_height"
 
-    # [{"epoch":317,"epoch_slot":120071,"block_no":6806994}]
+    # [{"epoch":317,"epoch_slot":120071,"block_height":6806994}]
     ```
 
     ## Horizontal Filtering
@@ -64,8 +64,8 @@ info:
     ``` bash
     curl "https://api.koios.rest/api/v0/blocks?epoch=eq.250&epoch_slot=lt.180"
 
-    # [{"hash":"8fad2808ac6b37064a0fa69f6fe065807703d5235a57442647bbcdba1c02faf8","epoch":250,"abs_slot":22636942,"epoch_slot":142,"height":5385757,"block_time":"2021-02-24T21:47:13","tx_count":65,"vrf_key":"vrf_vk14y9pjprzlsjvjt66mv5u7w7292sxp3kn4ewhss45ayjga5vurgaqhqknuu","pool":null,"op_cert_counter":2},
-    #  {"hash":"9d33b02badaedc0dedd0d59f3e0411e5fb4ac94217fb5ee86719e8463c570e16","epoch":250,"abs_slot":22636800,"epoch_slot":0,"height":5385756,"block_time":"2021-02-24T21:44:51","tx_count":10,"vrf_key":"vrf_vk1dkfsejw3h2k7tnguwrauqfwnxa7wj3nkp3yw2yw3400c4nlkluwqzwvka6","pool":null,"op_cert_counter":2}]
+    # [{"hash":"8fad2808ac6b37064a0fa69f6fe065807703d5235a57442647bbcdba1c02faf8","epoch":250,"abs_slot":22636942,"epoch_slot":142,"block_height":5385757,"block_time":"2021-02-24T21:47:13","tx_count":65,"vrf_key":"vrf_vk14y9pjprzlsjvjt66mv5u7w7292sxp3kn4ewhss45ayjga5vurgaqhqknuu","pool":null,"op_cert_counter":2},
+    #  {"hash":"9d33b02badaedc0dedd0d59f3e0411e5fb4ac94217fb5ee86719e8463c570e16","epoch":250,"abs_slot":22636800,"epoch_slot":0,"block_height":5385756,"block_time":"2021-02-24T21:44:51","tx_count":10,"vrf_key":"vrf_vk1dkfsejw3h2k7tnguwrauqfwnxa7wj3nkp3yw2yw3400c4nlkluwqzwvka6","pool":null,"op_cert_counter":2}]
     ```
 
     Here, we made use of `eq.` operator to denote a filter of "value equal to" against `epoch` column. Similarly, we added a filter using `lt.` operator to denote a filter of "values lower than" against `epoch_slot` column. You can find a complete list of operators supported in PostgREST documentation (commonly used ones extracted below):
@@ -94,10 +94,10 @@ info:
     The default headers returned by PostgREST will include a `Content-Range` field giving a range of observations returned. For large tables, this range could include a wildcard `*` as it is expensive to query exact count of observations from endpoint. But if you would like to get an estimate count without overloading servers, PostgREST can utilise Postgres's own maintenance thread results (which maintain stats for each table) to provide you a count, by specifying a header `"Profile: count=estimated"`.  
 
     Sounds confusing? Let's see this in practice, to hopefully make it easier.
-    Consider a simple case where I want query `blocks` endpoint for `height` column and focus on `content-range` header to monitor the rows we discussed above.<br><br>
+    Consider a simple case where I want query `blocks` endpoint for `block_height` column and focus on `content-range` header to monitor the rows we discussed above.<br><br>
 
     ``` bash
-    curl -s "https://api.koios.rest/api/v0/blocks?select=height" -I | grep -i content-range
+    curl -s "https://api.koios.rest/api/v0/blocks?select=block_height" -I | grep -i content-range
 
     # content-range: 0-999/*
 
@@ -106,7 +106,7 @@ info:
     As we can see above, the number of observations returned was 1000 (range being 0-999), but the total size was not queried to avoid wait times. Now, let's modify this default behaviour to query rows beyond the first 999, but this time - also add another clause to limit results by 500. We can do this using `offset=1000` and `limit=500` as below:<br><br>
 
     ``` bash
-    curl -s "https://api.koios.rest/api/v0/blocks?select=height&offset=1000&limit=500" -I | grep -i content-range
+    curl -s "https://api.koios.rest/api/v0/blocks?select=block_height&offset=1000&limit=500" -I | grep -i content-range
 
     # content-range: 1000-1499/*
 
@@ -115,7 +115,7 @@ info:
     There is also another method to achieve the above, instead of adding parameters to the URL itself, you can specify a `Range` header as below to achieve something similar:<br><br>
 
     ``` bash
-    curl -s "https://api.koios.rest/api/v0/blocks?select=height" -H "Range: 1000-1499" -I | grep -i content-range
+    curl -s "https://api.koios.rest/api/v0/blocks?select=block_height" -H "Range: 1000-1499" -I | grep -i content-range
 
     # content-range: 1000-1499/*
 
@@ -126,16 +126,16 @@ info:
     ## Ordering
 
     You can set a sorting order for returned queries against specific column(s).
-    Consider example where you want to check `epoch` and `epoch_slot` for the first 5 blocks created by a particular pool, i.e. you can set order to ascending based on height column and add horizontal filter for that pool ID as below:<br><br>
+    Consider example where you want to check `epoch` and `epoch_slot` for the first 5 blocks created by a particular pool, i.e. you can set order to ascending based on block_height column and add horizontal filter for that pool ID as below:<br><br>
 
     ``` bash
-    curl -s "https://api.koios.rest/api/v0/blocks?pool=eq.pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc&order=height.asc&limit=5"
+    curl -s "https://api.koios.rest/api/v0/blocks?pool=eq.pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc&order=block_height.asc&limit=5"
 
-    # [{"hash":"610b4c7bbebeeb212bd002885048cc33154ba29f39919d62a3d96de05d315706","epoch":236,"abs_slot":16594295,"epoch_slot":5495,"height":5086774,"block_time":"2020-12-16T23:16:26","tx_count":1,"vrf_key":"vrf_vk18x0e7dx8j37gdxftnn8ru6jcxs7n6acdazc4ykeda2ygjwg9a7ls7ns699","pool":"pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc","op_cert_counter":1},
-    # {"hash":"d93d1db5275329ab695d30c06a35124038d8d9af64fc2b0aa082b8aa43da4164","epoch":236,"abs_slot":16597729,"epoch_slot":8929,"height":5086944,"block_time":"2020-12-17T00:13:40","tx_count":7,"vrf_key":"vrf_vk18x0e7dx8j37gdxftnn8ru6jcxs7n6acdazc4ykeda2ygjwg9a7ls7ns699","pool":"pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc","op_cert_counter":1},
-    # {"hash":"dc9496eae64294b46f07eb20499ae6dae4d81fdc67c63c354397db91bda1ee55","epoch":236,"abs_slot":16598058,"epoch_slot":9258,"height":5086962,"block_time":"2020-12-17T00:19:09","tx_count":1,"vrf_key":"vrf_vk18x0e7dx8j37gdxftnn8ru6jcxs7n6acdazc4ykeda2ygjwg9a7ls7ns699","pool":"pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc","op_cert_counter":1},
-    # {"hash":"6ebc7b734c513bc19290d96ca573a09cac9503c5a349dd9892b9ab43f917f9bd","epoch":236,"abs_slot":16601491,"epoch_slot":12691,"height":5087097,"block_time":"2020-12-17T01:16:22","tx_count":0,"vrf_key":"vrf_vk18x0e7dx8j37gdxftnn8ru6jcxs7n6acdazc4ykeda2ygjwg9a7ls7ns699","pool":"pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc","op_cert_counter":1},
-    # {"hash":"2eac97548829fc312858bc56a40f7ce3bf9b0ca27ee8530283ccebb3963de1c0","epoch":236,"abs_slot":16602308,"epoch_slot":13508,"height":5087136,"block_time":"2020-12-17T01:29:59","tx_count":1,"vrf_key":"vrf_vk18x0e7dx8j37gdxftnn8ru6jcxs7n6acdazc4ykeda2ygjwg9a7ls7ns699","pool":"pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc","op_cert_counter":1}]
+    # [{"hash":"610b4c7bbebeeb212bd002885048cc33154ba29f39919d62a3d96de05d315706","epoch":236,"abs_slot":16594295,"epoch_slot":5495,"block_height":5086774,"block_time":"2020-12-16T23:16:26","tx_count":1,"vrf_key":"vrf_vk18x0e7dx8j37gdxftnn8ru6jcxs7n6acdazc4ykeda2ygjwg9a7ls7ns699","pool":"pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc","op_cert_counter":1},
+    # {"hash":"d93d1db5275329ab695d30c06a35124038d8d9af64fc2b0aa082b8aa43da4164","epoch":236,"abs_slot":16597729,"epoch_slot":8929,"block_height":5086944,"block_time":"2020-12-17T00:13:40","tx_count":7,"vrf_key":"vrf_vk18x0e7dx8j37gdxftnn8ru6jcxs7n6acdazc4ykeda2ygjwg9a7ls7ns699","pool":"pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc","op_cert_counter":1},
+    # {"hash":"dc9496eae64294b46f07eb20499ae6dae4d81fdc67c63c354397db91bda1ee55","epoch":236,"abs_slot":16598058,"epoch_slot":9258,"block_height":5086962,"block_time":"2020-12-17T00:19:09","tx_count":1,"vrf_key":"vrf_vk18x0e7dx8j37gdxftnn8ru6jcxs7n6acdazc4ykeda2ygjwg9a7ls7ns699","pool":"pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc","op_cert_counter":1},
+    # {"hash":"6ebc7b734c513bc19290d96ca573a09cac9503c5a349dd9892b9ab43f917f9bd","epoch":236,"abs_slot":16601491,"epoch_slot":12691,"block_height":5087097,"block_time":"2020-12-17T01:16:22","tx_count":0,"vrf_key":"vrf_vk18x0e7dx8j37gdxftnn8ru6jcxs7n6acdazc4ykeda2ygjwg9a7ls7ns699","pool":"pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc","op_cert_counter":1},
+    # {"hash":"2eac97548829fc312858bc56a40f7ce3bf9b0ca27ee8530283ccebb3963de1c0","epoch":236,"abs_slot":16602308,"epoch_slot":13508,"block_height":5087136,"block_time":"2020-12-17T01:29:59","tx_count":1,"vrf_key":"vrf_vk18x0e7dx8j37gdxftnn8ru6jcxs7n6acdazc4ykeda2ygjwg9a7ls7ns699","pool":"pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc","op_cert_counter":1}]
     ```
 
     ## Response Formats
@@ -174,19 +174,23 @@ info:
 
     A big thank you to the following projects who are already starting to use Koios from early days:
 
+    ## CLI
+
+      - [Koios CLI in GoLang](https://github.com/cardano-community/koios-cli)
+
     ## Libraries
 
       - [.Net SDK](https://github.com/CardanoSharp/cardanosharp-koios)
       - [Go Client](https://github.com/cardano-community/koios-go-client)
-      - [Go CLI](https://github.com/cardano-community/koios-cli)
       - [Java Client](https://github.com/cardano-community/koios-java-client)
 
     ## Builder Tools
 
       - [Building On Cardano](https://buildingoncardano.com)
-      - [CCVault](https://ccvault.io/)
+      - [CardaStat](cardastat.info)
       - [CNTools](https://cardano-community.github.io/guild-operators/Scripts/cntools/)
       - [Dandelion](https://dandelion.link)
+      - [Eternl](https://eternl.io/)
       - [PoolPeek](https://poolpeek.com)
 
     # FAQ
@@ -1186,8 +1190,8 @@ components:
         type: string
         example: 444f4e545350414d
       in: query
-      required: true
-      allowEmptyValue: false
+      required: false
+      allowEmptyValue: true
     _pool_bech32:
       deprecated: false
       name: _pool_bech32
@@ -2226,7 +2230,7 @@ components:
           asset_policy:
             $ref: "#/components/schemas/asset_summary/items/properties/policy_id"
           asset_name:
-            $ref: "#/components/schemas/asset_summary/items/properties/asset_name"
+            $ref: "#/components/schemas/asset_info/items/properties/asset_name_ascii"
           quantity:
             type: string
             description: Asset quantity owned by account
@@ -2803,9 +2807,9 @@ components:
       items:
         properties:
           metalabel:
-            type: number
+            type: string
             description: A distinct known metalabel
-            example: 721
+            example: "721"
     asset_list:
       type: array
       description: Array of policy IDs and asset names
@@ -2975,77 +2979,69 @@ components:
                   example: "-10"
     asset_policy_info:
       type: array
+      description: List of policy assets
       items:
         properties:
-          policy_id:
+          asset_name:
             type: string
-            description: Asset Policy ID (hex)
-            example: d3501d9531fcc25e3ca4b6429318c2cc374dbdbcf5e99c1c1e5da1ff
-          assets:
-            type: array
-            description: List of policy assets
-            items:
-              properties:
-                asset_name:
-                  type: string
-                  description: Asset Name (hex)
-                  example: 444f4e545350414d
-                asset_name_ascii:
-                  type: string
-                  description: Asset Name (ASCII)
-                  example: DONTSPAM
-                fingerprint:
-                  type: string
-                  description: The CIP14 fingerprint of the asset
-                  example: asset1ua6pz3yd5mdka946z8jw2fld3f8d0mmxt75gv9
-                minting_tx_metadata:
-                  type: object
-                  nullable: true
-                  properties:
-                    key:
-                      type: string
-                      description: The metadata key
-                      example: "721"
-                    json:
-                      type: object
-                      description: The minting Tx JSON payload if it can be decoded as JSON
-                      example:
-                        {
-                          "image": "ipfs://QmVHpTQL4Furw6fFNhSHdT3AWGbDE9Vs341JHJhQF1bAEA",
-                          "pattern": "08",
-                          "collection": "ccvault.io - the mesmerizer 2021",
-                          "description": "Thanks for supporting ccvault.io development!",
-                        }
-                token_registry_metadata:
-                  type: object
-                  description: Asset metadata registered on the Cardano Token Registry
-                  nullable: true
-                  properties:
-                    name:
-                      type: string
-                      example: Rackmob
-                    description:
-                      type: string
-                      example: Metaverse Blockchain Cryptocurrency.
-                    ticker:
-                      type: string
-                      example: MOB
-                    url:
-                      type: string
-                      example: https://www.rackmob.com/
-                    logo:
-                      type: string
-                      description: A PNG image file as a byte string
-                      example: iVBORw0KGgoAAAANSUhEUgAAAPoAAAD6CAYAAACI7Fo9AAAACXBIWXMAAA7EAAAOxAGVKw4bAAADnmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSfvu78nIGlkPSdXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQnPz4KPHg6eG1wbWV0YSB4bWxuczp4PSdhZG9iZTpuczptZXRhLyc
-                    decimals:
-                      type: integer
-                      example: 0
-                total_supply:
-                  type: string
-                  example: "35000"
-                creation_time:
-                  type: string
-                  example: "2021-10-10T18:42:14"
+            description: Asset Name (hex)
+            example: 444f4e545350414d
+          asset_name_ascii:
+            type: string
+            description: Asset Name (ASCII)
+            example: DONTSPAM
+          fingerprint:
+            type: string
+            description: The CIP14 fingerprint of the asset
+            example: asset1ua6pz3yd5mdka946z8jw2fld3f8d0mmxt75gv9
+          minting_tx_metadata:
+            type: object
+            nullable: true
+            properties:
+              key:
+                type: string
+                description: The metadata key
+                example: "721"
+              json:
+                type: object
+                description: The minting Tx JSON payload if it can be decoded as JSON
+                example:
+                  {
+                    "image": "ipfs://QmVHpTQL4Furw6fFNhSHdT3AWGbDE9Vs341JHJhQF1bAEA",
+                    "pattern": "08",
+                    "collection": "ccvault.io - the mesmerizer 2021",
+                    "description": "Thanks for supporting ccvault.io development!",
+                  }
+          token_registry_metadata:
+            type: object
+            description: Asset metadata registered on the Cardano Token Registry
+            nullable: true
+            properties:
+              name:
+                type: string
+                example: Rackmob
+              description:
+                type: string
+                example: Metaverse Blockchain Cryptocurrency.
+              ticker:
+                type: string
+                example: MOB
+              url:
+                type: string
+                example: https://www.rackmob.com/
+              logo:
+                type: string
+                description: A PNG image file as a byte string
+                example: iVBORw0KGgoAAAANSUhEUgAAAPoAAAD6CAYAAACI7Fo9AAAACXBIWXMAAA7EAAAOxAGVKw4bAAADnmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSfvu78nIGlkPSdXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQnPz4KPHg6eG1wbWV0YSB4bWxuczp4PSdhZG9iZTpuczptZXRhLyc
+              decimals:
+                type: integer
+                example: 0
+          total_supply:
+            type: string
+            example: "35000"
+          creation_time:
+            type: string
+            example: "2021-10-10T18:42:14"
     asset_txs:
       type: array
       description: An array of Tx hashes that included the given asset (latest first)

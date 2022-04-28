@@ -1,12 +1,14 @@
 {
+  "CLI": [
+    {
+      "text": "Koios CLI in GoLang",
+      "link": "https://github.com/cardano-community/koios-cli"
+    }
+  ],
   "Libraries": [
     {
       "text": ".Net SDK",
       "link": "https://github.com/cardano-community/cardanosharp-koios"
-    },
-    {
-      "text": "Go CLI",
-      "link": "https://github.com/cardano-community/koios-cli"
     },
     {
       "text": "Go Client",
@@ -23,8 +25,8 @@
       "link": "https://buildingoncardano.com"
     },
     {
-      "text": "Eternl",
-      "link": "https://eternl.io/"
+      "text": "CardaStat",
+      "link": "https://cardastat.info"
     },
     {
       "text": "CNTools",
@@ -33,6 +35,10 @@
     {
       "text": "Dandelion",
       "link": "https://dandelion.link"
+    },
+    {
+      "text": "Eternl",
+      "link": "https://eternl.io/"
     },
     {
       "text": "Poolpeek",
