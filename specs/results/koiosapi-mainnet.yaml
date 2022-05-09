@@ -184,10 +184,11 @@ info:
       - [Go Client](https://github.com/cardano-community/koios-go-client)
       - [Java Client](https://github.com/cardano-community/koios-java-client)
 
-    ## Builder Tools
+    ## Community Projects/Tools
 
       - [Building On Cardano](https://buildingoncardano.com)
       - [CardaStat](cardastat.info)
+      - [CNFT.IO](https://cnft.io)
       - [CNTools](https://cardano-community.github.io/guild-operators/Scripts/cntools/)
       - [Dandelion](https://dandelion.link)
       - [Eternl](https://eternl.io/)
@@ -2129,6 +2130,8 @@ components:
         properties:
           tx_hash:
             $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+          epoch_no:
+            $ref: "#/components/schemas/blocks/items/properties/epoch_no"
           block_height:
             $ref: "#/components/schemas/blocks/items/properties/block_height"
           block_time:
@@ -3047,24 +3050,14 @@ components:
       description: An array of Tx hashes that included the given asset (latest first)
       items:
         properties:
-          policy_id:
-            type: string
-            description: Asset Policy ID (hex)
-            example: 6cf6b5cf0fefbe9e69d640d8be84912bb2c9e132671954548790bcfb
-          asset_name:
-            type: string
-            description: Asset Name (hex)
-            example: 6d65736d6572697a65723038353436
-          tx_hashes:
-            type: array
-            description: List of Tx hashes
-            nullable: true
-            example:
-              [
-                "17377b1978c8be190d31b418d1999d8b5c2748709580ded896163440e70face1",
-                "a50b2bbb40b25b6fc19b56c2b3d7887086d0df5a03414e1097d9fba852134bb4",
-                "c418d9c874aff0a163218ffdb5ba9189202473cdc16d7dfe66420e95fa398ee9",
-              ]
+          tx_hash:
+            $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+          epoch_no:
+            $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+          block_height:
+            $ref: "#/components/schemas/blocks/items/properties/block_height"
+          block_time:
+            $ref: "#/components/schemas/blocks/items/properties/block_time"
     native_script_list:
       type: array
       items:
