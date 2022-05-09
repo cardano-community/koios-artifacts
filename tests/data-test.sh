@@ -10,13 +10,13 @@ source "${VENV_DIR_PATH}/bin/activate"
 # Determine a healthy instance to run checks against
 TRUSTED_INSTANCES=("http://127.0.0.1:8053" "https://koios-guild.ahlnet.nu:2165" "http://95.216.188.94:8053")
 for ((i = 0; i < ${#TRUSTED_INSTANCES[@]} - 1; i++)); do
-  echo "Comparing index: ${i}, instance: ${TRUSTED_INSTANCES[$i]}"
+  echo "Comparing instance: ${TRUSTED_INSTANCES[$i]}"
   for compare_instance in "${TRUSTED_INSTANCES[@]:${i}+1}"; do
     echo "  Comparing against: ${compare_instance}"
     pytest ${TESTS_DIR_PATH} \
       --local-url "${TRUSTED_INSTANCES[$i]}"/api/v0 \
       --compare-url "${compare_instance}"/api/v0 \
-      --api-schema-file "${API_SPEC_PATH}" -x -q
+      --api-schema-file "${API_SPEC_PATH}" -x -q --tb=line
     result_code=$?
 
     if [ $result_code -eq 0 ]; then
@@ -32,6 +32,7 @@ if [ -z "${HEALTHY_INSTANCE1}" ]; then
   exit 1
 fi
 echo "Healthy instance determined: ${HEALTHY_INSTANCE1}"
+echo ""
 
 # Test each server and mark down/bring up from maintenance
 readarray -t servers_array < <(echo "show servers state grest_core" | nc -U "$HAPROXY_SOCKET_PATH" | grep 'grest_core' | awk '{print $4 " " $5 " " $18 " " $19 " " $7}')
@@ -43,7 +44,12 @@ for server in "${servers_array[@]}"; do
     test_instance="http://"${ip}:${port}
   fi
 
+  # Don't run checks against healthy instances, make sure they are not in MAINT state
   if [[ "${test_instance}" == "${HEALTHY_INSTANCE1}" || "${test_instance}" == "${HEALTHY_INSTANCE2}" ]]; then
+    if [[ "${state}" -ne 0 ]]; then
+      echo "Marking server back up from maintenance: ${name}"
+      echo "enable server grest_core/${name}" | nc -U "$HAPROXY_SOCKET_PATH"
+    fi
     continue
   fi
 
@@ -52,7 +58,7 @@ for server in "${servers_array[@]}"; do
   pytest ${TESTS_DIR_PATH} \
     --local-url "${test_instance}"/api/v0 \
     --compare-url "${HEALTHY_INSTANCE1}"/api/v0 \
-    --api-schema-file "${API_SPEC_PATH}" -x -q
+    --api-schema-file "${API_SPEC_PATH}" -x -q --tb=line
   result_code=$?
 
   if [[ "$result_code" -ne 0 ]]; then
