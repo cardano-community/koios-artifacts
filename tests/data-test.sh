@@ -64,12 +64,12 @@ for server in "${servers_array[@]}"; do
   if [[ "$result_code" -ne 0 ]]; then
     if [[ "${state}" -ne 1 ]]; then
       echo "Marking server down for maintenance: ${name}"
-      echo "disable server grest_core/${name}" | nc -U "$HAPROXY_SOCKET_PATH"
+      echo "set server grest_core/${name} state maint" | nc -U "$HAPROXY_SOCKET_PATH"
     else
       echo "Server already marked down for maintenance: ${name}"
     fi
   elif [[ "${state}" -ne 0 ]]; then
     echo "Marking server back up from maintenance: ${name}"
-    echo "enable server grest_core/${name}" | nc -U "$HAPROXY_SOCKET_PATH"
+    echo "set server grest_core/${name} state ready" | nc -U "$HAPROXY_SOCKET_PATH"
   fi
 done
