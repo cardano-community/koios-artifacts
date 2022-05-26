@@ -1,6 +1,6 @@
 {
   "Providers": [
-      { "name": "damjan", "addr": "65.21.183.97", "port": 8053 },
+      { "name": "eden-ssl", "addr": "eden-mainnet.koios.rest", "port": 8453, "ssl": "true" },
       { "name": "old-rdlrt", "addr": "207.244.252.116", "port": 8453, "ssl": "true"},
       { "name": "rdlrt", "addr": "194.36.145.157", "port": 8053 },
       { "name": "markus", "addr": "185.161.193.32", "port": 8053},
