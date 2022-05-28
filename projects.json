@@ -17,6 +17,10 @@
     {
       "text": "Java client",
       "link": "https://github.com/cardano-community/koios-java-client"
+    },
+    {
+      "text": "Python Client",
+      "link": "https://github.com/QuixoteSystems/koios-python"
     }
   ],
   "Community Projects/Tools": [
@@ -51,6 +55,10 @@
     {
       "text": "TosiDrop",
       "link": "https://tosidrop.io"
+    },
+    {
+      "text": "Raw Cardano Explorer",
+      "link": "https://rawcardano.app"
     }
   ]
 }
