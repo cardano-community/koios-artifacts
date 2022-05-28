@@ -462,6 +462,16 @@ schemas:
             description: Total active stake in epoch stake snapshot (null for pre-Shelley epochs)
             example: 23395112387185880
             nullable: true
+          total_rewards:
+            type: string
+            description: Total rewards earned in epoch (null for pre-Shelley epochs)
+            example: 252902897534230
+            nullable: true
+          avg_blk_reward:
+            type: string
+            description: Average block reward for epoch (null for pre-Shelley epochs)
+            example: 660233450
+            nullable: true
     epoch_params:
       type: array
       items:
