@@ -24,9 +24,7 @@ schemas:
             description: Block Height number on chain
             example: 6338276
           block_time:
-            type: string
-            description: Timestamp for when the block was created
-            example: "2021-10-06T23:41:44"
+            $ref: "#/components/schemas/blocks/items/properties/block_time"
     genesis:
       type: array
       items:
@@ -52,9 +50,9 @@ schemas:
             example: 45000000000000000
             description: Maximum smallest units (lovelaces) supply for the blockchain
           systemstart:
-            type: string
-            example: "2017-09-23T21:44:51Z"
-            description: Timestamp for first block (genesis) on chain
+            type: number
+            description: UNIX timestamp of the first block (genesis) on chain
+            example: 1506203091
           activeslotcoeff:
             type: string
             example: 0.05
@@ -442,21 +440,21 @@ schemas:
             description: Number of blocks created in epoch
             example: 17321
           start_time:
-            type: string
-            description: Timestamp of the epoch start
-            example: "2021-10-02T21:44:51"
+            type: number
+            description: UNIX timestamp of the epoch start
+            example: 1506203091
           end_time:
-            type: string
-            description: Timestamp of the epoch end
-            example: "2021-10-02T21:44:51"
+            type: number
+            description: UNIX timestamp of the epoch end
+            example: 1506635091
           first_block_time:
-            type: string
-            description: Timestamp for first block created in epoch
-            example: "2021-10-02T21:50:11"
+            type: number
+            description: UNIX timestamp of the epoch's first block
+            example: 1506635091
           last_block_time:
-            type: string
-            description: Timestamp for last block created in epoch
-            example: "2021-10-02T21:50:11"
+            type: number
+            description: UNIX timestamp of the epoch's last block
+            example: 1506635091
           active_stake:
             type: string
             description: Total active stake in epoch stake snapshot (null for pre-Shelley epochs)
@@ -631,9 +629,9 @@ schemas:
             description: Block size in bytes
             example: 79109
           block_time:
-            type: string
-            description: Timestamp of the block
-            example: "2022-02-15T18:42:13"
+            type: number
+            description: UNIX timestamp of the block
+            example: 1506635091
           tx_count:
             type: integer
             description: Number of transactions in the block
@@ -906,9 +904,9 @@ schemas:
             description: Overall slot number (slots from genesis block of chain)
             example: 42325043
           tx_timestamp:
-            type: string
-            description: Timestamp where block containing transaction was created
-            example: "2021-10-10T18:42:14"
+            type: number
+            description: UNIX timestamp of the transaction
+            example: 1506635091
           tx_block_index:
             type: integer
             description: Index of transaction within block
@@ -1569,8 +1567,9 @@ schemas:
             type: string
             example: "35000"
           creation_time:
-            type: string
-            example: "2021-10-10T18:42:14"
+            type: number
+            description: UNIX timestamp of the first asset mint
+            example: 1506635091
     asset_history:
       type: array
       items:
@@ -1662,7 +1661,7 @@ schemas:
             example: "35000"
           creation_time:
             type: string
-            example: "2021-10-10T18:42:14"
+            $ref: "#/components/schemas/asset_info/items/properties/creation_time"
     asset_txs:
       type: array
       description: An array of Tx hashes that included the given asset (latest first)
