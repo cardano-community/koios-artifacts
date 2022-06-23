@@ -17,6 +17,10 @@
     {
       "text": "Java client",
       "link": "https://github.com/cardano-community/koios-java-client"
+    },
+    {
+      "text": "Python Client",
+      "link": "https://github.com/cardano-community/koios-python"
     }
   ],
   "Community Projects/Tools": [
@@ -37,6 +41,10 @@
       "link": "https://cardano-community.github.io/guild-operators/Scripts/cntools/"
     },
     {
+      "text": "cscli",
+      "link": "https://github.com/CardanoSharp/cscli"
+    },
+    {
       "text": "Dandelion",
       "link": "https://dandelion.link"
     },
@@ -51,6 +59,10 @@
     {
       "text": "TosiDrop",
       "link": "https://tosidrop.io"
+    },
+    {
+      "text": "Raw Cardano Explorer",
+      "link": "https://rawcardano.app"
     }
   ]
 }
