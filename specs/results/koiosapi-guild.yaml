@@ -231,6 +231,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/tip"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -248,6 +250,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/genesis"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -267,6 +271,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/totals"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -288,6 +294,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/epoch_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -307,6 +315,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/epoch_params"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -326,6 +336,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/blocks"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -345,6 +357,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/block_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -364,6 +378,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/block_txs"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -383,6 +399,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/tx_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -402,6 +420,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/tx_utxos"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -421,6 +441,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/tx_metadata"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -438,6 +460,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/tx_metalabels"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -487,6 +511,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/tx_status"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -506,6 +532,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/address_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -525,6 +553,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/address_txs"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -544,6 +574,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/address_assets"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -563,6 +595,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/credential_txs"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -580,6 +614,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/account_list"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -599,6 +635,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/account_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -619,6 +657,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/account_rewards"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -640,6 +680,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/account_updates"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -661,6 +703,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/account_addresses"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -680,6 +724,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/account_assets"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -699,6 +745,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/account_history"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -716,6 +764,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/asset_list"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -736,6 +786,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/asset_address_list"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -756,6 +808,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/asset_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -776,6 +830,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/asset_history"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -795,6 +851,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/asset_policy_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -815,6 +873,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/asset_summary"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -835,6 +895,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/asset_txs"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -852,6 +914,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/pool_list"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -871,6 +935,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/pool_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -891,6 +957,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/pool_delegators"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -911,6 +979,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/pool_blocks"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -933,6 +1003,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/pool_history_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -955,6 +1027,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/pool_updates"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -972,6 +1046,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/pool_relays"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -991,6 +1067,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/pool_metadata"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -1008,6 +1086,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/native_script_list"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -1025,6 +1105,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/plutus_script_list"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -1044,6 +1126,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/script_redeemers"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -1834,58 +1918,71 @@ components:
             type: integer
             description: The 'a' parameter to calculate the minimum transaction fee
             example: 44
+            nullable: true
           min_fee_b:
             type: integer
             description: The 'b' parameter to calculate the minimum transaction fee
             example: 155381
+            nullable: true
           max_block_size:
             type: integer
             description: The maximum block size (in bytes)
             example: 65536
+            nullable: true
           max_tx_size:
             type: integer
             description: The maximum transaction size (in bytes)
             example: 16384
+            nullable: true
           max_bh_size:
             type: integer
             description: The maximum block header size (in bytes)
             example: 1100
+            nullable: true
           key_deposit:
             type: integer
             description: The amount (in lovelace) required for a deposit to register a stake address
             example: 2000000
+            nullable: true
           pool_deposit:
             type: integer
             description: The amount (in lovelace) required for a deposit to register a stake pool
             example: 500000000
+            nullable: true
           max_epoch:
             type: integer
             description: The maximum number of epochs in the future that a pool retirement is allowed to be scheduled for
             example: 18
+            nullable: true
           optimal_pool_count:
             type: integer
             description: The optimal number of stake pools
             example: 500
+            nullable: true
           influence:
             type: number
             format: double
             description: The pledge influence on pool rewards
             example: 0.3
+            nullable: true
           monetary_expand_rate:
             type: number
             format: double
             description: The monetary expansion rate
             example: 0.003
+            nullable: true
           treasury_growth_rate:
             type: number
             format: double
             description: The treasury growth rate
             example: 0.2
+            nullable: true
           decentralisation:
             type: number
             format: double
             description: The decentralisation parameter (1 fully centralised, 0 fully decentralised)
             example: 0.1
+            nullable: true
           entropy:
             type: string
             description: The hash of 32-byte string of extra random-ness added into the protocol's entropy pool
@@ -1895,22 +1992,27 @@ components:
             type: integer
             description: The protocol major version
             example: 5
+            nullable: true
           protocol_minor:
             type: integer
             description: The protocol minor version
             example: 0
+            nullable: true
           min_utxo_value:
             type: integer
             description: The minimum value of a UTxO entry
             example: 34482
+            nullable: true
           min_pool_cost:
             type: integer
             description: The minimum pool cost
             example: 340000000
+            nullable: true
           nonce:
             type: string
             description: The nonce value for this epoch
             example: 01304ddf5613166be96fce27be110747f2c8fcb38776618ee79225ccb59b81e2
+            nullable: true
           block_hash:
             type: string
             description: The hash of the first block where these parameters are valid
@@ -1919,48 +2021,59 @@ components:
             type: string
             description: The per language cost models
             example: null
+            nullable: true
           price_mem:
             type: number
             format: double
             description: The per word cost of script memory usage
             example: 0.0577
+            nullable: true
           price_step:
             type: number
             format: double
             description: The cost of script execution step usage
             example: 7.21e-05
+            nullable: true
           max_tx_ex_mem:
             type: number
             description: The maximum number of execution memory allowed to be used in a single transaction
             example: 10000000
+            nullable: true
           max_tx_ex_steps:
             type: number
             description: The maximum number of execution steps allowed to be used in a single transaction
             example: 10000000000
+            nullable: true
           max_block_ex_mem:
             type: number
             description: The maximum number of execution memory allowed to be used in a single block
             example: 50000000
+            nullable: true
           max_block_ex_steps:
             type: number
             description: The maximum number of execution steps allowed to be used in a single block
             example: 40000000000
+            nullable: true
           max_val_size:
             type: number
             description: The maximum Val size
             example: 5000
+            nullable: true
           collateral_percent:
             type: integer
             description: The percentage of the tx fee which must be provided as collateral when including non-native scripts
             example: 150
+            nullable: true
           max_collateral_inputs:
             type: integer
             description: The maximum number of collateral inputs allowed in a transaction
             example: 3
+            nullable: true
           coins_per_utxo_word:
             type: integer
             description: The cost per UTxO word
             example: 34482
+            nullable: true
     blocks:
       type: array
       items:
@@ -2042,6 +2155,10 @@ components:
             $ref: "#/components/schemas/blocks/items/properties/op_cert_counter"
           pool:
             $ref: "#/components/schemas/blocks/items/properties/pool"
+          proto_major:
+            $ref: "#/components/schemas/epoch_params/items/properties/protocol_major"
+          proto_minor:
+            $ref: "#/components/schemas/epoch_params/items/properties/protocol_minor"
           total_output:
             type: string
             description: Total output of the block (in lovelace)
@@ -3128,6 +3245,8 @@ components:
       description: The selected server has restricted the endpoint to be only usable via authentication. The authentication supplied was not authorized to access the endpoint
     PartialContent:
       description: The result was truncated
+    BadRequest:
+      description: The server cannot process the request due to invalid input
 tags:
   - name: Network
     description: Query information about the network
