@@ -239,7 +239,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Query Chain Tip
       description: Get the tip info about the latest block seen by chain
-  /genesis:
+  /genesis: #RPC
     get:
       tags:
         - Network
