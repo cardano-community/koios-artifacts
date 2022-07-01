@@ -16,13 +16,15 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/tip"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Query Chain Tip
       description: Get the tip info about the latest block seen by chain
-  /genesis:
+  /genesis: #RPC
     get:
       tags:
         - Network
@@ -33,6 +35,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/genesis"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -52,6 +56,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/totals"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -73,6 +79,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/epoch_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -92,6 +100,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/epoch_params"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -111,6 +121,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/blocks"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -130,6 +142,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/block_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -149,6 +163,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/block_txs"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -168,6 +184,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/tx_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -187,6 +205,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/tx_utxos"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -206,6 +226,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/tx_metadata"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -223,6 +245,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/tx_metalabels"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -272,6 +296,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/tx_status"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -291,6 +317,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/address_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -310,6 +338,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/address_txs"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -329,6 +359,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/address_assets"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -348,6 +380,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/credential_txs"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -365,6 +399,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/account_list"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -384,6 +420,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/account_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -404,6 +442,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/account_rewards"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -425,6 +465,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/account_updates"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -446,6 +488,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/account_addresses"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -465,6 +509,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/account_assets"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -484,6 +530,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/account_history"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -501,6 +549,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/asset_list"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -521,6 +571,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/asset_address_list"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -541,6 +593,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/asset_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -561,6 +615,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/asset_history"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -580,6 +636,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/asset_policy_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -600,6 +658,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/asset_summary"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -620,6 +680,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/asset_txs"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -637,6 +699,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/pool_list"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -656,6 +720,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/pool_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -676,6 +742,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/pool_delegators"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -696,6 +764,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/pool_blocks"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -718,6 +788,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/pool_history_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -740,6 +812,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/pool_updates"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -757,6 +831,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/pool_relays"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -776,6 +852,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/pool_metadata"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -793,6 +871,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/native_script_list"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -810,6 +890,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/plutus_script_list"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -829,6 +911,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/script_redeemers"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -850,6 +934,8 @@ components:
       description: The selected server has restricted the endpoint to be only usable via authentication. The authentication supplied was not authorized to access the endpoint
     PartialContent:
       description: The result was truncated
+    BadRequest:
+      description: The server cannot process the request due to invalid input
 tags:
   - name: Network
     description: Query information about the network
