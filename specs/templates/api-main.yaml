@@ -523,6 +523,7 @@ paths:
         - Account
       parameters:
         - $ref: "#/components/parameters/_any_address"
+        - $ref: "#/components/parameters/_epoch_no"
       responses:
         "200":
           description: Array of active stake values per epoch
