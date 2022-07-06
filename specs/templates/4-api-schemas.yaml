@@ -460,6 +460,16 @@ schemas:
             description: Total active stake in epoch stake snapshot (null for pre-Shelley epochs)
             example: 23395112387185880
             nullable: true
+          total_rewards:
+            type: string
+            description: Total rewards earned in epoch (null for pre-Shelley epochs)
+            example: 252902897534230
+            nullable: true
+          avg_blk_reward:
+            type: string
+            description: Average block reward for epoch (null for pre-Shelley epochs)
+            example: 660233450
+            nullable: true
     epoch_params:
       type: array
       description: Epoch parameters (all fields nullable for pre-Shelley/Gougen epochs except first block hash)
@@ -710,6 +720,10 @@ schemas:
             $ref: "#/components/schemas/blocks/items/properties/op_cert_counter"
           pool:
             $ref: "#/components/schemas/blocks/items/properties/pool"
+          proto_major:
+            $ref: "#/components/schemas/epoch_params/items/properties/protocol_major"
+          proto_minor:
+            $ref: "#/components/schemas/epoch_params/items/properties/protocol_minor"
           total_output:
             type: string
             description: Total output of the block (in lovelace)
