@@ -472,6 +472,7 @@ schemas:
             nullable: true
     epoch_params:
       type: array
+      description: Epoch parameters (all fields nullable for pre-Shelley/Gougen epochs except first block hash)
       items:
         properties:
           epoch_no:
