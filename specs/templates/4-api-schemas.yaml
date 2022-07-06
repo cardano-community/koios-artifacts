@@ -183,9 +183,7 @@ schemas:
             description: Pool ID (Hex format)
             example: a532904ca60e13e88437b58e7c6ff66b8d5e7ec8d3f4b9e4be7820ec
           active_epoch_no:
-            type: integer
-            description: Block number on chain where transaction was included
-            example: 6354154
+            $ref: "#/components/schemas/pool_updates/items/properties/active_epoch_no"
           vrf_key_hash:
             type: string
             description: Pool VRF key hash
@@ -333,8 +331,10 @@ schemas:
             type: string
             description: Current delegator live stake (in lovelace)
             example: 64328591517480
-          epoch_no:
-            $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+          active_epoch_no:
+            type: integer
+            description: Epoch number in which the delegation becomes active
+            example: 324
     pool_blocks:
       type: array
       nullable: true

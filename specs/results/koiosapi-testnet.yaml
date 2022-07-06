@@ -1770,8 +1770,10 @@ components:
             type: string
             description: Current delegator live stake (in lovelace)
             example: 64328591517480
-          epoch_no:
-            $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+          active_epoch_no:
+            type: integer
+            description: Epoch number in which the delegation becomes active
+            example: 324
     pool_blocks:
       type: array
       nullable: true
