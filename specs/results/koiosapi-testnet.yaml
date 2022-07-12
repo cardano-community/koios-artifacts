@@ -1487,7 +1487,7 @@ components:
             example: 45000000000000000
             description: Maximum smallest units (lovelaces) supply for the blockchain
           systemstart:
-            type: number
+            type: integer
             description: UNIX timestamp of the first block (genesis) on chain
             example: 1506203091
           activeslotcoeff:
@@ -1879,19 +1879,19 @@ components:
             description: Number of blocks created in epoch
             example: 17321
           start_time:
-            type: number
+            type: integer
             description: UNIX timestamp of the epoch start
             example: 1506203091
           end_time:
-            type: number
+            type: integer
             description: UNIX timestamp of the epoch end
             example: 1506635091
           first_block_time:
-            type: number
+            type: integer
             description: UNIX timestamp of the epoch's first block
             example: 1506635091
           last_block_time:
-            type: number
+            type: integer
             description: UNIX timestamp of the epoch's last block
             example: 1506635091
           active_stake:
@@ -2107,7 +2107,7 @@ components:
             description: Block size in bytes
             example: 79109
           block_time:
-            type: number
+            type: integer
             description: UNIX timestamp of the block
             example: 1506635091
           tx_count:
@@ -2386,7 +2386,7 @@ components:
             description: Overall slot number (slots from genesis block of chain)
             example: 42325043
           tx_timestamp:
-            type: number
+            type: integer
             description: UNIX timestamp of the transaction
             example: 1506635091
           tx_block_index:
@@ -2636,8 +2636,7 @@ components:
                           "version": 1,
                           "copyright": "...",
                           "publisher": ["p...o"],
-                          ? "4bf184e01e0f163296ab253edd60774e2d34367d0e7b6cbc689b567d"
-                          : {},
+                          "4bf184e01e0f163296ab253edd60774e2d34367d0e7b6cbc689b567d":{},
                         },
                     }
           certificates:
@@ -3049,7 +3048,7 @@ components:
             type: string
             example: "35000"
           creation_time:
-            type: number
+            type: integer
             description: UNIX timestamp of the first asset mint
             example: 1506635091
     asset_history:
