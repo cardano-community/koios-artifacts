@@ -4,7 +4,7 @@
     {"name":"damjan","addr":"195.201.129.190","port":8053},
     {"name":"homer","addr":"95.216.173.194","port":8053},
     {"name":"rdlrt","addr":"89.58.43.194","port":8053},
-    {"name":"HuthS0lo1-ssl","addr":"dbsync-testnet1.digitalsyndicate.io","port":8453,"ssl":"true"},
+    {"name":"HuthS0lo1-ssl","addr":"koios-testnet.digitalsyndicate.io","port":8453,"ssl":"true"},
     {"name":"reqlez","addr":"192.234.196.167","port":8053}
   ],
   "Consumers": []
