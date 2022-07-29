@@ -2837,23 +2837,24 @@ components:
             description: Count of total burn transactions
             example: 5
           minting_tx_metadata:
-            type: object
+            type: array
             nullable: true
-            properties:
-              key:
-                type: string
-                description: The metadata key
-                example: "721"
-              json:
-                type: object
-                description: The minting Tx JSON payload if it can be decoded as JSON
-                example:
-                  {
-                    "image": "ipfs://QmVHpTQL4Furw6fFNhSHdT3AWGbDE9Vs341JHJhQF1bAEA",
-                    "pattern": "08",
-                    "collection": "ccvault.io - the mesmerizer 2021",
-                    "description": "Thanks for supporting ccvault.io development!",
-                  }
+            items:
+              properties:
+                key:
+                  type: string
+                  description: The metadata key
+                  example: "721"
+                json:
+                  type: object
+                  description: The minting Tx JSON payload if it can be decoded as JSON
+                  example:
+                    {
+                      "image": "ipfs://QmVHpTQL4Furw6fFNhSHdT3AWGbDE9Vs341JHJhQF1bAEA",
+                      "pattern": "08",
+                      "collection": "ccvault.io - the mesmerizer 2021",
+                      "description": "Thanks for supporting ccvault.io development!",
+                    }
           token_registry_metadata:
             type: object
             description: Asset metadata registered on the Cardano Token Registry
@@ -2904,10 +2905,14 @@ components:
                   type: string
                   description: Hash of minting/burning transaction
                   example: e1ecc517f95715bb87681cfde2c594dbc971739f84f8bfda16170b35d63d0ddf
+                block_time:
+                  $ref: "#/components/schemas/blocks/items/properties/block_time"
                 quantity:
                   type: string
                   description: Quantity minted/burned (negative numbers indicate burn transactions)
                   example: "-10"
+                metadata:
+                  $ref: "#/components/schemas/asset_info/items/properties/minting_tx_metadata"
     asset_policy_info:
       type: array
       description: List of policy assets
