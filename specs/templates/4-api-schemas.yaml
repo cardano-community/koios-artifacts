@@ -4,25 +4,15 @@ schemas:
       items:
         properties:
           hash:
-            type: string
-            description: Block Hash in hex
-            example: 3cc8cfdb2d68fdb2a467292bf0acda7b91ab677741e3e1c1dc111f5be0cef0fe
+            $ref: "#/components/schemas/blocks/items/properties/hash"
           epoch_no:
-            type: integer
-            description: Epoch number
-            example: 294
+            $ref: "#/components/schemas/blocks/items/properties/epoch_no"
           abs_slot:
-            type: integer
-            description: Absolute Slot number (slots not divided into epochs)
-            example: 41997413
+            $ref: "#/components/schemas/blocks/items/properties/abs_slot"
           epoch_slot:
-            type: integer
-            description: Slot number within Epoch
-            example: 352613
+            $ref: "#/components/schemas/blocks/items/properties/epoch_slot"
           block_no:
-            type: integer
-            description: Block Height number on chain
-            example: 6338276
+            $ref: "#/components/schemas/blocks/items/properties/block_height"
           block_time:
             $ref: "#/components/schemas/blocks/items/properties/block_time"
     genesis:
@@ -547,7 +537,7 @@ schemas:
             description: The decentralisation parameter (1 fully centralised, 0 fully decentralised)
             example: 0.1
             nullable: true
-          entropy:
+          extra_entropy:
             type: string
             description: The hash of 32-byte string of extra random-ness added into the protocol's entropy pool
             example: d982e06fd33e7440b43cefad529b7ecafbaa255e38178ad4189a37e4ce9bf1fa
@@ -633,9 +623,9 @@ schemas:
             description: The maximum number of collateral inputs allowed in a transaction
             example: 3
             nullable: true
-          coins_per_utxo_word:
+          coins_per_utxo_size:
             type: integer
-            description: The cost per UTxO word
+            description: The cost per UTxO size
             example: 34482
             nullable: true
     blocks:
@@ -688,6 +678,10 @@ schemas:
             type: integer
             description: Counter value of the operational certificate used to create this block
             example: 8
+          proto_major:
+            $ref: "#/components/schemas/epoch_params/items/properties/protocol_major"
+          proto_minor:
+            $ref: "#/components/schemas/epoch_params/items/properties/protocol_minor"
     block_info:
       type: array
       items:
@@ -890,7 +884,7 @@ schemas:
         type: object
         properties:
           asset_policy:
-            $ref: "#/components/schemas/asset_summary/items/properties/policy_id"
+            $ref: "#/components/schemas/asset_info/items/properties/policy_id"
           asset_name:
             $ref: "#/components/schemas/asset_info/items/properties/asset_name_ascii"
           quantity:
@@ -927,25 +921,15 @@ schemas:
             description: Hash identifier of the transaction
             example: f144a8264acf4bdfe2e1241170969c930d64ab6b0996a4a45237b623f1dd670e
           block_hash:
-            type: string
-            description: Hash of Block in which transaction was included
-            example: 90062dfc314c7dc3430922a48f79032a63032206fdca2dfd144cf0930d4aa426
+            $ref: "#/components/schemas/blocks/items/properties/hash"
           block_height:
-            type: integer
-            description: Block number on chain where transaction was included
-            example: 6354154
+            $ref: "#/components/schemas/blocks/items/properties/block_height"
           epoch_no:
-            type: integer
-            description: Epoch number
-            example: 295
+            $ref: "#/components/schemas/blocks/items/properties/epoch_no"
           epoch_slot:
-            type: integer
-            description: Slot number within epoch
-            example: 248243
+            $ref: "#/components/schemas/blocks/items/properties/epoch_slot"
           absolute_slot:
-            type: integer
-            description: Overall slot number (slots from genesis block of chain)
-            example: 42325043
+            $ref: "#/components/schemas/blocks/items/properties/abs_slot"
           tx_timestamp:
             type: integer
             description: UNIX timestamp of the transaction
@@ -979,7 +963,7 @@ schemas:
             description: Slot after which transaction cannot be validated
             example: 42332172
             nullable: true
-          collaterals:
+          collateral_inputs:
             type: array
             description: An array of collateral inputs needed when dealing with smart contracts (same json schema as inputs)
             nullable: true
@@ -1022,13 +1006,9 @@ schemas:
                   items:
                     properties:
                       policy_id:
-                        type: string
-                        description: Asset Policy ID (hex)
-                        example: 6cf6b5cf0fefbe9e69d640d8be84912bb2c9e132671954548790bcfb
+                        $ref: "#/components/schemas/asset_info/items/properties/policy_id"
                       asset_name:
-                        type: string
-                        description: Asset Name (hex)
-                        example: 6d65736d6572697a65723038353436
+                        $ref: "#/components/schemas/asset_info/items/properties/asset_name"
                       quantity:
                         type: string
                         description: Asset balance on the selected input transaction
@@ -1070,20 +1050,17 @@ schemas:
                 asset_list:
                   type: array
                   nullable: true
-                  description: An array of assets contained on input UTxO
+                  description: An array of assets on the UTxO
                   items:
                     properties:
                       policy_id:
-                        type: string
-                        description: Asset Policy ID (hex)
-                        example: 6cf6b5cf0fefbe9e69d640d8be84912bb2c9e132671954548790bcfb
+                        $ref: "#/components/schemas/asset_info/items/properties/policy_id"
                       asset_name:
-                        type: string
-                        description: Asset Name (hex)
-                        example: 6d65736d6572697a65723038353436
+                        $ref: "#/components/schemas/asset_info/items/properties/asset_name"
                       quantity:
                         type: string
-                        description: Asset balance on the selected input transaction
+                        nullable: true
+                        description: Quantity of assets on the UTxO
                         example: 1
           outputs:
             type: array
@@ -1120,26 +1097,7 @@ schemas:
                   description: Total sum on the output address
                   example: 157832856
                 asset_list:
-                  type: array
-                  nullable: true
-                  description: An array of assets to be included in output UTxO
-                  items:
-                    properties:
-                      policy_id:
-                        type: string
-                        nullable: true
-                        description: Asset Policy ID (hex)
-                        example: 6cf6b5cf0fefbe9e69d640d8be84912bb2c9e132671954548790bcfb
-                      asset_name:
-                        type: string
-                        nullable: true
-                        description: Asset Name (hex)
-                        example: 6d65736d6572697a65723038353436
-                      quantity:
-                        type: string
-                        nullable: true
-                        description: Sum of assets for output UTxO
-                        example: 1
+                  $ref: "#/components/schemas/tx_info/items/properties/inputs/items/properties/asset_list"
           withdrawals:
             type: array
             description: Array of withdrawals with-in a transaction
@@ -1165,13 +1123,9 @@ schemas:
             items:
               properties:
                 policy_id:
-                  type: string
-                  description: Asset Policy ID (hex)
-                  example: 6cf6b5cf0fefbe9e69d640d8be84912bb2c9e132671954548790bcfb
+                  $ref: "#/components/schemas/asset_info/items/properties/policy_id"
                 asset_name:
-                  type: string
-                  description: Asset Name (hex)
-                  example: 6d65736d6572697a65723036363333
+                  $ref: "#/components/schemas/asset_info/items/properties/asset_name"
                 quantity:
                   type: string
                   description: Sum of minted assets (negative on burn)
@@ -1187,19 +1141,7 @@ schemas:
                   description: Metadata key (index)
                   example: "0"
                 json:
-                  type: object
-                  description: A JSON containing details about metadata within transaction
-                  nullable: true
-                  example:
-                    {
-                      "721":
-                        {
-                          "version": 1,
-                          "copyright": "...",
-                          "publisher": ["p...o"],
-                          "4bf184e01e0f163296ab253edd60774e2d34367d0e7b6cbc689b567d":{},
-                        },
-                    }
+                  $ref: "#/components/schemas/tx_metadata/items/properties/metadata"
           certificates:
             type: array
             nullable: true
@@ -1321,120 +1263,18 @@ schemas:
       items:
         properties:
           tx_hash:
-            type: string
-            description: Hash of Transaction for which details are being shown
-            example: f144a8264acf4bdfe2e1241170969c930d64ab6b0996a4a45237b623f1dd670e
+            $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
           inputs:
-            type: array
-            description: An array with details about inputs used in a transaction
-            items:
-              type: object
-              properties:
-                payment_addr:
-                  type: object
-                  properties:
-                    bech32:
-                      type: string
-                      description: A Cardano payment/base address (bech32 encoded) for transaction's input UTxO
-                      example: addr1qxkfe8s6m8qt5436lec3f0320hrmpppwqgs2gah4360krvyssntpwjcz303mx3h4avg7p29l3zd8u3jyglmewds9ezrqdc3cxp
-                    cred:
-                      type: string
-                      description: Payment credential
-                      example: ac9c9e1ad9c0ba563afe7114be2a7dc7b0842e0220a476f58e9f61b0
-                stake_addr:
-                  type: string
-                  nullable: true
-                  description: A Cardano staking address (reward account, bech32 encoded) for transaction's input UTxO
-                  example: stake1uxggf4shfvpghcangm67ky0q4zlc3xn7gezy0auhxczu3pslm9wrj
-                tx_hash:
-                  type: string
-                  description: Hash of Transaction for input UTxO
-                  example: f144a8264acf4bdfe2e1241170969c930d64ab6b0996a4a45237b623f1dd670e
-                tx_index:
-                  type: integer
-                  description: Index of input UTxO on the mentioned address used for input
-                  example: 0
-                value:
-                  type: string
-                  description: Balance on the selected input transaction
-                  example: 158005617
-                asset_list:
-                  type: array
-                  description: An array of assets contained on input UTxO
-                  items:
-                    properties:
-                      policy_id:
-                        type: string
-                        description: Asset Policy ID (hex)
-                        example: 6cf6b5cf0fefbe9e69d640d8be84912bb2c9e132671954548790bcfb
-                      asset_name:
-                        type: string
-                        description: Asset Name (hex)
-                        example: 6d65736d6572697a65723038353436
-                      quantity:
-                        type: string
-                        description: Asset balance on the selected input transaction
-                        example: 1
+            $ref: "#/components/schemas/tx_info/items/properties/inputs"
           outputs:
-            type: array
-            description: An array with details about outputs from the transaction
-            items:
-              type: object
-              properties:
-                payment_addr:
-                  type: object
-                  properties:
-                    bech32:
-                      type: string
-                      description: A Cardano payment/base address (bech32 encoded) where funds were sent or change to be returned
-                      example: addr1q80rc8zj06yzdwwdyqc03rm4l3zv6n89rxuaak0t099n09yssntpwjcz303mx3h4avg7p29l3zd8u3jyglmewds9ezrqad9mkw
-                    cred:
-                      type: string
-                      description: Payment credential
-                      example: de3c1c527e8826b9cd2030f88f75fc44cd4ce519b9ded9eb794b3794
-                stake_addr:
-                  type: string
-                  nullable: true
-                  description: A Cardano staking address (reward account, bech32 encoded) for transaction's output UTxO
-                  example: stake1uxggf4shfvpghcangm67ky0q4zlc3xn7gezy0auhxczu3pslm9wrj
-                tx_hash:
-                  type: string
-                  description: Hash of this transaction
-                  example: f144a8264acf4bdfe2e1241170969c930d64ab6b0996a4a45237b623f1dd670e
-                tx_index:
-                  type: integer
-                  description: Index of output UTxO
-                  example: 0
-                value:
-                  type: string
-                  description: Total sum on the output address
-                  example: 157832856
-                asset_list:
-                  type: array
-                  description: An array of assets to be included in output UTxO
-                  items:
-                    properties:
-                      policy_id:
-                        type: string
-                        description: Asset Policy ID (hex)
-                        example: 6cf6b5cf0fefbe9e69d640d8be84912bb2c9e132671954548790bcfb
-                      asset_name:
-                        type: string
-                        description: Asset Name (hex)
-                        example: 6d65736d6572697a65723038353436
-                      quantity:
-                        type: string
-                        description: Sum of assets for output UTxO
-                        example: 1
+            $ref: "#/components/schemas/tx_info/items/properties/outputs"
     tx_metadata:
       type: array
       nullable: true
       items:
         properties:
           tx_hash:
-            type: string
-            description: Hash of the transaction for which details are being shown
-            example: f144a8264acf4bdfe2e1241170969c930d64ab6b0996a4a45237b623f1dd670e
+            $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
           metadata:
             type: object
             nullable: true
@@ -1455,9 +1295,7 @@ schemas:
       items:
         properties:
           tx_hash:
-            type: string
-            description: Hash of the transaction for which details are being shown
-            example: f144a8264acf4bdfe2e1241170969c930d64ab6b0996a4a45237b623f1dd670e
+            $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
           num_confirmations:
             type: integer
             description: Number of block confirmations
@@ -1478,7 +1316,7 @@ schemas:
         type: object
         properties:
           policy_id:
-            $ref: "#/components/schemas/asset_summary/items/properties/policy_id"
+            $ref: "#/components/schemas/asset_info/items/properties/policy_id"
           asset_names:
             type: object
             properties:
@@ -1512,13 +1350,9 @@ schemas:
       items:
         properties:
           policy_id:
-            type: string
-            description: Asset Policy ID (hex)
-            example: 6cf6b5cf0fefbe9e69d640d8be84912bb2c9e132671954548790bcfb
+            $ref: "#/components/schemas/asset_info/items/properties/policy_id"
           asset_name:
-            type: string
-            description: Asset Name (hex)
-            example: 6d65736d6572697a65723038353436
+            $ref: "#/components/schemas/asset_info/items/properties/asset_name"
           total_transactions:
             type: integer
             description: Total number of transactions including the given asset
@@ -1537,10 +1371,12 @@ schemas:
         properties:
           policy_id:
             type: string
+            nullable: true
             description: Asset Policy ID (hex)
             example: d3501d9531fcc25e3ca4b6429318c2cc374dbdbcf5e99c1c1e5da1ff
           asset_name:
             type: string
+            nullable: true
             description: Asset Name (hex)
             example: 444f4e545350414d
           asset_name_ascii:
@@ -1617,13 +1453,9 @@ schemas:
       items:
         properties:
           policy_id:
-            type: string
-            description: Asset Policy ID (hex)
-            example: d3501d9531fcc25e3ca4b6429318c2cc374dbdbcf5e99c1c1e5da1ff
+            $ref: "#/components/schemas/asset_info/items/properties/policy_id"
           asset_name:
-            type: string
-            description: Asset Name (hex)
-            example: 444f4e545350414d
+            $ref: "#/components/schemas/asset_info/items/properties/asset_name"
           minting_txs:
             type: array
             description: Array of all mint/burn transactions for an asset
@@ -1645,59 +1477,15 @@ schemas:
       items:
         properties:
           asset_name:
-            type: string
-            description: Asset Name (hex)
-            example: 444f4e545350414d
+            $ref: "#/components/schemas/asset_info/items/properties/asset_name"
           asset_name_ascii:
-            type: string
-            description: Asset Name (ASCII)
-            example: DONTSPAM
+            $ref: "#/components/schemas/asset_info/items/properties/asset_name_ascii"
           fingerprint:
-            type: string
-            description: The CIP14 fingerprint of the asset
-            example: asset1ua6pz3yd5mdka946z8jw2fld3f8d0mmxt75gv9
+            $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
           minting_tx_metadata:
-            type: object
-            nullable: true
-            properties:
-              key:
-                type: string
-                description: The metadata key
-                example: "721"
-              json:
-                type: object
-                description: The minting Tx JSON payload if it can be decoded as JSON
-                example:
-                  {
-                    "image": "ipfs://QmVHpTQL4Furw6fFNhSHdT3AWGbDE9Vs341JHJhQF1bAEA",
-                    "pattern": "08",
-                    "collection": "ccvault.io - the mesmerizer 2021",
-                    "description": "Thanks for supporting ccvault.io development!",
-                  }
+            $ref: "#/components/schemas/asset_info/items/properties/minting_tx_metadata"
           token_registry_metadata:
-            type: object
-            description: Asset metadata registered on the Cardano Token Registry
-            nullable: true
-            properties:
-              name:
-                type: string
-                example: Rackmob
-              description:
-                type: string
-                example: Metaverse Blockchain Cryptocurrency.
-              ticker:
-                type: string
-                example: MOB
-              url:
-                type: string
-                example: https://www.rackmob.com/
-              logo:
-                type: string
-                description: A PNG image file as a byte string
-                example: iVBORw0KGgoAAAANSUhEUgAAAPoAAAD6CAYAAACI7Fo9AAAACXBIWXMAAA7EAAAOxAGVKw4bAAADnmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSfvu78nIGlkPSdXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQnPz4KPHg6eG1wbWV0YSB4bWxuczp4PSdhZG9iZTpuczptZXRhLyc
-              decimals:
-                type: integer
-                example: 0
+            $ref: "#/components/schemas/asset_info/items/properties/token_registry_metadata"
           total_supply:
             type: string
             example: "35000"
