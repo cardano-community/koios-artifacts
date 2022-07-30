@@ -964,107 +964,20 @@ schemas:
             example: 42332172
             nullable: true
           collateral_inputs:
-            type: array
-            description: An array of collateral inputs needed when dealing with smart contracts (same json schema as inputs)
-            nullable: true
-            items:
-              type: object
-              nullable: true
-              properties:
-                payment_addr:
-                  type: object
-                  properties:
-                    bech32:
-                      type: string
-                      description: A Cardano payment/base address (bech32 encoded) for transaction's input UTxO
-                      example: addr1qxkfe8s6m8qt5436lec3f0320hrmpppwqgs2gah4360krvyssntpwjcz303mx3h4avg7p29l3zd8u3jyglmewds9ezrqdc3cxp
-                    cred:
-                      type: string
-                      description: Payment credential
-                      example: ac9c9e1ad9c0ba563afe7114be2a7dc7b0842e0220a476f58e9f61b0
-                stake_addr:
-                  type: string
-                  nullable: true
-                  description: A Cardano staking address (reward account, bech32 encoded) for transaction's input UTxO
-                  example: stake1uxggf4shfvpghcangm67ky0q4zlc3xn7gezy0auhxczu3pslm9wrj
-                tx_hash:
-                  type: string
-                  description: Hash of Transaction for input UTxO
-                  example: f144a8264acf4bdfe2e1241170969c930d64ab6b0996a4a45237b623f1dd670e
-                tx_index:
-                  type: integer
-                  description: Index of input UTxO on the mentioned address used for input
-                  example: 0
-                value:
-                  type: string
-                  description: Balance on the selected input transaction
-                  example: 158005617
-                asset_list:
-                  type: array
-                  nullable: true
-                  description: An array of assets contained on input UTxO
-                  items:
-                    properties:
-                      policy_id:
-                        $ref: "#/components/schemas/asset_info/items/properties/policy_id"
-                      asset_name:
-                        $ref: "#/components/schemas/asset_info/items/properties/asset_name"
-                      quantity:
-                        type: string
-                        description: Asset balance on the selected input transaction
-                        example: 1
+            $ref: "#/components/schemas/tx_info/items/properties/outputs"
+            description: An array of collateral inputs needed for smart contracts in case of contract failure
+          collateral_outputs:
+            $ref: "#/components/schemas/tx_info/items/properties/outputs"
+            description: An array of collateral outputs for change if the smart contract fails to execute and collateral inputs are spent. (CIP-40)
+          reference_inputs:
+            $ref: "#/components/schemas/tx_info/items/properties/outputs"
+            description: An array of reference inputs. A reference input allows looking at an output without spending it. (CIP-31)
           inputs:
-            type: array
-            description: An array with details about inputs used in a transaction
-            items:
-              type: object
-              properties:
-                payment_addr:
-                  type: object
-                  properties:
-                    bech32:
-                      type: string
-                      description: A Cardano payment/base address (bech32 encoded) for transaction's input UTxO
-                      example: addr1qxkfe8s6m8qt5436lec3f0320hrmpppwqgs2gah4360krvyssntpwjcz303mx3h4avg7p29l3zd8u3jyglmewds9ezrqdc3cxp
-                    cred:
-                      type: string
-                      description: Payment credential
-                      example: ac9c9e1ad9c0ba563afe7114be2a7dc7b0842e0220a476f58e9f61b0
-                stake_addr:
-                  type: string
-                  nullable: true
-                  description: A Cardano staking address (reward account, bech32 encoded) for transaction's input UTxO
-                  example: stake1uxggf4shfvpghcangm67ky0q4zlc3xn7gezy0auhxczu3pslm9wrj
-                tx_hash:
-                  type: string
-                  description: Hash of Transaction for input UTxO
-                  example: f144a8264acf4bdfe2e1241170969c930d64ab6b0996a4a45237b623f1dd670e
-                tx_index:
-                  type: integer
-                  description: Index of input UTxO on the mentioned address used for input
-                  example: 0
-                value:
-                  type: string
-                  description: Balance on the selected input transaction
-                  example: 158005617
-                asset_list:
-                  type: array
-                  nullable: true
-                  description: An array of assets on the UTxO
-                  items:
-                    properties:
-                      policy_id:
-                        $ref: "#/components/schemas/asset_info/items/properties/policy_id"
-                      asset_name:
-                        $ref: "#/components/schemas/asset_info/items/properties/asset_name"
-                      quantity:
-                        type: string
-                        nullable: true
-                        description: Quantity of assets on the UTxO
-                        example: 1
+            $ref: "#/components/schemas/tx_info/items/properties/outputs"
+            description: An array of UTxO inputs spent in the transaction
           outputs:
             type: array
-            description: An array with details about outputs from the transaction
+            description: An array of UTxO outputs created by the transaction
             items:
               type: object
               properties:
@@ -1080,24 +993,77 @@ schemas:
                       description: Payment credential
                       example: de3c1c527e8826b9cd2030f88f75fc44cd4ce519b9ded9eb794b3794
                 stake_addr:
-                  type: string
-                  nullable: true
-                  description: A Cardano staking address (reward account, bech32 encoded) for transaction's output UTxO
-                  example: stake1uxggf4shfvpghcangm67ky0q4zlc3xn7gezy0auhxczu3pslm9wrj
+                  $ref: "#/components/schemas/account_history/items/properties/stake_address"
                 tx_hash:
                   type: string
-                  description: Hash of this transaction
+                  description: Hash of transaction for UTxO
                   example: f144a8264acf4bdfe2e1241170969c930d64ab6b0996a4a45237b623f1dd670e
                 tx_index:
                   type: integer
-                  description: Index of output UTxO
+                  description: Index of UTxO in the transaction 
                   example: 0
                 value:
                   type: string
-                  description: Total sum on the output address
+                  description: Total sum of ADA on the UTxO
                   example: 157832856
+                datum_hash:
+                  type: string
+                  nullable: true
+                  description: Hash of datum (if any) connected to UTxO 
+                  example: 30c16dd243324cf9d90ffcf211b9e0f2117a7dc28d17e85927dfe2af3328e5c9
+                inline_datum:
+                  type: object
+                  nullable: true
+                  description: Allows datums to be attached to UTxO (CIP-32)
+                  properties:
+                    bytes:
+                      type: string
+                      description: Datum (hex)
+                      example: 19029a
+                    value:
+                      type: object
+                      description: Value (json)
+                      example: { "int": 666 }
+                reference_script:
+                  type: object
+                  nullable: true
+                  description: Allow reference scripts to be used to satisfy script requirements during validation, rather than requiring the spending transaction to do so. (CIP-33)
+                  properties:
+                    hash:
+                      type: string
+                      description: Hash of referenced script
+                      example: 67f33146617a5e61936081db3b2117cbf59bd2123748f58ac9678656
+                    size:
+                      type: integer
+                      description: Size in bytes
+                      example: 14
+                    type:
+                      type: string
+                      description: Type of script
+                      example: plutusV1
+                    bytes:
+                      type: string
+                      description: Script bytes (hex)
+                      example: 4e4d01000033222220051200120011
+                    value:
+                      type: object
+                      nullable: true
+                      description: Value (json)
+                      example: null
                 asset_list:
-                  $ref: "#/components/schemas/tx_info/items/properties/inputs/items/properties/asset_list"
+                  type: array
+                  nullable: true
+                  description: An array of assets on the UTxO
+                  items:
+                    properties:
+                      policy_id:
+                        $ref: "#/components/schemas/asset_info/items/properties/policy_id"
+                      asset_name:
+                        $ref: "#/components/schemas/asset_info/items/properties/asset_name"
+                      quantity:
+                        type: string
+                        description: Quantity of assets on the UTxO
+                        example: 1
           withdrawals:
             type: array
             description: Array of withdrawals with-in a transaction
