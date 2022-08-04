@@ -449,7 +449,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Transaction Metadata
       description: Get metadata information (if any) for given transaction(s)
-  /tx_metalabels:
+  /tx_metalabels: #RPC
     get:
       tags:
         - Transactions
