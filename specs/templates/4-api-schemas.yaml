@@ -993,7 +993,9 @@ schemas:
                       description: Payment credential
                       example: de3c1c527e8826b9cd2030f88f75fc44cd4ce519b9ded9eb794b3794
                 stake_addr:
-                  $ref: "#/components/schemas/account_history/items/properties/stake_address"
+                  nullable: true
+                  allOf:
+                  - $ref: "#/components/schemas/account_history/items/properties/stake_address"
                 tx_hash:
                   type: string
                   description: Hash of transaction for UTxO
@@ -1374,6 +1376,7 @@ schemas:
                   type: string
                   description: The metadata key
                   example: "721"
+                  nullable: true
                 json:
                   type: object
                   description: The minting Tx JSON payload if it can be decoded as JSON
@@ -1384,6 +1387,7 @@ schemas:
                       "collection": "ccvault.io - the mesmerizer 2021",
                       "description": "Thanks for supporting ccvault.io development!",
                     }
+                  nullable: true
           token_registry_metadata:
             type: object
             description: Asset metadata registered on the Cardano Token Registry
