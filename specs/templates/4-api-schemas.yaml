@@ -494,12 +494,12 @@ schemas:
             example: 1100
             nullable: true
           key_deposit:
-            type: integer
+            type: string
             description: The amount (in lovelace) required for a deposit to register a stake address
             example: 2000000
             nullable: true
           pool_deposit:
-            type: integer
+            type: string
             description: The amount (in lovelace) required for a deposit to register a stake pool
             example: 500000000
             nullable: true
@@ -553,12 +553,12 @@ schemas:
             example: 0
             nullable: true
           min_utxo_value:
-            type: integer
+            type: string
             description: The minimum value of a UTxO entry
             example: 34482
             nullable: true
           min_pool_cost:
-            type: integer
+            type: string
             description: The minimum pool cost
             example: 340000000
             nullable: true
@@ -624,7 +624,7 @@ schemas:
             example: 3
             nullable: true
           coins_per_utxo_size:
-            type: integer
+            type: string
             description: The cost per UTxO size
             example: 34482
             nullable: true
@@ -727,6 +727,10 @@ schemas:
             description: Total fees of the block (in lovelace)
             example: 2346834
             nullable: true
+          num_confirmations:
+            type: integers
+            description: Number of confirmations for the block
+            example: 664275
           parent_hash:
             type: string
             description: Hash of the parent of this block
