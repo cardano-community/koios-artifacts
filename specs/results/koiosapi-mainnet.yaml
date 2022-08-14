@@ -2165,7 +2165,7 @@ components:
             example: 2346834
             nullable: true
           num_confirmations:
-            type: integers
+            type: integer
             description: Number of confirmations for the block
             example: 664275
           parent_hash:
@@ -2507,6 +2507,8 @@ components:
                         type: string
                         description: Quantity of assets on the UTxO
                         example: 1
+                      fingerprint:
+                        $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
           withdrawals:
             type: array
             description: Array of withdrawals with-in a transaction
@@ -2714,7 +2716,7 @@ components:
       type: array
       items:
         properties:
-          metalabel:
+          key:
             type: string
             description: A distinct known metalabel
             example: "721"
