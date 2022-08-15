@@ -973,6 +973,7 @@ schemas:
           collateral_output:
             $ref: "#/components/schemas/tx_info/items/properties/outputs/items"
             description: A collateral output for change if the smart contract fails to execute and collateral inputs are spent. (CIP-40)
+            nullable: true
           reference_inputs:
             $ref: "#/components/schemas/tx_info/items/properties/outputs"
             description: An array of reference inputs. A reference input allows looking at an output without spending it. (CIP-31)
