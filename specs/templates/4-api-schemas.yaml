@@ -628,6 +628,22 @@ schemas:
             description: The cost per UTxO size
             example: 34482
             nullable: true
+    epoch_block_protocols:
+      type: array
+      items:
+        properties:
+          proto_major:
+            type: integer
+            description: Protocol major version
+            example: 6
+          proto_minor:
+            type: integer
+            description: Protocol major version
+            example: 2
+          blocks:
+            type: integer
+            description: Amount of blocks with specified major and protocol combination
+            example: 2183
     blocks:
       type: array
       items:
