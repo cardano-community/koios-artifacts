@@ -1825,7 +1825,7 @@ components:
             description: Epoch number for the snapshot entry
             example: 324
           nonce:
-            type: "5c6916ca6c2cf8c52b552c2b7092f40ef81fe2ad2cdfe614962efa049c75e139"
+            $ref: "#/components/schemas/epoch_params/items/properties/nonce"
           pool_stake:
             type: string
             description: Pool's Active Stake for the given epoch
@@ -1846,7 +1846,7 @@ components:
             type: string
             description: Current delegator live stake (in lovelace)
             example: 64328591517480
-          epoch_no:
+          active_epoch_no:
             type: integer
             description: Epoch number in which the delegation becomes active
             example: 324
@@ -1921,6 +1921,8 @@ components:
             $ref: "#/components/schemas/pool_info/items/properties/meta_url"
           meta_hash:
             $ref: "#/components/schemas/pool_info/items/properties/meta_hash"
+          meta_json:
+            $ref: "#/components/schemas/pool_info/items/properties/meta_json"
           pool_status:
             $ref: "#/components/schemas/pool_info/items/properties/pool_status"
           retiring_epoch:
@@ -2338,9 +2340,9 @@ components:
                 datum_hash:
                   $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_hash"
                 inline_datum:
-                  $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/inline_datum"
+                  $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/inline_datum"
                 reference_script:
-                  $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/reference_script"
+                  $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/reference_script"
                 asset_list:
                   $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/asset_list"
     address_txs:
