@@ -325,6 +325,28 @@ paths:
       description: >-
         Get the protocol parameters for specific epoch, returns information
         about all epochs if no epoch specified
+  /epoch_block_protocols: #RPC
+    get:
+      tags:
+        - Epoch
+      parameters:
+        - $ref: "#/components/parameters/_epoch_no"
+      responses:
+        "200":
+          description: Array of distinct block protocol versions counts in epoch
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/epoch_params"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Epoch's Block Protocols
+      description: >-
+        Get the information about block protocol distribution in epoch
   /blocks:
     get:
       tags:
@@ -2151,6 +2173,22 @@ components:
             description: The cost per UTxO size
             example: 34482
             nullable: true
+    epoch_block_protocols:
+      type: array
+      items:
+        properties:
+          proto_major:
+            type: integer
+            description: Protocol major version
+            example: 6
+          proto_minor:
+            type: integer
+            description: Protocol major version
+            example: 2
+          blocks:
+            type: integer
+            description: Amount of blocks with specified major and protocol combination
+            example: 2183
     blocks:
       type: array
       items:
