@@ -309,6 +309,30 @@ schemas:
             nullable: true
             description: Pool live saturation (decimal format)
             example: 94.52
+    pool_snapshot:
+      type: array
+      nullable: true
+      items:
+        type: object
+        properties:
+          snapshot:
+            type: string
+            description: Type of snapshot ("Mark", "Set" or "Go")
+            example: "Mark"
+          epoch_no:
+            type: integer
+            description: Epoch number for the snapshot entry
+            example: 324
+          nonce:
+            type: "5c6916ca6c2cf8c52b552c2b7092f40ef81fe2ad2cdfe614962efa049c75e139"
+          pool_stake:
+            type: string
+            description: Pool's Active Stake for the given epoch
+            example: "100000000000"
+          active_stake:
+            type: string
+            description: Total Active Stake for the given epoch
+            example: "103703246364020"
     pool_delegators:
       type: array
       nullable: true
@@ -321,9 +345,27 @@ schemas:
             type: string
             description: Current delegator live stake (in lovelace)
             example: 64328591517480
-          active_epoch_no:
+          epoch_no:
             type: integer
             description: Epoch number in which the delegation becomes active
+            example: 324
+          latest_delegation_hash:
+            type: string
+            description: Latest transaction hash used for delegation by the account
+            example: 368d08fe86804d637649341d3aec4a9baa7dffa6d00f16de2ba9dba814f1c948
+    pool_delegators_history:
+      type: array
+      nullable: true
+      items:
+        type: object
+        properties:
+          stake_address:
+            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+          amount:
+            $ref: "#/components/schemas/pool_delegators/items/properties/amount"
+          epoch_no:
+            type: integer
+            description: Epoch number for the delegation history
             example: 324
     pool_blocks:
       type: array

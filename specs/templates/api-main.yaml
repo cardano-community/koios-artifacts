@@ -751,13 +751,33 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Pool Information
       description: Current pool statuses and details for a specified list of pool ids
+  /pool_stake_snapshot: #RPC
+    get:
+      tags:
+        - Pool
+      parameters:
+        - $ref: "#/components/parameters/_pool_bech32"
+      responses:
+        "200":
+          description: Array of pool stake information for 3 snapshots
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_snapshot"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Pool Stake Snapshot
+      description: Returns Mark, Set and Go stake snapshots for the selected pool, useful for leaderlog calculation
   /pool_delegators: #RPC
     get:
       tags:
         - Pool
       parameters:
         - $ref: "#/components/parameters/_pool_bech32"
-        - $ref: "#/components/parameters/_epoch_no"
       responses:
         "200":
           description: Array of pool delegator information
@@ -772,7 +792,29 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Pool Delegators List
-      description: Return information about delegators by a given pool and optional epoch (current if omitted)
+      description: Return information about live delegators for a given pool.
+  /pool_delegators_history: #RPC
+    get:
+      tags:
+        - Pool
+      parameters:
+        - $ref: "#/components/parameters/_pool_bech32"
+        - $ref: "#/components/parameters/_epoch_no"
+      responses:
+        "200":
+          description: Array of pool delegator information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_delegators_history"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Pool Delegators History
+      description: Return information about active delegators (incl. history) for a given pool and epoch number - current epoch if not provided.
   /pool_blocks: #RPC
     get:
       tags:
