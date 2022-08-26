@@ -520,11 +520,11 @@ paths:
       summary: Transaction Status (Block Confirmations)
       description: Get the number of block confirmations for a given transaction hash list
   /address_info: #RPC
-    get:
+    post:
       tags:
         - Address
-      parameters:
-        - $ref: "#/components/parameters/_address"
+      requestBody:
+        $ref: "#/components/requestBodies/address_info"
       responses:
         "200":
           description: Array of address information
@@ -539,7 +539,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Address Information
-      description: Get address info - balance, associated stake address (if any) and UTxO set
+      description: Get address info - balance, associated stake address (if any) and UTxO set for given addresses
   /address_txs: #RPC
     post:
       tags:
@@ -1352,6 +1352,24 @@ components:
                 - addr1qyp9kz50sh9c53hpmk3l4ewj9ur794t2hdqpngsjn3wkc5sztv9glpwt3frwrhdrltjaytc8ut2k4w6qrx3p98zad3fq07xe9g
                 - addr1qyfldpcvte8nkfpyv0jdc8e026cz5qedx7tajvupdu2724tlj8sypsq6p90hl40ya97xamkm9fwsppus2ru8zf6j8g9sm578cu
               _after_block_height: 6238675
+    address_info:
+      content:
+        application/json:
+          schema:
+            required:
+              - _addresses
+            type: object
+            properties:
+              _addresses:
+                format: text
+                type: array
+                items:
+                  type: string
+                description: Array of Cardano payment address(es) in bech32 format
+            example:
+              _addresses:
+                - addr1qyp9kz50sh9c53hpmk3l4ewj9ur794t2hdqpngsjn3wkc5sztv9glpwt3frwrhdrltjaytc8ut2k4w6qrx3p98zad3fq07xe9g
+                - addr1qyfldpcvte8nkfpyv0jdc8e026cz5qedx7tajvupdu2724tlj8sypsq6p90hl40ya97xamkm9fwsppus2ru8zf6j8g9sm578cu
     credential_txs:
       content:
         application/json:
@@ -2194,6 +2212,8 @@ components:
       items:
         type: object
         properties:
+          address:
+            $ref: "#/components/schemas/asset_address_list/items/properties/payment_address"
           balance:
             type: string
             description: Sum of all UTxO values beloning to address
@@ -2222,9 +2242,9 @@ components:
                 datum_hash:
                   $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_hash"
                 inline_datum:
-                  $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/inline_datum"
+                  $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/inline_datum"
                 reference_script:
-                  $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/reference_script"
+                  $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/reference_script"
                 asset_list:
                   $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/asset_list"
     address_txs:

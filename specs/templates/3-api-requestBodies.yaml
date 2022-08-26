@@ -42,6 +42,24 @@ requestBodies:
                 - ##address_txs_addresses1_rb##
                 - ##address_txs_addresses2_rb##
               _after_block_height: ##address_txs_after_block_height_rb##
+    address_info:
+      content:
+        application/json:
+          schema:
+            required:
+              - _addresses
+            type: object
+            properties:
+              _addresses:
+                format: text
+                type: array
+                items:
+                  type: string
+                description: Array of Cardano payment address(es) in bech32 format
+            example:
+              _addresses:
+                - ##address_txs_addresses1_rb##
+                - ##address_txs_addresses2_rb##
     credential_txs:
       content:
         application/json:
