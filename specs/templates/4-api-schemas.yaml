@@ -826,6 +826,8 @@ schemas:
       items:
         type: object
         properties:
+          stake_address:
+            $ref: "#/components/schemas/account_history/items/properties/stake_address"
           status:
             type: string
             description: Stake address status

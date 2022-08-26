@@ -349,7 +349,7 @@ paths:
       tags:
         - Block
       requestBody:
-        $ref: "#/components/requestBodies/block_info"
+        $ref: "#/components/requestBodies/block_hashes"
       responses:
         "200":
           description: Array of detailed block information
@@ -370,7 +370,7 @@ paths:
       tags:
         - Block
       requestBody:
-        $ref: "#/components/requestBodies/block_txs"
+        $ref: "#/components/requestBodies/block_hashes"
       responses:
         "200":
           description: Array of transactions hashes
@@ -524,7 +524,7 @@ paths:
       tags:
         - Address
       requestBody:
-        $ref: "#/components/requestBodies/address_info"
+        $ref: "#/components/requestBodies/payment_addresses"
       responses:
         "200":
           description: Array of address information
@@ -566,7 +566,7 @@ paths:
       tags:
         - Address
       requestBody:
-        $ref: "#/components/requestBodies/address_assets"
+        $ref: "#/components/requestBodies/payment_addresses"
       responses:
         "200":
           description: Array of address-owned assets
@@ -623,11 +623,11 @@ paths:
       summary: Account List
       description: Get a list of all accounts
   /account_info: #RPC
-    get:
+    post:
       tags:
         - Account
-      parameters:
-        - $ref: "#/components/parameters/_any_address"
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses"
       responses:
         "200":
           description: Array of account information
@@ -642,7 +642,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Account Information
-      description: Get the account info of any (payment or staking) address
+      description: Get the account information for given stake addresses (accounts)
   /account_rewards: #RPC
     get:
       tags:
@@ -1309,7 +1309,7 @@ components:
       required: true
       allowEmptyValue: false
   requestBodies:
-    block_info:
+    block_hashes:
       content:
         application/json:
           schema:
@@ -1327,8 +1327,24 @@ components:
                 - fb9087c9f1408a7bbd7b022fd294ab565fec8dd3a8ef091567482722a1fa4e30
                 - 60188a8dcb6db0d80628815be2cf626c4d17cb3e826cebfca84adaff93ad492a
                 - c6646214a1f377aa461a0163c213fc6b86a559a2d6ebd647d54c4eb00aaab015
-    block_txs:
-      $ref: "#/components/requestBodies/block_info"
+    payment_addresses:
+      content:
+        application/json:
+          schema:
+            required:
+              - _addresses
+            type: object
+            properties:
+              _addresses:
+                format: text
+                type: array
+                items:
+                  type: string
+                description: Array of Cardano payment address(es) in bech32 format
+            example:
+              _addresses:
+                - addr1qyp9kz50sh9c53hpmk3l4ewj9ur794t2hdqpngsjn3wkc5sztv9glpwt3frwrhdrltjaytc8ut2k4w6qrx3p98zad3fq07xe9g
+                - addr1qyfldpcvte8nkfpyv0jdc8e026cz5qedx7tajvupdu2724tlj8sypsq6p90hl40ya97xamkm9fwsppus2ru8zf6j8g9sm578cu
     address_txs:
       content:
         application/json:
@@ -1352,26 +1368,24 @@ components:
                 - addr1qyp9kz50sh9c53hpmk3l4ewj9ur794t2hdqpngsjn3wkc5sztv9glpwt3frwrhdrltjaytc8ut2k4w6qrx3p98zad3fq07xe9g
                 - addr1qyfldpcvte8nkfpyv0jdc8e026cz5qedx7tajvupdu2724tlj8sypsq6p90hl40ya97xamkm9fwsppus2ru8zf6j8g9sm578cu
               _after_block_height: 6238675
-    address_info:
+    stake_addresses:
       content:
         application/json:
           schema:
             required:
-              - _addresses
+              - _stake_addresses
             type: object
             properties:
-              _addresses:
+              _stake_addresses:
                 format: text
                 type: array
                 items:
                   type: string
-                description: Array of Cardano payment address(es) in bech32 format
+                description: Array of Cardano stake address(es) in bech32 format
             example:
-              _addresses:
-                - addr1qyp9kz50sh9c53hpmk3l4ewj9ur794t2hdqpngsjn3wkc5sztv9glpwt3frwrhdrltjaytc8ut2k4w6qrx3p98zad3fq07xe9g
-                - addr1qyfldpcvte8nkfpyv0jdc8e026cz5qedx7tajvupdu2724tlj8sypsq6p90hl40ya97xamkm9fwsppus2ru8zf6j8g9sm578cu
-    address_assets:
-      $ref: "#/components/requestBodies/address_info"
+              _stake_addresses:
+                - stake1uyfmzu5qqy70a8kq4c8rw09q0w0ktfcxppwujejnsh6tyrg5c774g
+                - stake1uydhlh7f2kkw9eazct5zyzlrvj32gjnkmt2v5qf6t8rut4qwch8ey
     credential_txs:
       content:
         application/json:
@@ -2285,6 +2299,8 @@ components:
       items:
         type: object
         properties:
+          stake_address:
+            $ref: "#/components/schemas/account_history/items/properties/stake_address"
           status:
             type: string
             description: Stake address status

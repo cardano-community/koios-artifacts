@@ -134,7 +134,7 @@ paths:
       tags:
         - Block
       requestBody:
-        $ref: "#/components/requestBodies/block_info"
+        $ref: "#/components/requestBodies/block_hashes"
       responses:
         "200":
           description: Array of detailed block information
@@ -155,7 +155,7 @@ paths:
       tags:
         - Block
       requestBody:
-        $ref: "#/components/requestBodies/block_txs"
+        $ref: "#/components/requestBodies/block_hashes"
       responses:
         "200":
           description: Array of transactions hashes
@@ -309,7 +309,7 @@ paths:
       tags:
         - Address
       requestBody:
-        $ref: "#/components/requestBodies/address_info"
+        $ref: "#/components/requestBodies/payment_addresses"
       responses:
         "200":
           description: Array of address information
@@ -351,7 +351,7 @@ paths:
       tags:
         - Address
       requestBody:
-        $ref: "#/components/requestBodies/address_assets"
+        $ref: "#/components/requestBodies/payment_addresses"
       responses:
         "200":
           description: Array of address-owned assets
@@ -408,11 +408,11 @@ paths:
       summary: Account List
       description: Get a list of all accounts
   /account_info: #RPC
-    get:
+    post:
       tags:
         - Account
-      parameters:
-        - $ref: "#/components/parameters/_any_address"
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses"
       responses:
         "200":
           description: Array of account information
@@ -427,7 +427,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Account Information
-      description: Get the account info of any (payment or staking) address
+      description: Get the account information for given stake addresses (accounts)
   /account_rewards: #RPC
     get:
       tags:
