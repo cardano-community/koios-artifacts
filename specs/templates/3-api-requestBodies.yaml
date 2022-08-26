@@ -58,7 +58,7 @@ requestBodies:
                 - ##payment_addresses1_rb##
                 - ##payment_addresses2_rb##
               _after_block_height: ##address_txs_after_block_height_rb##
-    account_rewards:
+    stake_addresses_with_epoch_no:
       content:
         application/json:
           schema:
@@ -80,8 +80,7 @@ requestBodies:
               _stake_addresses:
                 - ##stake_addresses1_rb##
                 - ##stake_addresses2_rb##
-              _epoch_no:
-                - 17
+              _epoch_no: 17
     stake_addresses:
       content:
         application/json:

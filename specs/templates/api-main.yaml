@@ -412,7 +412,7 @@ paths:
       tags:
         - Account
       requestBody:
-        $ref: "#/components/requestBodies/stake_addresses"
+        $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
       responses:
         "200":
           description: Array of account information
@@ -433,7 +433,7 @@ paths:
       tags:
         - Account
       requestBody:
-        $ref: "#/components/requestBodies/stake_addresses"
+        $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
       responses:
         "200":
           description: Array of reward history information
@@ -455,7 +455,7 @@ paths:
       tags:
         - Account
       requestBody:
-        $ref: "#/components/requestBodies/stake_addresses"
+        $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
       responses:
         "200":
           description: Array of account updates information
@@ -478,7 +478,7 @@ paths:
       tags:
         - Account
       requestBody:
-        $ref: "#/components/requestBodies/stake_addresses"
+        $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
       responses:
         "200":
           description: Array of payment addresses
@@ -499,7 +499,7 @@ paths:
       tags:
         - Account
       requestBody:
-        $ref: "#/components/requestBodies/stake_addresses"
+        $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
       responses:
         "200":
           description: Array of assets owned by account
@@ -516,12 +516,11 @@ paths:
       summary: Account Assets
       description: Get the native asset balance of given accounts
   /account_history: #RPC
-    get:
+    post:
       tags:
         - Account
-      parameters:
-        - $ref: "#/components/parameters/_any_address"
-        - $ref: "#/components/parameters/_epoch_no"
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
       responses:
         "200":
           description: Array of active stake values per epoch
@@ -536,7 +535,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Account History
-      description: Get the staking history of an account
+      description: Get the staking history of given stake addresses (accounts)
   /asset_list:
     get:
       tags:

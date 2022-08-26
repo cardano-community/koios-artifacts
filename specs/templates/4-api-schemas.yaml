@@ -962,18 +962,23 @@ schemas:
             type: string
             description: Cardano staking address (reward account) in bech32 format
             example: stake1u8yxtugdv63wxafy9d00nuz6hjyyp4qnggvc9a3vxh8yl0ckml2uz
-          pool_id:
-            type: string
-            description: Bech32 representation of pool ID
-            example: pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt
-          epoch_no:
-            type: integer
-            description: Epoch number
-            example: 301
-          active_stake:
-            type: string
-            description: Active stake amount (in lovelaces)
-            example: 682334162
+          history:
+            type: array
+            items:
+              type: object
+              properties:
+                pool_id:
+                  type: string
+                  description: Bech32 representation of pool ID
+                  example: pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt
+                epoch_no:
+                  type: integer
+                  description: Epoch number
+                  example: 301
+                active_stake:
+                  type: string
+                  description: Active stake amount (in lovelaces)
+                  example: 682334162
     tx_info:
       type: array
       items:
