@@ -921,8 +921,12 @@ schemas:
       items:
         type: object
         properties:
-          address:
-            $ref: "#/components/schemas/asset_address_list/items/properties/payment_address"
+          stake_address:
+            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+          addresses:
+            type: array
+            items:
+              $ref: "#/components/schemas/asset_address_list/items/properties/payment_address"
     account_assets:
       type: array
       items:

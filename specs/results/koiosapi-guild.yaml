@@ -689,11 +689,11 @@ paths:
         Get the account updates (registration, deregistration, delegation and
         withdrawals) for given stake addresses (accounts)
   /account_addresses: #RPC
-    get:
+    post:
       tags:
         - Account
-      parameters:
-        - $ref: "#/components/parameters/_any_address"
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses"
       responses:
         "200":
           description: Array of payment addresses
@@ -708,7 +708,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Account Addresses
-      description: Get all addresses associated with an account
+      description: Get all addresses associated with given staking accounts
   /account_assets: #RPC
     get:
       tags:
@@ -2416,8 +2416,12 @@ components:
       items:
         type: object
         properties:
-          address:
-            $ref: "#/components/schemas/asset_address_list/items/properties/payment_address"
+          stake_address:
+            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+          addresses:
+            type: array
+            items:
+              $ref: "#/components/schemas/asset_address_list/items/properties/payment_address"
     account_assets:
       type: array
       items:
