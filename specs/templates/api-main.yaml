@@ -151,11 +151,11 @@ paths:
       summary: Block Information
       description: Get detailed information about a specific block
   /block_txs: #RPC
-    get:
+    post:
       tags:
         - Block
-      parameters:
-        - $ref: "#/components/parameters/_block_hash"
+      requestBody:
+        $ref: "#/components/requestBodies/block_txs"
       responses:
         "200":
           description: Array of transactions hashes
@@ -170,7 +170,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Block Transactions
-      description: Get a list of all transactions included in a provided block
+      description: Get a list of all transactions included in provided blocks
   /tx_info: #RPC
     post:
       tags:

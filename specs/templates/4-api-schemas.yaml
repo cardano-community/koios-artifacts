@@ -744,8 +744,12 @@ schemas:
       items:
         type: object
         properties:
-          tx_hash:
-            $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+          block_hash:
+            $ref: "#/components/schemas/blocks/items/properties/hash"
+          tx_hashes:
+            type: array
+            items:
+              $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
     address_info:
       type: array
       items:

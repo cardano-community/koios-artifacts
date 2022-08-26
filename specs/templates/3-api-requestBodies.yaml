@@ -17,6 +17,8 @@ requestBodies:
                 - ##block_info1_rb##
                 - ##block_info2_rb##
                 - ##block_info3_rb##
+    block_txs:
+      $ref: "#/components/requestBodies/block_info"
     address_txs:
       content:
         application/json:

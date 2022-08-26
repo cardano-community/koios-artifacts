@@ -366,11 +366,11 @@ paths:
       summary: Block Information
       description: Get detailed information about a specific block
   /block_txs: #RPC
-    get:
+    post:
       tags:
         - Block
-      parameters:
-        - $ref: "#/components/parameters/_block_hash"
+      requestBody:
+        $ref: "#/components/requestBodies/block_txs"
       responses:
         "200":
           description: Array of transactions hashes
@@ -385,7 +385,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Block Transactions
-      description: Get a list of all transactions included in a provided block
+      description: Get a list of all transactions included in provided blocks
   /tx_info: #RPC
     post:
       tags:
@@ -1327,6 +1327,8 @@ components:
                 - af2f6f7dd4e4ea6765103a1e38e023da3edd2b3c7fea2aa367222564dbe01cfd
                 - bddbbc6df0ad09567a513349bafd56d8ec5c8fcd9ee9db12173624b896350d57
                 - 732bf9bbc3780e6cd7ad57a3889dd5904f6e8a27d54eabf43eb0dbc485323f04
+    block_txs:
+      $ref: "#/components/requestBodies/block_info"
     address_txs:
       content:
         application/json:
@@ -2181,8 +2183,12 @@ components:
       items:
         type: object
         properties:
-          tx_hash:
-            $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+          block_hash:
+            $ref: "#/components/schemas/blocks/items/properties/hash"
+          tx_hashes:
+            type: array
+            items:
+              $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
     address_info:
       type: array
       items:
