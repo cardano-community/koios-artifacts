@@ -710,11 +710,11 @@ paths:
       summary: Account Addresses
       description: Get all addresses associated with given staking accounts
   /account_assets: #RPC
-    get:
+    post:
       tags:
         - Account
-      parameters:
-        - $ref: "#/components/parameters/_any_address"
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses"
       responses:
         "200":
           description: Array of assets owned by account
@@ -729,7 +729,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Account Assets
-      description: Get the native asset balance of an account
+      description: Get the native asset balance of given accounts
   /account_history: #RPC
     get:
       tags:
@@ -2427,14 +2427,28 @@ components:
       items:
         type: object
         properties:
-          asset_policy:
-            $ref: "#/components/schemas/asset_info/items/properties/policy_id"
-          asset_name:
-            $ref: "#/components/schemas/asset_info/items/properties/asset_name_ascii"
-          quantity:
-            type: string
-            description: Asset quantity owned by account
-            example: 990000
+          stake_address:
+            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+          assets:
+            type: array
+            items:
+              type: object
+              properties:
+                policy_id:
+                  $ref: "#/components/schemas/asset_info/items/properties/policy_id"
+                assets:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      asset_name:
+                        $ref: "#/components/schemas/asset_info/items/properties/asset_name_ascii"
+                      asset_policy:
+                        $ref: "#/components/schemas/asset_info/items/properties/policy_id"
+                      balance:
+                        type: string
+                        description: Asset quantity owned by account
+                        example: 990000
     account_history:
       type: array
       items:

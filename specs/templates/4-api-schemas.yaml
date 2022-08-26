@@ -932,14 +932,28 @@ schemas:
       items:
         type: object
         properties:
-          asset_policy:
-            $ref: "#/components/schemas/asset_info/items/properties/policy_id"
-          asset_name:
-            $ref: "#/components/schemas/asset_info/items/properties/asset_name_ascii"
-          quantity:
-            type: string
-            description: Asset quantity owned by account
-            example: 990000
+          stake_address:
+            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+          assets:
+            type: array
+            items:
+              type: object
+              properties:
+                policy_id:
+                  $ref: "#/components/schemas/asset_info/items/properties/policy_id"
+                assets:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      asset_name:
+                        $ref: "#/components/schemas/asset_info/items/properties/asset_name_ascii"
+                      asset_policy:
+                        $ref: "#/components/schemas/asset_info/items/properties/policy_id"
+                      balance:
+                        type: string
+                        description: Asset quantity owned by account
+                        example: 990000
     account_history:
       type: array
       items:
