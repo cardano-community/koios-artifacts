@@ -451,11 +451,11 @@ paths:
       description: >-
         Get the full rewards history (including MIR) for given stake addresses (accounts)
   /account_updates: #RPC
-    get:
+    post:
       tags:
         - Account
-      parameters:
-        - $ref: "#/components/parameters/_stake_address"
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses"
       responses:
         "200":
           description: Array of account updates information
@@ -472,7 +472,7 @@ paths:
       summary: Account Updates
       description: >-
         Get the account updates (registration, deregistration, delegation and
-        withdrawals)
+        withdrawals) for given stake addresses (accounts)
   /account_addresses: #RPC
     get:
       tags:

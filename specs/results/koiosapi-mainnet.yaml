@@ -666,11 +666,11 @@ paths:
       description: >-
         Get the full rewards history (including MIR) for given stake addresses (accounts)
   /account_updates: #RPC
-    get:
+    post:
       tags:
         - Account
-      parameters:
-        - $ref: "#/components/parameters/_stake_address"
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses"
       responses:
         "200":
           description: Array of account updates information
@@ -687,7 +687,7 @@ paths:
       summary: Account Updates
       description: >-
         Get the account updates (registration, deregistration, delegation and
-        withdrawals)
+        withdrawals) for given stake addresses (accounts)
   /account_addresses: #RPC
     get:
       tags:
@@ -2389,13 +2389,28 @@ components:
       items:
         type: object
         properties:
-          action_type:
-            type: string
-            description: Type of certificate submitted
-            enum: ["registration", "delegation", "withdrawal", "deregistration"]
-            example: "registration"
-          tx_hash:
-            $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+          stake_address:
+            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+          updates:
+            type: array
+            items:
+              type: object
+              properties:
+                action_type:
+                  type: string
+                  description: Type of certificate submitted
+                  enum: ["registration", "delegation", "withdrawal", "deregistration"]
+                  example: "registration"
+                tx_hash:
+                  $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+                epoch_no:
+                  $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+                epoch_slot:
+                  $ref: "#/components/schemas/blocks/items/properties/epoch_slot"
+                absolute_slot:
+                  $ref: "#/components/schemas/blocks/items/properties/abs_slot"
+                block_time:
+                  $ref: "#/components/schemas/blocks/items/properties/block_time"
     account_addresses:
       type: array
       items:

@@ -894,13 +894,28 @@ schemas:
       items:
         type: object
         properties:
-          action_type:
-            type: string
-            description: Type of certificate submitted
-            enum: ["registration", "delegation", "withdrawal", "deregistration"]
-            example: "registration"
-          tx_hash:
-            $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+          stake_address:
+            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+          updates:
+            type: array
+            items:
+              type: object
+              properties:
+                action_type:
+                  type: string
+                  description: Type of certificate submitted
+                  enum: ["registration", "delegation", "withdrawal", "deregistration"]
+                  example: "registration"
+                tx_hash:
+                  $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+                epoch_no:
+                  $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+                epoch_slot:
+                  $ref: "#/components/schemas/blocks/items/properties/epoch_slot"
+                absolute_slot:
+                  $ref: "#/components/schemas/blocks/items/properties/abs_slot"
+                block_time:
+                  $ref: "#/components/schemas/blocks/items/properties/block_time"
     account_addresses:
       type: array
       items:
