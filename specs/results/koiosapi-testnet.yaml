@@ -562,11 +562,11 @@ paths:
       summary: Address Transactions
       description: Get the transaction hash list of input address array, optionally filtering after specified block height (inclusive)
   /address_assets: #RPC
-    get:
+    post:
       tags:
         - Address
-      parameters:
-        - $ref: "#/components/parameters/_address_assets"
+      requestBody:
+        $ref: "#/components/requestBodies/address_assets"
       responses:
         "200":
           description: Array of address-owned assets
@@ -581,7 +581,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Address Assets
-      description: Get the list of all the assets (policy, name and quantity) for a given address
+      description: Get the list of all the assets (policy, name and quantity) for given addresses
   /credential_txs: #RPC
     post:
       tags:
@@ -1370,6 +1370,8 @@ components:
               _addresses:
                 - addr_test1qzx9hu8j4ah3auytk0mwcupd69hpc52t0cw39a65ndrah86djs784u92a3m5w475w3w35tyd6v3qumkze80j8a6h5tuqq5xe8y
                 - addr_test1qrk7920v35zukhcch4kyydy6rxnhqdcvetkvngeqrvtgavw8tpzdklse3kwer7urhrlfg962m9fc8cznfcdpka5pd07sgf8n0w
+    address_assets:
+      $ref: "#/components/requestBodies/address_info"
     credential_txs:
       content:
         application/json:
@@ -2261,7 +2263,14 @@ components:
           block_time:
             $ref: "#/components/schemas/blocks/items/properties/block_time"
     address_assets:
-      $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/asset_list"
+      type: array
+      items:
+        type: object
+        properties:
+          address:
+            $ref: "#/components/schemas/asset_address_list/items/properties/payment_address"
+          assets:
+            $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/asset_list"
     credential_txs:
       $ref: "#/components/schemas/address_txs"
     account_list:

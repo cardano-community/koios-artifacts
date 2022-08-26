@@ -804,7 +804,14 @@ schemas:
           block_time:
             $ref: "#/components/schemas/blocks/items/properties/block_time"
     address_assets:
-      $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/asset_list"
+      type: array
+      items:
+        type: object
+        properties:
+          address:
+            $ref: "#/components/schemas/asset_address_list/items/properties/payment_address"
+          assets:
+            $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/asset_list"
     credential_txs:
       $ref: "#/components/schemas/address_txs"
     account_list:

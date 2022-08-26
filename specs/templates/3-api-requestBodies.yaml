@@ -60,6 +60,8 @@ requestBodies:
               _addresses:
                 - ##address_txs_addresses1_rb##
                 - ##address_txs_addresses2_rb##
+    address_assets:
+      $ref: "#/components/requestBodies/address_info"
     credential_txs:
       content:
         application/json:
