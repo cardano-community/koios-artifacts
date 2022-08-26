@@ -644,12 +644,11 @@ paths:
       summary: Account Information
       description: Get the account information for given stake addresses (accounts)
   /account_rewards: #RPC
-    get:
+    post:
       tags:
         - Account
-      parameters:
-        - $ref: "#/components/parameters/_stake_address"
-        - $ref: "#/components/parameters/_earned_epoch_no"
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses"
       responses:
         "200":
           description: Array of reward history information
@@ -665,8 +664,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Account Rewards
       description: >-
-        Get the full rewards history (including MIR) for a stake address, or
-        certain epoch if specified
+        Get the full rewards history (including MIR) for given stake addresses (accounts)
   /account_updates: #RPC
     get:
       tags:
@@ -1368,6 +1366,30 @@ components:
                 - addr1qyp9kz50sh9c53hpmk3l4ewj9ur794t2hdqpngsjn3wkc5sztv9glpwt3frwrhdrltjaytc8ut2k4w6qrx3p98zad3fq07xe9g
                 - addr1qyfldpcvte8nkfpyv0jdc8e026cz5qedx7tajvupdu2724tlj8sypsq6p90hl40ya97xamkm9fwsppus2ru8zf6j8g9sm578cu
               _after_block_height: 6238675
+    account_rewards:
+      content:
+        application/json:
+          schema:
+            required:
+              - _stake_addresses
+            type: object
+            properties:
+              _stake_addresses:
+                format: text
+                type: array
+                items:
+                  type: string
+                description: Array of Cardano stake address(es) in bech32 format
+              _epoch_no:
+                format: integer
+                type: integer
+                description: Only fetch information for a specific epoch
+            example:
+              _stake_addresses:
+                - stake1uyfmzu5qqy70a8kq4c8rw09q0w0ktfcxppwujejnsh6tyrg5c774g
+                - stake1uydhlh7f2kkw9eazct5zyzlrvj32gjnkmt2v5qf6t8rut4qwch8ey
+              _epoch_no:
+                - 17
     stake_addresses:
       content:
         application/json:
@@ -2341,20 +2363,27 @@ components:
       items:
         type: object
         properties:
-          earned_epoch:
-            $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
-          spendable_epoch:
-            $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
-          amount:
-            type: string
-            description: Amount of rewards earned (in lovelace)
-          type:
-            type: string
-            description: The source of the rewards
-            enum: [member, leader, treasury, reserves]
-            example: member
-          pool_id:
-            $ref: "#/components/schemas/pool_list/items/properties/pool_id_bech32"
+          stake_address:
+            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+          rewards:
+            type: array
+            items:
+              type: object
+              properties:
+                earned_epoch:
+                  $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+                spendable_epoch:
+                  $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+                amount:
+                  type: string
+                  description: Amount of rewards earned (in lovelace)
+                type:
+                  type: string
+                  description: The source of the rewards
+                  enum: [member, leader, treasury, reserves]
+                  example: member
+                pool_id:
+                  $ref: "#/components/schemas/pool_list/items/properties/pool_id_bech32"
     account_updates:
       type: array
       items:

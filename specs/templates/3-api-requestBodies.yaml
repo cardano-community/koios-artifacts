@@ -58,6 +58,30 @@ requestBodies:
                 - ##payment_addresses1_rb##
                 - ##payment_addresses2_rb##
               _after_block_height: ##address_txs_after_block_height_rb##
+    account_rewards:
+      content:
+        application/json:
+          schema:
+            required:
+              - _stake_addresses
+            type: object
+            properties:
+              _stake_addresses:
+                format: text
+                type: array
+                items:
+                  type: string
+                description: Array of Cardano stake address(es) in bech32 format
+              _epoch_no:
+                format: integer
+                type: integer
+                description: Only fetch information for a specific epoch
+            example:
+              _stake_addresses:
+                - ##stake_addresses1_rb##
+                - ##stake_addresses2_rb##
+              _epoch_no:
+                - 17
     stake_addresses:
       content:
         application/json:

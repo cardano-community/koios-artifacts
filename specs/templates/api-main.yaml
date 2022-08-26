@@ -429,12 +429,11 @@ paths:
       summary: Account Information
       description: Get the account information for given stake addresses (accounts)
   /account_rewards: #RPC
-    get:
+    post:
       tags:
         - Account
-      parameters:
-        - $ref: "#/components/parameters/_stake_address"
-        - $ref: "#/components/parameters/_earned_epoch_no"
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses"
       responses:
         "200":
           description: Array of reward history information
@@ -450,8 +449,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Account Rewards
       description: >-
-        Get the full rewards history (including MIR) for a stake address, or
-        certain epoch if specified
+        Get the full rewards history (including MIR) for given stake addresses (accounts)
   /account_updates: #RPC
     get:
       tags:
