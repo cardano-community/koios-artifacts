@@ -134,7 +134,7 @@ paths:
       tags:
         - Block
       requestBody:
-        $ref: "#/components/requestBodies/block_info"
+        $ref: "#/components/requestBodies/block_hashes"
       responses:
         "200":
           description: Array of detailed block information
@@ -151,11 +151,11 @@ paths:
       summary: Block Information
       description: Get detailed information about a specific block
   /block_txs: #RPC
-    get:
+    post:
       tags:
         - Block
-      parameters:
-        - $ref: "#/components/parameters/_block_hash"
+      requestBody:
+        $ref: "#/components/requestBodies/block_hashes"
       responses:
         "200":
           description: Array of transactions hashes
@@ -170,7 +170,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Block Transactions
-      description: Get a list of all transactions included in a provided block
+      description: Get a list of all transactions included in provided blocks
   /tx_info: #RPC
     post:
       tags:
@@ -305,11 +305,11 @@ paths:
       summary: Transaction Status (Block Confirmations)
       description: Get the number of block confirmations for a given transaction hash list
   /address_info: #RPC
-    get:
+    post:
       tags:
         - Address
-      parameters:
-        - $ref: "#/components/parameters/_address"
+      requestBody:
+        $ref: "#/components/requestBodies/payment_addresses"
       responses:
         "200":
           description: Array of address information
@@ -324,7 +324,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Address Information
-      description: Get address info - balance, associated stake address (if any) and UTxO set
+      description: Get address info - balance, associated stake address (if any) and UTxO set for given addresses
   /address_txs: #RPC
     post:
       tags:
@@ -347,11 +347,11 @@ paths:
       summary: Address Transactions
       description: Get the transaction hash list of input address array, optionally filtering after specified block height (inclusive)
   /address_assets: #RPC
-    get:
+    post:
       tags:
         - Address
-      parameters:
-        - $ref: "#/components/parameters/_address_assets"
+      requestBody:
+        $ref: "#/components/requestBodies/payment_addresses"
       responses:
         "200":
           description: Array of address-owned assets
@@ -366,7 +366,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Address Assets
-      description: Get the list of all the assets (policy, name and quantity) for a given address
+      description: Get the list of all the assets (policy, name and quantity) for given addresses
   /credential_txs: #RPC
     post:
       tags:
@@ -408,11 +408,11 @@ paths:
       summary: Account List
       description: Get a list of all accounts
   /account_info: #RPC
-    get:
+    post:
       tags:
         - Account
-      parameters:
-        - $ref: "#/components/parameters/_any_address"
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
       responses:
         "200":
           description: Array of account information
@@ -427,14 +427,13 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Account Information
-      description: Get the account info of any (payment or staking) address
+      description: Get the account information for given stake addresses (accounts)
   /account_rewards: #RPC
-    get:
+    post:
       tags:
         - Account
-      parameters:
-        - $ref: "#/components/parameters/_stake_address"
-        - $ref: "#/components/parameters/_earned_epoch_no"
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
       responses:
         "200":
           description: Array of reward history information
@@ -450,14 +449,13 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Account Rewards
       description: >-
-        Get the full rewards history (including MIR) for a stake address, or
-        certain epoch if specified
+        Get the full rewards history (including MIR) for given stake addresses (accounts)
   /account_updates: #RPC
-    get:
+    post:
       tags:
         - Account
-      parameters:
-        - $ref: "#/components/parameters/_stake_address"
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
       responses:
         "200":
           description: Array of account updates information
@@ -474,13 +472,13 @@ paths:
       summary: Account Updates
       description: >-
         Get the account updates (registration, deregistration, delegation and
-        withdrawals)
+        withdrawals) for given stake addresses (accounts)
   /account_addresses: #RPC
-    get:
+    post:
       tags:
         - Account
-      parameters:
-        - $ref: "#/components/parameters/_any_address"
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
       responses:
         "200":
           description: Array of payment addresses
@@ -495,13 +493,13 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Account Addresses
-      description: Get all addresses associated with an account
+      description: Get all addresses associated with given staking accounts
   /account_assets: #RPC
-    get:
+    post:
       tags:
         - Account
-      parameters:
-        - $ref: "#/components/parameters/_any_address"
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
       responses:
         "200":
           description: Array of assets owned by account
@@ -516,14 +514,13 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Account Assets
-      description: Get the native asset balance of an account
+      description: Get the native asset balance of given accounts
   /account_history: #RPC
-    get:
+    post:
       tags:
         - Account
-      parameters:
-        - $ref: "#/components/parameters/_any_address"
-        - $ref: "#/components/parameters/_epoch_no"
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
       responses:
         "200":
           description: Array of active stake values per epoch
@@ -538,7 +535,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Account History
-      description: Get the staking history of an account
+      description: Get the staking history of given stake addresses (accounts)
   /asset_list:
     get:
       tags:

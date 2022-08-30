@@ -349,7 +349,7 @@ paths:
       tags:
         - Block
       requestBody:
-        $ref: "#/components/requestBodies/block_info"
+        $ref: "#/components/requestBodies/block_hashes"
       responses:
         "200":
           description: Array of detailed block information
@@ -366,11 +366,11 @@ paths:
       summary: Block Information
       description: Get detailed information about a specific block
   /block_txs: #RPC
-    get:
+    post:
       tags:
         - Block
-      parameters:
-        - $ref: "#/components/parameters/_block_hash"
+      requestBody:
+        $ref: "#/components/requestBodies/block_hashes"
       responses:
         "200":
           description: Array of transactions hashes
@@ -385,7 +385,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Block Transactions
-      description: Get a list of all transactions included in a provided block
+      description: Get a list of all transactions included in provided blocks
   /tx_info: #RPC
     post:
       tags:
@@ -520,11 +520,11 @@ paths:
       summary: Transaction Status (Block Confirmations)
       description: Get the number of block confirmations for a given transaction hash list
   /address_info: #RPC
-    get:
+    post:
       tags:
         - Address
-      parameters:
-        - $ref: "#/components/parameters/_address"
+      requestBody:
+        $ref: "#/components/requestBodies/payment_addresses"
       responses:
         "200":
           description: Array of address information
@@ -539,7 +539,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Address Information
-      description: Get address info - balance, associated stake address (if any) and UTxO set
+      description: Get address info - balance, associated stake address (if any) and UTxO set for given addresses
   /address_txs: #RPC
     post:
       tags:
@@ -562,11 +562,11 @@ paths:
       summary: Address Transactions
       description: Get the transaction hash list of input address array, optionally filtering after specified block height (inclusive)
   /address_assets: #RPC
-    get:
+    post:
       tags:
         - Address
-      parameters:
-        - $ref: "#/components/parameters/_address_assets"
+      requestBody:
+        $ref: "#/components/requestBodies/payment_addresses"
       responses:
         "200":
           description: Array of address-owned assets
@@ -581,7 +581,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Address Assets
-      description: Get the list of all the assets (policy, name and quantity) for a given address
+      description: Get the list of all the assets (policy, name and quantity) for given addresses
   /credential_txs: #RPC
     post:
       tags:
@@ -623,11 +623,11 @@ paths:
       summary: Account List
       description: Get a list of all accounts
   /account_info: #RPC
-    get:
+    post:
       tags:
         - Account
-      parameters:
-        - $ref: "#/components/parameters/_any_address"
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
       responses:
         "200":
           description: Array of account information
@@ -642,14 +642,13 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Account Information
-      description: Get the account info of any (payment or staking) address
+      description: Get the account information for given stake addresses (accounts)
   /account_rewards: #RPC
-    get:
+    post:
       tags:
         - Account
-      parameters:
-        - $ref: "#/components/parameters/_stake_address"
-        - $ref: "#/components/parameters/_earned_epoch_no"
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
       responses:
         "200":
           description: Array of reward history information
@@ -665,14 +664,13 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Account Rewards
       description: >-
-        Get the full rewards history (including MIR) for a stake address, or
-        certain epoch if specified
+        Get the full rewards history (including MIR) for given stake addresses (accounts)
   /account_updates: #RPC
-    get:
+    post:
       tags:
         - Account
-      parameters:
-        - $ref: "#/components/parameters/_stake_address"
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
       responses:
         "200":
           description: Array of account updates information
@@ -689,13 +687,13 @@ paths:
       summary: Account Updates
       description: >-
         Get the account updates (registration, deregistration, delegation and
-        withdrawals)
+        withdrawals) for given stake addresses (accounts)
   /account_addresses: #RPC
-    get:
+    post:
       tags:
         - Account
-      parameters:
-        - $ref: "#/components/parameters/_any_address"
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
       responses:
         "200":
           description: Array of payment addresses
@@ -710,13 +708,13 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Account Addresses
-      description: Get all addresses associated with an account
+      description: Get all addresses associated with given staking accounts
   /account_assets: #RPC
-    get:
+    post:
       tags:
         - Account
-      parameters:
-        - $ref: "#/components/parameters/_any_address"
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
       responses:
         "200":
           description: Array of assets owned by account
@@ -731,14 +729,13 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Account Assets
-      description: Get the native asset balance of an account
+      description: Get the native asset balance of given accounts
   /account_history: #RPC
-    get:
+    post:
       tags:
         - Account
-      parameters:
-        - $ref: "#/components/parameters/_any_address"
-        - $ref: "#/components/parameters/_epoch_no"
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
       responses:
         "200":
           description: Array of active stake values per epoch
@@ -753,7 +750,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Account History
-      description: Get the staking history of an account
+      description: Get the staking history of given stake addresses (accounts)
   /asset_list:
     get:
       tags:
@@ -1309,7 +1306,7 @@ components:
       required: true
       allowEmptyValue: false
   requestBodies:
-    block_info:
+    block_hashes:
       content:
         application/json:
           schema:
@@ -1327,6 +1324,24 @@ components:
                 - fb9087c9f1408a7bbd7b022fd294ab565fec8dd3a8ef091567482722a1fa4e30
                 - 60188a8dcb6db0d80628815be2cf626c4d17cb3e826cebfca84adaff93ad492a
                 - c6646214a1f377aa461a0163c213fc6b86a559a2d6ebd647d54c4eb00aaab015
+    payment_addresses:
+      content:
+        application/json:
+          schema:
+            required:
+              - _addresses
+            type: object
+            properties:
+              _addresses:
+                format: text
+                type: array
+                items:
+                  type: string
+                description: Array of Cardano payment address(es) in bech32 format
+            example:
+              _addresses:
+                - addr1qyp9kz50sh9c53hpmk3l4ewj9ur794t2hdqpngsjn3wkc5sztv9glpwt3frwrhdrltjaytc8ut2k4w6qrx3p98zad3fq07xe9g
+                - addr1qyfldpcvte8nkfpyv0jdc8e026cz5qedx7tajvupdu2724tlj8sypsq6p90hl40ya97xamkm9fwsppus2ru8zf6j8g9sm578cu
     address_txs:
       content:
         application/json:
@@ -1350,6 +1365,47 @@ components:
                 - addr1qyp9kz50sh9c53hpmk3l4ewj9ur794t2hdqpngsjn3wkc5sztv9glpwt3frwrhdrltjaytc8ut2k4w6qrx3p98zad3fq07xe9g
                 - addr1qyfldpcvte8nkfpyv0jdc8e026cz5qedx7tajvupdu2724tlj8sypsq6p90hl40ya97xamkm9fwsppus2ru8zf6j8g9sm578cu
               _after_block_height: 6238675
+    stake_addresses_with_epoch_no:
+      content:
+        application/json:
+          schema:
+            required:
+              - _stake_addresses
+            type: object
+            properties:
+              _stake_addresses:
+                format: text
+                type: array
+                items:
+                  type: string
+                description: Array of Cardano stake address(es) in bech32 format
+              _epoch_no:
+                format: integer
+                type: integer
+                description: Only fetch information for a specific epoch
+            example:
+              _stake_addresses:
+                - stake1uyfmzu5qqy70a8kq4c8rw09q0w0ktfcxppwujejnsh6tyrg5c774g
+                - stake1uydhlh7f2kkw9eazct5zyzlrvj32gjnkmt2v5qf6t8rut4qwch8ey
+              _epoch_no: 17
+    stake_addresses:
+      content:
+        application/json:
+          schema:
+            required:
+              - _stake_addresses
+            type: object
+            properties:
+              _stake_addresses:
+                format: text
+                type: array
+                items:
+                  type: string
+                description: Array of Cardano stake address(es) in bech32 format
+            example:
+              _stake_addresses:
+                - stake1uyfmzu5qqy70a8kq4c8rw09q0w0ktfcxppwujejnsh6tyrg5c774g
+                - stake1uydhlh7f2kkw9eazct5zyzlrvj32gjnkmt2v5qf6t8rut4qwch8ey
     credential_txs:
       content:
         application/json:
@@ -2186,13 +2242,19 @@ components:
       items:
         type: object
         properties:
-          tx_hash:
-            $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+          block_hash:
+            $ref: "#/components/schemas/blocks/items/properties/hash"
+          tx_hashes:
+            type: array
+            items:
+              $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
     address_info:
       type: array
       items:
         type: object
         properties:
+          address:
+            $ref: "#/components/schemas/asset_address_list/items/properties/payment_address"
           balance:
             type: string
             description: Sum of all UTxO values beloning to address
@@ -2221,9 +2283,9 @@ components:
                 datum_hash:
                   $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_hash"
                 inline_datum:
-                  $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/inline_datum"
+                  $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/inline_datum"
                 reference_script:
-                  $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/reference_script"
+                  $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/reference_script"
                 asset_list:
                   $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/asset_list"
     address_txs:
@@ -2240,7 +2302,14 @@ components:
           block_time:
             $ref: "#/components/schemas/blocks/items/properties/block_time"
     address_assets:
-      $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/asset_list"
+      type: array
+      items:
+        type: object
+        properties:
+          address:
+            $ref: "#/components/schemas/asset_address_list/items/properties/payment_address"
+          assets:
+            $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/asset_list"
     credential_txs:
       $ref: "#/components/schemas/address_txs"
     account_list:
@@ -2255,6 +2324,8 @@ components:
       items:
         type: object
         properties:
+          stake_address:
+            $ref: "#/components/schemas/account_history/items/properties/stake_address"
           status:
             type: string
             description: Stake address status
@@ -2295,52 +2366,92 @@ components:
       items:
         type: object
         properties:
-          earned_epoch:
-            $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
-          spendable_epoch:
-            $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
-          amount:
-            type: string
-            description: Amount of rewards earned (in lovelace)
-          type:
-            type: string
-            description: The source of the rewards
-            enum: [member, leader, treasury, reserves]
-            example: member
-          pool_id:
-            $ref: "#/components/schemas/pool_list/items/properties/pool_id_bech32"
+          stake_address:
+            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+          rewards:
+            type: array
+            items:
+              type: object
+              properties:
+                earned_epoch:
+                  $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+                spendable_epoch:
+                  $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+                amount:
+                  type: string
+                  description: Amount of rewards earned (in lovelace)
+                type:
+                  type: string
+                  description: The source of the rewards
+                  enum: [member, leader, treasury, reserves]
+                  example: member
+                pool_id:
+                  $ref: "#/components/schemas/pool_list/items/properties/pool_id_bech32"
     account_updates:
       type: array
       items:
         type: object
         properties:
-          action_type:
-            type: string
-            description: Type of certificate submitted
-            enum: ["registration", "delegation", "withdrawal", "deregistration"]
-            example: "registration"
-          tx_hash:
-            $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+          stake_address:
+            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+          updates:
+            type: array
+            items:
+              type: object
+              properties:
+                action_type:
+                  type: string
+                  description: Type of certificate submitted
+                  enum: ["registration", "delegation", "withdrawal", "deregistration"]
+                  example: "registration"
+                tx_hash:
+                  $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+                epoch_no:
+                  $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+                epoch_slot:
+                  $ref: "#/components/schemas/blocks/items/properties/epoch_slot"
+                absolute_slot:
+                  $ref: "#/components/schemas/blocks/items/properties/abs_slot"
+                block_time:
+                  $ref: "#/components/schemas/blocks/items/properties/block_time"
     account_addresses:
       type: array
       items:
         type: object
         properties:
-          address:
-            $ref: "#/components/schemas/asset_address_list/items/properties/payment_address"
+          stake_address:
+            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+          addresses:
+            type: array
+            items:
+              $ref: "#/components/schemas/asset_address_list/items/properties/payment_address"
     account_assets:
       type: array
       items:
         type: object
         properties:
-          asset_policy:
-            $ref: "#/components/schemas/asset_info/items/properties/policy_id"
-          asset_name:
-            $ref: "#/components/schemas/asset_info/items/properties/asset_name_ascii"
-          quantity:
-            type: string
-            description: Asset quantity owned by account
-            example: 990000
+          stake_address:
+            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+          assets:
+            type: array
+            items:
+              type: object
+              properties:
+                policy_id:
+                  $ref: "#/components/schemas/asset_info/items/properties/policy_id"
+                assets:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      asset_name:
+                        $ref: "#/components/schemas/asset_info/items/properties/asset_name_ascii"
+                      asset_policy:
+                        $ref: "#/components/schemas/asset_info/items/properties/policy_id"
+                      balance:
+                        type: string
+                        description: Asset quantity owned by account
+                        example: 990000
     account_history:
       type: array
       items:
@@ -2349,18 +2460,23 @@ components:
             type: string
             description: Cardano staking address (reward account) in bech32 format
             example: stake1u8yxtugdv63wxafy9d00nuz6hjyyp4qnggvc9a3vxh8yl0ckml2uz
-          pool_id:
-            type: string
-            description: Bech32 representation of pool ID
-            example: pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt
-          epoch_no:
-            type: integer
-            description: Epoch number
-            example: 301
-          active_stake:
-            type: string
-            description: Active stake amount (in lovelaces)
-            example: 682334162
+          history:
+            type: array
+            items:
+              type: object
+              properties:
+                pool_id:
+                  type: string
+                  description: Bech32 representation of pool ID
+                  example: pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt
+                epoch_no:
+                  type: integer
+                  description: Epoch number
+                  example: 301
+                active_stake:
+                  type: string
+                  description: Active stake amount (in lovelaces)
+                  example: 682334162
     tx_info:
       type: array
       items:
