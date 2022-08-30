@@ -1778,6 +1778,11 @@ components:
             nullable: true
             description: Pool active stake (will be null post epoch transition until dbsync calculation is complete)
             example: "64328627680963"
+          sigma:
+            type: number
+            nullable: true
+            description: Pool relative active stake share
+            example: 0.0034839235
           block_count:
             type: integer
             nullable: true
