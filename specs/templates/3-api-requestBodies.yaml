@@ -1,5 +1,5 @@
 requestBodies:
-    block_info:
+    block_hashes:
       content:
         application/json:
           schema:
@@ -17,6 +17,24 @@ requestBodies:
                 - ##block_info1_rb##
                 - ##block_info2_rb##
                 - ##block_info3_rb##
+    payment_addresses:
+      content:
+        application/json:
+          schema:
+            required:
+              - _addresses
+            type: object
+            properties:
+              _addresses:
+                format: text
+                type: array
+                items:
+                  type: string
+                description: Array of Cardano payment address(es) in bech32 format
+            example:
+              _addresses:
+                - ##payment_addresses1_rb##
+                - ##payment_addresses2_rb##
     address_txs:
       content:
         application/json:
@@ -37,9 +55,50 @@ requestBodies:
                 description: Only fetch information after specific block height
             example:
               _addresses:
-                - ##address_txs_addresses1_rb##
-                - ##address_txs_addresses2_rb##
+                - ##payment_addresses1_rb##
+                - ##payment_addresses2_rb##
               _after_block_height: ##address_txs_after_block_height_rb##
+    stake_addresses_with_epoch_no:
+      content:
+        application/json:
+          schema:
+            required:
+              - _stake_addresses
+            type: object
+            properties:
+              _stake_addresses:
+                format: text
+                type: array
+                items:
+                  type: string
+                description: Array of Cardano stake address(es) in bech32 format
+              _epoch_no:
+                format: integer
+                type: integer
+                description: Only fetch information for a specific epoch
+            example:
+              _stake_addresses:
+                - ##stake_addresses1_rb##
+                - ##stake_addresses2_rb##
+              _epoch_no: 17
+    stake_addresses:
+      content:
+        application/json:
+          schema:
+            required:
+              - _stake_addresses
+            type: object
+            properties:
+              _stake_addresses:
+                format: text
+                type: array
+                items:
+                  type: string
+                description: Array of Cardano stake address(es) in bech32 format
+            example:
+              _stake_addresses:
+                - ##stake_addresses1_rb##
+                - ##stake_addresses2_rb##
     credential_txs:
       content:
         application/json:

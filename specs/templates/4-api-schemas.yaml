@@ -285,6 +285,11 @@ schemas:
             nullable: true
             description: Pool active stake (will be null post epoch transition until dbsync calculation is complete)
             example: "64328627680963"
+          sigma:
+            type: number
+            nullable: true
+            description: Pool relative active stake share
+            example: 0.0034839235
           block_count:
             type: integer
             nullable: true
@@ -804,13 +809,19 @@ schemas:
       items:
         type: object
         properties:
-          tx_hash:
-            $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+          block_hash:
+            $ref: "#/components/schemas/blocks/items/properties/hash"
+          tx_hashes:
+            type: array
+            items:
+              $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
     address_info:
       type: array
       items:
         type: object
         properties:
+          address:
+            $ref: "#/components/schemas/asset_address_list/items/properties/payment_address"
           balance:
             type: string
             description: Sum of all UTxO values beloning to address
@@ -858,7 +869,14 @@ schemas:
           block_time:
             $ref: "#/components/schemas/blocks/items/properties/block_time"
     address_assets:
-      $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/asset_list"
+      type: array
+      items:
+        type: object
+        properties:
+          address:
+            $ref: "#/components/schemas/asset_address_list/items/properties/payment_address"
+          assets:
+            $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/asset_list"
     credential_txs:
       $ref: "#/components/schemas/address_txs"
     account_list:
@@ -873,6 +891,8 @@ schemas:
       items:
         type: object
         properties:
+          stake_address:
+            $ref: "#/components/schemas/account_history/items/properties/stake_address"
           status:
             type: string
             description: Stake address status
@@ -913,52 +933,92 @@ schemas:
       items:
         type: object
         properties:
-          earned_epoch:
-            $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
-          spendable_epoch:
-            $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
-          amount:
-            type: string
-            description: Amount of rewards earned (in lovelace)
-          type:
-            type: string
-            description: The source of the rewards
-            enum: [member, leader, treasury, reserves]
-            example: member
-          pool_id:
-            $ref: "#/components/schemas/pool_list/items/properties/pool_id_bech32"
+          stake_address:
+            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+          rewards:
+            type: array
+            items:
+              type: object
+              properties:
+                earned_epoch:
+                  $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+                spendable_epoch:
+                  $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+                amount:
+                  type: string
+                  description: Amount of rewards earned (in lovelace)
+                type:
+                  type: string
+                  description: The source of the rewards
+                  enum: [member, leader, treasury, reserves]
+                  example: member
+                pool_id:
+                  $ref: "#/components/schemas/pool_list/items/properties/pool_id_bech32"
     account_updates:
       type: array
       items:
         type: object
         properties:
-          action_type:
-            type: string
-            description: Type of certificate submitted
-            enum: ["registration", "delegation", "withdrawal", "deregistration"]
-            example: "registration"
-          tx_hash:
-            $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+          stake_address:
+            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+          updates:
+            type: array
+            items:
+              type: object
+              properties:
+                action_type:
+                  type: string
+                  description: Type of certificate submitted
+                  enum: ["registration", "delegation", "withdrawal", "deregistration"]
+                  example: "registration"
+                tx_hash:
+                  $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+                epoch_no:
+                  $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+                epoch_slot:
+                  $ref: "#/components/schemas/blocks/items/properties/epoch_slot"
+                absolute_slot:
+                  $ref: "#/components/schemas/blocks/items/properties/abs_slot"
+                block_time:
+                  $ref: "#/components/schemas/blocks/items/properties/block_time"
     account_addresses:
       type: array
       items:
         type: object
         properties:
-          address:
-            $ref: "#/components/schemas/asset_address_list/items/properties/payment_address"
+          stake_address:
+            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+          addresses:
+            type: array
+            items:
+              $ref: "#/components/schemas/asset_address_list/items/properties/payment_address"
     account_assets:
       type: array
       items:
         type: object
         properties:
-          asset_policy:
-            $ref: "#/components/schemas/asset_info/items/properties/policy_id"
-          asset_name:
-            $ref: "#/components/schemas/asset_info/items/properties/asset_name_ascii"
-          quantity:
-            type: string
-            description: Asset quantity owned by account
-            example: 990000
+          stake_address:
+            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+          assets:
+            type: array
+            items:
+              type: object
+              properties:
+                policy_id:
+                  $ref: "#/components/schemas/asset_info/items/properties/policy_id"
+                assets:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      asset_name:
+                        $ref: "#/components/schemas/asset_info/items/properties/asset_name_ascii"
+                      asset_policy:
+                        $ref: "#/components/schemas/asset_info/items/properties/policy_id"
+                      balance:
+                        type: string
+                        description: Asset quantity owned by account
+                        example: 990000
     account_history:
       type: array
       items:
@@ -967,18 +1027,23 @@ schemas:
             type: string
             description: Cardano staking address (reward account) in bech32 format
             example: stake1u8yxtugdv63wxafy9d00nuz6hjyyp4qnggvc9a3vxh8yl0ckml2uz
-          pool_id:
-            type: string
-            description: Bech32 representation of pool ID
-            example: pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt
-          epoch_no:
-            type: integer
-            description: Epoch number
-            example: 301
-          active_stake:
-            type: string
-            description: Active stake amount (in lovelaces)
-            example: 682334162
+          history:
+            type: array
+            items:
+              type: object
+              properties:
+                pool_id:
+                  type: string
+                  description: Bech32 representation of pool ID
+                  example: pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt
+                epoch_no:
+                  type: integer
+                  description: Epoch number
+                  example: 301
+                active_stake:
+                  type: string
+                  description: Active stake amount (in lovelaces)
+                  example: 682334162
     tx_info:
       type: array
       items:
