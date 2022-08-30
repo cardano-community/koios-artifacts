@@ -908,6 +908,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/_asset_policy"
         - $ref: "#/components/parameters/_asset_name"
+        - $ref: "#/components/parameters/_after_block_height"
       responses:
         "200":
           description: Array of Tx hashes that included the given asset
@@ -1259,6 +1260,16 @@ components:
       in: query
       required: true
       allowEmptyValue: false
+    _after_block_height:
+      deprecated: false
+      name: _after_block_height
+      description: Block height for specifying time delta
+      schema:
+        type: integer
+        example: 63487
+      in: query
+      required: false
+      allowEmptyValue: true
     _epoch_no:
       deprecated: false
       name: _epoch_no
