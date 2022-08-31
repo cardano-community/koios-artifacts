@@ -649,7 +649,7 @@ paths:
       tags:
         - Account
       requestBody:
-        $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
+        $ref: "#/components/requestBodies/stake_addresses"
       responses:
         "200":
           description: Array of account information
@@ -692,7 +692,7 @@ paths:
       tags:
         - Account
       requestBody:
-        $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
+        $ref: "#/components/requestBodies/stake_addresses"
       responses:
         "200":
           description: Array of account updates information
@@ -715,7 +715,7 @@ paths:
       tags:
         - Account
       requestBody:
-        $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
+        $ref: "#/components/requestBodies/stake_addresses"
       responses:
         "200":
           description: Array of payment addresses
@@ -736,7 +736,7 @@ paths:
       tags:
         - Account
       requestBody:
-        $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
+        $ref: "#/components/requestBodies/stake_addresses"
       responses:
         "200":
           description: Array of assets owned by account
