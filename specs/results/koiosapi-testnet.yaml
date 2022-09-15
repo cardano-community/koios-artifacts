@@ -1462,7 +1462,8 @@ components:
               _stake_addresses:
                 - stake_test1uqrw9tjymlm8wrwq7jk68n6v7fs9qz8z0tkdkve26dylmfc2ux2hj
                 - stake_test1uq7g7kqeucnqfweqzgxk3dw34e8zg4swnc7nagysug2mm4cm77jrx
-              _epoch_no: 17
+              _epoch_no:
+                - 200
     stake_addresses:
       content:
         application/json:
@@ -2395,7 +2396,9 @@ components:
             description: Sum of all UTxO values beloning to address
             example: 10723473983
           stake_address:
-            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+            nullable: true
+            allOf:
+            - $ref: "#/components/schemas/account_history/items/properties/stake_address"
           script_address:
             type: boolean
             description: Signifies whether the address is a script address

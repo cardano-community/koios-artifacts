@@ -827,7 +827,9 @@ schemas:
             description: Sum of all UTxO values beloning to address
             example: 10723473983
           stake_address:
-            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+            nullable: true
+            allOf:
+            - $ref: "#/components/schemas/account_history/items/properties/stake_address"
           script_address:
             type: boolean
             description: Signifies whether the address is a script address
