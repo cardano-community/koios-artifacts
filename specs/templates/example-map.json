@@ -63,9 +63,9 @@
   },
   "requestBodies": {
     "epoch_no": {
-      "m": "350",
-      "t": "200",
-      "g": "1000"
+      "m": 350,
+      "t": 200,
+      "g": 1000
     },
     "stake_addresses1": {
       "m": "stake1uyfmzu5qqy70a8kq4c8rw09q0w0ktfcxppwujejnsh6tyrg5c774g",

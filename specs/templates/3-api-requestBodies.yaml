@@ -80,8 +80,7 @@ requestBodies:
               _stake_addresses:
                 - ##stake_addresses1_rb##
                 - ##stake_addresses2_rb##
-              _epoch_no:
-                - ##epoch_no_rb##
+              _epoch_no: ##epoch_no_rb##
     stake_addresses:
       content:
         application/json:

@@ -1462,8 +1462,7 @@ components:
               _stake_addresses:
                 - stake1uyfmzu5qqy70a8kq4c8rw09q0w0ktfcxppwujejnsh6tyrg5c774g
                 - stake1uydhlh7f2kkw9eazct5zyzlrvj32gjnkmt2v5qf6t8rut4qwch8ey
-              _epoch_no:
-                - 350
+              _epoch_no: 350
     stake_addresses:
       content:
         application/json:
