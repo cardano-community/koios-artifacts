@@ -1050,7 +1050,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Pool Blocks
       description: >-
-        Return information about blocks minted by a given pool in current epoch
+        Return information about blocks minted by a given pool for all epochs
         (or _epoch_no if provided)
   /pool_history: #RPC
     get:
