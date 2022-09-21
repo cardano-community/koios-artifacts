@@ -3074,7 +3074,8 @@ components:
             description: Count of total burn transactions
             example: 5
           minting_tx_metadata:
-            type: array
+            type: object
+            description: Transaction metadata of the latest asset minting transaction
             nullable: true
             items:
               properties:
