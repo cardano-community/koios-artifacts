@@ -314,6 +314,30 @@ schemas:
             nullable: true
             description: Pool live saturation (decimal format)
             example: 94.52
+    pool_snapshot:
+      type: array
+      nullable: true
+      items:
+        type: object
+        properties:
+          snapshot:
+            type: string
+            description: Type of snapshot ("Mark", "Set" or "Go")
+            example: "Mark"
+          epoch_no:
+            type: integer
+            description: Epoch number for the snapshot entry
+            example: 324
+          nonce:
+            $ref: "#/components/schemas/epoch_params/items/properties/nonce"
+          pool_stake:
+            type: string
+            description: Pool's Active Stake for the given epoch
+            example: "100000000000"
+          active_stake:
+            type: string
+            description: Total Active Stake for the given epoch
+            example: "103703246364020"
     pool_delegators:
       type: array
       nullable: true
@@ -329,6 +353,24 @@ schemas:
           active_epoch_no:
             type: integer
             description: Epoch number in which the delegation becomes active
+            example: 324
+          latest_delegation_hash:
+            type: string
+            description: Latest transaction hash used for delegation by the account
+            example: 368d08fe86804d637649341d3aec4a9baa7dffa6d00f16de2ba9dba814f1c948
+    pool_delegators_history:
+      type: array
+      nullable: true
+      items:
+        type: object
+        properties:
+          stake_address:
+            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+          amount:
+            $ref: "#/components/schemas/pool_delegators/items/properties/amount"
+          epoch_no:
+            type: integer
+            description: Epoch number for the delegation history
             example: 324
     pool_blocks:
       type: array
@@ -383,6 +425,8 @@ schemas:
             $ref: "#/components/schemas/pool_info/items/properties/meta_url"
           meta_hash:
             $ref: "#/components/schemas/pool_info/items/properties/meta_hash"
+          meta_json:
+            $ref: "#/components/schemas/pool_info/items/properties/meta_json"
           pool_status:
             $ref: "#/components/schemas/pool_info/items/properties/pool_status"
           retiring_epoch:
@@ -633,6 +677,22 @@ schemas:
             description: The cost per UTxO size
             example: 34482
             nullable: true
+    epoch_block_protocols:
+      type: array
+      items:
+        properties:
+          proto_major:
+            type: integer
+            description: Protocol major version
+            example: 6
+          proto_minor:
+            type: integer
+            description: Protocol major version
+            example: 2
+          blocks:
+            type: integer
+            description: Amount of blocks with specified major and protocol combination
+            example: 2183
     blocks:
       type: array
       items:
@@ -767,7 +827,9 @@ schemas:
             description: Sum of all UTxO values beloning to address
             example: 10723473983
           stake_address:
-            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+            nullable: true
+            allOf:
+            - $ref: "#/components/schemas/account_history/items/properties/stake_address"
           script_address:
             type: boolean
             description: Signifies whether the address is a script address
@@ -1444,7 +1506,8 @@ schemas:
             description: Count of total burn transactions
             example: 5
           minting_tx_metadata:
-            type: array
+            type: object
+            description: Transaction metadata of the latest asset minting transaction
             nullable: true
             items:
               properties:
