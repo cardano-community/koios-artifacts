@@ -2806,11 +2806,7 @@ components:
                   description: Sum of minted assets (negative on burn)
                   example: 1
           metadata:
-            type: array
-            nullable: true
-            description: Metadata present with-in a transaction (if any)
-            items:
-              $ref: "#/components/schemas/tx_metadata/items/properties/metadata"
+            $ref: "#/components/schemas/tx_metadata/items/properties/metadata"
           certificates:
             type: array
             nullable: true
@@ -3069,27 +3065,7 @@ components:
             description: Count of total burn transactions
             example: 5
           minting_tx_metadata:
-            type: object
-            description: Transaction metadata of the latest asset minting transaction
-            nullable: true
-            items:
-              properties:
-                key:
-                  type: string
-                  description: The metadata key
-                  example: "721"
-                  nullable: true
-                json:
-                  type: object
-                  description: The minting Tx JSON payload if it can be decoded as JSON
-                  example:
-                    {
-                      "image": "ipfs://QmVHpTQL4Furw6fFNhSHdT3AWGbDE9Vs341JHJhQF1bAEA",
-                      "pattern": "08",
-                      "collection": "ccvault.io - the mesmerizer 2021",
-                      "description": "Thanks for supporting ccvault.io development!",
-                    }
-                  nullable: true
+            $ref: "#/components/schemas/tx_metadata/items/properties/metadata"
           token_registry_metadata:
             type: object
             description: Asset metadata registered on the Cardano Token Registry
