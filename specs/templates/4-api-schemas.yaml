@@ -1241,7 +1241,7 @@ schemas:
             nullable: true
             description: Metadata present with-in a transaction (if any)
             items:
-              $ref: "#/components/schemas/tx_metadata/items/properties/metadata/items"
+              $ref: "#/components/schemas/tx_metadata/items/properties/metadata"
           certificates:
             type: array
             nullable: true
@@ -1376,30 +1376,20 @@ schemas:
           tx_hash:
             $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
           metadata:
-            type: array
+            type: object
             nullable: true
-            description: Metadata present with-in a transaction (if any)
-            items:
-              properties:
-                key:
-                  type: string
-                  description: Metadata key (index)
-                  example: "0"
-                json:
-                  type: object
-                  nullable: true
-                  description: A JSON array containing details about metadata within transaction
-                  example:
-                    {
-                      "721":
-                        {
-                          "version": 1,
-                          "copyright": "...",
-                          "publisher": ["p...o"],
-                          "4bf184e01e0f163296ab253edd60774e2d34367d0e7b6cbc689b567d":
-                            {},
-                        },
-                    }
+            description: A JSON array containing details about metadata within transaction
+            example:
+              {
+                "721":
+                  {
+                    "version": 1,
+                    "copyright": "...",
+                    "publisher": ["p...o"],
+                    "4bf184e01e0f163296ab253edd60774e2d34367d0e7b6cbc689b567d":
+                      {},
+                  },
+              }
     tx_status:
       type: array
       items:
