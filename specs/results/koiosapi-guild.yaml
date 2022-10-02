@@ -338,7 +338,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/epoch_params"
+                $ref: "#/components/schemas/epoch_block_protocols"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
