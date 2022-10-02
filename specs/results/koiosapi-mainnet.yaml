@@ -2810,13 +2810,7 @@ components:
             nullable: true
             description: Metadata present with-in a transaction (if any)
             items:
-              properties:
-                key:
-                  type: string
-                  description: Metadata key (index)
-                  example: "0"
-                json:
-                  $ref: "#/components/schemas/tx_metadata/items/properties/metadata"
+              $ref: "#/components/schemas/tx_metadata/items/properties/metadata/items"
           certificates:
             type: array
             nullable: true
@@ -2951,20 +2945,30 @@ components:
           tx_hash:
             $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
           metadata:
-            type: object
+            type: array
             nullable: true
-            description: A JSON array containing details about metadata within transaction
-            example:
-              {
-                "721":
-                  {
-                    "version": 1,
-                    "copyright": "...",
-                    "publisher": ["p...o"],
-                    "4bf184e01e0f163296ab253edd60774e2d34367d0e7b6cbc689b567d":
-                      {},
-                  },
-              }
+            description: Metadata present with-in a transaction (if any)
+            items:
+              properties:
+                key:
+                  type: string
+                  description: Metadata key (index)
+                  example: "0"
+                json:
+                  type: object
+                  nullable: true
+                  description: A JSON array containing details about metadata within transaction
+                  example:
+                    {
+                      "721":
+                        {
+                          "version": 1,
+                          "copyright": "...",
+                          "publisher": ["p...o"],
+                          "4bf184e01e0f163296ab253edd60774e2d34367d0e7b6cbc689b567d":
+                            {},
+                        },
+                    }
     tx_status:
       type: array
       items:
