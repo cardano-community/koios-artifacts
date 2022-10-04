@@ -1,7 +1,7 @@
 openapi: 3.0.2
 info:
   title: Koios API
-  version: 1.0.7
+  version: 1.0.8
   description: |
     Koios is best described as a Decentralized and Elastic RESTful query layer for exploring data on Cardano blockchain to consume within applications/wallets/explorers/etc.
 
@@ -1028,7 +1028,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Pool Delegators History
-      description: Return information about active delegators (incl. history) for a given pool and epoch number - current epoch if not provided.
+      description: Return information about active delegators (incl. history) for a given pool and epoch number (all epochs if not specified).
   /pool_blocks: #RPC
     get:
       tags:
@@ -1337,7 +1337,7 @@ components:
       description: Asset Policy ID in hexadecimal format (hex)
       schema:
         type: string
-        example: d3501d9531fcc25e3ca4b6429318c2cc374dbdbcf5e99c1c1e5da1ff
+        example: 750900e4999ebe0d58f19b634768ba25e525aaf12403bfe8fe130501
       in: query
       required: true
       allowEmptyValue: false
@@ -1347,7 +1347,7 @@ components:
       description: Asset Name in hexadecimal format (hex)
       schema:
         type: string
-        example: 444f4e545350414d
+        example: 424f4f4b
       in: query
       required: false
       allowEmptyValue: true
@@ -1461,8 +1461,8 @@ components:
                 description: Only fetch information for a specific epoch
             example:
               _stake_addresses:
-                - stake1uyfmzu5qqy70a8kq4c8rw09q0w0ktfcxppwujejnsh6tyrg5c774g
-                - stake1uydhlh7f2kkw9eazct5zyzlrvj32gjnkmt2v5qf6t8rut4qwch8ey
+                - stake1uyrx65wjqjgeeksd8hptmcgl5jfyrqkfq0xe8xlp367kphsckq250
+                - stake1uxpdrerp9wrxunfh6ukyv5267j70fzxgw0fr3z8zeac5vyqhf9jhy
               _epoch_no: 350
     stake_addresses:
       content:
@@ -1480,8 +1480,8 @@ components:
                 description: Array of Cardano stake address(es) in bech32 format
             example:
               _stake_addresses:
-                - stake1uyfmzu5qqy70a8kq4c8rw09q0w0ktfcxppwujejnsh6tyrg5c774g
-                - stake1uydhlh7f2kkw9eazct5zyzlrvj32gjnkmt2v5qf6t8rut4qwch8ey
+                - stake1uyrx65wjqjgeeksd8hptmcgl5jfyrqkfq0xe8xlp367kphsckq250
+                - stake1uxpdrerp9wrxunfh6ukyv5267j70fzxgw0fr3z8zeac5vyqhf9jhy
     credential_txs:
       content:
         application/json:

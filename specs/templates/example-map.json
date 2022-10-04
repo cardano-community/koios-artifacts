@@ -36,12 +36,12 @@
       "g": "stake_test17zt9x005zkd2usz2vhvktyzqsuwz25gmgnaqdka5hcj9m2qfg2py2"
     },
     "_asset_policy": {
-      "m": "d3501d9531fcc25e3ca4b6429318c2cc374dbdbcf5e99c1c1e5da1ff",
+      "m": "750900e4999ebe0d58f19b634768ba25e525aaf12403bfe8fe130501",
       "t": "000327a9e427a3a3256eb6212ae26b7f53f7969b8e62d37ea9138a7b",
       "g": "313534a537bc476c86ff7c57ec511bd7f24a9d15654091b24e9c606e"
     },
     "_asset_name": {
-      "m": "444f4e545350414d",
+      "m": "424f4f4b",
       "t": "54735465737431",
       "g": "41484c636f696e"
     },
@@ -68,12 +68,12 @@
       "g": 1500
     },
     "stake_addresses1": {
-      "m": "stake1uyfmzu5qqy70a8kq4c8rw09q0w0ktfcxppwujejnsh6tyrg5c774g",
+      "m": "stake1uyrx65wjqjgeeksd8hptmcgl5jfyrqkfq0xe8xlp367kphsckq250",
       "t": "stake_test1uqrw9tjymlm8wrwq7jk68n6v7fs9qz8z0tkdkve26dylmfc2ux2hj",
       "g": "stake_test17zt9x005zkd2usz2vhvktyzqsuwz25gmgnaqdka5hcj9m2qfg2py2"
     },
     "stake_addresses2": {
-      "m": "stake1uydhlh7f2kkw9eazct5zyzlrvj32gjnkmt2v5qf6t8rut4qwch8ey",
+      "m": "stake1uxpdrerp9wrxunfh6ukyv5267j70fzxgw0fr3z8zeac5vyqhf9jhy",
       "t": "stake_test1uq7g7kqeucnqfweqzgxk3dw34e8zg4swnc7nagysug2mm4cm77jrx",
       "g": "stake_test1uzzm95hs7dzw23ftj3cly3rgm64crqxet7g46k6y5kcy3zcs3mpjd"
     },
