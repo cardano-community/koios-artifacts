@@ -812,7 +812,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Pool Delegators History
-      description: Return information about active delegators (incl. history) for a given pool and epoch number - current epoch if not provided.
+      description: Return information about active delegators (incl. history) for a given pool and epoch number (all epochs if not specified).
   /pool_blocks: #RPC
     get:
       tags:
