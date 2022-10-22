@@ -1198,6 +1198,27 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Script Redeemers
       description: List of all redeemers for a given script hash
+  /datum_info: #RPC
+    post:
+      tags:
+        - Script
+      requestBody:
+        $ref: "#/components/requestBodies/datum_hashes"
+      responses:
+        "200":
+          description: List of datum information for given datum hashes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/datum_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Datum Information
+      description: List of datum information for given datum hashes
 components:
   parameters:
     select:
@@ -1566,6 +1587,22 @@ components:
                 - pool100wj94uzf54vup2hdzk0afng4dhjaqggt7j434mtgm8v2gfvfgp
                 - pool102s2nqtea2hf5q0s4amj0evysmfnhrn4apyyhd4azcmsclzm96m
                 - pool102vsulhfx8ua2j9fwl2u7gv57fhhutc3tp6juzaefgrn7ae35wm
+    datum_hashes:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              _datum_hashes:
+                format: text
+                type: array
+                items:
+                  type: string
+                description: Array of Cardano datum hashes
+            example:
+              _datum_hashes:
+                  - 818ee3db3bbbd04f9f2ce21778cac3ac605802a4fcb00c8b3a58ee2dafc17d46
+                  - 45b0cfc220ceec5b7c1c62c4d4193d38e4eba48e8815729ce75f9c0ab0e4c1c0
   securitySchemes: {}
   schemas:
     tip:
@@ -2725,7 +2762,7 @@ components:
                   properties:
                     bytes:
                       type: string
-                      description: Datum (hex)
+                      description: Datum bytes (hex)
                       example: 19029a
                     value:
                       type: object
@@ -3239,6 +3276,17 @@ components:
                   type: object
                   description: The actual data in json format
                   example: { "bytes": "3c33" }
+    datum_info:
+      type: array
+      items:
+        type: object
+        properties:
+          hash:
+            $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_hash"
+          value:
+            $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_value"
+          bytes:
+            $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/inline_datum/properties/bytes"
   headers: {}
   responses:
     OK:
