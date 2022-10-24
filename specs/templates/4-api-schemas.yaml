@@ -1156,7 +1156,7 @@ schemas:
                   properties:
                     bytes:
                       type: string
-                      description: Datum (hex)
+                      description: Datum bytes (hex)
                       example: 19029a
                     value:
                       type: object
@@ -1668,3 +1668,14 @@ schemas:
                   type: object
                   description: The actual data in json format
                   example: { "bytes": "3c33" }
+    datum_info:
+      type: array
+      items:
+        type: object
+        properties:
+          hash:
+            $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_hash"
+          value:
+            $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_value"
+          bytes:
+            $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/inline_datum/properties/bytes"

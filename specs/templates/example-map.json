@@ -146,6 +146,16 @@
       "m": "pool102vsulhfx8ua2j9fwl2u7gv57fhhutc3tp6juzaefgrn7ae35wm",
       "t": "pool103qt58f9xlsr7y9anz3lnyq6cph4xh2yr4qrrtc356ldzz6ktqz",
       "g": "pool1us9ww725p0vygae5zaydme3apt7wg9se2yemhl8mgwkes3tlrqp"
+    },
+    "datum_hashes1": {
+      "m": "818ee3db3bbbd04f9f2ce21778cac3ac605802a4fcb00c8b3a58ee2dafc17d46",
+      "t": "5865d96e4313780a37af26055cdcc90308db23adaf4f2082178355e5e1dc20f6",
+      "g": "45b0cfc220ceec5b7c1c62c4d4193d38e4eba48e8815729ce75f9c0ab0e4c1c0"
+    },
+    "datum_hashes2": {
+      "m": "45b0cfc220ceec5b7c1c62c4d4193d38e4eba48e8815729ce75f9c0ab0e4c1c0",
+      "t": "4932dce28712ccc4858e3d83cc8e79b12740f66007dc9a287bb640a264c899de",
+      "g": "45b0cfc220ceec5b7c1c62c4d4193d38e4eba48e8815729ce75f9c0ab0e4c1c0"
     }
   }
 }

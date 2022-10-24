@@ -982,6 +982,27 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Script Redeemers
       description: List of all redeemers for a given script hash
+  /datum_info: #RPC
+    post:
+      tags:
+        - Script
+      requestBody:
+        $ref: "#/components/requestBodies/datum_hashes"
+      responses:
+        "200":
+          description: List of datum information for given datum hashes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/datum_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Datum Information
+      description: List of datum information for given datum hashes
 components:
   #!params!#
   #!requestBodies!#
