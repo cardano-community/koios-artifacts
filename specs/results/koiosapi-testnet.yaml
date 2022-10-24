@@ -1365,7 +1365,7 @@ components:
     _asset_name:
       deprecated: false
       name: _asset_name
-      description: Asset Name in hexadecimal format (hex)
+      description: Asset Name in hexadecimal format (hex), empty asset name returns royalties
       schema:
         type: string
         example: 54735465737431
@@ -2822,12 +2822,9 @@ components:
                   description: Withdrawal amount (in lovelaces)
                   example: 9845162
                 stake_addr:
-                  type: object
-                  properties:
-                    bech32:
-                      type: string
-                      description: A Cardano staking address (reward account, bech32 encoded)
-                      example: stake1uxggf4shfvpghcangm67ky0q4zlc3xn7gezy0auhxczu3pslm9wrj
+                  type: string
+                  description: A Cardano staking address (reward account, bech32 encoded)
+                  example: stake1uxggf4shfvpghcangm67ky0q4zlc3xn7gezy0auhxczu3pslm9wrj
           assets_minted:
             type: array
             description: Array of minted assets with-in a transaction
@@ -3073,7 +3070,6 @@ components:
         properties:
           policy_id:
             type: string
-            nullable: true
             description: Asset Policy ID (hex)
             example: d3501d9531fcc25e3ca4b6429318c2cc374dbdbcf5e99c1c1e5da1ff
           asset_name:
@@ -3102,7 +3098,9 @@ components:
             description: Count of total burn transactions
             example: 5
           minting_tx_metadata:
-            $ref: "#/components/schemas/tx_metadata/items/properties/metadata"
+            allOf:
+              - $ref: "#/components/schemas/tx_metadata/items/properties/metadata"
+            description: Latest minting transaction metadata (aligns with CIP-25)
           token_registry_metadata:
             type: object
             description: Asset metadata registered on the Cardano Token Registry

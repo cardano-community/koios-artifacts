@@ -143,7 +143,7 @@ parameters:
     _asset_name:
       deprecated: false
       name: _asset_name
-      description: Asset Name in hexadecimal format (hex)
+      description: Asset Name in hexadecimal format (hex), empty asset name returns royalties
       schema:
         type: string
         example: ##_asset_name_param##
