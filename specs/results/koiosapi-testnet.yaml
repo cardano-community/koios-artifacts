@@ -2462,7 +2462,7 @@ components:
                 reference_script:
                   $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/reference_script"
                 asset_list:
-                  $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/asset_list"
+                  $ref: "#/components/schemas/account_assets/items/properties/asset_list"
     address_txs:
       type: array
       items:
@@ -2483,8 +2483,8 @@ components:
         properties:
           address:
             $ref: "#/components/schemas/asset_address_list/items/properties/payment_address"
-          assets:
-            $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/asset_list"
+          asset_list:
+            $ref: "#/components/schemas/account_assets/items/properties/asset_list"
     credential_txs:
       $ref: "#/components/schemas/address_txs"
     account_list:
@@ -2607,26 +2607,21 @@ components:
         properties:
           stake_address:
             $ref: "#/components/schemas/account_history/items/properties/stake_address"
-          assets:
+          asset_list:
             type: array
             items:
               type: object
               properties:
                 policy_id:
                   $ref: "#/components/schemas/asset_info/items/properties/policy_id"
-                assets:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      asset_name:
-                        $ref: "#/components/schemas/asset_info/items/properties/asset_name_ascii"
-                      asset_policy:
-                        $ref: "#/components/schemas/asset_info/items/properties/policy_id"
-                      balance:
-                        type: string
-                        description: Asset quantity owned by account
-                        example: 990000
+                asset_name:
+                  $ref: "#/components/schemas/asset_info/items/properties/asset_name"
+                fingerprint:
+                  $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
+                quantity:
+                  type: string
+                  description: Asset quantity owned by account
+                  example: 990000
     account_history:
       type: array
       items:
@@ -2804,12 +2799,12 @@ components:
                         $ref: "#/components/schemas/asset_info/items/properties/policy_id"
                       asset_name:
                         $ref: "#/components/schemas/asset_info/items/properties/asset_name"
+                      fingerprint:
+                        $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
                       quantity:
                         type: string
                         description: Quantity of assets on the UTxO
                         example: 1
-                      fingerprint:
-                        $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
           withdrawals:
             type: array
             description: Array of withdrawals with-in a transaction
@@ -2835,9 +2830,11 @@ components:
                   $ref: "#/components/schemas/asset_info/items/properties/policy_id"
                 asset_name:
                   $ref: "#/components/schemas/asset_info/items/properties/asset_name"
+                fingerprint:
+                  $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
                 quantity:
                   type: string
-                  description: Sum of minted assets (negative on burn)
+                  description: Quantity of minted assets (negative on burn)
                   example: 1
           metadata:
             $ref: "#/components/schemas/tx_metadata/items/properties/metadata"
@@ -3016,21 +3013,10 @@ components:
         properties:
           policy_id:
             $ref: "#/components/schemas/asset_info/items/properties/policy_id"
-          asset_names:
-            type: object
-            properties:
-              hex:
-                type: array
-                description: Asset Name (hex)
-                items:
-                  type: string
-                  example: "\x444f4e545350414d"
-              ascii:
-                type: array
-                description: Asset Name (ASCII)
-                items:
-                  type: string
-                  example: "DONTSPAM"
+          asset_name:
+            $ref: "#/components/schemas/asset_info/items/properties/asset_name"
+          fingerprint:
+            $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
     asset_address_list:
       type: array
       description: An array of payment addresses holding the given token (including balances)
@@ -3052,6 +3038,8 @@ components:
             $ref: "#/components/schemas/asset_info/items/properties/policy_id"
           asset_name:
             $ref: "#/components/schemas/asset_info/items/properties/asset_name"
+          fingerprint:
+            $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
           total_transactions:
             type: integer
             description: Total number of transactions including the given asset
@@ -3140,6 +3128,8 @@ components:
             $ref: "#/components/schemas/asset_info/items/properties/policy_id"
           asset_name:
             $ref: "#/components/schemas/asset_info/items/properties/asset_name"
+          fingerprint:
+            $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
           minting_txs:
             type: array
             description: Array of all mint/burn transactions for an asset
