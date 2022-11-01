@@ -12,8 +12,8 @@ cat <<-EOF
 	
 	To run the endpoint validation tests, use the below:
 	
-	  schemathesis --pre-run not_empty_response run --request-timeout 5000 --hypothesis-seed 1 https://guild.koios.rest/koiosapi.yaml \\
-	               --hypothesis-phases=explicit,generate --hypothesis-max-examples=1 -v --hypothesis-verbosity quiet -b http://127.0.0.1:8053/api/v0 -c all
+	  schemathesis --pre-run not_empty_response run --request-timeout 5000 https://guild.koios.rest/koiosapi.yaml --hypothesis-phases=explicit,generate \\
+	      --hypothesis-verbosity quiet -b http://127.0.0.1:8053/api/v0 -c all --validate-schema=true -H "Content-Type: application/json"
 	
 	      where http://127.0.0.1:8053/api/v0 is the URL of instance you want to test, and guild.koios.rest is the target enviornment for testing.
 	

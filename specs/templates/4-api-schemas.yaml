@@ -1542,7 +1542,10 @@ schemas:
                   description: Quantity minted/burned (negative numbers indicate burn transactions)
                   example: "-10"
                 metadata:
-                  $ref: "#/components/schemas/asset_info/items/properties/minting_tx_metadata"
+                  type: array
+                  description: Array of Transaction Metadata for given transaction
+                  items:
+                    $ref: "#/components/schemas/asset_info/items/properties/minting_tx_metadata"
     asset_policy_info:
       type: array
       description: List of policy assets
