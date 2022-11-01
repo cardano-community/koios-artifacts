@@ -44,14 +44,15 @@ BEGIN
         ENCODE(tx.hash, 'hex') AS tx_hash,
         EXTRACT(epoch from b.time)::integer as block_time,
         mtm.quantity::text,
-        COALESCE(
-          JSON_AGG(
-            JSON_BUILD_OBJECT(
-              'key', TM.key::text,
-              'json', TM.json
-            )
-          ),
-          JSON_BUILD_ARRAY()
+        ( CASE WHEN TM.key IS NULL THEN JSON_BUILD_ARRAY()
+          ELSE
+            JSON_AGG(
+              JSON_BUILD_OBJECT(
+                'key', TM.key::text,
+                'json', TM.json
+              )
+            ) 
+          END
         ) AS metadata
       FROM
         ma_tx_mint mtm
@@ -65,7 +66,8 @@ BEGIN
         ma.fingerprint,
         tx.id,
         b.time,
-        mtm.quantity
+        mtm.quantity,
+        TM.key
     ) minting_data
     GROUP BY
       minting_data.fingerprint;
