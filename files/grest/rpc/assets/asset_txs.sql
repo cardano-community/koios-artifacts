@@ -1,7 +1,8 @@
-CREATE FUNCTION grest.asset_txs (
+CREATE OR REPLACE FUNCTION grest.asset_txs (
   _asset_policy text,
   _asset_name text default '',
-  _after_block_height integer DEFAULT 0
+  _after_block_height integer DEFAULT 0,
+  _history boolean DEFAULT false
 )
   RETURNS TABLE (
     tx_hash text,
@@ -44,10 +45,12 @@ BEGIN
         INNER JOIN tx_out TXO ON TXO.id = MTO.tx_out_id
         INNER JOIN tx ON tx.id = TXO.tx_id
         INNER JOIN block ON block.id = tx.block_id
+        LEFT JOIN tx_in TXI ON TXO.tx_id = TXI.tx_out_id
+          AND TXO.index::smallint = TXI.tx_out_index::smallint
       WHERE
         MTO.ident = _asset_id
-        AND
-        block.block_no >= _after_block_height
+        AND block.block_no >= _after_block_height
+        AND (_history = true OR TXI.id IS NULL)
       GROUP BY
         ident,
         tx.hash,
