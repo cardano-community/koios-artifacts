@@ -910,6 +910,7 @@ paths:
         - $ref: "#/components/parameters/_asset_policy"
         - $ref: "#/components/parameters/_asset_name"
         - $ref: "#/components/parameters/_after_block_height"
+        - $ref: "#/components/parameters/_history"
       responses:
         "200":
           description: Array of Tx hashes that included the given asset
@@ -923,8 +924,8 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
-      summary: Asset Transaction History
-      description: Get the list of all asset transaction hashes (newest first)
+      summary: Asset Transactions
+      description: Get the list of current or all asset transaction hashes (newest first)
   /pool_list: #RPC
     get:
       tags:
@@ -1372,6 +1373,16 @@ components:
       in: query
       required: false
       allowEmptyValue: true
+    _history:
+      deprecated: false
+      name: _history
+      description: Include all historical transactions, setting to false includes only the non-empty ones
+      schema:
+        type: boolean
+        example: "false"
+      in: query
+      required: false
+      allowEmptyValue: false
     _pool_bech32:
       deprecated: false
       name: _pool_bech32
