@@ -46,7 +46,11 @@ BEGIN
           )
           AND NOT EXISTS (
             SELECT TRUE FROM EPOCH_STAKE
-              WHERE EPOCH_STAKE.ADDR_ID = STAKE_ADDRESS.ID
+              WHERE EPOCH_STAKE.EPOCH_NO = (
+                SELECT last_value::integer FROM GREST.CONTROL_TABLE
+                  WHERE key = 'last_active_stake_validated_epoch'
+                )
+                AND EPOCH_STAKE.ADDR_ID = STAKE_ADDRESS.ID
           )
     )
   -- INSERT QUERY START

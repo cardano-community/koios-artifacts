@@ -73,7 +73,8 @@ BEGIN
       FROM
         block tB
       WHERE
-        id = b.id - 1
+        block_no = b.block_no - 1
+      LIMIT 1
     ) AS parent_hash,
     (
       SELECT
@@ -81,7 +82,8 @@ BEGIN
       FROM
         block tB
       WHERE
-        id = b.id + 1
+        block_no = b.block_no + 1
+      LIMIT 1
     ) AS child_hash
   FROM
     block B
