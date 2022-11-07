@@ -666,6 +666,27 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Account Information
       description: Get the account information for given stake addresses (accounts)
+  /account_info_cache: #RPC
+    post:
+      tags:
+        - Account
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses"
+      responses:
+        "200":
+          description: Array of account information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Account Information (Cached)
+      description: Get the cached account information for given stake addresses (accounts)
   /account_rewards: #RPC
     post:
       tags:

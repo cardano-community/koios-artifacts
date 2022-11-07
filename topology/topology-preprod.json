@@ -1,0 +1,7 @@
+{
+  "Providers": [
+    {"name":"rdlrt","addr":"209.145.50.190","port":18050},
+    {"name":"eden","addr":"eden-preprod.koios.rest","port":8053}
+  ],
+  "Consumers": []
+}

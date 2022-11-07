@@ -1,0 +1,6 @@
+{
+  "Providers": [
+    {"name":"rdlrt","addr":"194.36.145.157","port":28050}
+  ],
+  "Consumers": []
+}
