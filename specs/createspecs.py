@@ -29,6 +29,8 @@ def main():
   populate_spec("m", "results/koiosapi-mainnet.yaml")
   populate_spec("t", "results/koiosapi-testnet.yaml")
   populate_spec("g", "results/koiosapi-guild.yaml")
+  populate_spec("pv", "results/koiosapi-preview.yaml")
+  populate_spec("pp", "results/koiosapi-preprod.yaml")
   print("Done!!")
 
 try:

@@ -666,7 +666,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Account Information
       description: Get the account information for given stake addresses (accounts)
-  /account_info_cache: #RPC
+  /account_info_cached: #RPC
     post:
       tags:
         - Account
@@ -1310,7 +1310,7 @@ components:
       description: Block height for specifying time delta
       schema:
         type: integer
-        example: 63487
+        example: 50000
       in: query
       required: false
       allowEmptyValue: true
@@ -1390,7 +1390,7 @@ components:
       description: Asset Name in hexadecimal format (hex), empty asset name returns royalties
       schema:
         type: string
-        example: 54735465737431
+        example: "54735465737431"
       in: query
       required: false
       allowEmptyValue: true
@@ -2926,7 +2926,6 @@ components:
                     }
           plutus_contracts:
             type: array
-            nullable: true
             description: Plutus contracts present in transaction (if any)
             items:
               properties:
@@ -2981,6 +2980,7 @@ components:
                           $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_value"
                 output:
                   type: object
+                  nullable: true
                   properties:
                     hash:
                       $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_hash"

@@ -450,7 +450,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Account Information
       description: Get the account information for given stake addresses (accounts)
-  /account_info_cache: #RPC
+  /account_info_cached: #RPC
     post:
       tags:
         - Account

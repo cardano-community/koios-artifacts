@@ -1288,7 +1288,6 @@ schemas:
                     }
           plutus_contracts:
             type: array
-            nullable: true
             description: Plutus contracts present in transaction (if any)
             items:
               properties:
@@ -1343,6 +1342,7 @@ schemas:
                           $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_value"
                 output:
                   type: object
+                  nullable: true
                   properties:
                     hash:
                       $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_hash"
