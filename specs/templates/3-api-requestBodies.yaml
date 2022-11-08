@@ -183,3 +183,19 @@ requestBodies:
                 - ##pool_ids_pool_bech32_ids1_rb##
                 - ##pool_ids_pool_bech32_ids2_rb##
                 - ##pool_ids_pool_bech32_ids3_rb##
+    datum_hashes:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              _datum_hashes:
+                format: text
+                type: array
+                items:
+                  type: string
+                description: Array of Cardano datum hashes
+            example:
+              _datum_hashes:
+                  - ##datum_hashes1_rb##
+                  - ##datum_hashes2_rb##

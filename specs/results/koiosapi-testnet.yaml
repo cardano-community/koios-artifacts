@@ -1,7 +1,7 @@
 openapi: 3.0.2
 info:
   title: Koios API
-  version: 1.0.7
+  version: 1.0.9rc
   description: |
     Koios is best described as a Decentralized and Elastic RESTful query layer for exploring data on Cardano blockchain to consume within applications/wallets/explorers/etc.
 
@@ -338,7 +338,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/epoch_params"
+                $ref: "#/components/schemas/epoch_block_protocols"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -666,6 +666,27 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Account Information
       description: Get the account information for given stake addresses (accounts)
+  /account_info_cached: #RPC
+    post:
+      tags:
+        - Account
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses"
+      responses:
+        "200":
+          description: Array of account information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Account Information (Cached)
+      description: Get the cached account information for given stake addresses (accounts)
   /account_rewards: #RPC
     post:
       tags:
@@ -910,6 +931,7 @@ paths:
         - $ref: "#/components/parameters/_asset_policy"
         - $ref: "#/components/parameters/_asset_name"
         - $ref: "#/components/parameters/_after_block_height"
+        - $ref: "#/components/parameters/_history"
       responses:
         "200":
           description: Array of Tx hashes that included the given asset
@@ -923,8 +945,8 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
-      summary: Asset Transaction History
-      description: Get the list of all asset transaction hashes (newest first)
+      summary: Asset Transactions
+      description: Get the list of current or all asset transaction hashes (newest first)
   /pool_list: #RPC
     get:
       tags:
@@ -1028,7 +1050,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Pool Delegators History
-      description: Return information about active delegators (incl. history) for a given pool and epoch number - current epoch if not provided.
+      description: Return information about active delegators (incl. history) for a given pool and epoch number (all epochs if not specified).
   /pool_blocks: #RPC
     get:
       tags:
@@ -1198,6 +1220,27 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Script Redeemers
       description: List of all redeemers for a given script hash
+  /datum_info: #RPC
+    post:
+      tags:
+        - Script
+      requestBody:
+        $ref: "#/components/requestBodies/datum_hashes"
+      responses:
+        "200":
+          description: List of datum information for given datum hashes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/datum_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Datum Information
+      description: List of datum information for given datum hashes
 components:
   parameters:
     select:
@@ -1267,7 +1310,7 @@ components:
       description: Block height for specifying time delta
       schema:
         type: integer
-        example: 63487
+        example: 50000
       in: query
       required: false
       allowEmptyValue: true
@@ -1344,13 +1387,23 @@ components:
     _asset_name:
       deprecated: false
       name: _asset_name
-      description: Asset Name in hexadecimal format (hex)
+      description: Asset Name in hexadecimal format (hex), empty asset name returns royalties
       schema:
         type: string
-        example: 54735465737431
+        example: "54735465737431"
       in: query
       required: false
       allowEmptyValue: true
+    _history:
+      deprecated: false
+      name: _history
+      description: Include all historical transactions, setting to false includes only the non-empty ones
+      schema:
+        type: boolean
+        example: "false"
+      in: query
+      required: false
+      allowEmptyValue: false
     _pool_bech32:
       deprecated: false
       name: _pool_bech32
@@ -1566,6 +1619,22 @@ components:
                 - pool102llj7e7a0mmxssjvjkv2d6lppuh6cz6q9xwc3tsksn0jqwz9eh
                 - pool102x86jz7uus6p6mlw02fdw2s805kng7g6ujs6s342t5msk36tch
                 - pool103qt58f9xlsr7y9anz3lnyq6cph4xh2yr4qrrtc356ldzz6ktqz
+    datum_hashes:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              _datum_hashes:
+                format: text
+                type: array
+                items:
+                  type: string
+                description: Array of Cardano datum hashes
+            example:
+              _datum_hashes:
+                  - 5865d96e4313780a37af26055cdcc90308db23adaf4f2082178355e5e1dc20f6
+                  - 4932dce28712ccc4858e3d83cc8e79b12740f66007dc9a287bb640a264c899de
   securitySchemes: {}
   schemas:
     tip:
@@ -2425,7 +2494,7 @@ components:
                 reference_script:
                   $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/reference_script"
                 asset_list:
-                  $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/asset_list"
+                  $ref: "#/components/schemas/account_assets/items/properties/asset_list"
     address_txs:
       type: array
       items:
@@ -2446,8 +2515,8 @@ components:
         properties:
           address:
             $ref: "#/components/schemas/asset_address_list/items/properties/payment_address"
-          assets:
-            $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/asset_list"
+          asset_list:
+            $ref: "#/components/schemas/account_assets/items/properties/asset_list"
     credential_txs:
       $ref: "#/components/schemas/address_txs"
     account_list:
@@ -2570,26 +2639,21 @@ components:
         properties:
           stake_address:
             $ref: "#/components/schemas/account_history/items/properties/stake_address"
-          assets:
+          asset_list:
             type: array
             items:
               type: object
               properties:
                 policy_id:
                   $ref: "#/components/schemas/asset_info/items/properties/policy_id"
-                assets:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      asset_name:
-                        $ref: "#/components/schemas/asset_info/items/properties/asset_name_ascii"
-                      asset_policy:
-                        $ref: "#/components/schemas/asset_info/items/properties/policy_id"
-                      balance:
-                        type: string
-                        description: Asset quantity owned by account
-                        example: 990000
+                asset_name:
+                  $ref: "#/components/schemas/asset_info/items/properties/asset_name"
+                fingerprint:
+                  $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
+                quantity:
+                  type: string
+                  description: Asset quantity owned by account
+                  example: 990000
     account_history:
       type: array
       items:
@@ -2725,7 +2789,7 @@ components:
                   properties:
                     bytes:
                       type: string
-                      description: Datum (hex)
+                      description: Datum bytes (hex)
                       example: 19029a
                     value:
                       type: object
@@ -2767,12 +2831,12 @@ components:
                         $ref: "#/components/schemas/asset_info/items/properties/policy_id"
                       asset_name:
                         $ref: "#/components/schemas/asset_info/items/properties/asset_name"
+                      fingerprint:
+                        $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
                       quantity:
                         type: string
                         description: Quantity of assets on the UTxO
                         example: 1
-                      fingerprint:
-                        $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
           withdrawals:
             type: array
             description: Array of withdrawals with-in a transaction
@@ -2785,12 +2849,9 @@ components:
                   description: Withdrawal amount (in lovelaces)
                   example: 9845162
                 stake_addr:
-                  type: object
-                  properties:
-                    bech32:
-                      type: string
-                      description: A Cardano staking address (reward account, bech32 encoded)
-                      example: stake1uxggf4shfvpghcangm67ky0q4zlc3xn7gezy0auhxczu3pslm9wrj
+                  type: string
+                  description: A Cardano staking address (reward account, bech32 encoded)
+                  example: stake1uxggf4shfvpghcangm67ky0q4zlc3xn7gezy0auhxczu3pslm9wrj
           assets_minted:
             type: array
             description: Array of minted assets with-in a transaction
@@ -2801,22 +2862,14 @@ components:
                   $ref: "#/components/schemas/asset_info/items/properties/policy_id"
                 asset_name:
                   $ref: "#/components/schemas/asset_info/items/properties/asset_name"
+                fingerprint:
+                  $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
                 quantity:
                   type: string
-                  description: Sum of minted assets (negative on burn)
+                  description: Quantity of minted assets (negative on burn)
                   example: 1
           metadata:
-            type: array
-            nullable: true
-            description: Metadata present with-in a transaction (if any)
-            items:
-              properties:
-                key:
-                  type: string
-                  description: Metadata key (index)
-                  example: "0"
-                json:
-                  $ref: "#/components/schemas/tx_metadata/items/properties/metadata"
+            $ref: "#/components/schemas/tx_metadata/items/properties/metadata"
           certificates:
             type: array
             nullable: true
@@ -2873,7 +2926,6 @@ components:
                     }
           plutus_contracts:
             type: array
-            nullable: true
             description: Plutus contracts present in transaction (if any)
             items:
               properties:
@@ -2928,6 +2980,7 @@ components:
                           $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_value"
                 output:
                   type: object
+                  nullable: true
                   properties:
                     hash:
                       $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_hash"
@@ -2992,21 +3045,10 @@ components:
         properties:
           policy_id:
             $ref: "#/components/schemas/asset_info/items/properties/policy_id"
-          asset_names:
-            type: object
-            properties:
-              hex:
-                type: array
-                description: Asset Name (hex)
-                items:
-                  type: string
-                  example: "\x444f4e545350414d"
-              ascii:
-                type: array
-                description: Asset Name (ASCII)
-                items:
-                  type: string
-                  example: "DONTSPAM"
+          asset_name:
+            $ref: "#/components/schemas/asset_info/items/properties/asset_name"
+          fingerprint:
+            $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
     asset_address_list:
       type: array
       description: An array of payment addresses holding the given token (including balances)
@@ -3028,6 +3070,8 @@ components:
             $ref: "#/components/schemas/asset_info/items/properties/policy_id"
           asset_name:
             $ref: "#/components/schemas/asset_info/items/properties/asset_name"
+          fingerprint:
+            $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
           total_transactions:
             type: integer
             description: Total number of transactions including the given asset
@@ -3046,7 +3090,6 @@ components:
         properties:
           policy_id:
             type: string
-            nullable: true
             description: Asset Policy ID (hex)
             example: d3501d9531fcc25e3ca4b6429318c2cc374dbdbcf5e99c1c1e5da1ff
           asset_name:
@@ -3075,27 +3118,9 @@ components:
             description: Count of total burn transactions
             example: 5
           minting_tx_metadata:
-            type: object
-            description: Transaction metadata of the latest asset minting transaction
-            nullable: true
-            items:
-              properties:
-                key:
-                  type: string
-                  description: The metadata key
-                  example: "721"
-                  nullable: true
-                json:
-                  type: object
-                  description: The minting Tx JSON payload if it can be decoded as JSON
-                  example:
-                    {
-                      "image": "ipfs://QmVHpTQL4Furw6fFNhSHdT3AWGbDE9Vs341JHJhQF1bAEA",
-                      "pattern": "08",
-                      "collection": "ccvault.io - the mesmerizer 2021",
-                      "description": "Thanks for supporting ccvault.io development!",
-                    }
-                  nullable: true
+            allOf:
+              - $ref: "#/components/schemas/tx_metadata/items/properties/metadata"
+            description: Latest minting transaction metadata (aligns with CIP-25)
           token_registry_metadata:
             type: object
             description: Asset metadata registered on the Cardano Token Registry
@@ -3135,6 +3160,8 @@ components:
             $ref: "#/components/schemas/asset_info/items/properties/policy_id"
           asset_name:
             $ref: "#/components/schemas/asset_info/items/properties/asset_name"
+          fingerprint:
+            $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
           minting_txs:
             type: array
             description: Array of all mint/burn transactions for an asset
@@ -3153,7 +3180,10 @@ components:
                   description: Quantity minted/burned (negative numbers indicate burn transactions)
                   example: "-10"
                 metadata:
-                  $ref: "#/components/schemas/asset_info/items/properties/minting_tx_metadata"
+                  type: array
+                  description: Array of Transaction Metadata for given transaction
+                  items:
+                    $ref: "#/components/schemas/asset_info/items/properties/minting_tx_metadata"
     asset_policy_info:
       type: array
       description: List of policy assets
@@ -3269,6 +3299,17 @@ components:
                   type: object
                   description: The actual data in json format
                   example: { "bytes": "3c33" }
+    datum_info:
+      type: array
+      items:
+        type: object
+        properties:
+          hash:
+            $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_hash"
+          value:
+            $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_value"
+          bytes:
+            $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/inline_datum/properties/bytes"
   headers: {}
   responses:
     OK:

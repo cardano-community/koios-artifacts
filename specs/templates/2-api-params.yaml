@@ -66,7 +66,7 @@ parameters:
       description: Block height for specifying time delta
       schema:
         type: integer
-        example: 63487
+        example: 50000
       in: query
       required: false
       allowEmptyValue: true
@@ -143,13 +143,23 @@ parameters:
     _asset_name:
       deprecated: false
       name: _asset_name
-      description: Asset Name in hexadecimal format (hex)
+      description: Asset Name in hexadecimal format (hex), empty asset name returns royalties
       schema:
         type: string
-        example: ##_asset_name_param##
+        example: "##_asset_name_param##"
       in: query
       required: false
       allowEmptyValue: true
+    _history:
+      deprecated: false
+      name: _history
+      description: Include all historical transactions, setting to false includes only the non-empty ones
+      schema:
+        type: boolean
+        example: "false"
+      in: query
+      required: false
+      allowEmptyValue: false
     _pool_bech32:
       deprecated: false
       name: _pool_bech32

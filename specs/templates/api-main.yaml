@@ -122,7 +122,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/epoch_params"
+                $ref: "#/components/schemas/epoch_block_protocols"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -450,6 +450,27 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Account Information
       description: Get the account information for given stake addresses (accounts)
+  /account_info_cached: #RPC
+    post:
+      tags:
+        - Account
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses"
+      responses:
+        "200":
+          description: Array of account information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Account Information (Cached)
+      description: Get the cached account information for given stake addresses (accounts)
   /account_rewards: #RPC
     post:
       tags:
@@ -694,6 +715,7 @@ paths:
         - $ref: "#/components/parameters/_asset_policy"
         - $ref: "#/components/parameters/_asset_name"
         - $ref: "#/components/parameters/_after_block_height"
+        - $ref: "#/components/parameters/_history"
       responses:
         "200":
           description: Array of Tx hashes that included the given asset
@@ -707,8 +729,8 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
-      summary: Asset Transaction History
-      description: Get the list of all asset transaction hashes (newest first)
+      summary: Asset Transactions
+      description: Get the list of current or all asset transaction hashes (newest first)
   /pool_list: #RPC
     get:
       tags:
@@ -812,7 +834,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Pool Delegators History
-      description: Return information about active delegators (incl. history) for a given pool and epoch number - current epoch if not provided.
+      description: Return information about active delegators (incl. history) for a given pool and epoch number (all epochs if not specified).
   /pool_blocks: #RPC
     get:
       tags:
@@ -982,6 +1004,27 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Script Redeemers
       description: List of all redeemers for a given script hash
+  /datum_info: #RPC
+    post:
+      tags:
+        - Script
+      requestBody:
+        $ref: "#/components/requestBodies/datum_hashes"
+      responses:
+        "200":
+          description: List of datum information for given datum hashes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/datum_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Datum Information
+      description: List of datum information for given datum hashes
 components:
   #!params!#
   #!requestBodies!#
