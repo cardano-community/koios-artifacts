@@ -3,20 +3,29 @@
     "list": [
       {
         "builtIn": 1,
-        "datasource": "-- Grafana --",
+        "datasource": {
+          "type": "datasource",
+          "uid": "grafana"
+        },
         "enable": true,
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
         "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
         "type": "dashboard"
       }
     ]
   },
   "description": "Stake Pool Monitor",
   "editable": true,
-  "gnetId": null,
+  "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 11,
+  "iteration": 1668403650564,
   "links": [
     {
       "icon": "external link",
@@ -26,14 +35,17 @@
       "url": "https://cardano-community.github.io/guild-operators"
     }
   ],
+  "liveNow": false,
   "panels": [
     {
       "aliasColors": {},
       "bars": false,
-      "cacheTimeout": null,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "P1809F7CD0C75ACF3"
+      },
       "decimals": 0,
       "description": "",
       "fieldConfig": {
@@ -73,7 +85,7 @@
         "alertThreshold": false
       },
       "percentage": false,
-      "pluginVersion": "7.5.7",
+      "pluginVersion": "9.0.0",
       "pointradius": 0.5,
       "points": false,
       "renderer": "flot",
@@ -83,19 +95,22 @@
       "steppedLine": false,
       "targets": [
         {
-          "datasource": "prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P1809F7CD0C75ACF3"
+          },
+          "editorMode": "code",
           "exemplar": true,
-          "expr": "haproxy_server_check_status{state=\"PROCOK\",proxy=\"grest_core\"}",
+          "expr": "haproxy_server_check_status{state=\"PROCOK\",proxy=\"grest_core\",server=~\"$gRestNode\",instance=\"us-api.koios.rest:443\"}",
           "format": "time_series",
           "interval": "",
           "legendFormat": "{{ server }}",
+          "range": true,
           "refId": "A"
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
       "title": "Servers State",
       "tooltip": {
         "shared": true,
@@ -104,9 +119,7 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
@@ -116,7 +129,6 @@
           "format": "locale",
           "label": "",
           "logBase": 1,
-          "max": null,
           "min": "0",
           "show": true
         },
@@ -125,8 +137,6 @@
           "format": "short",
           "label": "Relays",
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": false
         }
       ],
@@ -138,10 +148,12 @@
     {
       "aliasColors": {},
       "bars": false,
-      "cacheTimeout": null,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "P1809F7CD0C75ACF3"
+      },
       "decimals": 0,
       "description": "",
       "fieldConfig": {
@@ -181,7 +193,7 @@
         "alertThreshold": false
       },
       "percentage": false,
-      "pluginVersion": "7.5.7",
+      "pluginVersion": "9.0.0",
       "pointradius": 0.5,
       "points": true,
       "renderer": "flot",
@@ -191,19 +203,22 @@
       "steppedLine": false,
       "targets": [
         {
-          "datasource": "prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P1809F7CD0C75ACF3"
+          },
+          "editorMode": "code",
           "exemplar": true,
-          "expr": "dbsize/1024/1024/1024  ",
+          "expr": "dbsize{service=~\"$gRestNode\"}/1024/1024/1024",
           "format": "time_series",
           "interval": "",
           "legendFormat": "{{ service }}",
+          "range": true,
           "refId": "A"
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
       "title": "DB Size (GB)",
       "tooltip": {
         "shared": true,
@@ -212,9 +227,7 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
@@ -224,8 +237,6 @@
           "format": "locale",
           "label": "",
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         },
         {
@@ -233,14 +244,11 @@
           "format": "short",
           "label": "Relays",
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": false
         }
       ],
       "yaxis": {
-        "align": false,
-        "alignLevel": null
+        "align": false
       }
     },
     {
@@ -248,7 +256,10 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "P1809F7CD0C75ACF3"
+      },
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -284,7 +295,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.5.7",
+      "pluginVersion": "9.0.0",
       "pointradius": 0.5,
       "points": true,
       "renderer": "flot",
@@ -298,8 +309,12 @@
       "steppedLine": false,
       "targets": [
         {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P1809F7CD0C75ACF3"
+          },
           "exemplar": true,
-          "expr": "(memused / memtotal)* 100",
+          "expr": "(memused{service=~\"$gRestNode\"} / memtotal{service=~\"$gRestNode\"})* 100",
           "hide": false,
           "interval": "",
           "legendFormat": "{{ service }}",
@@ -307,9 +322,7 @@
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
       "title": "Memory Utilization",
       "tooltip": {
         "shared": true,
@@ -318,9 +331,7 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
@@ -328,33 +339,28 @@
         {
           "decimals": 1,
           "format": "%",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         },
         {
           "format": "short",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         }
       ],
       "yaxis": {
-        "align": false,
-        "alignLevel": null
+        "align": false
       }
     },
     {
       "aliasColors": {},
       "bars": false,
-      "cacheTimeout": null,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "P1809F7CD0C75ACF3"
+      },
       "decimals": 0,
       "description": "",
       "fieldConfig": {
@@ -394,7 +400,7 @@
         "alertThreshold": false
       },
       "percentage": false,
-      "pluginVersion": "7.5.7",
+      "pluginVersion": "9.0.0",
       "pointradius": 0.5,
       "points": true,
       "renderer": "flot",
@@ -404,18 +410,19 @@
       "steppedLine": false,
       "targets": [
         {
-          "datasource": "prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P1809F7CD0C75ACF3"
+          },
           "exemplar": true,
-          "expr": "nodeBlockHeight",
+          "expr": "nodeBlockHeight{service=~\"$gRestNode\"}",
           "interval": "",
           "legendFormat": "{{ service }}",
           "refId": "A"
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
       "title": "Block height (node)",
       "tooltip": {
         "shared": true,
@@ -424,9 +431,7 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
@@ -435,31 +440,28 @@
           "format": "locale",
           "label": "",
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         },
         {
           "format": "short",
           "label": "Relays",
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": false
         }
       ],
       "yaxis": {
-        "align": false,
-        "alignLevel": null
+        "align": false
       }
     },
     {
       "aliasColors": {},
       "bars": false,
-      "cacheTimeout": null,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "P1809F7CD0C75ACF3"
+      },
       "decimals": 0,
       "description": "",
       "fieldConfig": {
@@ -499,7 +501,7 @@
         "alertThreshold": false
       },
       "percentage": false,
-      "pluginVersion": "7.5.7",
+      "pluginVersion": "9.0.0",
       "pointradius": 0.5,
       "points": true,
       "renderer": "flot",
@@ -509,18 +511,19 @@
       "steppedLine": false,
       "targets": [
         {
-          "datasource": "prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P1809F7CD0C75ACF3"
+          },
           "exemplar": true,
-          "expr": "dbsyncBlockHeight",
+          "expr": "dbsyncBlockHeight{service=~\"$gRestNode\"}",
           "interval": "",
           "legendFormat": "{{ service }}",
           "refId": "A"
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
       "title": "Block height (dbsync)",
       "tooltip": {
         "shared": true,
@@ -529,9 +532,7 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
@@ -541,8 +542,6 @@
           "format": "locale",
           "label": "",
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         },
         {
@@ -550,23 +549,22 @@
           "format": "short",
           "label": "Relays",
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": false
         }
       ],
       "yaxis": {
-        "align": false,
-        "alignLevel": null
+        "align": false
       }
     },
     {
       "aliasColors": {},
       "bars": false,
-      "cacheTimeout": null,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "P1809F7CD0C75ACF3"
+      },
       "decimals": 0,
       "description": "",
       "fieldConfig": {
@@ -607,7 +605,7 @@
         "alertThreshold": false
       },
       "percentage": false,
-      "pluginVersion": "7.5.7",
+      "pluginVersion": "9.0.0",
       "pointradius": 0.5,
       "points": true,
       "renderer": "flot",
@@ -617,9 +615,12 @@
       "steppedLine": false,
       "targets": [
         {
-          "datasource": "prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P1809F7CD0C75ACF3"
+          },
           "exemplar": true,
-          "expr": "dbsyncQueueLength",
+          "expr": "dbsyncQueueLength{service=~\"$gRestNode\"}",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -628,9 +629,7 @@
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
       "title": "Queue Length (dbsync)",
       "tooltip": {
         "shared": true,
@@ -639,9 +638,7 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
@@ -651,7 +648,6 @@
           "format": "locale",
           "label": "",
           "logBase": 1,
-          "max": null,
           "min": "0",
           "show": true
         },
@@ -660,14 +656,11 @@
           "format": "short",
           "label": "Relays",
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": false
         }
       ],
       "yaxis": {
-        "align": false,
-        "alignLevel": null
+        "align": false
       }
     },
     {
@@ -675,7 +668,10 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": null,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "P1809F7CD0C75ACF3"
+      },
       "fieldConfig": {
         "defaults": {
           "links": []
@@ -711,19 +707,22 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.5.7",
+      "pluginVersion": "9.0.0",
       "pointradius": 0.5,
       "points": true,
       "renderer": "flot",
-      "repeat": null,
       "seriesOverrides": [],
       "spaceLength": 10,
       "stack": false,
       "steppedLine": false,
       "targets": [
         {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P1809F7CD0C75ACF3"
+          },
           "exemplar": true,
-          "expr": "(load1m/100)",
+          "expr": "(load1m{service=~\"$gRestNode\"}/100)",
           "format": "time_series",
           "hide": false,
           "interval": "",
@@ -734,9 +733,7 @@
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
       "title": "Load 1m",
       "tooltip": {
         "shared": true,
@@ -745,9 +742,7 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
@@ -758,23 +753,18 @@
           "format": "none",
           "label": "Load",
           "logBase": 1,
-          "max": null,
           "min": "0",
           "show": true
         },
         {
           "$$hashKey": "object:316",
           "format": "short",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": false
         }
       ],
       "yaxis": {
-        "align": false,
-        "alignLevel": null
+        "align": false
       }
     },
     {
@@ -782,12 +772,9 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": null,
-      "fieldConfig": {
-        "defaults": {
-          "unit": "s"
-        },
-        "overrides": []
+      "datasource": {
+        "type": "prometheus",
+        "uid": "P1809F7CD0C75ACF3"
       },
       "fill": 0,
       "fillGradient": 0,
@@ -817,7 +804,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.5.7",
+      "pluginVersion": "9.0.0",
       "pointradius": 0.5,
       "points": true,
       "renderer": "flot",
@@ -829,8 +816,12 @@
       "steppedLine": false,
       "targets": [
         {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P1809F7CD0C75ACF3"
+          },
           "exemplar": true,
-          "expr": "abs(nodetipref)",
+          "expr": "abs(nodetipref{service=~\"$gRestNode\"})",
           "format": "time_series",
           "interval": "",
           "legendFormat": "{{ service }}",
@@ -838,9 +829,7 @@
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
       "title": "Tipp diff (node)",
       "tooltip": {
         "shared": true,
@@ -849,33 +838,26 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
       "yaxes": [
         {
+          "$$hashKey": "object:133",
           "format": "s",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         },
         {
+          "$$hashKey": "object:134",
           "format": "short",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         }
       ],
       "yaxis": {
-        "align": false,
-        "alignLevel": null
+        "align": false
       }
     },
     {
@@ -883,7 +865,10 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": null,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "P1809F7CD0C75ACF3"
+      },
       "fieldConfig": {
         "defaults": {
           "unit": "s"
@@ -918,7 +903,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.5.7",
+      "pluginVersion": "9.0.0",
       "pointradius": 1,
       "points": true,
       "renderer": "flot",
@@ -932,8 +917,12 @@
       "steppedLine": false,
       "targets": [
         {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P1809F7CD0C75ACF3"
+          },
           "exemplar": true,
-          "expr": "dbsynctipref",
+          "expr": "dbsynctipref{service=~\"$gRestNode\"}",
           "format": "time_series",
           "interval": "",
           "legendFormat": "{{ service }}",
@@ -941,9 +930,7 @@
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
       "title": "Tipp diff (dbsync)",
       "tooltip": {
         "shared": true,
@@ -952,9 +939,7 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
@@ -962,25 +947,19 @@
         {
           "$$hashKey": "object:363",
           "format": "s",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
+          "min": "0",
           "show": true
         },
         {
           "$$hashKey": "object:364",
           "format": "short",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         }
       ],
       "yaxis": {
-        "align": false,
-        "alignLevel": null
+        "align": false
       }
     },
     {
@@ -988,7 +967,10 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "prometheus",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "P1809F7CD0C75ACF3"
+      },
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -1024,7 +1006,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.5.7",
+      "pluginVersion": "9.0.0",
       "pointradius": 0.5,
       "points": true,
       "renderer": "flot",
@@ -1034,8 +1016,12 @@
       "steppedLine": false,
       "targets": [
         {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P1809F7CD0C75ACF3"
+          },
           "exemplar": true,
-          "expr": "abs(cpuutil)",
+          "expr": "abs(cpuutil{service=~\"$gRestNode\"})",
           "hide": false,
           "interval": "",
           "legendFormat": "{{ service }}",
@@ -1043,9 +1029,7 @@
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
       "title": "CPU Utilization",
       "tooltip": {
         "shared": true,
@@ -1054,9 +1038,7 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
@@ -1065,25 +1047,18 @@
           "$$hashKey": "object:102",
           "decimals": 1,
           "format": "%",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         },
         {
           "$$hashKey": "object:103",
           "format": "short",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         }
       ],
       "yaxis": {
-        "align": false,
-        "alignLevel": null
+        "align": false
       }
     },
     {
@@ -1091,10 +1066,9 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": null,
-      "fieldConfig": {
-        "defaults": {},
-        "overrides": []
+      "datasource": {
+        "type": "prometheus",
+        "uid": "P1809F7CD0C75ACF3"
       },
       "fill": 0,
       "fillGradient": 0,
@@ -1122,7 +1096,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.5.7",
+      "pluginVersion": "9.0.0",
       "pointradius": 0.5,
       "points": true,
       "renderer": "flot",
@@ -1132,17 +1106,19 @@
       "steppedLine": false,
       "targets": [
         {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P1809F7CD0C75ACF3"
+          },
           "exemplar": true,
-          "expr": "uptime",
+          "expr": "uptime{service=~\"$gRestNode\"}",
           "interval": "",
           "legendFormat": "{{ service }}",
           "refId": "A"
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
       "title": "Uptime (node)",
       "tooltip": {
         "shared": true,
@@ -1151,45 +1127,68 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
       "yaxes": [
         {
           "format": "s",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         },
         {
           "format": "short",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         }
       ],
       "yaxis": {
-        "align": false,
-        "alignLevel": null
+        "align": false
       }
     }
   ],
   "refresh": "30s",
-  "schemaVersion": 27,
+  "schemaVersion": 36,
   "style": "dark",
   "tags": [],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "current": {
+          "selected": true,
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "P1809F7CD0C75ACF3"
+        },
+        "definition": "label_values(service)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "gRestNode",
+        "multi": true,
+        "name": "gRestNode",
+        "options": [],
+        "query": {
+          "query": "label_values(service)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      }
+    ]
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-3h",
     "to": "now"
   },
   "timepicker": {
@@ -1219,5 +1218,6 @@
   "timezone": "",
   "title": "GRest Operator's monitoring",
   "uid": "GRest",
-  "version": 1
+  "version": 84,
+  "weekStart": ""
 }

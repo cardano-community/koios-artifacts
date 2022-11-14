@@ -5,7 +5,7 @@
     {"name":"damjan-ssl","addr":"eden-guildnet.koios.rest","port":8453,"ssl":"true"},
     {"name":"homer","addr":"95.216.188.94","port":8053},
     {"name":"gufmar","addr":"185.161.193.105","port":6029},
-    {"name":"HuthS0lo-ssl","addr":"koios-guild.digitalsyndicate.io","port":8453,"ssl":"true"}
+    {"name":"HuthS0lo-ssl","addr":"koios-guild.themorphium.io","port":8453,"ssl":"true"}
   ],
   "Consumers": []
 }
