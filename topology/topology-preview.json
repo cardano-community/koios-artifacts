@@ -4,6 +4,7 @@
     {"name":"damjan","addr":"195.201.129.190","port":8053},
     {"name":"ola-ssl","addr":"koios-preview.ahlnet.nu","port":2175,"ssl":"true"},
     {"name":"bbhmm","addr":"74.122.122.121","port":8053}
+    {"name":"huths0lo","addr":"koios-preview.themorphiumio","port":8053,"ssl":"true"}
   ],
   "Consumers": []
 }
