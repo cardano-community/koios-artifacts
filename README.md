@@ -29,8 +29,9 @@ The specs can be browsed for each network using below:
 | Network | Link                       |
 |:--------|:--------------------------:|
 | Mainnet | https://api.koios.rest     |
-| Testnet | https://testnet.koios.rest |
 | Guild   | https://guild.koios.rest   |
+| PreProd | https://preprod.koios.rest |
+| Preview | https://preview.koios.rest |
 
 ## Further discussions
 
