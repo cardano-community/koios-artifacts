@@ -73,8 +73,7 @@ BEGIN
       FROM
         block tB
       WHERE
-        block_no = b.block_no - 1
-      LIMIT 1
+        block_no = b.id - 1
     ) AS parent_hash,
     (
       SELECT
@@ -82,8 +81,7 @@ BEGIN
       FROM
         block tB
       WHERE
-        block_no = b.block_no + 1
-      LIMIT 1
+        block_no = b.id + 1
     ) AS child_hash
   FROM
     block B
@@ -107,8 +105,7 @@ BEGIN
         tx.block_id = b.id
     ) block_data ON TRUE
   WHERE
-    B.id = ANY (_block_id_list)
-    AND B.block_no IS NOT NULL;
+    B.id = ANY (_block_id_list);
 END;
 $$;
 
