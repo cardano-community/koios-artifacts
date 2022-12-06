@@ -47,7 +47,7 @@ BEGIN
         WHERE
           MTM.ident = _asset_id AND MTM.quantity > 0
         ORDER BY
-          MTM.tx_id ASC
+          MTM.tx_id DESC
         LIMIT 1
       ) AS tx_hash,
       minting_data.total_supply,
@@ -62,15 +62,15 @@ BEGIN
           ) as minting_tx_metadata
         FROM
           (
-            SELECT TM.key, TM.json, MAX(MTM.tx_id)
+            SELECT TM.key, TM.json, MTM.tx_id
               FROM tx_metadata TM
                 INNER JOIN ma_tx_mint MTM
                 ON TM.tx_id = MTM.tx_id
               WHERE
                 MTM.ident = _asset_id
+                AND MTM.tx_id = (SELECT max(tx_id) from ma_tx_mint where ident = _asset_id)
                 AND MTM.quantity > 0
                 AND TM.JSON IS NOT NULL
-              GROUP BY TM.key, TM.json
           ) x
       ) AS minting_tx_metadata,
       (

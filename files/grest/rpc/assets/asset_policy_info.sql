@@ -33,7 +33,7 @@ BEGIN
           MTM.ident = ANY(_policy_asset_ids) AND MTM.quantity > 0
         ORDER BY
           MTM.ident,
-          TM.tx_id ASC
+          TM.tx_id DESC
       ),
       token_registry_metadatas AS (
         SELECT DISTINCT ON (asset_policy, asset_name)
