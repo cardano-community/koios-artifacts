@@ -12,8 +12,8 @@ CREATE FUNCTION grest.tx_info (_tx_hashes text[])
     total_output text,
     fee text,
     deposit text,
-    invalid_before word64type,
-    invalid_after word64type,
+    invalid_before text,
+    invalid_after text,
     collateral_inputs jsonb,
     collateral_output jsonb,
     reference_inputs jsonb,
@@ -708,8 +708,8 @@ BEGIN
       ATX.total_output::text,
       ATX.fee::text,
       ATX.deposit::text,
-      ATX.invalid_before,
-      ATX.invalid_after,
+      ATX.invalid_before::text,
+      ATX.invalid_after::text,
       COALESCE((
         SELECT JSONB_AGG(tx_collateral_inputs)
         FROM (

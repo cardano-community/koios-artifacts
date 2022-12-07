@@ -1089,11 +1089,11 @@ schemas:
             description: Total Deposits included in transaction (for example, if it is registering a pool/key)
             example: 0
           invalid_before:
-            type: integer
+            type: string
             description: Slot before which transaction cannot be validated (if supplied, else null)
             nullable: true
           invalid_after:
-            type: integer
+            type: string
             description: Slot after which transaction cannot be validated
             example: 42332172
             nullable: true
@@ -1477,7 +1477,7 @@ schemas:
             example: asset1ua6pz3yd5mdka946z8jw2fld3f8d0mmxt75gv9
           minting_tx_hash:
             type: string
-            description: Hash of the first mint transaction
+            description: Hash of the latest mint transaction
             example: cb07b7e51b77079776c4a78f2daf8f14f9945d2b047da7bfcb71d7fbb9f86712
           mint_cnt:
             type: integer
