@@ -6,6 +6,7 @@ CREATE FUNCTION grest.asset_policy_info (_asset_policy text)
     minting_tx_metadata jsonb,
     token_registry_metadata jsonb,
     total_supply text,
+    decimals integer,
     creation_time integer
   )
   LANGUAGE PLPGSQL
@@ -87,9 +88,11 @@ BEGIN
       mtm.metadata as minting_tx_metadata,
       trm.metadata as token_registry_metadata,
       ts.amount::text as total_supply,
+      aic.decimals as decimals,
       EXTRACT(epoch from ct.date)::integer
     FROM 
       multi_asset MA
+      LEFT JOIN asset_info_cache aic ON aic.asset_id = MA.id
       LEFT JOIN minting_tx_metadatas mtm ON mtm.ident = MA.id
       LEFT JOIN token_registry_metadatas trm ON trm.asset_policy = _asset_policy
         AND DECODE(trm.asset_name, 'hex') = MA.name

@@ -14,6 +14,7 @@ BEGIN
       ma.policy,
       ma.name,
       ma.fingerprint,
+      aic.decimals,
       SUM(mtx.quantity) as quantity
     FROM
       MA_TX_OUT MTX
@@ -21,6 +22,7 @@ BEGIN
       INNER JOIN TX_OUT TXO ON TXO.ID = MTX.TX_OUT_ID
       LEFT JOIN TX_IN ON TXO.TX_ID = TX_IN.TX_OUT_ID
         AND TXO.INDEX::smallint = TX_IN.TX_OUT_INDEX::smallint
+      LEFT JOIN grest.asset_info_cache aic ON aic.asset_id = MA.id
     WHERE
       TXO.address = ANY(_addresses)
       AND TX_IN.TX_IN_ID IS NULL
@@ -39,6 +41,7 @@ BEGIN
           'policy_id', ENCODE(aa.policy, 'hex'),
           'asset_name', ENCODE(aa.name, 'hex'),
           'fingerprint', aa.fingerprint,
+          'decimals', COALESCE(aa.decimals, 0),
           'quantity', aa.quantity::text
         )
       ) as asset_list

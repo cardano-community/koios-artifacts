@@ -1012,6 +1012,10 @@ schemas:
                   $ref: "#/components/schemas/asset_info/items/properties/asset_name"
                 fingerprint:
                   $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
+                decimals:
+                  type: integer
+                  description: Asset decimals
+                  example: 6
                 quantity:
                   type: string
                   description: Asset quantity owned by account
@@ -1195,6 +1199,8 @@ schemas:
                         $ref: "#/components/schemas/asset_info/items/properties/asset_name"
                       fingerprint:
                         $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
+                      decimals:
+                        $ref: "#/components/schemas/account_assets/items/properties/asset_list/items/properties/decimals"
                       quantity:
                         type: string
                         description: Quantity of assets on the UTxO
@@ -1226,6 +1232,8 @@ schemas:
                   $ref: "#/components/schemas/asset_info/items/properties/asset_name"
                 fingerprint:
                   $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
+                decimals:
+                  $ref: "#/components/schemas/account_assets/items/properties/asset_list/items/properties/decimals"
                 quantity:
                   type: string
                   description: Quantity of minted assets (negative on burn)
@@ -1514,6 +1522,8 @@ schemas:
             type: integer
             description: UNIX timestamp of the first asset mint
             example: 1506635091
+    asset_info_bulk:
+      $ref: "#/components/schemas/asset_info"
     asset_history:
       type: array
       items:
@@ -1564,9 +1574,24 @@ schemas:
           total_supply:
             type: string
             example: "35000"
+          decimals:
+            $ref: "#/components/schemas/account_assets/items/properties/asset_list/items/properties/decimals"
           creation_time:
             type: string
             $ref: "#/components/schemas/asset_info/items/properties/creation_time"
+    asset_policy_list:
+      type: array
+      description: List of policy assets
+      items:
+        properties:
+          asset_name:
+            $ref: "#/components/schemas/asset_info/items/properties/asset_name"
+          fingerprint:
+            $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
+          total_supply:
+            $ref: "#/components/schemas/asset_info/items/properties/total_supply"
+          decimals:
+            $ref: "#/components/schemas/account_assets/items/properties/asset_list/items/properties/decimals"
     asset_txs:
       type: array
       description: An array of Tx hashes that included the given asset (latest first)
