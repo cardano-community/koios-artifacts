@@ -3212,8 +3212,6 @@ components:
           total_supply:
             type: string
             example: "35000"
-          decimals:
-            $ref: "#/components/schemas/account_assets/items/properties/asset_list/items/properties/decimals"
           creation_time:
             type: string
             $ref: "#/components/schemas/asset_info/items/properties/creation_time"
