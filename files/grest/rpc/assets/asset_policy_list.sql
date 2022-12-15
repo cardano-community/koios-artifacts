@@ -22,7 +22,7 @@ BEGIN
       aic.decimals
     FROM 
       multi_asset ma
-      LEFT JOIN grest.asset_info_cache aic ON aic.asset_id = ma.id
+      INNER JOIN grest.asset_info_cache aic ON aic.asset_id = ma.id
     WHERE
       ma.policy = _asset_policy_decoded;
 

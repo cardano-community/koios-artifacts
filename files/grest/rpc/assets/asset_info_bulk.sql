@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION grest.asset_info_bulk (_asset_list text[][])
+CREATE OR REPLACE FUNCTION grest.asset_info (_asset_list text[][])
   RETURNS TABLE (
     policy_id text,
     asset_name text,
@@ -58,7 +58,7 @@ BEGIN
       END
     FROM
       multi_asset ma
-      LEFT JOIN grest.asset_info_cache aic ON aic.asset_id = ma.id
+      INNER JOIN grest.asset_info_cache aic ON aic.asset_id = ma.id
       LEFT JOIN tx ON tx.id = aic.last_mint_tx_id
       LEFT JOIN grest.asset_registry_cache arc ON DECODE(arc.asset_policy, 'hex') = ma.policy AND DECODE(arc.asset_name, 'hex') = ma.name
       LEFT JOIN LATERAL (
@@ -77,6 +77,3 @@ BEGIN
 
 END;
 $$;
-
-COMMENT ON FUNCTION grest.asset_info IS 'Get the information of an asset incl first minting & token registry metadata';
-

@@ -29,9 +29,9 @@ BEGIN
         INNER JOIN MULTI_ASSET MA ON MA.id = MTX.ident
         INNER JOIN TX_OUT TXO ON TXO.ID = MTX.TX_OUT_ID
         INNER JOIN STAKE_ADDRESS sa ON sa.id = TXO.stake_address_id
+        INNER JOIN grest.asset_info_cache aic ON aic.asset_id = MA.id
         LEFT JOIN TX_IN on TXO.TX_ID = TX_IN.TX_OUT_ID
           AND TXO.INDEX::smallint = TX_IN.TX_OUT_INDEX::smallint
-        LEFT JOIN grest.asset_info_cache aic ON aic.asset_id = MA.id
       WHERE
         sa.id = ANY(sa_id_list)
         AND TX_IN.TX_IN_ID IS NULL

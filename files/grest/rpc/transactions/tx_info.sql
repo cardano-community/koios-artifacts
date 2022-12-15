@@ -95,7 +95,7 @@ BEGIN
                 'policy_id', ENCODE(MA.policy, 'hex'),
                 'asset_name', ENCODE(MA.name, 'hex'),
                 'fingerprint', MA.fingerprint,
-                'decimals', COALESCE(aic.decimals, 0),
+                'decimals', aic.decimals,
                 'quantity', MTO.quantity::text
               )
             END
@@ -150,7 +150,7 @@ BEGIN
                 'policy_id', ENCODE(MA.policy, 'hex'),
                 'asset_name', ENCODE(MA.name, 'hex'),
                 'fingerprint', MA.fingerprint,
-                'decimals', COALESCE(aic.decimals, 0),
+                'decimals', aic.decimals,
                 'quantity', MTO.quantity::text
               )
             END
@@ -205,7 +205,7 @@ BEGIN
                 'policy_id', ENCODE(MA.policy, 'hex'),
                 'asset_name', ENCODE(MA.name, 'hex'),
                 'fingerprint', MA.fingerprint,
-                'decimals', COALESCE(aic.decimals, 0),
+                'decimals', aic.decimals,
                 'quantity', MTO.quantity::text
               )
             END
@@ -260,7 +260,7 @@ BEGIN
                 'policy_id', ENCODE(MA.policy, 'hex'),
                 'asset_name', ENCODE(MA.name, 'hex'),
                 'fingerprint', MA.fingerprint,
-                'decimals', COALESCE(aic.decimals, 0),
+                'decimals', aic.decimals,
                 'quantity', MTO.quantity::text
               )
             END
@@ -313,7 +313,7 @@ BEGIN
                 'policy_id', ENCODE(MA.policy, 'hex'),
                 'asset_name', ENCODE(MA.name, 'hex'),
                 'fingerprint', MA.fingerprint,
-                'decimals', COALESCE(aic.decimals, 0),
+                'decimals', aic.decimals,
                 'quantity', MTO.quantity::text
               )
             END
@@ -388,7 +388,7 @@ BEGIN
           FROM 
             ma_tx_mint MTM
             INNER JOIN MULTI_ASSET MA ON MA.id = MTM.ident
-            LEFT JOIN grest.asset_info_cache aic ON aic.asset_id = MA.id
+            INNER JOIN grest.asset_info_cache aic ON aic.asset_id = MA.id
           WHERE
             MTM.tx_id = ANY (_tx_id_list)
         ) AS tmp

@@ -57,7 +57,7 @@ BEGIN
                 'policy_id', ENCODE(MA.policy, 'hex'),
                 'asset_name', ENCODE(MA.name, 'hex'),
                 'fingerprint', MA.fingerprint,
-                'decimals', COALESCE(aic.decimals, 0),
+                'decimals', aic.decimals,
                 'quantity', MTO.quantity::text
               )
             END
@@ -90,7 +90,7 @@ BEGIN
                 'policy_id', ENCODE(MA.policy, 'hex'),
                 'asset_name', ENCODE(MA.name, 'hex'),
                 'fingerprint', MA.fingerprint,
-                'decimals', COALESCE(aic.decimals, 0),
+                'decimals', aic.decimals,
                 'quantity', MTO.quantity::text
               )
             END

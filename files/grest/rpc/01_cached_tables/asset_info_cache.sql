@@ -42,7 +42,7 @@ BEGIN
     public.tx;
 
   SELECT
-    last_value::bigint INTO _asset_info_cache_last_tx_id
+    COALESCE(last_value::bigint,100) - 100 INTO _asset_info_cache_last_tx_id
   FROM
     grest.control_table
   WHERE
@@ -75,6 +75,7 @@ BEGIN
         CASE WHEN _asset_info_cache_last_tx_id IS NOT NULL AND _asset_id_list IS NOT NULL
           THEN
             mtm.ident = any(_asset_id_list)
+            AND mtm.tx_id > _asset_info_cache_last_tx_id
           ELSE TRUE
         END
         AND mtm.quantity > 0
@@ -94,6 +95,7 @@ BEGIN
         CASE WHEN _asset_info_cache_last_tx_id IS NOT NULL AND _asset_id_list IS NOT NULL
           THEN
             mtm.id = any(_asset_id_list)
+            AND mtm.tx_id > _asset_info_cache_last_tx_id
           ELSE TRUE
         END
         AND tx_mint_meta IS NULL
@@ -158,8 +160,6 @@ BEGIN
     decimals          = excluded.decimals,
     mint_cnt          = excluded.mint_cnt,
     burn_cnt          = excluded.burn_cnt,
-    first_mint_tx_id  = excluded.first_mint_tx_id,
-    first_mint_keys   = excluded.first_mint_keys,
     last_mint_tx_id   = excluded.last_mint_tx_id,
     last_mint_keys    = excluded.last_mint_keys;
 
