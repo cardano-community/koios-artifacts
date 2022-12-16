@@ -642,6 +642,26 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Asset Information
       description: Get the information of an asset including first minting & token registry metadata
+    post:
+      tags:
+        - Asset
+      prequestBody:
+        $ref: "#/components/requestBodies/asset_list"
+      responses:
+        "200":
+          description: Array of detailed asset information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/asset_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Asset Information
+      description: Get the information of a list of assets including first minting & token registry metadata
   /asset_history: #RPC
     get:
       tags:

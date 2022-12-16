@@ -858,6 +858,26 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Asset Information
       description: Get the information of an asset including first minting & token registry metadata
+    post:
+      tags:
+        - Asset
+      prequestBody:
+        $ref: "#/components/requestBodies/asset_list"
+      responses:
+        "200":
+          description: Array of detailed asset information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/asset_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Asset Information
+      description: Get the information of a list of assets including first minting & token registry metadata
   /asset_history: #RPC
     get:
       tags:
@@ -1635,6 +1655,25 @@ components:
               _datum_hashes:
                   - 45b0cfc220ceec5b7c1c62c4d4193d38e4eba48e8815729ce75f9c0ab0e4c1c0
                   - 45b0cfc220ceec5b7c1c62c4d4193d38e4eba48e8815729ce75f9c0ab0e4c1c0
+    asset_list:
+      content:
+        application/json:
+          schema:
+            required:
+              - _asset_list
+            type: object
+            properties:
+              _asset_list:
+                format: text
+                type: array
+                items:
+                  type: array
+                  items:
+                    type: string
+            example:
+              _asset_list:
+                - ['313534a537bc476c86ff7c57ec511bd7f24a9d15654091b24e9c606e','41484c636f696e']
+                - ['313534a537bc476c86ff7c57ec511bd7f24a9d15654091b24e9c606e','41484c636f696e']
   securitySchemes: {}
   schemas:
     tip:
@@ -3160,8 +3199,6 @@ components:
             type: integer
             description: UNIX timestamp of the first asset mint
             example: 1506635091
-    asset_info_bulk:
-      $ref: "#/components/schemas/asset_info"
     asset_history:
       type: array
       items:
