@@ -1,6 +1,3 @@
-
-DROP FUNCTION IF EXISTS grest.epoch_info (_epoch_no numeric);
-
 CREATE OR REPLACE FUNCTION grest.epoch_info (_epoch_no numeric DEFAULT NULL, _include_next_epoch boolean DEFAULT false)
   RETURNS TABLE (
     epoch_no word31type,
@@ -55,5 +52,4 @@ BEGIN
 END;
 $$;
 
-COMMENT ON FUNCTION grest.epoch_info IS 'Get the epoch information, all epochs if no epoch specified - if _include_next_epoch is used and set to true also return next epoch that has not commenced yet if cache table information including active stake snapshot amount is available';
-
+COMMENT ON FUNCTION grest.epoch_info IS 'Get the epoch information, all epochs if no epoch specified. If _include_next_epoch is set to true, also return active stake calculation for next epoch if available';

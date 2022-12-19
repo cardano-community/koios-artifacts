@@ -169,7 +169,7 @@ parameters:
         example: "false"
       in: query
       required: false
-      allowEmptyValue: false
+      allowEmptyValue: true
     _pool_bech32:
       deprecated: false
       name: _pool_bech32
