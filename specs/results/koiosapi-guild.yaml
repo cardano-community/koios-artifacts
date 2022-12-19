@@ -861,7 +861,7 @@ paths:
     post:
       tags:
         - Asset
-      prequestBody:
+      requestBody:
         $ref: "#/components/requestBodies/asset_list"
       responses:
         "200":
@@ -1666,6 +1666,7 @@ components:
               _asset_list:
                 format: text
                 type: array
+                description: Array of array of policy ID and asset names (hex)
                 items:
                   type: array
                   items:

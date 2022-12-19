@@ -645,7 +645,7 @@ paths:
     post:
       tags:
         - Asset
-      prequestBody:
+      requestBody:
         $ref: "#/components/requestBodies/asset_list"
       responses:
         "200":
