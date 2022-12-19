@@ -1,7 +1,7 @@
 
 DROP FUNCTION IF EXISTS grest.epoch_info (_epoch_no numeric);
 
-CREATE OR REPLACE FUNCTION grest.epoch_info (_epoch_no numeric DEFAULT NULL, _include_unstarted_epoch boolean DEFAULT false)
+CREATE OR REPLACE FUNCTION grest.epoch_info (_epoch_no numeric DEFAULT NULL, _include_next_epoch boolean DEFAULT false)
   RETURNS TABLE (
     epoch_no word31type,
     out_sum text,
@@ -51,9 +51,9 @@ BEGIN
   WHERE
     ei.epoch_no::text LIKE CASE WHEN _epoch_no IS NULL THEN '%' ELSE _epoch_no::text END
     AND
-    (_include_unstarted_epoch OR ei.i_first_block_time::integer is not null);
+    (_include_next_epoch OR ei.i_first_block_time::integer is not null);
 END;
 $$;
 
-COMMENT ON FUNCTION grest.epoch_info IS 'Get the epoch information, all epochs if no epoch specified - if _include_unstarted_epoch is used and set to true also return next epoch that has not commenced yet if cached information is available';
+COMMENT ON FUNCTION grest.epoch_info IS 'Get the epoch information, all epochs if no epoch specified - if _include_next_epoch is used and set to true also return next epoch that has not commenced yet if cache table information including active stake snapshot amount is available';
 
