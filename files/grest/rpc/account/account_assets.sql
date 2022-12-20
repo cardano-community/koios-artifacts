@@ -22,12 +22,14 @@ BEGIN
         ma.policy,
         ma.name,
         ma.fingerprint,
+        aic.decimals,
         SUM(mtx.quantity) as quantity
       FROM
         MA_TX_OUT MTX
         INNER JOIN MULTI_ASSET MA ON MA.id = MTX.ident
         INNER JOIN TX_OUT TXO ON TXO.ID = MTX.TX_OUT_ID
         INNER JOIN STAKE_ADDRESS sa ON sa.id = TXO.stake_address_id
+        INNER JOIN grest.asset_info_cache aic ON aic.asset_id = MA.id
         LEFT JOIN TX_IN on TXO.TX_ID = TX_IN.TX_OUT_ID
           AND TXO.INDEX::smallint = TX_IN.TX_OUT_INDEX::smallint
       WHERE
@@ -48,6 +50,7 @@ BEGIN
           'policy_id', ENCODE(aa.policy, 'hex'),
           'asset_name', ENCODE(aa.name, 'hex'),
           'fingerprint', aa.fingerprint,
+          'decimals', COALESCE(aa.decimals, 0),
           'quantity', aa.quantity::text
         )
       ) as assets

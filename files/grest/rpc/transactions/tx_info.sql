@@ -95,6 +95,7 @@ BEGIN
                 'policy_id', ENCODE(MA.policy, 'hex'),
                 'asset_name', ENCODE(MA.name, 'hex'),
                 'fingerprint', MA.fingerprint,
+                'decimals', aic.decimals,
                 'quantity', MTO.quantity::text
               )
             END
@@ -126,6 +127,7 @@ BEGIN
           LEFT JOIN stake_address SA ON tx_out.stake_address_id = SA.id
           LEFT JOIN ma_tx_out MTO ON MTO.tx_out_id = tx_out.id
           LEFT JOIN multi_asset MA ON MA.id = MTO.ident
+          LEFT JOIN grest.asset_info_cache aic ON aic.asset_id = MA.id
           LEFT JOIN datum ON datum.id = tx_out.inline_datum_id
           LEFT JOIN script ON script.id = tx_out.reference_script_id
         WHERE 
@@ -148,6 +150,7 @@ BEGIN
                 'policy_id', ENCODE(MA.policy, 'hex'),
                 'asset_name', ENCODE(MA.name, 'hex'),
                 'fingerprint', MA.fingerprint,
+                'decimals', aic.decimals,
                 'quantity', MTO.quantity::text
               )
             END
@@ -179,6 +182,7 @@ BEGIN
           LEFT JOIN stake_address SA ON tx_out.stake_address_id = SA.id
           LEFT JOIN ma_tx_out MTO ON MTO.tx_out_id = tx_out.id
           LEFT JOIN multi_asset MA ON MA.id = MTO.ident
+          LEFT JOIN grest.asset_info_cache aic ON aic.asset_id = MA.id
           LEFT JOIN datum ON datum.id = tx_out.inline_datum_id
           LEFT JOIN script ON script.id = tx_out.reference_script_id
         WHERE 
@@ -201,6 +205,7 @@ BEGIN
                 'policy_id', ENCODE(MA.policy, 'hex'),
                 'asset_name', ENCODE(MA.name, 'hex'),
                 'fingerprint', MA.fingerprint,
+                'decimals', aic.decimals,
                 'quantity', MTO.quantity::text
               )
             END
@@ -232,6 +237,7 @@ BEGIN
           LEFT JOIN stake_address SA ON tx_out.stake_address_id = SA.id
           LEFT JOIN ma_tx_out MTO ON MTO.tx_out_id = tx_out.id
           LEFT JOIN multi_asset MA ON MA.id = MTO.ident
+          LEFT JOIN grest.asset_info_cache aic ON aic.asset_id = MA.id
           LEFT JOIN datum ON datum.id = tx_out.inline_datum_id
           LEFT JOIN script ON script.id = tx_out.reference_script_id
         WHERE 
@@ -254,6 +260,7 @@ BEGIN
                 'policy_id', ENCODE(MA.policy, 'hex'),
                 'asset_name', ENCODE(MA.name, 'hex'),
                 'fingerprint', MA.fingerprint,
+                'decimals', aic.decimals,
                 'quantity', MTO.quantity::text
               )
             END
@@ -283,6 +290,7 @@ BEGIN
           LEFT JOIN stake_address SA ON tx_out.stake_address_id = SA.id
           LEFT JOIN ma_tx_out MTO ON MTO.tx_out_id = tx_out.id
           LEFT JOIN multi_asset MA ON MA.id = MTO.ident
+          LEFT JOIN grest.asset_info_cache aic ON aic.asset_id = MA.id
           LEFT JOIN datum ON datum.id = tx_out.inline_datum_id
           LEFT JOIN script ON script.id = tx_out.reference_script_id
         WHERE 
@@ -305,6 +313,7 @@ BEGIN
                 'policy_id', ENCODE(MA.policy, 'hex'),
                 'asset_name', ENCODE(MA.name, 'hex'),
                 'fingerprint', MA.fingerprint,
+                'decimals', aic.decimals,
                 'quantity', MTO.quantity::text
               )
             END
@@ -334,6 +343,7 @@ BEGIN
           LEFT JOIN stake_address SA ON tx_out.stake_address_id = SA.id
           LEFT JOIN ma_tx_out MTO ON MTO.tx_out_id = tx_out.id
           LEFT JOIN multi_asset MA ON MA.id = MTO.ident
+          LEFT JOIN grest.asset_info_cache aic ON aic.asset_id = MA.id
           LEFT JOIN datum ON datum.id = tx_out.inline_datum_id
           LEFT JOIN script ON script.id = tx_out.reference_script_id
         WHERE 
@@ -372,11 +382,13 @@ BEGIN
               'policy_id', ENCODE(MA.policy, 'hex'),
               'asset_name', ENCODE(MA.name, 'hex'),
               'fingerprint', MA.fingerprint,
+              'decimals', COALESCE(aic.decimals, 0),
               'quantity', MTM.quantity::text
             ) AS data
           FROM 
             ma_tx_mint MTM
             INNER JOIN MULTI_ASSET MA ON MA.id = MTM.ident
+            INNER JOIN grest.asset_info_cache aic ON aic.asset_id = MA.id
           WHERE
             MTM.tx_id = ANY (_tx_id_list)
         ) AS tmp

@@ -859,6 +859,26 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Asset Information
       description: Get the information of an asset including first minting & token registry metadata
+    post:
+      tags:
+        - Asset
+      requestBody:
+        $ref: "#/components/requestBodies/asset_list"
+      responses:
+        "200":
+          description: Array of detailed asset information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/asset_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Asset Information (Bulk)
+      description: Get the information of a list of assets including first minting & token registry metadata
   /asset_history: #RPC
     get:
       tags:
@@ -1646,6 +1666,26 @@ components:
               _datum_hashes:
                   - 5865d96e4313780a37af26055cdcc90308db23adaf4f2082178355e5e1dc20f6
                   - 4932dce28712ccc4858e3d83cc8e79b12740f66007dc9a287bb640a264c899de
+    asset_list:
+      content:
+        application/json:
+          schema:
+            required:
+              - _asset_list
+            type: object
+            properties:
+              _asset_list:
+                format: text
+                type: array
+                description: Array of array of policy ID and asset names (hex)
+                items:
+                  type: array
+                  items:
+                    type: string
+            example:
+              _asset_list:
+                - ['000327a9e427a3a3256eb6212ae26b7f53f7969b8e62d37ea9138a7b','54735465737431']
+                - ['000327a9e427a3a3256eb6212ae26b7f53f7969b8e62d37ea9138a7b','54735465737431']
   securitySchemes: {}
   schemas:
     tip:
@@ -2661,6 +2701,10 @@ components:
                   $ref: "#/components/schemas/asset_info/items/properties/asset_name"
                 fingerprint:
                   $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
+                decimals:
+                  type: integer
+                  description: Asset decimals
+                  example: 6
                 quantity:
                   type: string
                   description: Asset quantity owned by account
@@ -2844,6 +2888,8 @@ components:
                         $ref: "#/components/schemas/asset_info/items/properties/asset_name"
                       fingerprint:
                         $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
+                      decimals:
+                        $ref: "#/components/schemas/account_assets/items/properties/asset_list/items/properties/decimals"
                       quantity:
                         type: string
                         description: Quantity of assets on the UTxO
@@ -2875,6 +2921,8 @@ components:
                   $ref: "#/components/schemas/asset_info/items/properties/asset_name"
                 fingerprint:
                   $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
+                decimals:
+                  $ref: "#/components/schemas/account_assets/items/properties/asset_list/items/properties/decimals"
                 quantity:
                   type: string
                   description: Quantity of minted assets (negative on burn)
@@ -3216,6 +3264,19 @@ components:
           creation_time:
             type: string
             $ref: "#/components/schemas/asset_info/items/properties/creation_time"
+    asset_policy_list:
+      type: array
+      description: List of policy assets
+      items:
+        properties:
+          asset_name:
+            $ref: "#/components/schemas/asset_info/items/properties/asset_name"
+          fingerprint:
+            $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
+          total_supply:
+            $ref: "#/components/schemas/asset_info/items/properties/total_supply"
+          decimals:
+            $ref: "#/components/schemas/account_assets/items/properties/asset_list/items/properties/decimals"
     asset_txs:
       type: array
       description: An array of Tx hashes that included the given asset (latest first)

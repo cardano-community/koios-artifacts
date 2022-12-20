@@ -199,3 +199,23 @@ requestBodies:
               _datum_hashes:
                   - ##datum_hashes1_rb##
                   - ##datum_hashes2_rb##
+    asset_list:
+      content:
+        application/json:
+          schema:
+            required:
+              - _asset_list
+            type: object
+            properties:
+              _asset_list:
+                format: text
+                type: array
+                description: Array of array of policy ID and asset names (hex)
+                items:
+                  type: array
+                  items:
+                    type: string
+            example:
+              _asset_list:
+                - ##asset1_rb##
+                - ##asset2_rb##
