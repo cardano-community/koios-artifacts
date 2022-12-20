@@ -72,6 +72,7 @@ paths:
         - Epoch
       parameters:
         - $ref: "#/components/parameters/_epoch_no"
+        - $ref: "#/components/parameters/_include_next_epoch"
       responses:
         "200":
           description: Array of detailed summary for each epoch

@@ -288,6 +288,7 @@ paths:
         - Epoch
       parameters:
         - $ref: "#/components/parameters/_epoch_no"
+        - $ref: "#/components/parameters/_include_next_epoch"
       responses:
         "200":
           description: Array of detailed summary for each epoch
@@ -1404,6 +1405,16 @@ components:
       in: query
       required: false
       allowEmptyValue: false
+    _include_next_epoch:
+      deprecated: false
+      name: _history
+      description: Include information about nearing but not yet started epoch, to get access to active stake snapshot information if available
+      schema:
+        type: boolean
+        example: "false"
+      in: query
+      required: false
+      allowEmptyValue: true
     _pool_bech32:
       deprecated: false
       name: _pool_bech32
