@@ -1,4 +1,4 @@
-CREATE FUNCTION grest.epoch_info (_epoch_no numeric DEFAULT NULL)
+CREATE OR REPLACE FUNCTION grest.epoch_info (_epoch_no numeric DEFAULT NULL, _include_next_epoch boolean DEFAULT false)
   RETURNS TABLE (
     epoch_no word31type,
     out_sum text,
@@ -46,9 +46,10 @@ BEGIN
     grest.epoch_info_cache ei
     LEFT JOIN grest.EPOCH_ACTIVE_STAKE_CACHE eas ON eas.epoch_no = ei.epoch_no
   WHERE
-    ei.epoch_no::text LIKE CASE WHEN _epoch_no IS NULL THEN '%' ELSE _epoch_no::text END;
+    ei.epoch_no::text LIKE CASE WHEN _epoch_no IS NULL THEN '%' ELSE _epoch_no::text END
+    AND
+    (_include_next_epoch OR ei.i_first_block_time::integer is not null);
 END;
 $$;
 
-COMMENT ON FUNCTION grest.epoch_info IS 'Get the epoch information, all epochs if no epoch specified';
-
+COMMENT ON FUNCTION grest.epoch_info IS 'Get the epoch information, all epochs if no epoch specified. If _include_next_epoch is set to true, also return active stake calculation for next epoch if available';
