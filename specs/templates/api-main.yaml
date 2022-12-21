@@ -3,7 +3,8 @@ openapi: 3.0.2
 servers:
   - url: https://api.koios.rest/api/v0
   - url: https://guild.koios.rest/api/v0
-  - url: https://testnet.koios.rest/api/v0
+  - url: https://preview.koios.rest/api/v0
+  - url: https://preprod.koios.rest/api/v0
 paths:
   /tip: #RPC
     get:
@@ -599,6 +600,25 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Asset List
       description: Get the list of all native assets (paginated)
+  /asset_token_registry:
+    get:
+      tags:
+        - Asset
+      responses:
+        "200":
+          description: Array of token registry information for each asset
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/asset_token_registry"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Asset Token Registry
+      description: Get a list of assets registered via token registry on github
   /asset_address_list: #RPC
     get:
       tags:
