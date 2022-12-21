@@ -73,7 +73,7 @@ BEGIN
       FROM
         block tB
       WHERE
-        block_no = b.id - 1
+        id = b.previous_id
     ) AS parent_hash,
     (
       SELECT
@@ -81,7 +81,7 @@ BEGIN
       FROM
         block tB
       WHERE
-        block_no = b.id + 1
+        previous_id = b.id
     ) AS child_hash
   FROM
     block B
@@ -110,4 +110,3 @@ END;
 $$;
 
 COMMENT ON FUNCTION grest.block_info IS 'Get detailed information about list of block hashes';
-
