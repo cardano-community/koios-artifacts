@@ -81,6 +81,32 @@ requestBodies:
                 - ##stake_addresses1_rb##
                 - ##stake_addresses2_rb##
               _epoch_no: ##epoch_no_rb##
+    stake_addresses_with_first_only_and_empty:
+      content:
+        application/json:
+          schema:
+            required:
+              - _stake_addresses
+            type: object
+            properties:
+              _stake_addresses:
+                format: text
+                type: array
+                items:
+                  type: string
+                description: Array of Cardano stake address(es) in bech32 format
+              _first_only:
+                format: boolean
+                type: boolean
+                description: Only return the first result
+              _empty:
+                format: boolean
+                type: boolean
+                description: Include zero quantity entries
+            example:
+              _stake_addresses:
+                - ##stake_addresses1_rb##
+                - ##stake_addresses2_rb##
     stake_addresses:
       content:
         application/json:

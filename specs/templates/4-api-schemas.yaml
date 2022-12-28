@@ -822,7 +822,7 @@ schemas:
         type: object
         properties:
           address:
-            $ref: "#/components/schemas/asset_address_list/items/properties/payment_address"
+            $ref: "#/components/schemas/asset_addresses/items/properties/payment_address"
           balance:
             type: string
             description: Sum of all UTxO values beloning to address
@@ -877,7 +877,7 @@ schemas:
         type: object
         properties:
           address:
-            $ref: "#/components/schemas/asset_address_list/items/properties/payment_address"
+            $ref: "#/components/schemas/asset_addresses/items/properties/payment_address"
           asset_list:
             $ref: "#/components/schemas/account_assets/items/properties/asset_list"
     credential_txs:
@@ -994,7 +994,7 @@ schemas:
           addresses:
             type: array
             items:
-              $ref: "#/components/schemas/asset_address_list/items/properties/payment_address"
+              $ref: "#/components/schemas/asset_addresses/items/properties/payment_address"
     account_assets:
       type: array
       items:
@@ -1442,7 +1442,7 @@ schemas:
             $ref: "#/components/schemas/asset_info/items/properties/token_registry_metadata/properties/decimals"
           logo:
             $ref: "#/components/schemas/asset_info/items/properties/token_registry_metadata/properties/logo"
-    asset_address_list:
+    asset_addresses:
       type: array
       description: An array of payment addresses holding the given token (including balances)
       items:
@@ -1455,6 +1455,8 @@ schemas:
             type: string
             description: Asset balance on the payment address
             example: 23
+    asset_nft_address:
+      $ref: "#/components/schemas/asset_addresses/items/properties/payment_address"
     asset_summary:
       type: array
       items:
