@@ -640,7 +640,8 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Asset Address List
-      description: Get the list of all addresses holding a given asset
+      description: Get the list of all addresses holding a given asset \
+        "Note: Due to cardano's UTxO design and usage from projects, asset to addresses map can be infinite. Thus, for few of the most active projects that have millions of transactions, this will likely end up with timeouts (HTTP code 504) on free layer. Such large-scale projects are free to subscribe to query layers to have a dedicated cache table for themselves served via Koios."
   /asset_address_list: #RPC
     get:
       tags:
@@ -661,8 +662,8 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
-      summary: Asset Address List (DEPRECATED !! replaced by asset_addresses)
-      description: Get the list of all addresses holding a given asset
+      summary: DEPRECATED
+      description: Get the list of all addresses holding a given asset (replaced by asset_addresses)
   /asset_nft_address: #RPC
     get:
       tags:
