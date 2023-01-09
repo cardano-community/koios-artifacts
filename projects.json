@@ -63,6 +63,10 @@
     {
       "text": "Raw Cardano Explorer",
       "link": "https://rawcardano.app"
+    },
+    {
+      "text": "MeshJS",
+      "link": "https://meshjs.dev"
     }
   ]
 }
