@@ -223,7 +223,7 @@ parameters:
     _first_only:
       deprecated: false
       name: _first_only
-      description: Return the first entry only
+      description: Returns the first entry only (overrides _empty to true)
       schema:
         type: boolean
         example: "false"

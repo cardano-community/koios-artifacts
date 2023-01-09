@@ -7,7 +7,6 @@ CREATE OR REPLACE FUNCTION grest.account_addresses (_stake_addresses text[], _fi
   AS $$
 DECLARE
   sa_id_list integer[];
-  limit_first_only integer;
 BEGIN
   SELECT INTO sa_id_list
     ARRAY_AGG(STAKE_ADDRESS.ID)
@@ -16,24 +15,16 @@ BEGIN
   WHERE
     STAKE_ADDRESS.VIEW = ANY(_stake_addresses);
 
-  SELECT (
-    CASE WHEN _first_only IS TRUE
-      THEN 1
-    ELSE
-      NULL
-    END
-  ) INTO limit_first_only;
-
-  IF _first_only IS NOT TRUE AND _empty IS NOT TRUE THEN
-    RETURN QUERY
-      WITH txo_addr AS (
-        SELECT 
-          address, 
-          stake_address_id 
-        FROM
-          (
+  RETURN QUERY
+    WITH txo_addr AS (
+      SELECT 
+        DISTINCT ON(address) address, 
+        stake_address_id 
+      FROM
+        (
+          IF _empty IS NOT TRUE THEN
             SELECT
-              DISTINCT ON (txo.address) address, 
+              txo.address,
               txo.stake_address_id, 
               txo.id
             FROM
@@ -43,51 +34,33 @@ BEGIN
             WHERE 
               txo.stake_address_id = ANY(sa_id_list)
               AND tx_in.tx_in_id IS NULL
-            ORDER BY 
-              address, id
-          ) x
-        ORDER BY id
-        LIMIT limit_first_only
-      )
-      SELECT
-        sa.view as stake_address,
-        JSON_AGG(txo_addr.address) as addresses
-      FROM
-        txo_addr
-        INNER JOIN STAKE_ADDRESS sa ON sa.id = txo_addr.stake_address_id
-      GROUP BY
-        sa.id;
-  ELSE
-    RETURN QUERY
-      WITH txo_addr AS (
-        SELECT 
-          address, 
-          stake_address_id 
-        FROM
-          (
+          ELSE
             SELECT
-              DISTINCT ON (txo.address) address, 
+              txo.address, 
               txo.stake_address_id, 
               txo.id
             FROM
               tx_out txo
             WHERE 
-              txo.stake_address_id = ANY(sa_id_list) 
-            ORDER BY 
-              address, id
-          ) x
-        ORDER BY id
-        LIMIT limit_first_only
-      )
-      SELECT
-        sa.view as stake_address,
-        JSON_AGG(txo_addr.address) as addresses
-      FROM
-        txo_addr
-        INNER JOIN STAKE_ADDRESS sa ON sa.id = txo_addr.stake_address_id
-      GROUP BY
-        sa.id;
-  END IF;
+              txo.stake_address_id = ANY(sa_id_list)
+          END IF
+        ) x
+      ORDER BY id
+      LIMIT 
+        CASE WHEN _first_only IS TRUE
+          THEN 1
+        ELSE
+          NULL
+        END
+    )
+    SELECT
+      sa.view as stake_address,
+      JSON_AGG(txo_addr.address) as addresses
+    FROM
+      txo_addr
+      INNER JOIN STAKE_ADDRESS sa ON sa.id = txo_addr.stake_address_id
+    GROUP BY
+      sa.id;
 END;
 $$;
 

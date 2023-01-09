@@ -10,7 +10,7 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE FUNCTION grest.asset_addresses (_asset_policy text, _asset_name text default '')
+CREATE OR REPLACE FUNCTION grest.asset_addresses (_asset_policy text, _asset_name text default '', _empty boolean default false)
   RETURNS TABLE (
     payment_address varchar,
     quantity text
@@ -37,13 +37,30 @@ BEGIN
     txo.address,
     SUM(mto.quantity)::text
   FROM
-    ma_tx_out mto
-    INNER JOIN tx_out txo ON txo.id = mto.tx_out_id
-    LEFT JOIN tx_in ON txo.tx_id = tx_in.tx_out_id
-      AND txo.index::smallint = tx_in.tx_out_index::smallint
-  WHERE
-    mto.ident = _asset_id
-    AND tx_in.tx_in_id IS NULL
+    (
+      IF _empty IS NOT TRUE THEN
+        SELECT
+          txo.address,
+          mto.quantity
+        FROM
+          ma_tx_out mto
+          INNER JOIN tx_out txo ON txo.id = mto.tx_out_id
+          LEFT JOIN tx_in ON txo.tx_id = tx_in.tx_out_id
+            AND txo.index::smallint = tx_in.tx_out_index::smallint
+        WHERE
+          mto.ident = _asset_id
+          AND tx_in.tx_in_id IS NULL
+      ELSE
+        SELECT
+          txo.address,
+          mto.quantity
+        FROM
+          ma_tx_out mto
+          INNER JOIN tx_out txo ON txo.id = mto.tx_out_id
+        WHERE
+          mto.ident = _asset_id
+      END IF
+    ) x
   GROUP BY
     txo.address;
 END;
