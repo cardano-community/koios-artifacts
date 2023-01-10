@@ -15,16 +15,16 @@ BEGIN
   WHERE
     STAKE_ADDRESS.VIEW = ANY(_stake_addresses);
 
-  RETURN QUERY
-    WITH txo_addr AS (
-      SELECT 
-        DISTINCT ON(address) address, 
-        stake_address_id 
-      FROM
-        (
-          IF _empty IS NOT TRUE THEN
+  IF _first_only IS NOT TRUE AND _empty IS NOT TRUE THEN
+    RETURN QUERY
+      WITH txo_addr AS (
+        SELECT 
+          DISTINCT ON (address) address,
+          stake_address_id 
+        FROM
+          (
             SELECT
-              txo.address,
+              txo.address, 
               txo.stake_address_id, 
               txo.id
             FROM
@@ -34,7 +34,24 @@ BEGIN
             WHERE 
               txo.stake_address_id = ANY(sa_id_list)
               AND tx_in.tx_in_id IS NULL
-          ELSE
+          ) x
+      )
+      SELECT
+        sa.view as stake_address,
+        JSON_AGG(txo_addr.address) as addresses
+      FROM
+        txo_addr
+        INNER JOIN STAKE_ADDRESS sa ON sa.id = txo_addr.stake_address_id
+      GROUP BY
+        sa.id;
+  ELSE
+    RETURN QUERY
+      WITH txo_addr AS (
+        SELECT 
+          DISTINCT ON (address) address,
+          stake_address_id 
+        FROM
+          (
             SELECT
               txo.address, 
               txo.stake_address_id, 
@@ -43,24 +60,18 @@ BEGIN
               tx_out txo
             WHERE 
               txo.stake_address_id = ANY(sa_id_list)
-          END IF
-        ) x
-      ORDER BY id
-      LIMIT 
-        CASE WHEN _first_only IS TRUE
-          THEN 1
-        ELSE
-          NULL
-        END
-    )
-    SELECT
-      sa.view as stake_address,
-      JSON_AGG(txo_addr.address) as addresses
-    FROM
-      txo_addr
-      INNER JOIN STAKE_ADDRESS sa ON sa.id = txo_addr.stake_address_id
-    GROUP BY
-      sa.id;
+            LIMIT (CASE WHEN _first_only IS TRUE THEN 1 ELSE NULL END)
+          ) x
+      )
+      SELECT
+        sa.view as stake_address,
+        JSON_AGG(txo_addr.address) as addresses
+      FROM
+        txo_addr
+        INNER JOIN STAKE_ADDRESS sa ON sa.id = txo_addr.stake_address_id
+      GROUP BY
+        sa.id;
+  END IF;
 END;
 $$;
 

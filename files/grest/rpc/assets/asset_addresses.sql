@@ -32,37 +32,46 @@ BEGIN
   ) INTO _asset_name_decoded;
   SELECT id INTO _asset_id FROM multi_asset ma WHERE ma.policy = _asset_policy_decoded AND ma.name = _asset_name_decoded;
 
-  RETURN QUERY
-  SELECT
-    txo.address,
-    SUM(mto.quantity)::text
-  FROM
-    (
-      IF _empty IS NOT TRUE THEN
-        SELECT
-          txo.address,
-          mto.quantity
-        FROM
-          ma_tx_out mto
-          INNER JOIN tx_out txo ON txo.id = mto.tx_out_id
-          LEFT JOIN tx_in ON txo.tx_id = tx_in.tx_out_id
-            AND txo.index::smallint = tx_in.tx_out_index::smallint
-        WHERE
-          mto.ident = _asset_id
-          AND tx_in.tx_in_id IS NULL
-      ELSE
-        SELECT
-          txo.address,
-          mto.quantity
-        FROM
-          ma_tx_out mto
-          INNER JOIN tx_out txo ON txo.id = mto.tx_out_id
-        WHERE
-          mto.ident = _asset_id
-      END IF
-    ) x
-  GROUP BY
-    txo.address;
+  IF _empty IS NOT TRUE THEN
+    RETURN QUERY
+      SELECT
+        x.address,
+        SUM(x.quantity)::text
+      FROM
+        (
+          SELECT
+            txo.address,
+            mto.quantity
+          FROM
+            ma_tx_out mto
+            INNER JOIN tx_out txo ON txo.id = mto.tx_out_id
+            LEFT JOIN tx_in ON txo.tx_id = tx_in.tx_out_id
+              AND txo.index::smallint = tx_in.tx_out_index::smallint
+          WHERE
+            mto.ident = _asset_id
+            AND tx_in.tx_in_id IS NULL
+        ) x
+      GROUP BY
+        x.address;
+  ELSE
+    RETURN QUERY
+      SELECT
+        x.address,
+        SUM(x.quantity)::text
+      FROM
+        (
+          SELECT
+            txo.address,
+            mto.quantity
+          FROM
+            ma_tx_out mto
+            INNER JOIN tx_out txo ON txo.id = mto.tx_out_id
+          WHERE
+            mto.ident = _asset_id
+        ) x
+      GROUP BY
+        x.address;
+  END IF;
 END;
 $$;
 
