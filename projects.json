@@ -3,6 +3,10 @@
     {
       "text": "Koios CLI in GoLang",
       "link": "https://github.com/cardano-community/koios-cli"
+    },
+    {
+      "text": "CardanoSharp CSCLI",
+      "link": "https://github.com/CardanoSharp/cscli"
     }
   ],
   "Libraries": [
@@ -15,15 +19,27 @@
       "link": "https://github.com/cardano-community/koios-go-client"
     },
     {
-      "text": "Java client",
+      "text": "Java Client",
       "link": "https://github.com/cardano-community/koios-java-client"
     },
     {
-      "text": "Python Client",
+      "text": "JavaScript Client",
+      "link": "https://meshjs.dev/providers/koios"
+    },
+    {
+      "text": "Python Library - Quixote",
       "link": "https://github.com/cardano-community/koios-python"
+    },
+    {
+      "text": "Python Library - Apex",
+      "link": "https://github.com/cardano-apexpool/koios-api-python"
     }
   ],
   "Community Projects/Tools": [
+    {
+      "text": "ADABox",
+      "link": "https://explorer.adabox.io/pools"
+    },
     {
       "text": "Building On Cardano",
       "link": "https://buildingoncardano.com"
@@ -38,11 +54,11 @@
     },
     {
       "text": "CNTools",
-      "link": "https://cardano-community.github.io/guild-operators/Scripts/cntools/"
-    },
-    {
-      "text": "cscli",
-      "link": "https://github.com/CardanoSharp/cscli"
+      "link": "https://cardano-community.github.io/guild-operators/Scripts/cntools/",
+      "logo": {
+         "dark": "https://github.com/cardano-community/guild-operators/raw/alpha/guild.png",
+         "light": "https://github.com/cardano-community/guild-operators/raw/alpha/guild.png"
+      }
     },
     {
       "text": "Dandelion",
@@ -53,12 +69,32 @@
       "link": "https://eternl.io/"
     },
     {
+      "text": "Mesh SDK",
+      "link": "https://meshjs.dev",
+      "logo": {
+        "dark": "https://meshjs.dev/logo-mesh/black/logo-mesh-black-256x256.png",
+        "light": "https://meshjs.dev/logo-mesh/white/logo-mesh-white-256x256.png"
+      }
+    },
+    {
+      "text": "MusicBox",
+      "link": "https://musicboxnft.com",
+      "logo": {
+        "dark": "https://github.com/adabox-aio/musicbox-website/blob/main/src/main/resources/static/favicon/android-icon-192x192.png",
+        "light": "https://github.com/adabox-aio/musicbox-website/blob/main/src/main/resources/static/favicon/android-icon-192x192.png"
+      }
+    },
+    {
       "text": "Poolpeek",
       "link": "https://poolpeek.com"
     },
     {
       "text": "TosiDrop",
-      "link": "https://tosidrop.io"
+      "link": "https://tosidrop.io",
+      "logo": {
+        "dark": "https://www.tosidrop.io/img/umbrella_blue.png",
+        "light": "https://www.tosidrop.io/img/umbrella_blue.png"
+      }
     },
     {
       "text": "Raw Cardano Explorer",

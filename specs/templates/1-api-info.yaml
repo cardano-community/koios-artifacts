@@ -171,28 +171,7 @@ info:
 
     # Community projects
 
-    A big thank you to the following projects who are already starting to use Koios from early days:
-
-    ## CLI
-
-      - [Koios CLI in GoLang](https://github.com/cardano-community/koios-cli)
-
-    ## Libraries
-
-      - [.Net SDK](https://github.com/CardanoSharp/cardanosharp-koios)
-      - [Go Client](https://github.com/cardano-community/koios-go-client)
-      - [Java Client](https://github.com/cardano-community/koios-java-client)
-
-    ## Community Projects/Tools
-
-      - [Building On Cardano](https://buildingoncardano.com)
-      - [CardaStat](cardastat.info)
-      - [CNFT.IO](https://cnft.io)
-      - [CNTools](https://cardano-community.github.io/guild-operators/Scripts/cntools/)
-      - [Dandelion](https://dandelion.link)
-      - [Eternl](https://eternl.io/)
-      - [PoolPeek](https://poolpeek.com)
-      - [TosiDrop](https://tosidrop.io)
+    A big thank you to the following projects who are already starting to use Koios from early days. A list of tools, libraries and projects utilising Koios (atleast those who'd like to be named) can be found [here](https://www.koios.rest/api-calls-tools-and-libraries)
 
     # FAQ
 
