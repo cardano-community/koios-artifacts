@@ -1504,6 +1504,9 @@ schemas:
             type: string
             description: Hash of the latest mint transaction
             example: cb07b7e51b77079776c4a78f2daf8f14f9945d2b047da7bfcb71d7fbb9f86712
+          total_supply:
+            type: string
+            example: "35000"
           mint_cnt:
             type: integer
             description: Count of total mint transactions
@@ -1512,6 +1515,10 @@ schemas:
             type: integer
             description: Count of total burn transactions
             example: 5
+          creation_time:
+            type: integer
+            description: UNIX timestamp of the first asset mint
+            example: 1506635091
           minting_tx_metadata:
             allOf:
               - $ref: "#/components/schemas/tx_metadata/items/properties/metadata"
@@ -1540,13 +1547,6 @@ schemas:
               decimals:
                 type: integer
                 example: 0
-          total_supply:
-            type: string
-            example: "35000"
-          creation_time:
-            type: integer
-            description: UNIX timestamp of the first asset mint
-            example: 1506635091
     asset_history:
       type: array
       items:
@@ -1579,7 +1579,18 @@ schemas:
                   description: Array of Transaction Metadata for given transaction
                   items:
                     $ref: "#/components/schemas/asset_info/items/properties/minting_tx_metadata"
-    asset_policy_info:
+    policy_asset_addresses:
+      type: array
+      description: Array of asset names and payment addresses for the given policy (including balances)
+      items:
+        properties:
+          asset_name:
+            $ref: "#/components/schemas/asset_info/items/properties/asset_name"
+          payment_address:
+            $ref: "#/components/schemas/asset_addresses/items/properties/payment_address"
+          quantity:
+            $ref: "#/components/schemas/asset_addresses/items/properties/quantity"
+    policy_asset_info:
       type: array
       description: List of policy assets
       items:
@@ -1590,17 +1601,19 @@ schemas:
             $ref: "#/components/schemas/asset_info/items/properties/asset_name_ascii"
           fingerprint:
             $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
+          minting_tx_hash:
+            $ref: "#/components/schemas/asset_info/items/properties/minting_tx_hash"
+          mint_cnt:
+            $ref: "#/components/schemas/asset_info/items/properties/mint_cnt"
+          burn_cnt:
+            $ref: "#/components/schemas/asset_info/items/properties/burn_cnt"
+          creation_time:
+            $ref: "#/components/schemas/asset_info/items/properties/creation_time"
           minting_tx_metadata:
             $ref: "#/components/schemas/asset_info/items/properties/minting_tx_metadata"
           token_registry_metadata:
             $ref: "#/components/schemas/asset_info/items/properties/token_registry_metadata"
-          total_supply:
-            type: string
-            example: "35000"
-          creation_time:
-            type: string
-            $ref: "#/components/schemas/asset_info/items/properties/creation_time"
-    asset_policy_list:
+    policy_asset_list:
       type: array
       description: List of policy assets
       items:

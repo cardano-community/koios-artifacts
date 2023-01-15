@@ -626,7 +626,6 @@ paths:
       parameters:
         - $ref: "#/components/parameters/_asset_policy"
         - $ref: "#/components/parameters/_asset_name"
-        - $ref: "#/components/parameters/_empty"
       responses:
         "200":
           description: Array of payment addresses holding the given token (including balances)
@@ -751,6 +750,49 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Asset History
       description: Get the mint/burn history of an asset
+  /policy_asset_addresses: #RPC
+    get:
+      tags:
+        - Asset
+      parameters:
+        - $ref: "#/components/parameters/_asset_policy"
+      responses:
+        "200":
+          description: Array of asset names and payment addresses for the given policy (including balances)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/policy_asset_addresses"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Policy Asset Address List
+      description: Get the list of addresses with quantity for each asset on the given policy \
+        "Note: Due to cardano's UTxO design and usage from projects, asset to addresses map can be infinite. Thus, for few of the most active projects that have millions of transactions, this will likely end up with timeouts (HTTP code 504) on free layer. Such large-scale projects are free to subscribe to query layers to have a dedicated cache table for themselves served via Koios."
+  /policy_asset_info: #RPC
+    get:
+      tags:
+        - Asset
+      parameters:
+        - $ref: "#/components/parameters/_asset_policy"
+      responses:
+        "200":
+          description: Array of detailed information of assets under the same policy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/policy_asset_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Policy Asset Information
+      description: Get the information for all assets under the same policy
   /asset_policy_info: #RPC
     get:
       tags:
@@ -763,15 +805,36 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/asset_policy_info"
+                $ref: "#/components/schemas/policy_asset_info"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
-      summary: Asset Policy Information
-      description: Get the information for all assets under the same policy
+      summary: DEPRECATED
+      description: Get the information for all assets under the same policy (replaced by asset_addresses)
+  /policy_asset_list: #RPC
+    get:
+      tags:
+        - Asset
+      parameters:
+        - $ref: "#/components/parameters/_asset_policy"
+      responses:
+        "200":
+          description: Array of detailed information of assets under the same policy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/policy_asset_list"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Policy Asset List
+      description: Get the list of asset under the given policy (including balances)
   /asset_summary: #RPC
     get:
       tags:

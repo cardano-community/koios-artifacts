@@ -1,4 +1,4 @@
-CREATE FUNCTION grest.asset_policy_info (_asset_policy text)
+CREATE FUNCTION grest.policy_asset_list (_asset_policy text)
   RETURNS TABLE (
     asset_name text,
     fingerprint varchar,
