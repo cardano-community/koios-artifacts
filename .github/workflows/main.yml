@@ -1,0 +1,24 @@
+name: Update Repository
+
+on: [ push, pull_request ]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.GIT_CC }}
+    - name: Clone repository
+      run: |
+        git clone https://github.com/cardano-community/koios-artifacts.git
+        cd koios-artifacts
+        git config --global user.name 'cardano-bot'
+        git config --global user.email '${{ secrets.GIT_EMAIL }}'
+    - name: Sync repositories
+      run: |
+        git remote add new https://github.com/koios-official/koios-artifacts.git
+        git fetch --unshallow origin
+        git fetch --all
+        git remote set-url --add --push new https://github.com/koios-official/koios-artifacts.git
+        git push -f --all new
