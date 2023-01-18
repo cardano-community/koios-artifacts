@@ -15,7 +15,7 @@ BEGIN
       _all_assets AS (
         SELECT
           id,
-          DECODE(name, 'hex') AS asset_name
+          ENCODE(name, 'hex') AS asset_name
         FROM
           multi_asset ma
         WHERE ma.policy = _asset_policy_decoded

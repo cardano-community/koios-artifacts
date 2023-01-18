@@ -19,7 +19,7 @@ BEGIN
 END;
 $$;
 
-CREATE FUNCTION grest.policy_asset_info (_asset_policy text)
+CREATE OR REPLACE FUNCTION grest.policy_asset_info (_asset_policy text)
   RETURNS TABLE (
     asset_name text,
     asset_name_ascii text,
