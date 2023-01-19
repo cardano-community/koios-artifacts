@@ -34,7 +34,7 @@ BEGIN
           AND TXO.INDEX::smallint = TX_IN.TX_OUT_INDEX::smallint
       WHERE
         sa.id = ANY(sa_id_list)
-        AND TX_IN.TX_IN_ID IS NULL
+        AND TX_IN.ID IS NULL
       GROUP BY
         sa.view, MA.policy, MA.name, MA.fingerprint
     )

@@ -119,7 +119,7 @@ BEGIN
             AND TX_OUT.INDEX::smallint = TX_IN.TX_OUT_INDEX::smallint
         WHERE
           TX_OUT.STAKE_ADDRESS_ID = ANY(sa_id_list)
-          AND TX_IN.TX_IN_ID IS NULL
+          AND TX_IN.ID IS NULL
         GROUP BY
           tx_out.stake_address_id
       ) UTXO_T ON UTXO_T.stake_address_id = status_t.id

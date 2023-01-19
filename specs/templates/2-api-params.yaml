@@ -146,7 +146,27 @@ parameters:
       description: Asset Name in hexadecimal format (hex), empty asset name returns royalties
       schema:
         type: string
-        example: "##_asset_name_param##"
+        example: ##_asset_name_param##
+      in: query
+      required: false
+      allowEmptyValue: true
+    _asset_policy_nft:
+      deprecated: false
+      name: _asset_policy
+      description: NFT Policy ID in hexadecimal format (hex)
+      schema:
+        type: string
+        example: ##_asset_policy_nft_param##
+      in: query
+      required: true
+      allowEmptyValue: false
+    _asset_name_nft:
+      deprecated: false
+      name: _asset_name
+      description: NFT Name in hexadecimal format (hex)
+      schema:
+        type: string
+        example: ##_asset_name_nft_param##
       in: query
       required: false
       allowEmptyValue: true
@@ -200,3 +220,23 @@ parameters:
       in: query
       required: true
       allowEmptyValue: false
+    _first_only:
+      deprecated: false
+      name: _first_only
+      description: Returns the first entry only (overrides _empty to true)
+      schema:
+        type: boolean
+        example: "false"
+      in: query
+      required: false
+      allowEmptyValue: true
+    _empty:
+      deprecated: false
+      name: _empty
+      description: Include zero quantity entries
+      schema:
+        type: boolean
+        example: "false"
+      in: query
+      required: false
+      allowEmptyValue: true

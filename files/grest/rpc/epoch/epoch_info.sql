@@ -46,7 +46,11 @@ BEGIN
     grest.epoch_info_cache ei
     LEFT JOIN grest.EPOCH_ACTIVE_STAKE_CACHE eas ON eas.epoch_no = ei.epoch_no
   WHERE
-    ei.epoch_no::text LIKE CASE WHEN _epoch_no IS NULL THEN '%' ELSE _epoch_no::text END
+    CASE WHEN _epoch_no IS NULL THEN
+      ei.epoch_no <= (SELECT MAX(epoch.no) FROM public.epoch)
+    ELSE
+      ei.epoch_no = _epoch_no
+    END
     AND
     (_include_next_epoch OR ei.i_first_block_time::integer is not null);
 END;

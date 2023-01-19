@@ -718,7 +718,7 @@ paths:
       tags:
         - Account
       requestBody:
-        $ref: "#/components/requestBodies/stake_addresses"
+        $ref: "#/components/requestBodies/stake_addresses_with_first_only_and_empty"
       responses:
         "200":
           description: Array of payment addresses
@@ -814,6 +814,29 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Asset Token Registry
       description: Get a list of assets registered via token registry on github
+  /asset_addresses: #RPC
+    get:
+      tags:
+        - Asset
+      parameters:
+        - $ref: "#/components/parameters/_asset_policy"
+        - $ref: "#/components/parameters/_asset_name"
+      responses:
+        "200":
+          description: Array of payment addresses holding the given token (including balances)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/asset_addresses"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Asset Address List
+      description: Get the list of all addresses holding a given asset \
+        "Note: Due to cardano's UTxO design and usage from projects, asset to addresses map can be infinite. Thus, for few of the most active projects that have millions of transactions, this will likely end up with timeouts (HTTP code 504) on free layer. Such large-scale projects are free to subscribe to query layers to have a dedicated cache table for themselves served via Koios."
   /asset_address_list: #RPC
     get:
       tags:
@@ -827,15 +850,37 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/asset_address_list"
+                $ref: "#/components/schemas/asset_addresses"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
-      summary: Asset Address List
-      description: Get the list of all addresses holding a given asset
+      summary: DEPRECATED
+      description: Get the list of all addresses holding a given asset (replaced by asset_addresses)
+  /asset_nft_address: #RPC
+    get:
+      tags:
+        - Asset
+      parameters:
+        - $ref: "#/components/parameters/_asset_policy_nft"
+        - $ref: "#/components/parameters/_asset_name_nft"
+      responses:
+        "200":
+          description: Payment addresses currently holding the given NFT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/asset_nft_address"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: NFT Address
+      description: Get the address where specified NFT currently reside on.
   /asset_info: #RPC
     get:
       tags:
@@ -900,6 +945,49 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Asset History
       description: Get the mint/burn history of an asset
+  /policy_asset_addresses: #RPC
+    get:
+      tags:
+        - Asset
+      parameters:
+        - $ref: "#/components/parameters/_asset_policy"
+      responses:
+        "200":
+          description: Array of asset names and payment addresses for the given policy (including balances)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/policy_asset_addresses"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Policy Asset Address List
+      description: Get the list of addresses with quantity for each asset on the given policy \
+        "Note: Due to cardano's UTxO design and usage from projects, asset to addresses map can be infinite. Thus, for few of the most active projects that have millions of transactions, this will likely end up with timeouts (HTTP code 504) on free layer. Such large-scale projects are free to subscribe to query layers to have a dedicated cache table for themselves served via Koios."
+  /policy_asset_info: #RPC
+    get:
+      tags:
+        - Asset
+      parameters:
+        - $ref: "#/components/parameters/_asset_policy"
+      responses:
+        "200":
+          description: Array of detailed information of assets under the same policy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/policy_asset_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Policy Asset Information
+      description: Get the information for all assets under the same policy
   /asset_policy_info: #RPC
     get:
       tags:
@@ -912,15 +1000,36 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/asset_policy_info"
+                $ref: "#/components/schemas/policy_asset_info"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
-      summary: Asset Policy Information
-      description: Get the information for all assets under the same policy
+      summary: DEPRECATED
+      description: Get the information for all assets under the same policy (replaced by asset_addresses)
+  /policy_asset_list: #RPC
+    get:
+      tags:
+        - Asset
+      parameters:
+        - $ref: "#/components/parameters/_asset_policy"
+      responses:
+        "200":
+          description: Array of detailed information of assets under the same policy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/policy_asset_list"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Policy Asset List
+      description: Get the list of asset under the given policy (including balances)
   /asset_summary: #RPC
     get:
       tags:
@@ -1410,7 +1519,27 @@ components:
       description: Asset Name in hexadecimal format (hex), empty asset name returns royalties
       schema:
         type: string
-        example: "41484c636f696e"
+        example: 41484c636f696e
+      in: query
+      required: false
+      allowEmptyValue: true
+    _asset_policy_nft:
+      deprecated: false
+      name: _asset_policy
+      description: NFT Policy ID in hexadecimal format (hex)
+      schema:
+        type: string
+        example: 187abba169e246fdcbebcd12915a8610cb470fda3b3fc21da0c4aed4
+      in: query
+      required: true
+      allowEmptyValue: false
+    _asset_name_nft:
+      deprecated: false
+      name: _asset_name
+      description: NFT Name in hexadecimal format (hex)
+      schema:
+        type: string
+        example: 4f504b4559
       in: query
       required: false
       allowEmptyValue: true
@@ -1464,6 +1593,26 @@ components:
       in: query
       required: true
       allowEmptyValue: false
+    _first_only:
+      deprecated: false
+      name: _first_only
+      description: Returns the first entry only (overrides _empty to true)
+      schema:
+        type: boolean
+        example: "false"
+      in: query
+      required: false
+      allowEmptyValue: true
+    _empty:
+      deprecated: false
+      name: _empty
+      description: Include zero quantity entries
+      schema:
+        type: boolean
+        example: "false"
+      in: query
+      required: false
+      allowEmptyValue: true
   requestBodies:
     block_hashes:
       content:
@@ -1547,6 +1696,32 @@ components:
                 - stake_test17zt9x005zkd2usz2vhvktyzqsuwz25gmgnaqdka5hcj9m2qfg2py2
                 - stake_test1uzzm95hs7dzw23ftj3cly3rgm64crqxet7g46k6y5kcy3zcs3mpjd
               _epoch_no: 1500
+    stake_addresses_with_first_only_and_empty:
+      content:
+        application/json:
+          schema:
+            required:
+              - _stake_addresses
+            type: object
+            properties:
+              _stake_addresses:
+                format: text
+                type: array
+                items:
+                  type: string
+                description: Array of Cardano stake address(es) in bech32 format
+              _first_only:
+                format: boolean
+                type: boolean
+                description: Only return the first result
+              _empty:
+                format: boolean
+                type: boolean
+                description: Include zero quantity entries
+            example:
+              _stake_addresses:
+                - stake_test17zt9x005zkd2usz2vhvktyzqsuwz25gmgnaqdka5hcj9m2qfg2py2
+                - stake_test1uzzm95hs7dzw23ftj3cly3rgm64crqxet7g46k6y5kcy3zcs3mpjd
     stake_addresses:
       content:
         application/json:
@@ -2510,7 +2685,7 @@ components:
         type: object
         properties:
           address:
-            $ref: "#/components/schemas/asset_address_list/items/properties/payment_address"
+            $ref: "#/components/schemas/asset_addresses/items/properties/payment_address"
           balance:
             type: string
             description: Sum of all UTxO values beloning to address
@@ -2565,7 +2740,7 @@ components:
         type: object
         properties:
           address:
-            $ref: "#/components/schemas/asset_address_list/items/properties/payment_address"
+            $ref: "#/components/schemas/asset_addresses/items/properties/payment_address"
           asset_list:
             $ref: "#/components/schemas/account_assets/items/properties/asset_list"
     credential_txs:
@@ -2682,7 +2857,7 @@ components:
           addresses:
             type: array
             items:
-              $ref: "#/components/schemas/asset_address_list/items/properties/payment_address"
+              $ref: "#/components/schemas/asset_addresses/items/properties/payment_address"
     account_assets:
       type: array
       items:
@@ -3130,7 +3305,7 @@ components:
             $ref: "#/components/schemas/asset_info/items/properties/token_registry_metadata/properties/decimals"
           logo:
             $ref: "#/components/schemas/asset_info/items/properties/token_registry_metadata/properties/logo"
-    asset_address_list:
+    asset_addresses:
       type: array
       description: An array of payment addresses holding the given token (including balances)
       items:
@@ -3143,6 +3318,8 @@ components:
             type: string
             description: Asset balance on the payment address
             example: 23
+    asset_nft_address:
+      $ref: "#/components/schemas/asset_addresses/items/properties/payment_address"
     asset_summary:
       type: array
       items:
@@ -3190,6 +3367,9 @@ components:
             type: string
             description: Hash of the latest mint transaction
             example: cb07b7e51b77079776c4a78f2daf8f14f9945d2b047da7bfcb71d7fbb9f86712
+          total_supply:
+            type: string
+            example: "35000"
           mint_cnt:
             type: integer
             description: Count of total mint transactions
@@ -3198,6 +3378,10 @@ components:
             type: integer
             description: Count of total burn transactions
             example: 5
+          creation_time:
+            type: integer
+            description: UNIX timestamp of the first asset mint
+            example: 1506635091
           minting_tx_metadata:
             allOf:
               - $ref: "#/components/schemas/tx_metadata/items/properties/metadata"
@@ -3226,13 +3410,6 @@ components:
               decimals:
                 type: integer
                 example: 0
-          total_supply:
-            type: string
-            example: "35000"
-          creation_time:
-            type: integer
-            description: UNIX timestamp of the first asset mint
-            example: 1506635091
     asset_history:
       type: array
       items:
@@ -3265,7 +3442,18 @@ components:
                   description: Array of Transaction Metadata for given transaction
                   items:
                     $ref: "#/components/schemas/asset_info/items/properties/minting_tx_metadata"
-    asset_policy_info:
+    policy_asset_addresses:
+      type: array
+      description: Array of asset names and payment addresses for the given policy (including balances)
+      items:
+        properties:
+          asset_name:
+            $ref: "#/components/schemas/asset_info/items/properties/asset_name"
+          payment_address:
+            $ref: "#/components/schemas/asset_addresses/items/properties/payment_address"
+          quantity:
+            $ref: "#/components/schemas/asset_addresses/items/properties/quantity"
+    policy_asset_info:
       type: array
       description: List of policy assets
       items:
@@ -3276,17 +3464,19 @@ components:
             $ref: "#/components/schemas/asset_info/items/properties/asset_name_ascii"
           fingerprint:
             $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
+          minting_tx_hash:
+            $ref: "#/components/schemas/asset_info/items/properties/minting_tx_hash"
+          mint_cnt:
+            $ref: "#/components/schemas/asset_info/items/properties/mint_cnt"
+          burn_cnt:
+            $ref: "#/components/schemas/asset_info/items/properties/burn_cnt"
+          creation_time:
+            $ref: "#/components/schemas/asset_info/items/properties/creation_time"
           minting_tx_metadata:
             $ref: "#/components/schemas/asset_info/items/properties/minting_tx_metadata"
           token_registry_metadata:
             $ref: "#/components/schemas/asset_info/items/properties/token_registry_metadata"
-          total_supply:
-            type: string
-            example: "35000"
-          creation_time:
-            type: string
-            $ref: "#/components/schemas/asset_info/items/properties/creation_time"
-    asset_policy_list:
+    policy_asset_list:
       type: array
       description: List of policy assets
       items:

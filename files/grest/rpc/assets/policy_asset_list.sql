@@ -1,4 +1,4 @@
-CREATE FUNCTION grest.asset_policy_info (_asset_policy text)
+CREATE OR REPLACE FUNCTION grest.policy_asset_list (_asset_policy text)
   RETURNS TABLE (
     asset_name text,
     fingerprint varchar,
@@ -18,7 +18,7 @@ BEGIN
     SELECT
       ENCODE(ma.name, 'hex') AS asset_name,
       ma.fingerprint AS fingerprint,
-      aic.total_supply,
+      aic.total_supply::text,
       aic.decimals
     FROM 
       multi_asset ma

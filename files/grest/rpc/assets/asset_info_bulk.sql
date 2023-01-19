@@ -59,7 +59,7 @@ BEGIN
     FROM
       multi_asset ma
       INNER JOIN grest.asset_info_cache aic ON aic.asset_id = ma.id
-      LEFT JOIN tx ON tx.id = aic.last_mint_tx_id
+      INNER JOIN tx ON tx.id = aic.last_mint_tx_id
       LEFT JOIN grest.asset_registry_cache arc ON DECODE(arc.asset_policy, 'hex') = ma.policy AND DECODE(arc.asset_name, 'hex') = ma.name
       LEFT JOIN LATERAL (
         SELECT

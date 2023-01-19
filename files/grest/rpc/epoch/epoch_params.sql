@@ -72,6 +72,8 @@ BEGIN
       ei.p_coins_per_utxo_size::text AS coins_per_utxo_size
     FROM
       grest.epoch_info_cache ei
+    WHERE
+      ei.epoch_no <= (SELECT MAX(epoch.no) FROM public.epoch)
     ORDER BY
       ei.epoch_no DESC;
   ELSE
