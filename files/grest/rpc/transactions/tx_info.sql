@@ -647,7 +647,12 @@ BEGIN
           SELECT
             redeemer.tx_id,
             JSONB_BUILD_OBJECT(
-              'address', INUTXO.address,
+              'address',
+                CASE 
+                  WHEN INUTXO.address IS NOT NULL THEN INUTXO.address
+                  WHEN SA.view IS NOT NULL THEN SA.view
+                  ELSE NULL
+                END,
               'script_hash', ENCODE(script.hash, 'hex'),
               'bytecode', ENCODE(script.bytes, 'hex'),
               'size', script.serialised_size,
@@ -683,11 +688,12 @@ BEGIN
             INNER JOIN tx ON redeemer.tx_id = tx.id
             INNER JOIN redeemer_data RD ON RD.id = redeemer.redeemer_data_id
             INNER JOIN script ON redeemer.script_hash = script.hash
-            INNER JOIN tx_in ON tx_in.redeemer_id = redeemer.id
-            INNER JOIN tx_out INUTXO ON INUTXO.tx_id = tx_in.tx_out_id AND INUTXO.index = tx_in.tx_out_index
-            INNER JOIN datum IND ON IND.hash = INUTXO.data_hash
-            LEFT JOIN tx_out OUTUTXO ON OUTUTXO.tx_id = redeemer.tx_id AND OUTUTXO.address = INUTXO.address
-            LEFT JOIN datum OUTD ON OUTD.hash = OUTUTXO.data_hash
+            LEFT JOIN tx_in            ON redeemer.purpose = 'spend' AND tx_in.redeemer_id = redeemer.id
+            LEFT JOIN tx_out INUTXO    ON redeemer.purpose = 'spend' AND INUTXO.tx_id = tx_in.tx_out_id AND INUTXO.index = tx_in.tx_out_index
+            LEFT JOIN datum IND        ON redeemer.purpose = 'spend' AND IND.hash = INUTXO.data_hash
+            LEFT JOIN tx_out OUTUTXO   ON redeemer.purpose = 'spend' AND OUTUTXO.tx_id = redeemer.tx_id AND OUTUTXO.address = INUTXO.address
+            LEFT JOIN datum OUTD       ON redeemer.purpose = 'spend' AND OUTD.hash = OUTUTXO.data_hash
+            LEFT JOIN stake_address SA ON redeemer.purpose = 'cert'  AND SA.script_hash = script.hash
           WHERE
             redeemer.tx_id = ANY (_tx_id_list)
         ) AS tmp
