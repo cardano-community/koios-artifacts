@@ -1,4 +1,4 @@
-CREATE FUNCTION grest.tx_info (_tx_hashes text[])
+CREATE FUNCTION grest.tx_info2 (_tx_hashes text[])
   RETURNS TABLE (
     tx_hash text,
     block_hash text,
@@ -644,58 +644,89 @@ BEGIN
           tx_id,
           JSONB_AGG(data) AS list
         FROM (
+          WITH 
+            all_redeemers AS (
+              SELECT
+                redeemer.id,
+                redeemer.tx_id,
+                redeemer.purpose,
+                redeemer.fee,
+                redeemer.unit_steps,
+                redeemer.unit_mem,
+                rd.hash as rd_hash,
+                rd.value as rd_value,
+                script.hash as script_hash,
+                script.bytes as script_bytes,
+                script.serialised_size as script_serialised_size,
+                tx.valid_contract
+              FROM redeemer
+                INNER JOIN tx ON redeemer.tx_id = tx.id
+                INNER JOIN redeemer_data RD ON RD.id = redeemer.redeemer_data_id
+                INNER JOIN script ON redeemer.script_hash = script.hash
+              WHERE redeemer.tx_id = ANY (_tx_id_list)
+            ),
+            spend_redeemers AS (
+              SELECT
+                DISTINCT ON(redeemer.id) redeemer.id,
+                INUTXO.address,
+                IND.hash as ind_hash,
+                IND.value as ind_value,
+                outd.hash as outd_hash,
+                outd.value as outd_value
+              FROM redeemer
+                INNER JOIN tx_in ON tx_in.redeemer_id = redeemer.id
+                INNER JOIN tx_out INUTXO ON INUTXO.tx_id = tx_in.tx_out_id AND INUTXO.index = tx_in.tx_out_index
+                INNER JOIN datum IND ON IND.hash = INUTXO.data_hash
+                LEFT JOIN tx_out OUTUTXO ON OUTUTXO.tx_id = redeemer.tx_id AND OUTUTXO.address = INUTXO.address
+                LEFT JOIN datum OUTD ON OUTD.hash = OUTUTXO.data_hash
+              WHERE redeemer.tx_id = ANY (_tx_id_list)
+            )
           SELECT
-            redeemer.tx_id,
+            ar.tx_id,
             JSONB_BUILD_OBJECT(
-              'address',
+              'address', 
                 CASE 
-                  WHEN INUTXO.address IS NOT NULL THEN INUTXO.address
-                  WHEN SA.view IS NOT NULL THEN SA.view
+                  WHEN ar.purpose = 'spend' THEN
+                    (SELECT address FROM spend_redeemers sr WHERE sr.id = ar.id)
                   ELSE NULL
                 END,
-              'script_hash', ENCODE(script.hash, 'hex'),
-              'bytecode', ENCODE(script.bytes, 'hex'),
-              'size', script.serialised_size,
-              'valid_contract', tx.valid_contract,
+              'script_hash', ENCODE(ar.script_hash, 'hex'),
+              'bytecode', ENCODE(ar.script_bytes, 'hex'),
+              'size', ar.script_serialised_size,
+              'valid_contract', ar.valid_contract,
               'input', JSONB_BUILD_OBJECT(
                 'redeemer', JSONB_BUILD_OBJECT(
-                  'purpose', redeemer.purpose,
-                  'fee', redeemer.fee::text,
+                  'purpose', ar.purpose,
+                  'fee', ar.fee::text,
                   'unit', JSONB_BUILD_OBJECT(
-                    'steps', redeemer.unit_steps::text,
-                    'mem', redeemer.unit_mem::text
+                    'steps', ar.unit_steps::text,
+                    'mem', ar.unit_mem::text
                   ),
                   'datum', JSONB_BUILD_OBJECT(
-                    'hash', ENCODE(rd.hash, 'hex'),
-                    'value', rd.value
+                    'hash', ENCODE(ar.rd_hash, 'hex'),
+                    'value', ar.rd_value
                   )
                 ),
-                'datum', JSONB_BUILD_OBJECT(
-                  'hash', ENCODE(ind.hash, 'hex'),
-                  'value', ind.value
-                )
+                'datum', CASE WHEN ar.purpose = 'spend' THEN (
+                    SELECT JSONB_BUILD_OBJECT(
+                      'hash', ENCODE(sr.ind_hash, 'hex'),
+                      'value', sr.ind_value
+                    ) FROM spend_redeemers sr WHERE sr.id = ar.id
+                  ) ELSE NULL END
               ),
-              'output', CASE WHEN outd.hash IS NULL THEN NULL
-                        ELSE
-                          JSONB_BUILD_OBJECT(
-                            'hash', ENCODE(outd.hash, 'hex'),
-                            'value', outd.value
-                          )
-                        END
+              'output', CASE WHEN ar.purpose = 'spend' THEN (
+                  SELECT 
+                    CASE WHEN sr.outd_hash IS NULL THEN NULL ELSE 
+                      JSONB_BUILD_OBJECT(
+                        'hash', ENCODE(sr.outd_hash, 'hex'),
+                        'value', sr.outd_value
+                      )
+                    END
+                  FROM spend_redeemers sr WHERE sr.id = ar.id
+                ) ELSE NULL END
             ) AS data
           FROM
-            redeemer
-            INNER JOIN tx ON redeemer.tx_id = tx.id
-            INNER JOIN redeemer_data RD ON RD.id = redeemer.redeemer_data_id
-            INNER JOIN script ON redeemer.script_hash = script.hash
-            LEFT JOIN tx_in            ON redeemer.purpose = 'spend' AND tx_in.redeemer_id = redeemer.id
-            LEFT JOIN tx_out INUTXO    ON redeemer.purpose = 'spend' AND INUTXO.tx_id = tx_in.tx_out_id AND INUTXO.index = tx_in.tx_out_index
-            LEFT JOIN datum IND        ON redeemer.purpose = 'spend' AND IND.hash = INUTXO.data_hash
-            LEFT JOIN tx_out OUTUTXO   ON redeemer.purpose = 'spend' AND OUTUTXO.tx_id = redeemer.tx_id AND OUTUTXO.address = INUTXO.address
-            LEFT JOIN datum OUTD       ON redeemer.purpose = 'spend' AND OUTD.hash = OUTUTXO.data_hash
-            LEFT JOIN stake_address SA ON redeemer.purpose = 'cert'  AND SA.script_hash = script.hash
-          WHERE
-            redeemer.tx_id = ANY (_tx_id_list)
+            all_redeemers ar
         ) AS tmp
 
         GROUP BY tx_id
