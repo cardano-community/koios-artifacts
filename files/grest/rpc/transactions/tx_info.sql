@@ -1,4 +1,4 @@
-CREATE FUNCTION grest.tx_info2 (_tx_hashes text[])
+CREATE FUNCTION grest.tx_info (_tx_hashes text[])
   RETURNS TABLE (
     tx_hash text,
     block_hash text,
