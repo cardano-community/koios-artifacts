@@ -670,15 +670,11 @@ BEGIN
                 DISTINCT ON(redeemer.id) redeemer.id,
                 INUTXO.address,
                 IND.hash as ind_hash,
-                IND.value as ind_value,
-                outd.hash as outd_hash,
-                outd.value as outd_value
+                IND.value as ind_value
               FROM redeemer
                 INNER JOIN tx_in ON tx_in.redeemer_id = redeemer.id
                 INNER JOIN tx_out INUTXO ON INUTXO.tx_id = tx_in.tx_out_id AND INUTXO.index = tx_in.tx_out_index
                 INNER JOIN datum IND ON IND.hash = INUTXO.data_hash
-                LEFT JOIN tx_out OUTUTXO ON OUTUTXO.tx_id = redeemer.tx_id AND OUTUTXO.address = INUTXO.address
-                LEFT JOIN datum OUTD ON OUTD.hash = OUTUTXO.data_hash
               WHERE redeemer.tx_id = ANY (_tx_id_list)
             )
           SELECT
@@ -713,17 +709,7 @@ BEGIN
                       'value', sr.ind_value
                     ) FROM spend_redeemers sr WHERE sr.id = ar.id
                   ) ELSE NULL END
-              ),
-              'output', CASE WHEN ar.purpose = 'spend' THEN (
-                  SELECT 
-                    CASE WHEN sr.outd_hash IS NULL THEN NULL ELSE 
-                      JSONB_BUILD_OBJECT(
-                        'hash', ENCODE(sr.outd_hash, 'hex'),
-                        'value', sr.outd_value
-                      )
-                    END
-                  FROM spend_redeemers sr WHERE sr.id = ar.id
-                ) ELSE NULL END
+              )
             ) AS data
           FROM
             all_redeemers ar
