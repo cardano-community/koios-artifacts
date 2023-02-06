@@ -3285,14 +3285,6 @@ components:
                           $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_hash"
                         value:
                           $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_value"
-                output:
-                  type: object
-                  nullable: true
-                  properties:
-                    hash:
-                      $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_hash"
-                    value:
-                      $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_value"
     tx_utxos:
       type: array
       items:
