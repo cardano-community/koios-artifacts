@@ -102,7 +102,10 @@
     },
     {
       "text": "Raw Cardano Explorer",
-      "link": "https://rawcardano.app"
+      "link": "https://rawcardano.app",
+      "logo": {
+        "dark": "https://www.quixote.systems/wp-content/uploads/2022/06/raw_explorer_logo.png",
+        "light": "https://www.quixote.systems/wp-content/uploads/2022/06/raw_explorer_logo.png"
     }
   ]
 }
