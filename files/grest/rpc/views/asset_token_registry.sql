@@ -1,3 +1,5 @@
+DROP VIEW IF EXISTS grest.asset_token_registry;
+
 CREATE VIEW grest.asset_token_registry AS
   SELECT
     asset_policy AS policy_id,

@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS grest.asset_registry_cache;
+DROP TABLE IF EXISTS grest.asset_registry_cache CASCADE;
 
 CREATE TABLE grest.asset_registry_cache (
     asset_policy text NOT NULL,
