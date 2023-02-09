@@ -38,19 +38,35 @@
   "Community Projects/Tools": [
     {
       "text": "ADABox",
-      "link": "https://explorer.adabox.io/pools"
+      "link": "https://explorer.adabox.io/pools",
+      "logo": {
+        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/Koios-logo-dummy.png",
+        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/Koios-logo-dummy.png"
+      }
     },
     {
       "text": "Building On Cardano",
-      "link": "https://buildingoncardano.com"
+      "link": "https://buildingoncardano.com",
+      "logo": {
+        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/Koios-logo-dummy.png",
+        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/Koios-logo-dummy.png"
+      }
     },
     {
       "text": "CardaStat",
-      "link": "https://cardastat.info"
+      "link": "https://cardastat.info",
+      "logo": {
+        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/Koios-logo-dummy.png",
+        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/Koios-logo-dummy.png"
+      }
     },
     {
       "text": "CNFT.IO",
-      "link": "https://CNFT.IO"
+      "link": "https://CNFT.IO",
+      "logo": {
+        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/Koios-logo-dummy.png",
+        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/Koios-logo-dummy.png"
+      }
     },
     {
       "text": "CNTools",
@@ -62,7 +78,11 @@
     },
     {
       "text": "Dandelion",
-      "link": "https://dandelion.link"
+      "link": "https://dandelion.link",
+      "logo": {
+        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/Koios-logo-dummy.png",
+        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/Koios-logo-dummy.png"
+      }
     },
     {
       "text": "Eternl",
@@ -84,13 +104,17 @@
       "text": "MusicBox",
       "link": "https://musicboxnft.com",
       "logo": {
-        "dark": "https://github.com/adabox-aio/musicbox-website/blob/main/src/main/resources/static/favicon/android-icon-192x192.png",
-        "light": "https://github.com/adabox-aio/musicbox-website/blob/main/src/main/resources/static/favicon/android-icon-192x192.png"
+        "dark": "https://raw.githubusercontent.com/adabox-aio/musicbox-website/main/src/main/resources/static/favicon/android-icon-192x192.png",
+        "light": "https://raw.githubusercontent.com/adabox-aio/musicbox-website/main/src/main/resources/static/favicon/android-icon-192x192.png"
       }
     },
     {
       "text": "Poolpeek",
-      "link": "https://poolpeek.com"
+      "link": "https://poolpeek.com",
+      "logo": {
+        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/Koios-logo-dummy.png",
+        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/Koios-logo-dummy.png"
+      }
     },
     {
       "text": "TosiDrop",
