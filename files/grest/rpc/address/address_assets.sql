@@ -25,9 +25,9 @@ BEGIN
         AND TXO.INDEX::smallint = TX_IN.TX_OUT_INDEX::smallint
     WHERE
       TXO.address = ANY(_addresses)
-      AND TX_IN.id IS NULL
+      AND TX_IN.tx_out_id IS NULL
     GROUP BY
-      TXO.address, MA.policy, MA.name, ma.fingerprint
+      TXO.address, MA.policy, MA.name, ma.fingerprint, aic.decimals
   )
 
   SELECT

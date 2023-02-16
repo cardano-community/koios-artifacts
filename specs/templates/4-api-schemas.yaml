@@ -1481,7 +1481,12 @@ schemas:
             description: Asset balance on the payment address
             example: 23
     asset_nft_address:
-      $ref: "#/components/schemas/asset_addresses/items/properties/payment_address"
+      type: array
+      description: An array of payment addresses holding the given token
+      items:
+        properties:
+          payment_address:
+            $ref: "#/components/schemas/asset_addresses/items/properties/payment_address"
     asset_summary:
       type: array
       items:

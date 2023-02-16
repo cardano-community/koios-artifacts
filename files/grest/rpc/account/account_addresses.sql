@@ -33,7 +33,7 @@ BEGIN
               AND txo.index::smallint = tx_in.tx_out_index::smallint
             WHERE 
               txo.stake_address_id = ANY(sa_id_list)
-              AND tx_in.id IS NULL
+              AND TX_IN.TX_OUT_ID IS NULL
           ) x
       )
       SELECT

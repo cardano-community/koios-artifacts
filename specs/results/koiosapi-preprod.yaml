@@ -875,10 +875,10 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Asset Addresses
-      description: Get the list of all addresses holding a given asset \
-        Note - Due to cardano's UTxO design and usage from projects, asset to addresses map can be infinite. Thus, for a small subset of active projects \
-        with millions of transactions, these might end up with timeouts (HTTP code 504) on free layer. Such large-scale projects are free to subscribe to \
-        query layers to have a dedicated cache table for themselves served via Koios.
+      description: Get the list of all addresses holding a given asset <br><br>
+        `Note - Due to cardano's UTxO design and usage from projects, asset to addresses map can be infinite. Thus, for a small subset of active projects 
+        with millions of transactions, these might end up with timeouts (HTTP code 504) on free layer. Such large-scale projects are free to subscribe to 
+        query layers to have a dedicated cache table for themselves served via Koios.`
   /asset_address_list: #RPC
     get:
       tags:
@@ -1007,10 +1007,10 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Policy Asset Address List
-      description: Get the list of addresses with quantity for each asset on the given policy \
-        Note - Due to cardano's UTxO design and usage from projects, asset to addresses map can be infinite. Thus, for a small subset of active projects \
-        with millions of transactions, these might end up with timeouts (HTTP code 504) on free layer. Such large-scale projects are free to subscribe to \
-        query layers to have a dedicated cache table for themselves served via Koios.
+      description: Get the list of addresses with quantity for each asset on the given policy <br><br>
+        `Note - Due to cardano's UTxO design and usage from projects, asset to addresses map can be infinite. Thus, for a small subset of active projects 
+        with millions of transactions, these might end up with timeouts (HTTP code 504) on free layer. Such large-scale projects are free to subscribe to 
+        query layers to have a dedicated cache table for themselves served via Koios.`
   /policy_asset_info: #RPC
     get:
       tags:
@@ -1599,7 +1599,7 @@ components:
       allowEmptyValue: false
     _include_next_epoch:
       deprecated: false
-      name: _history
+      name: _include_next_epoch
       description: Include information about nearing but not yet started epoch, to get access to active stake snapshot information if available
       schema:
         type: boolean
@@ -3388,7 +3388,12 @@ components:
             description: Asset balance on the payment address
             example: 23
     asset_nft_address:
-      $ref: "#/components/schemas/asset_addresses/items/properties/payment_address"
+      type: array
+      description: An array of payment addresses holding the given token
+      items:
+        properties:
+          payment_address:
+            $ref: "#/components/schemas/asset_addresses/items/properties/payment_address"
     asset_summary:
       type: array
       items:

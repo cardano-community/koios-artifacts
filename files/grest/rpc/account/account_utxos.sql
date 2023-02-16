@@ -26,7 +26,7 @@ BEGIN
     INNER JOIN tx ON tx.id = tx_out.tx_id
     LEFT JOIN block b ON b.id = tx.block_id
   WHERE
-    tx_in.id IS NULL
+    tx_in.tx_out_id IS NULL
     AND
     tx_out.stake_address_id = (select id from stake_address where view = _stake_address);
 
