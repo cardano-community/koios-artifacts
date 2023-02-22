@@ -69,7 +69,7 @@
       }
     },
     {
-      "text": "CNTools",
+      "text": "CNTools/gLiveview",
       "link": "https://cardano-community.github.io/guild-operators/Scripts/cntools/",
       "logo": {
          "dark": "https://github.com/cardano-community/guild-operators/raw/alpha/guild.png",
