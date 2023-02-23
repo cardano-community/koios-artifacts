@@ -48,7 +48,7 @@ BEGIN
             AND txo.index::smallint = tx_in.tx_out_index::smallint
         WHERE
           mto.ident = _asset_id
-          AND tx_in.id IS NULL
+          AND tx_in.tx_out_id IS NULL
       ) x
     GROUP BY
       x.address;

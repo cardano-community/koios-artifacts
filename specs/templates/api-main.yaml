@@ -67,6 +67,25 @@ paths:
       description: >-
         Get the circulating utxo, treasury, rewards, supply and reserves in
         lovelace for specified epoch, all epochs if empty
+  /param_updates: #RPC
+    get:
+      tags:
+        - Network
+      responses:
+        "200":
+          description: Array of unique param update proposals submitted on chain
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/param_updates"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Param Update Proposals
+      description: Get all parameter update proposals submitted to the chain starting Shelley era
   /epoch_info: #RPC
     get:
       tags:
@@ -415,7 +434,7 @@ paths:
   /account_list:
     get:
       tags:
-        - Account
+        - Stake Account
       responses:
         "200":
           description: Array of account (stake address) IDs
@@ -430,11 +449,11 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Account List
-      description: Get a list of all accounts
+      description: Get a list of all stake addresses that have atleast 1 transaction
   /account_info: #RPC
     post:
       tags:
-        - Account
+        - Stake Account
       requestBody:
         $ref: "#/components/requestBodies/stake_addresses"
       responses:
@@ -451,11 +470,32 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Account Information
-      description: Get the account information for given stake addresses (accounts)
+      description: Get the account information for given stake addresses
+  /account_utxos: #RPC
+    get:
+      tags:
+        - Stake Account
+      parameters:
+        - $ref: "#/components/parameters/_stake_address"
+      responses:
+        "200":
+          description: Array of account UTxOs associated with stake address
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account_utxos"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Account UTxOs
+      description: Get a list of all UTxOs for a given stake address (account)
   /account_info_cached: #RPC
     post:
       tags:
-        - Account
+        - Stake Account
       requestBody:
         $ref: "#/components/requestBodies/stake_addresses"
       responses:
@@ -472,11 +512,11 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Account Information (Cached)
-      description: Get the cached account information for given stake addresses (accounts)
+      description: Get the cached account information for given stake addresses
   /account_rewards: #RPC
     post:
       tags:
-        - Account
+        - Stake Account
       requestBody:
         $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
       responses:
@@ -494,11 +534,11 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Account Rewards
       description: >-
-        Get the full rewards history (including MIR) for given stake addresses (accounts)
+        Get the full rewards history (including MIR) for given stake addresses
   /account_updates: #RPC
     post:
       tags:
-        - Account
+        - Stake Account
       requestBody:
         $ref: "#/components/requestBodies/stake_addresses"
       responses:
@@ -517,11 +557,11 @@ paths:
       summary: Account Updates
       description: >-
         Get the account updates (registration, deregistration, delegation and
-        withdrawals) for given stake addresses (accounts)
+        withdrawals) for given stake addresses
   /account_addresses: #RPC
     post:
       tags:
-        - Account
+        - Stake Account
       requestBody:
         $ref: "#/components/requestBodies/stake_addresses_with_first_only_and_empty"
       responses:
@@ -542,7 +582,7 @@ paths:
   /account_assets: #RPC
     post:
       tags:
-        - Account
+        - Stake Account
       requestBody:
         $ref: "#/components/requestBodies/stake_addresses"
       responses:
@@ -559,11 +599,11 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Account Assets
-      description: Get the native asset balance of given accounts
+      description: Get the native asset balance for a given stake address
   /account_history: #RPC
     post:
       tags:
-        - Account
+        - Stake Account
       requestBody:
         $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
       responses:
@@ -639,9 +679,11 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
-      summary: Asset Address List
-      description: Get the list of all addresses holding a given asset \
-        "Note: Due to cardano's UTxO design and usage from projects, asset to addresses map can be infinite. Thus, for few of the most active projects that have millions of transactions, this will likely end up with timeouts (HTTP code 504) on free layer. Such large-scale projects are free to subscribe to query layers to have a dedicated cache table for themselves served via Koios."
+      summary: Asset Addresses
+      description: Get the list of all addresses holding a given asset <br><br>
+        `Note - Due to cardano's UTxO design and usage from projects, asset to addresses map can be infinite. Thus, for a small subset of active projects 
+        with millions of transactions, these might end up with timeouts (HTTP code 504) on free layer. Such large-scale projects are free to subscribe to 
+        query layers to have a dedicated cache table for themselves served via Koios.`
   /asset_address_list: #RPC
     get:
       tags:
@@ -662,7 +704,7 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
-      summary: DEPRECATED
+      summary: Asset Address List [DEPRECATED]
       description: Get the list of all addresses holding a given asset (replaced by asset_addresses)
   /asset_nft_address: #RPC
     get:
@@ -770,8 +812,10 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Policy Asset Address List
-      description: Get the list of addresses with quantity for each asset on the given policy \
-        "Note: Due to cardano's UTxO design and usage from projects, asset to addresses map can be infinite. Thus, for few of the most active projects that have millions of transactions, this will likely end up with timeouts (HTTP code 504) on free layer. Such large-scale projects are free to subscribe to query layers to have a dedicated cache table for themselves served via Koios."
+      description: Get the list of addresses with quantity for each asset on the given policy <br><br>
+        `Note - Due to cardano's UTxO design and usage from projects, asset to addresses map can be infinite. Thus, for a small subset of active projects 
+        with millions of transactions, these might end up with timeouts (HTTP code 504) on free layer. Such large-scale projects are free to subscribe to 
+        query layers to have a dedicated cache table for themselves served via Koios.`
   /policy_asset_info: #RPC
     get:
       tags:
@@ -812,7 +856,7 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
-      summary: DEPRECATED
+      summary: Asset Policy Information [DEPRECATED]
       description: Get the information for all assets under the same policy (replaced by asset_addresses)
   /policy_asset_list: #RPC
     get:

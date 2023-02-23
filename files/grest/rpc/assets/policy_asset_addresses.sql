@@ -38,7 +38,7 @@ BEGIN
           LEFT JOIN tx_in ON txo.tx_id = tx_in.tx_out_id
             AND txo.index::smallint = tx_in.tx_out_index::smallint
         WHERE
-          tx_in.id IS NULL
+          tx_in.tx_out_id IS NULL
       ) x
     GROUP BY
       x.asset_name, x.address;

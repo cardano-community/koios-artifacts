@@ -95,6 +95,22 @@ schemas:
             type: string
             description: Total Reserves yet to be unlocked on chain
             example: 11771504387608670
+    param_updates:
+      type: array
+      items:
+        properties:
+          tx_hash:
+            $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+          block_height:
+            $ref: "#/components/schemas/blocks/items/properties/block_height"
+          block_time:
+            $ref: "#/components/schemas/blocks/items/properties/block_time"
+          epoch_no:
+            $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+          data:
+            type: string
+            description: JSON encoded data with details about the parameter update
+            example: {"decentralisation": 0.9}
     pool_list:
       type: array
       items:
@@ -354,7 +370,7 @@ schemas:
             type: integer
             description: Epoch number in which the delegation becomes active
             example: 324
-          latest_delegation_hash:
+          latest_delegation_tx_hash:
             type: string
             description: Latest transaction hash used for delegation by the account
             example: 368d08fe86804d637649341d3aec4a9baa7dffa6d00f16de2ba9dba814f1c948
@@ -931,6 +947,23 @@ schemas:
             type: string
             description: Total treasury MIR value of the account
             example: "0"
+    account_utxos:
+      type: array
+      items:
+        type: object
+        properties:
+          tx_hash:
+            $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/tx_hash"
+          tx_index:
+            $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/tx_index"
+          address:
+            $ref: "#/components/schemas/asset_addresses/items/properties/payment_address"
+          value:
+            $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/value"
+          block_height:
+            $ref: "#/components/schemas/blocks/items/properties/block_height"
+          block_time:
+            $ref: "#/components/schemas/blocks/items/properties/block_time"
     account_rewards:
       type: array
       items:
@@ -1349,14 +1382,6 @@ schemas:
                           $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_hash"
                         value:
                           $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_value"
-                output:
-                  type: object
-                  nullable: true
-                  properties:
-                    hash:
-                      $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_hash"
-                    value:
-                      $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_value"
     tx_utxos:
       type: array
       items:
@@ -1456,7 +1481,12 @@ schemas:
             description: Asset balance on the payment address
             example: 23
     asset_nft_address:
-      $ref: "#/components/schemas/asset_addresses/items/properties/payment_address"
+      type: array
+      description: An array of payment addresses holding the given token
+      items:
+        properties:
+          payment_address:
+            $ref: "#/components/schemas/asset_addresses/items/properties/payment_address"
     asset_summary:
       type: array
       items:

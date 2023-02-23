@@ -66,7 +66,7 @@ BEGIN
       multi_asset ma
       INNER JOIN grest.asset_info_cache aic ON aic.asset_id = ma.id
       INNER JOIN tx ON tx.id = aic.last_mint_tx_id
-      LEFT JOIN grest.asset_registry_cache arc ON DECODE(arc.asset_policy, 'hex') = ma.policy AND DECODE(arc.asset_name, 'hex') = ma.name
+      LEFT JOIN grest.asset_registry_cache arc ON arc.asset_policy = ENCODE(ma.policy,'hex') AND arc.asset_name = ENCODE(ma.name, 'hex')
       LEFT JOIN LATERAL (
         SELECT
           JSONB_OBJECT_AGG(

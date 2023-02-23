@@ -1,4 +1,4 @@
-CREATE FUNCTION grest.account_assets (_stake_addresses text[])
+CREATE OR REPLACE FUNCTION grest.account_assets (_stake_addresses text[])
   RETURNS TABLE (
     stake_address varchar,
     asset_list json
@@ -34,9 +34,9 @@ BEGIN
           AND TXO.INDEX::smallint = TX_IN.TX_OUT_INDEX::smallint
       WHERE
         sa.id = ANY(sa_id_list)
-        AND TX_IN.ID IS NULL
+        AND TX_IN.TX_OUT_ID IS NULL
       GROUP BY
-        sa.view, MA.policy, MA.name, MA.fingerprint
+        sa.view, MA.policy, MA.name, MA.fingerprint, aic.decimals
     )
 
   SELECT

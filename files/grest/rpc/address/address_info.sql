@@ -43,7 +43,7 @@ BEGIN
           AND tx_in.tx_out_index = tx_out.index
         INNER JOIN tx ON tx.id = tx_out.tx_id
       WHERE
-        tx_in.id IS NULL
+        tx_in.tx_out_id IS NULL
         AND
         tx_out.address = ANY(_addresses)
     )

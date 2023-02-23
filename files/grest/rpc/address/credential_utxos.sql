@@ -30,6 +30,6 @@ BEGIN
     WHERE
       payment_cred = any(_payment_cred_bytea)
       AND
-        tx_in.id IS NULL;
+        tx_in.tx_out_id IS NULL;
 END;
 $$;

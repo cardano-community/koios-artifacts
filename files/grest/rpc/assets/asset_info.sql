@@ -14,13 +14,63 @@ CREATE OR REPLACE FUNCTION grest.asset_info (_asset_policy text, _asset_name tex
   )
   LANGUAGE PLPGSQL
   AS $$
+DECLARE
+  _asset_id_list      bigint[];
 BEGIN
-  
+
+  -- find all asset id's based on nested array input
+  SELECT INTO _asset_id_list ARRAY_AGG(id)
+  FROM (
+    SELECT DISTINCT mu.id
+    FROM
+       multi_asset mu
+    WHERE
+      mu.policy = DECODE(_asset_policy, 'hex') AND mu.name = DECODE(_asset_name, 'hex')
+  ) AS tmp;
+
   RETURN QUERY
-    SELECT grest.asset_info_bulk(array[array[_asset_policy, _asset_name]]);
-      
+
+    SELECT
+      ENCODE(ma.policy, 'hex'),
+      ENCODE(ma.name, 'hex'),
+      ENCODE(ma.name, 'escape'),
+      ma.fingerprint,
+      ENCODE(tx.hash, 'hex'),
+      aic.total_supply::text,
+      aic.mint_cnt,
+      aic.burn_cnt,
+      EXTRACT(epoch from aic.creation_time)::integer,
+      metadata.minting_tx_metadata,
+      CASE WHEN arc.name IS NULL THEN NULL
+      ELSE
+        JSON_BUILD_OBJECT(
+          'name', arc.name,
+          'description', arc.description,
+          'ticker', arc.ticker,
+          'url', arc.url,
+          'logo', arc.logo,
+          'decimals', arc.decimals
+        )
+      END
+    FROM
+      multi_asset ma
+      INNER JOIN grest.asset_info_cache aic ON aic.asset_id = ma.id
+      INNER JOIN tx ON tx.id = aic.last_mint_tx_id
+      LEFT JOIN grest.asset_registry_cache arc ON arc.asset_policy = ENCODE(ma.policy,'hex') AND arc.asset_name = ENCODE(ma.name,'hex')
+      LEFT JOIN LATERAL (
+        SELECT
+          JSONB_OBJECT_AGG(
+            key::text,
+            json
+          ) AS minting_tx_metadata
+        FROM
+          tx_metadata tm
+        WHERE
+          tm.tx_id = tx.id
+      ) metadata ON TRUE
+    WHERE
+      ma.id = any (_asset_id_list);
+
 END;
 $$;
-
-COMMENT ON FUNCTION grest.asset_info IS 'Get the information of an asset incl first minting & token registry metadata';
 
