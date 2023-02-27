@@ -1,8 +1,8 @@
 CREATE OR REPLACE FUNCTION grest.credential_utxos (_payment_credentials text[])
   RETURNS TABLE (
     tx_hash text,
-    index smallint,
-    balance text
+    tx_index smallint,
+    value text
   )
   LANGUAGE PLPGSQL
   AS $$

@@ -389,6 +389,27 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Address Transactions
       description: Get the transaction hash list of input address array, optionally filtering after specified block height (inclusive)
+  /credential_utxos: #RPC
+    post:
+      tags:
+        - Address
+    requestBody:
+      $ref: "#/components/requestBodies/credential_utxos"
+    responses:
+        "200":
+          description: Array of UTxOs with balances
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/credential_utxos"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: UTxOs from payment credentials
+      description: Get a list of UTxO against input payment credential array including their balances
   /address_assets: #RPC
     post:
       tags:

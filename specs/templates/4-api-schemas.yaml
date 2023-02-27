@@ -898,6 +898,17 @@ schemas:
             $ref: "#/components/schemas/account_assets/items/properties/asset_list"
     credential_txs:
       $ref: "#/components/schemas/address_txs"
+    credential_utxos:
+      type: array
+      items:
+        type: object
+        properties:
+          tx_hash:
+            $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/tx_hash"
+          tx_index:
+            $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/tx_index"
+          value:
+            $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/value"
     account_list:
       type: array
       items:

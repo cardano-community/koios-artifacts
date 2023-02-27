@@ -148,6 +148,24 @@ requestBodies:
                 - ##credential_txs_payment_credentials1_rb##
                 - ##credential_txs_payment_credentials2_rb##
               _after_block_height: ##address_txs_after_block_height_rb##
+    credential_utxos:
+      content:
+        application/json:
+          schema:
+            required:
+              - _payment_credentials
+            type: object
+            properties:
+              _payment_credentials:
+                format: text
+                type: array
+                items:
+                  type: string
+                description: Array of Cardano payment credential(s) in hex format
+            example:
+              _payment_credentials:
+                - ##credential_txs_payment_credentials1_rb##
+                - ##credential_txs_payment_credentials2_rb##
     tx_ids:
       content:
         application/json:

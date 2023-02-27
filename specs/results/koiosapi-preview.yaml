@@ -584,6 +584,27 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Address Transactions
       description: Get the transaction hash list of input address array, optionally filtering after specified block height (inclusive)
+  /credential_utxos: #RPC
+    post:
+      tags:
+        - Address
+    requestBody:
+      $ref: "#/components/requestBodies/credential_utxos"
+    responses:
+        "200":
+          description: Array of UTxOs with balances
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/credential_utxos"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: UTxOs from payment credentials
+      description: Get a list of UTxO against input payment credential array including their balances
   /address_assets: #RPC
     post:
       tags:
@@ -1807,6 +1828,24 @@ components:
                 - 33c378cee41b2e15ac848f7f6f1d2f78155ab12d93b713de898d855f
                 - 52e63f22c5107ed776b70f7b92248b02552fd08f3e747bc745099441
               _after_block_height: 40356
+    credential_utxos:
+      content:
+        application/json:
+          schema:
+            required:
+              - _payment_credentials
+            type: object
+            properties:
+              _payment_credentials:
+                format: text
+                type: array
+                items:
+                  type: string
+                description: Array of Cardano payment credential(s) in hex format
+            example:
+              _payment_credentials:
+                - 33c378cee41b2e15ac848f7f6f1d2f78155ab12d93b713de898d855f
+                - 52e63f22c5107ed776b70f7b92248b02552fd08f3e747bc745099441
     tx_ids:
       content:
         application/json:
@@ -2805,6 +2844,17 @@ components:
             $ref: "#/components/schemas/account_assets/items/properties/asset_list"
     credential_txs:
       $ref: "#/components/schemas/address_txs"
+    credential_utxos:
+      type: array
+      items:
+        type: object
+        properties:
+          tx_hash:
+            $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/tx_hash"
+          tx_index:
+            $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/tx_index"
+          value:
+            $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/value"
     account_list:
       type: array
       items:
