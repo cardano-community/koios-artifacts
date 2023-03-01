@@ -1,10 +1,10 @@
-CREATE FUNCTION grest.address_info (_addresses text[])
+CREATE OR REPLACE FUNCTION grest.address_info (_addresses text[])
   RETURNS TABLE (
     address varchar,
     balance text,
     stake_address character varying,
     script_address boolean,
-    utxo_set json
+    utxo_set jsonb
   )
   LANGUAGE PLPGSQL
   AS $$
@@ -56,8 +56,8 @@ BEGIN
         CASE WHEN EXISTS (
           SELECT TRUE FROM _all_utxos aus WHERE aus.address = ka.address
         ) THEN
-          JSON_AGG(
-            JSON_BUILD_OBJECT(
+          JSONB_AGG(
+            JSONB_BUILD_OBJECT(
               'tx_hash', ENCODE(au.hash, 'hex'), 
               'tx_index', au.index,
               'block_height', block.block_no,
@@ -86,7 +86,7 @@ BEGIN
               'asset_list', COALESCE(
                 (
                   SELECT
-                    JSON_AGG(JSON_BUILD_OBJECT(
+                    JSONB_AGG(JSONB_BUILD_OBJECT(
                       'policy_id', ENCODE(MA.policy, 'hex'),
                       'asset_name', ENCODE(MA.name, 'hex'),
                       'fingerprint', MA.fingerprint,
@@ -100,12 +100,12 @@ BEGIN
                   WHERE
                       MTX.tx_out_id = au.txo_id
                 ),
-                JSON_BUILD_ARRAY()
+                JSONB_BUILD_ARRAY()
               )
             )
           )
         ELSE
-          '[]'::json
+          '[]'::jsonb
         END as utxo_set
       FROM
         _known_addresses ka

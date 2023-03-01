@@ -1,8 +1,8 @@
-CREATE FUNCTION grest.tx_utxos (_tx_hashes text[])
+CREATE OR REPLACE FUNCTION grest.tx_utxos (_tx_hashes text[])
   RETURNS TABLE (
     tx_hash text,
-    inputs json,
-    outputs json
+    inputs jsonb,
+    outputs jsonb
   )
   LANGUAGE PLPGSQL
   AS $$
@@ -53,7 +53,7 @@ BEGIN
           tx_out.value::text                  AS value,
           ( CASE WHEN MA.policy IS NULL THEN NULL
             ELSE
-              JSON_BUILD_OBJECT(
+              JSONB_BUILD_OBJECT(
                 'policy_id', ENCODE(MA.policy, 'hex'),
                 'asset_name', ENCODE(MA.name, 'hex'),
                 'fingerprint', MA.fingerprint,
@@ -86,7 +86,7 @@ BEGIN
           tx_out.value::text                  AS value,
           ( CASE WHEN MA.policy IS NULL THEN NULL
             ELSE
-              JSON_BUILD_OBJECT(
+              JSONB_BUILD_OBJECT(
                 'policy_id', ENCODE(MA.policy, 'hex'),
                 'asset_name', ENCODE(MA.name, 'hex'),
                 'fingerprint', MA.fingerprint,
@@ -109,11 +109,11 @@ BEGIN
     SELECT
       ENCODE(ATX.tx_hash, 'hex'),      
       COALESCE((
-        SELECT JSON_AGG(tx_inputs)
+        SELECT JSONB_AGG(tx_inputs)
         FROM (
           SELECT
-            JSON_BUILD_OBJECT(
-              'payment_addr', JSON_BUILD_OBJECT(
+            JSONB_BUILD_OBJECT(
+              'payment_addr', JSONB_BUILD_OBJECT(
                 'bech32', payment_addr_bech32,
                 'cred', payment_addr_cred
               ),
@@ -121,19 +121,19 @@ BEGIN
               'tx_hash', AI.tx_hash,
               'tx_index', tx_index,
               'value', value,
-              'asset_list', COALESCE(JSON_AGG(asset_list) FILTER (WHERE asset_list IS NOT NULL), JSON_BUILD_ARRAY())
+              'asset_list', COALESCE(JSONB_AGG(asset_list) FILTER (WHERE asset_list IS NOT NULL), JSONB_BUILD_ARRAY())
             ) AS tx_inputs
           FROM _all_inputs AI
           WHERE AI.tx_id = ATX.tx_id
           GROUP BY payment_addr_bech32, payment_addr_cred, stake_addr, AI.tx_hash, tx_index, value
         ) AS tmp
-      ), JSON_BUILD_ARRAY()),
+      ), JSONB_BUILD_ARRAY()),
       COALESCE((
-        SELECT JSON_AGG(tx_outputs)
+        SELECT JSONB_AGG(tx_outputs)
         FROM (
           SELECT
-            JSON_BUILD_OBJECT(
-              'payment_addr', JSON_BUILD_OBJECT(
+            JSONB_BUILD_OBJECT(
+              'payment_addr', JSONB_BUILD_OBJECT(
                 'bech32', payment_addr_bech32,
                 'cred', payment_addr_cred
               ),
@@ -141,13 +141,13 @@ BEGIN
               'tx_hash', AO.tx_hash,
               'tx_index', tx_index,
               'value', value,
-              'asset_list', COALESCE(JSON_AGG(asset_list) FILTER (WHERE asset_list IS NOT NULL), JSON_BUILD_ARRAY())
+              'asset_list', COALESCE(JSONB_AGG(asset_list) FILTER (WHERE asset_list IS NOT NULL), JSONB_BUILD_ARRAY())
             ) AS tx_outputs
           FROM _all_outputs AO
           WHERE AO.tx_id = ATX.tx_id
           GROUP BY payment_addr_bech32, payment_addr_cred, stake_addr, AO.tx_hash, tx_index, value
         ) AS tmp
-      ), JSON_BUILD_ARRAY())
+      ), JSONB_BUILD_ARRAY())
     FROM
       _all_tx ATX
     WHERE ATX.tx_hash = ANY (_tx_hashes_bytea)

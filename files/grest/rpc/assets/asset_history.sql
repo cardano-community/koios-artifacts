@@ -1,9 +1,9 @@
-CREATE FUNCTION grest.asset_history (_asset_policy text, _asset_name text default '')
+CREATE OR REPLACE FUNCTION grest.asset_history (_asset_policy text, _asset_name text default '')
   RETURNS TABLE (
     policy_id text,
     asset_name text,
     fingerprint character varying,
-    minting_txs json[]
+    minting_txs jsonb[]
   )
   LANGUAGE PLPGSQL
   AS $$
@@ -29,7 +29,7 @@ BEGIN
       _asset_name,
       minting_data.fingerprint,
       ARRAY_AGG(
-        JSON_BUILD_OBJECT(
+        JSONB_BUILD_OBJECT(
           'tx_hash', minting_data.tx_hash,
           'block_time', minting_data.block_time,
           'quantity', minting_data.quantity,
@@ -44,10 +44,10 @@ BEGIN
         ENCODE(tx.hash, 'hex') AS tx_hash,
         EXTRACT(epoch from b.time)::integer as block_time,
         mtm.quantity::text,
-        ( CASE WHEN TM.key IS NULL THEN JSON_BUILD_ARRAY()
+        ( CASE WHEN TM.key IS NULL THEN JSONB_BUILD_ARRAY()
           ELSE
-            JSON_AGG(
-              JSON_BUILD_OBJECT(
+            JSONB_AGG(
+              JSONB_BUILD_OBJECT(
                 'key', TM.key::text,
                 'json', TM.json
               )

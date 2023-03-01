@@ -1,7 +1,7 @@
 CREATE OR REPLACE FUNCTION grest.account_assets (_stake_addresses text[])
   RETURNS TABLE (
     stake_address varchar,
-    asset_list json
+    asset_list jsonb
   )
   LANGUAGE PLPGSQL
   AS $$
@@ -45,8 +45,8 @@ BEGIN
   FROM (
     SELECT
       aa.view,
-      JSON_AGG(
-        JSON_BUILD_OBJECT(
+      JSONB_AGG(
+        JSONB_BUILD_OBJECT(
           'policy_id', ENCODE(aa.policy, 'hex'),
           'asset_name', ENCODE(aa.name, 'hex'),
           'fingerprint', aa.fingerprint,

@@ -1,7 +1,7 @@
 CREATE FUNCTION grest.account_updates (_stake_addresses text[])
   RETURNS TABLE (
     stake_address varchar,
-    updates json
+    updates jsonb
   )
   LANGUAGE PLPGSQL
   AS $$
@@ -18,8 +18,8 @@ BEGIN
   RETURN QUERY
     SELECT
       SA.view as stake_address,
-      JSON_AGG(
-        JSON_BUILD_OBJECT(
+      JSONB_AGG(
+        JSONB_BUILD_OBJECT(
           'action_type', ACTIONS.action_type,
           'tx_hash', ENCODE(TX.HASH, 'hex'),
           'epoch_no', b.epoch_no,

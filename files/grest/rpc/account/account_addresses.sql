@@ -1,7 +1,7 @@
 CREATE OR REPLACE FUNCTION grest.account_addresses (_stake_addresses text[], _first_only boolean default false, _empty boolean default false)
   RETURNS TABLE (
     stake_address varchar,
-    addresses json
+    addresses jsonb
   )
   LANGUAGE PLPGSQL
   AS $$
@@ -38,7 +38,7 @@ BEGIN
       )
       SELECT
         sa.view as stake_address,
-        JSON_AGG(txo_addr.address) as addresses
+        JSONB_AGG(txo_addr.address) as addresses
       FROM
         txo_addr
         INNER JOIN STAKE_ADDRESS sa ON sa.id = txo_addr.stake_address_id
@@ -65,7 +65,7 @@ BEGIN
       )
       SELECT
         sa.view as stake_address,
-        JSON_AGG(txo_addr.address) as addresses
+        JSONB_AGG(txo_addr.address) as addresses
       FROM
         txo_addr
         INNER JOIN STAKE_ADDRESS sa ON sa.id = txo_addr.stake_address_id

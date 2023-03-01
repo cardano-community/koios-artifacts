@@ -1,7 +1,7 @@
 CREATE FUNCTION grest.account_history (_stake_addresses text[], _epoch_no integer DEFAULT NULL)
   RETURNS TABLE (
     stake_address varchar,
-    history json
+    history jsonb
   )
   LANGUAGE PLPGSQL
   AS $$
@@ -19,8 +19,8 @@ BEGIN
     RETURN QUERY
       SELECT
         sa.view as stake_address,
-        JSON_AGG(
-          JSON_BUILD_OBJECT(
+        JSONB_AGG(
+          JSONB_BUILD_OBJECT(
             'pool_id', ph.view,
             'epoch_no', es.epoch_no::bigint,
             'active_stake', es.amount::text
@@ -40,8 +40,8 @@ BEGIN
     RETURN QUERY
       SELECT
         sa.view as stake_address,
-        JSON_AGG(
-          JSON_BUILD_OBJECT(
+        JSONB_AGG(
+          JSONB_BUILD_OBJECT(
             'pool_id', ph.view,
             'epoch_no', es.epoch_no::bigint,
             'active_stake', es.amount::text
