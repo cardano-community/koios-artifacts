@@ -107,7 +107,7 @@ BEGIN
             WHERE po.pool_update_id = _update_id
         ),
         ARRAY(
-            SELECT json_build_object(
+            SELECT JSONB_BUILD_OBJECT(
                 'ipv4', pr.ipv4,
                 'ipv6', pr.ipv6,
                 'dns', pr.dns_name,
@@ -239,7 +239,7 @@ BEGIN
 
         UPDATE grest.pool_info_cache
         SET
-            relays = relays || jsonb_build_object (
+            relays = relays || JSONB_BUILD_OBJECT (
                                     'ipv4', NEW.ipv4,
                                     'ipv6', NEW.ipv6,
                                     'dns', NEW.dns_name,

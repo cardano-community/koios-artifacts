@@ -10,7 +10,7 @@ CREATE OR REPLACE FUNCTION grest.asset_info (_asset_policy text, _asset_name tex
     burn_cnt bigint,
     creation_time integer,
     minting_tx_metadata jsonb,
-    token_registry_metadata json
+    token_registry_metadata jsonb
   )
   LANGUAGE PLPGSQL
   AS $$
@@ -43,7 +43,7 @@ BEGIN
       metadata.minting_tx_metadata,
       CASE WHEN arc.name IS NULL THEN NULL
       ELSE
-        JSON_BUILD_OBJECT(
+        JSONB_BUILD_OBJECT(
           'name', arc.name,
           'description', arc.description,
           'ticker', arc.ticker,

@@ -1,7 +1,7 @@
 CREATE FUNCTION grest.script_redeemers (_script_hash text) 
   RETURNS TABLE (
     script_hash text,
-    redeemers json
+    redeemers jsonb
   ) 
 LANGUAGE PLPGSQL AS
 $$
@@ -10,8 +10,8 @@ BEGIN
 SELECT INTO _script_hash_bytea DECODE(_script_hash, 'hex');
 RETURN QUERY
 select _script_hash,
-    JSON_AGG(
-        JSON_BUILD_OBJECT(
+    JSONB_AGG(
+        JSONB_BUILD_OBJECT(
             'tx_hash',
             ENCODE(tx.hash, 'hex'),
             'tx_index',

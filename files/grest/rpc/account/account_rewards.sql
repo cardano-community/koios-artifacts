@@ -1,7 +1,7 @@
 CREATE FUNCTION grest.account_rewards (_stake_addresses text[], _epoch_no numeric DEFAULT NULL)
   RETURNS TABLE (
     stake_address varchar,
-    rewards json
+    rewards jsonb
   )
   LANGUAGE PLPGSQL
   AS $$
@@ -19,8 +19,8 @@ BEGIN
     RETURN QUERY
       SELECT
         sa.view,
-        JSON_AGG(
-          JSON_BUILD_OBJECT(
+        JSONB_AGG(
+          JSONB_BUILD_OBJECT(
           'earned_epoch', r.earned_epoch,
           'spendable_epoch', r.spendable_epoch,
           'amount', r.amount::text,
@@ -40,8 +40,8 @@ BEGIN
     RETURN QUERY
       SELECT
         sa.view,
-        JSON_AGG(
-          JSON_BUILD_OBJECT(
+        JSONB_AGG(
+          JSONB_BUILD_OBJECT(
             'earned_epoch', r.earned_epoch,
             'spendable_epoch', r.spendable_epoch,
             'amount', r.amount::text,

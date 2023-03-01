@@ -1,7 +1,7 @@
 CREATE FUNCTION grest.address_assets (_addresses text[])
   RETURNS TABLE (
     address varchar,
-    asset_list json
+    asset_list jsonb
   )
   LANGUAGE PLPGSQL
   AS $$
@@ -36,8 +36,8 @@ BEGIN
   FROM (
     SELECT
       aa.address,
-      JSON_AGG(
-        JSON_BUILD_OBJECT(
+      JSONB_AGG(
+        JSONB_BUILD_OBJECT(
           'policy_id', ENCODE(aa.policy, 'hex'),
           'asset_name', ENCODE(aa.name, 'hex'),
           'fingerprint', aa.fingerprint,
