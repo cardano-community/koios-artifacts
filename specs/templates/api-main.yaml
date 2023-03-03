@@ -393,9 +393,9 @@ paths:
     post:
       tags:
         - Address
-    requestBody:
-      $ref: "#/components/requestBodies/credential_utxos"
-    responses:
+      requestBody:
+        $ref: "#/components/requestBodies/credential_utxos"
+      responses:
         "200":
           description: Array of UTxOs with balances
           content:
