@@ -43,7 +43,7 @@ BEGIN
         retiring_epoch
     FROM
         grest.pool_info_cache pic
-        LEFT JOIN public.pool_offline_data pod ON pod.id = pic.meta_id 
+        LEFT JOIN public.pool_offline_data pod ON pod.pmr_id = pic.meta_id
     WHERE
         _pool_bech32 IS NULL
         OR

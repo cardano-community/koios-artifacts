@@ -728,7 +728,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Account Information (Cached)
-      description: Get the cached account information for given stake addresses
+      description: Get the cached account information for given stake addresses, effective for registered accounts
   /account_rewards: #RPC
     post:
       tags:

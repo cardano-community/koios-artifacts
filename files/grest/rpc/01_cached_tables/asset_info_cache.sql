@@ -145,7 +145,7 @@ BEGIN
       INNER JOIN tx ON tx.id = mtm.tx_id
       INNER JOIN block b ON b.id = tx.block_id
       INNER JOIN tx_meta tm ON tm.ident = ma.id
-      LEFT JOIN grest.asset_registry_cache arc ON DECODE(arc.asset_policy, 'hex') = ma.policy AND DECODE(arc.asset_name, 'hex') = ma.name
+      LEFT JOIN grest.asset_registry_cache arc ON arc.asset_policy = ENCODE(ma.policy,'hex') AND arc.asset_name = encode(ma.name,'hex')
     WHERE
       CASE WHEN _asset_info_cache_last_tx_id IS NOT NULL AND _asset_id_list IS NOT NULL
         THEN
