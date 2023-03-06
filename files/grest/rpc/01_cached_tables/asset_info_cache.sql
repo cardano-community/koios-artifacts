@@ -94,7 +94,7 @@ BEGIN
       WHERE
         CASE WHEN _asset_info_cache_last_tx_id IS NOT NULL AND _asset_id_list IS NOT NULL
           THEN
-            mtm.id = any(_asset_id_list)
+            mtm.ident = any(_asset_id_list)
             AND mtm.tx_id > _asset_info_cache_last_tx_id
           ELSE TRUE
         END
@@ -145,11 +145,11 @@ BEGIN
       INNER JOIN tx ON tx.id = mtm.tx_id
       INNER JOIN block b ON b.id = tx.block_id
       INNER JOIN tx_meta tm ON tm.ident = ma.id
-      LEFT JOIN grest.asset_registry_cache arc ON DECODE(arc.asset_policy, 'hex') = ma.policy AND DECODE(arc.asset_name, 'hex') = ma.name
+      LEFT JOIN grest.asset_registry_cache arc ON arc.asset_policy = ENCODE(ma.policy,'hex') AND arc.asset_name = encode(ma.name,'hex')
     WHERE
       CASE WHEN _asset_info_cache_last_tx_id IS NOT NULL AND _asset_id_list IS NOT NULL
         THEN
-          mtm.id = any(_asset_id_list)
+          mtm.ident = any(_asset_id_list)
         ELSE TRUE
       END
     GROUP BY ma.id, arc.decimals, tm.first_mint_tx_id, tm.first_mint_keys, tm.last_mint_tx_id, tm.last_mint_keys
