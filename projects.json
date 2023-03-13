@@ -80,8 +80,8 @@
       "text": "Dandelion",
       "link": "https://dandelion.link",
       "logo": {
-        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/Koios-logo-dummy.png",
-        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/Koios-logo-dummy.png"
+        "dark": "https://raw.githubusercontent.com/repsistance/dandelion/master/src/img/dandelion-logo-white-no-bg-300x300.png",
+        "light": "https://raw.githubusercontent.com/repsistance/dandelion/master/src/img/dandelion-logo-black-no-bg-300x300.png"
       }
     },
     {
