@@ -8,7 +8,8 @@
       { "name": "docker", "addr": "92.204.53.48", "port": 8053},
       { "name": "rdlrt2", "addr": "194.36.145.157", "port": 8053},
       { "name": "HuthS0lo1-ssl", "addr": "koios-mainnet.themorphium.io", "port": 8453, "ssl": "true"},
-      { "name": "reqlez", "addr": "192.234.196.168", "port": 8053}
+      { "name": "reqlez", "addr": "192.234.196.168", "port": 8053},
+      { "name": "DCOne Crypto", "addr": "161.97.167.41", "port": 8053}
   ],
   "Consumers": []
 }
