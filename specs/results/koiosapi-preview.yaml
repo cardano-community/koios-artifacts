@@ -1584,7 +1584,7 @@ components:
       description: Asset Name in hexadecimal format (hex), empty asset name returns royalties
       schema:
         type: string
-        example: 433374
+        example: "433374"
       in: query
       required: false
       allowEmptyValue: true
@@ -1758,7 +1758,7 @@ components:
                 description: Only fetch information for a specific epoch
             example:
               _stake_addresses:
-                - stake_test1upv7n2x0lxepkyx8ux2gjt74ecaa39tjgaccxl6hw5fwzngpzf5zt
+                - stake_test1urqntq4wexjylnrdnp97qq79qkxxvrsa9lcnwr7ckjd6w0cr04y4p
                 - stake_test1up6wqzrw2h9vvjy5zfkjn0dwtymy5r29zyhf8fyhm6fat9c2am5hl
               _epoch_no: 11
     stake_addresses_with_first_only_and_empty:
@@ -1785,7 +1785,7 @@ components:
                 description: Include zero quantity entries
             example:
               _stake_addresses:
-                - stake_test1upv7n2x0lxepkyx8ux2gjt74ecaa39tjgaccxl6hw5fwzngpzf5zt
+                - stake_test1urqntq4wexjylnrdnp97qq79qkxxvrsa9lcnwr7ckjd6w0cr04y4p
                 - stake_test1up6wqzrw2h9vvjy5zfkjn0dwtymy5r29zyhf8fyhm6fat9c2am5hl
     stake_addresses:
       content:
@@ -1803,7 +1803,7 @@ components:
                 description: Array of Cardano stake address(es) in bech32 format
             example:
               _stake_addresses:
-                - stake_test1upv7n2x0lxepkyx8ux2gjt74ecaa39tjgaccxl6hw5fwzngpzf5zt
+                - stake_test1urqntq4wexjylnrdnp97qq79qkxxvrsa9lcnwr7ckjd6w0cr04y4p
                 - stake_test1up6wqzrw2h9vvjy5zfkjn0dwtymy5r29zyhf8fyhm6fat9c2am5hl
     credential_txs:
       content:
@@ -3294,6 +3294,7 @@ components:
                   type: string
                   description: Plutus script address
                   example: addr1w999n67e86jn6xal07pzxtrmqynspgx0fwmcmpua4wc6yzsxpljz3
+                  nullable: true
                 script_hash:
                   $ref: "#/components/schemas/plutus_script_list/items/properties/script_hash"
                 bytecode:

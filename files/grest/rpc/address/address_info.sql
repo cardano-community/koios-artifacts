@@ -90,13 +90,13 @@ BEGIN
                       'policy_id', ENCODE(MA.policy, 'hex'),
                       'asset_name', ENCODE(MA.name, 'hex'),
                       'fingerprint', MA.fingerprint,
-                      'decimals', aic.decimals,
+                      'decimals', COALESCE(aic.decimals, 0),
                       'quantity', MTX.quantity::text
                       ))
                   FROM
                       ma_tx_out MTX
                       INNER JOIN multi_asset MA ON MA.id = MTX.ident
-                      INNER JOIN grest.asset_info_cache aic ON aic.asset_id = MA.id
+                      LEFT JOIN grest.asset_info_cache aic ON aic.asset_id = MA.id
                   WHERE
                       MTX.tx_out_id = au.txo_id
                 ),

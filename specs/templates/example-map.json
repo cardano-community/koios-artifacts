@@ -70,13 +70,13 @@
       "m": "pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc",
       "g": "pool1xc9eywck4e20tydz4yvh5vfe0ep8whawvwz8wqkc9k046a2ypp4",
       "pv": "pool1leml52hm4fcp3hhe4zye08qz27llhj7d339p3gs0tl85cstx59q",
-      "pp": "pool1tc3suyyxh9796rd92744mne82chxpmfc6mu7qgqzlx56sjfwvvl"
+      "pp": "pool1x4p3cwemsm356vpxnjwuud7w76jz64hyss729zp7xa6wuey6yr9"
     },
     "_pool_bech32_optional": {
       "m": "pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc",
       "g": "pool1xc9eywck4e20tydz4yvh5vfe0ep8whawvwz8wqkc9k046a2ypp4",
       "pv": "pool1leml52hm4fcp3hhe4zye08qz27llhj7d339p3gs0tl85cstx59q",
-      "pp": "pool1tc3suyyxh9796rd92744mne82chxpmfc6mu7qgqzlx56sjfwvvl"
+      "pp": "pool1x4p3cwemsm356vpxnjwuud7w76jz64hyss729zp7xa6wuey6yr9"
     },
     "_script_hash": {
       "m": "d8480dc869b94b80e81ec91b0abe307279311fe0e7001a9488f61ff8",
@@ -107,7 +107,7 @@
     "stake_addresses1": {
       "m": "stake1uyrx65wjqjgeeksd8hptmcgl5jfyrqkfq0xe8xlp367kphsckq250",
       "g": "stake_test17zt9x005zkd2usz2vhvktyzqsuwz25gmgnaqdka5hcj9m2qfg2py2",
-      "pv": "stake_test1upv7n2x0lxepkyx8ux2gjt74ecaa39tjgaccxl6hw5fwzngpzf5zt",
+      "pv": "stake_test1urqntq4wexjylnrdnp97qq79qkxxvrsa9lcnwr7ckjd6w0cr04y4p",
       "pp": "stake_test1urq4rcynzj4uxqc74c852zky7wa6epgmn9r6k3j3gv7502q8jks0l"
     },
     "stake_addresses2": {
