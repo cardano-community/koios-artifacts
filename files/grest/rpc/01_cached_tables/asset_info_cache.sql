@@ -42,7 +42,7 @@ BEGIN
     public.tx;
 
   SELECT
-    COALESCE(last_value::bigint,100) - 100 INTO _asset_info_cache_last_tx_id
+    COALESCE(last_value::bigint,1000) - 1000 INTO _asset_info_cache_last_tx_id
   FROM
     grest.control_table
   WHERE
