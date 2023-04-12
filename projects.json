@@ -37,11 +37,11 @@
   ],
   "Community Projects/Tools": [
     {
-      "text": "ADABox",
-      "link": "https://explorer.adabox.io/pools",
+      "text": "adabox.io",
+      "link": "https://adabox.io",
       "logo": {
-        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/Koios-logo-dummy.webp",
-        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/Koios-logo-dummy.webp"
+        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/adabox-logo.webp",
+        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/adabox-logo.webp"
       }
     },
     {
@@ -104,8 +104,8 @@
       "text": "MusicBox",
       "link": "https://musicboxnft.com",
       "logo": {
-        "dark": "https://raw.githubusercontent.com/adabox-aio/musicbox-website/main/src/main/resources/static/favicon/android-icon-192x192.png",
-        "light": "https://raw.githubusercontent.com/adabox-aio/musicbox-website/main/src/main/resources/static/favicon/android-icon-192x192.png"
+        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/musicbox-logo.png",
+        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/musicbox-logo.png"
       }
     },
     {
