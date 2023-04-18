@@ -112,7 +112,7 @@ info:
 
     ```
 
-    There is also another method to achieve the above, instead of adding parameters to the URL itself, you can specify a `Range` header as below to achieve something similar:<br><br>
+    For GET endpoints, there is also another method to achieve the above, instead of adding parameters to the URL itself, you can specify a `Range` header as below to achieve something similar:<br><br>
 
     ``` bash
     curl -s "https://api.koios.rest/api/v0/blocks?select=block_height" -H "Range: 1000-1499" -I | grep -i content-range
@@ -3494,6 +3494,7 @@ components:
             example: cb07b7e51b77079776c4a78f2daf8f14f9945d2b047da7bfcb71d7fbb9f86712
           total_supply:
             type: string
+            description: Total supply for the asset
             example: "35000"
           mint_cnt:
             type: integer
@@ -3591,6 +3592,8 @@ components:
             $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
           minting_tx_hash:
             $ref: "#/components/schemas/asset_info/items/properties/minting_tx_hash"
+          total_supply:
+            $ref: "#/components/schemas/asset_info/items/properties/total_supply"
           mint_cnt:
             $ref: "#/components/schemas/asset_info/items/properties/mint_cnt"
           burn_cnt:

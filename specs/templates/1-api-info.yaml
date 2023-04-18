@@ -111,7 +111,7 @@ info:
 
     ```
 
-    There is also another method to achieve the above, instead of adding parameters to the URL itself, you can specify a `Range` header as below to achieve something similar:<br><br>
+    For GET endpoints, there is also another method to achieve the above, instead of adding parameters to the URL itself, you can specify a `Range` header as below to achieve something similar:<br><br>
 
     ``` bash
     curl -s "https://api.koios.rest/api/v0/blocks?select=block_height" -H "Range: 1000-1499" -I | grep -i content-range
