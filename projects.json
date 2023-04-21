@@ -48,24 +48,24 @@
       "text": "Building On Cardano",
       "link": "https://buildingoncardano.com",
       "logo": {
-        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/Koios-logo-dummy.webp",
-        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/Koios-logo-dummy.webp"
+        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/buildin_on_cardano_dark.webp",
+        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/buildin_on_cardano.webp"
       }
     },
     {
       "text": "CardaStat",
       "link": "https://cardastat.info",
       "logo": {
-        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/Koios-logo-dummy.webp",
-        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/Koios-logo-dummy.webp"
+        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/cardastat_dark.webp",
+        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/cardastat_light.webp"
       }
     },
     {
       "text": "CNFT.IO",
       "link": "https://CNFT.IO",
       "logo": {
-        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/Koios-logo-dummy.webp",
-        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/Koios-logo-dummy.webp"
+        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/cnft_dark.webp",
+        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/cnft_light.webp"
       }
     },
     {
@@ -112,8 +112,8 @@
       "text": "Poolpeek",
       "link": "https://poolpeek.com",
       "logo": {
-        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/Koios-logo-dummy.webp",
-        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/Koios-logo-dummy.webp"
+        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/poolpeek.webp",
+        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/poolpeek.webp"
       }
     },
     {
