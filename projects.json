@@ -72,8 +72,8 @@
       "text": "CNTools/gLiveview",
       "link": "https://cardano-community.github.io/guild-operators/Scripts/cntools/",
       "logo": {
-         "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/poolpeek.webp",
-         "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/poolpeek.webp"
+         "dark": "https://github.com/cardano-community/guild-operators/raw/alpha/guild.png",
+         "light": "https://github.com/cardano-community/guild-operators/raw/alpha/guild.png"
       }
     },
     {
