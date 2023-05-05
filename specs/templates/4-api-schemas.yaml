@@ -1401,9 +1401,42 @@ schemas:
           tx_hash:
             $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
           inputs:
-            $ref: "#/components/schemas/tx_info/items/properties/inputs"
+            type: array
+            description: An array of UTxO inputs used by the transaction
+            items:
+              type: object
+              properties:
+                payment_addr:
+                  type: object
+                  properties:
+                    bech32:
+                      type: string
+                      description: A Cardano payment/base address (bech32 encoded) where funds were sent or change to be returned
+                      example: addr1q80rc8zj06yzdwwdyqc03rm4l3zv6n89rxuaak0t099n09yssntpwjcz303mx3h4avg7p29l3zd8u3jyglmewds9ezrqad9mkw
+                    cred:
+                      type: string
+                      description: Payment credential
+                      example: de3c1c527e8826b9cd2030f88f75fc44cd4ce519b9ded9eb794b3794
+                stake_addr:
+                  nullable: true
+                  allOf:
+                  - $ref: "#/components/schemas/account_history/items/properties/stake_address"
+                tx_hash:
+                  type: string
+                  description: Hash of transaction for UTxO
+                  example: f144a8264acf4bdfe2e1241170969c930d64ab6b0996a4a45237b623f1dd670e
+                tx_index:
+                  type: integer
+                  description: Index of UTxO in the transaction 
+                  example: 0
+                value:
+                  type: string
+                  description: Total sum of ADA on the UTxO
+                  example: 157832856
           outputs:
-            $ref: "#/components/schemas/tx_info/items/properties/outputs"
+            description: An array of UTxO outputs created by the transaction
+            allOf:
+              - $ref: "#/components/schemas/tx_utxos/items/properties/inputs"
     tx_metadata:
       type: array
       nullable: true
