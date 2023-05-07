@@ -33,6 +33,10 @@
     {
       "text": "Python Library - Apex",
       "link": "https://github.com/cardano-apexpool/koios-api-python"
+    },
+    {
+      "text": "Koios TypeScript Library",
+      "link": "https://github.com/adabox-aio/koios-typescript-client"
     }
   ],
   "Community Projects/Tools": [
