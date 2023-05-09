@@ -85,7 +85,7 @@ BEGIN
           WHERE NOT EXISTS (
             SELECT TRUE FROM STAKE_REGISTRATION SR
               WHERE SR.ADDR_ID = SD.ADDR_ID
-                AND SR.TX_ID > SD.TX_ID
+                AND SR.TX_ID >= SD.TX_ID
           )
       );
 END;
