@@ -24,7 +24,7 @@
     },
     {
       "text": "JavaScript Client",
-      "link": "https://meshjs.dev/providers/koios"
+      "link": "https://github.com/MeshJS/mesh"
     },
     {
       "text": "Python Library - Quixote",
@@ -35,7 +35,7 @@
       "link": "https://github.com/cardano-apexpool/koios-api-python"
     },
     {
-      "text": "Koios TypeScript Library",
+      "text": "TypeScript Library",
       "link": "https://github.com/adabox-aio/koios-typescript-client"
     }
   ],
