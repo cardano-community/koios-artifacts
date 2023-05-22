@@ -66,7 +66,7 @@ CREATE FUNCTION grest.active_stake_cache_update (_epoch_no integer)
   AS
 $$
   DECLARE
-  _last_active_stake_cache_epoch_no integer;
+  _last_active_stake_validated_epoch integer;
   _last_account_active_stake_cache_epoch_no integer;
   BEGIN
 
@@ -94,7 +94,7 @@ $$
     SELECT
       COALESCE(last_value::integer, 0)
     INTO
-      _last_active_stake_cache_epoch_no
+      _last_active_stake_validated_epoch
     FROM
       GREST.CONTROL_TABLE
     WHERE key = 'last_active_stake_validated_epoch';
@@ -109,7 +109,7 @@ $$
         PUBLIC.EPOCH_STAKE
         INNER JOIN PUBLIC.POOL_HASH ON POOL_HASH.ID = EPOCH_STAKE.POOL_ID
       WHERE
-        EPOCH_STAKE.EPOCH_NO >= _last_active_stake_cache_epoch_no
+        EPOCH_STAKE.EPOCH_NO >= _last_active_stake_validated_epoch
           AND
         EPOCH_STAKE.EPOCH_NO <= _epoch_no
       GROUP BY
@@ -130,7 +130,7 @@ $$
       FROM
         PUBLIC.EPOCH_STAKE
       WHERE
-        EPOCH_STAKE.EPOCH_NO >= _last_active_stake_cache_epoch_no
+        EPOCH_STAKE.EPOCH_NO >= _last_active_stake_validated_epoch
           AND
         EPOCH_STAKE.EPOCH_NO <= _epoch_no
       GROUP BY
