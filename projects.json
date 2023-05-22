@@ -1,11 +1,11 @@
 {
   "CLI": [
     {
-      "text": "Koios CLI in GoLang",
+      "text": "GoLang CLI",
       "link": "https://github.com/cardano-community/koios-cli"
     },
     {
-      "text": "CardanoSharp CSCLI",
+      "text": "CSharp CSCLI",
       "link": "https://github.com/CardanoSharp/cscli"
     }
   ],
@@ -27,11 +27,11 @@
       "link": "https://github.com/MeshJS/mesh"
     },
     {
-      "text": "Python Library - Quixote",
+      "text": "Python Library",
       "link": "https://github.com/cardano-community/koios-python"
     },
     {
-      "text": "Python Library - Apex",
+      "text": "Python Library 2",
       "link": "https://github.com/cardano-apexpool/koios-api-python"
     },
     {
