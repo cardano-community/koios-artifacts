@@ -1,6 +1,12 @@
 #!/bin/bash
 DB_NAME=cexplorer
 
+tip=$(psql ${DB_NAME} -qbt -c "select time from block order by id desc limit 1;")
+
+if [[ $(( $(date +%s) - $(TZ=UTC date --date="${tip}" +%s) )) -gt 300 ]]; then
+  echo "$(date +%F_%H:%M:%S) Skipping as database has not received a new block in past 300 seconds!" && exit 1
+fi
+
 echo "$(date +%F_%H:%M:%S) Running active stake cache update..."
 
 # High level check in db to see if update needed at all (should be updated only once on epoch transition)
@@ -33,5 +39,5 @@ db_epoch_stakes_count=$(psql ${DB_NAME} -qbt -c "SELECT COUNT(1) FROM EPOCH_STAK
   exit 0
 
 # Stakes have been validated, run the cache update
-psql ${DB_NAME} -qbt -c "SELECT GREST.active_stake_cache_update(${db_last_epoch_no});" 2>&1 1>/dev/null
+psql ${DB_NAME} -qbt -c "SELECT GREST.active_stake_cache_update(${db_last_epoch_no});" 1>/dev/null 2>&1
 echo "$(date +%F_%H:%M:%S) Job done!"
