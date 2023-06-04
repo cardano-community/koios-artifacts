@@ -1,4 +1,4 @@
-CREATE FUNCTION grest.address_txs (_addresses text[], _after_block_height integer DEFAULT 0)
+CREATE OR REPLACE FUNCTION grest.address_txs (_addresses text[], _after_block_height integer DEFAULT 0)
   RETURNS TABLE (
     tx_hash text,
     epoch_no word31type,
@@ -8,8 +8,14 @@ CREATE FUNCTION grest.address_txs (_addresses text[], _after_block_height intege
   LANGUAGE PLPGSQL
   AS $$
 DECLARE
+  _tx_id_min bigint;
   _tx_id_list bigint[];
 BEGIN
+  SELECT INTO _tx_id_min id
+    FROM tx
+    WHERE block_id >= (SELECT id FROM block WHERE block_no = _after_block_height)
+    ORDER BY id limit 1;
+
   -- all tx_out & tx_in tx ids
   SELECT INTO _tx_id_list ARRAY_AGG(tx_id)
   FROM (
@@ -19,6 +25,7 @@ BEGIN
       tx_out
     WHERE
       address = ANY (_addresses)
+      AND tx_id >= _tx_id_min
     --
     UNION
     --
@@ -31,6 +38,7 @@ BEGIN
     WHERE
       tx_in.tx_in_id IS NOT NULL
       AND tx_out.address = ANY (_addresses)
+      AND tx_in.tx_in_id >= _tx_id_min
   ) AS tmp;
 
   RETURN QUERY
