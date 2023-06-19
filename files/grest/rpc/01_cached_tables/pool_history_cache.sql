@@ -12,13 +12,14 @@ CREATE TABLE grest.pool_history_cache (
   pool_fee_fixed lovelace NULL,
   pool_fees float8 NULL,
   deleg_rewards float8 NULL,
+  member_rewards float8 NULL,
   epoch_ros numeric NULL,
   PRIMARY KEY (pool_id, epoch_no)
 );
 
 COMMENT ON TABLE grest.pool_history_cache IS 'A history of pool performance including blocks, delegators, active stake, fees and rewards';
 
-create function grest.pool_history_cache_update (_epoch_no_to_insert_from bigint default NULL)
+CREATE OR REPLACE grest.pool_history_cache_update (_epoch_no_to_insert_from bigint default NULL)
   returns void
   language plpgsql
   as $$
@@ -224,6 +225,17 @@ begin
                               end
                             end
                           end deleg_rewards,
+                          case COALESCE(b.block_cnt, 0)
+                          when 0 then
+                            0
+                          else
+                            case COALESCE(m.memtotal, 0)
+                            when 0 then
+                              null
+                            else
+                              COALESCE(m.memtotal, 0)
+                            end
+                          end member_rewards,
                           case COALESCE(b.block_cnt, 0)
                           when 0 then
                             0

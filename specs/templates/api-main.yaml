@@ -254,7 +254,7 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
-      summary: Transaction UTxOs
+      summary: Transaction UTxOs [DEPRECATED]
       description: Get UTxO set (inputs/outputs) of transactions.
   /tx_metadata: #RPC
     post:
