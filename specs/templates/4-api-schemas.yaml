@@ -171,6 +171,10 @@ schemas:
             type: string
             description: Total amount of rewards earned by delegators in that epoch (in lovelaces)
             example: "123456789123"
+          member_rewards:
+            type: string
+            description: Total amount of rewards earned by members (delegator - owner) in that epoch (in lovelaces)
+            example: "123456780123"
           epoch_ros:
             type: number
             description: Annualized ROS (return on staking) for delegators for this epoch
