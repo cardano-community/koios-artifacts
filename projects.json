@@ -37,6 +37,10 @@
     {
       "text": "TypeScript Library",
       "link": "https://github.com/adabox-aio/koios-typescript-client"
+    },
+    {
+      "text": "TypeScript Client (Tiny)",
+      "link": "https://github.com/ray-network/koios-tiny-client"
     }
   ],
   "Community Projects/Tools": [
@@ -44,8 +48,8 @@
       "text": "adabox.io",
       "link": "https://adabox.io",
       "logo": {
-        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/adabox-logo.webp",
-        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/adabox-logo.webp"
+        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/adabox-logo.webp",
+        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/adabox-logo.webp"
       }
     },
     {
@@ -62,14 +66,6 @@
       "logo": {
         "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/cardastat_dark.webp",
         "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/cardastat_light.webp"
-      }
-    },
-    {
-      "text": "CNFT.IO",
-      "link": "https://CNFT.IO",
-      "logo": {
-        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/cnft_dark.webp",
-        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/cnft_light.webp"
       }
     },
     {
@@ -108,8 +104,8 @@
       "text": "MusicBox",
       "link": "https://musicboxnft.com",
       "logo": {
-        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/musicbox-logo.png",
-        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/musicbox-logo.png"
+        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/musicbox-logo.png",
+        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/musicbox-logo.png"
       }
     },
     {
