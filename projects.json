@@ -69,8 +69,24 @@
       }
     },
     {
-      "text": "CNTools/gLiveview",
-      "link": "https://cardano-community.github.io/guild-operators/Scripts/cntools/",
+      "text": "Cardano Foundation",
+      "link": "https://cardanofoundation.org/https://cardanofoundation.org/",
+      "logo": {
+        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/cf_dark.svg",
+        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/cf_light.svg"
+      }
+    },
+    {
+      "text": "DCOne Crypto",
+      "link": "https://dconecrypto.finance",
+      "logo": {
+        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/DCOneCrypto.png",
+        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/DCOneCrypto.png"
+      }
+    },
+    {
+      "text": "Guild Operators",
+      "link": "https://cardano-community.github.io/guild-operators/",
       "logo": {
         "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/guild.webp",
         "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/guild.webp"
@@ -109,19 +125,19 @@
       }
     },
     {
+      "text": "NMKR",
+      "link": "https://nmkr.io",
+      "logo": {
+        "dark": "https://raw.githubusercontent.com/PatrickTobler/koios-artifacts/main/images/projects/nmkr_logo.png",
+        "light": "https://raw.githubusercontent.com/PatrickTobler/koios-artifacts/main/images/projects/nmkr_logo.png"
+      }
+    },
+    {
       "text": "Poolpeek",
       "link": "https://poolpeek.com",
       "logo": {
         "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/poolpeek.webp",
         "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/poolpeek.webp"
-      }
-    },
-    {
-      "text": "TosiDrop",
-      "link": "https://tosidrop.io",
-      "logo": {
-        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/umbrella_blue.png",
-        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/umbrella_blue.png"
       }
     },
     {
@@ -133,27 +149,27 @@
       }
     },
     {
+      "text": "Ray Network",
+      "link": "https://raynetwork.io",
+      "logo": {
+        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/raywallet.png",
+        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/raywallet.png"
+      }
+    },
+    {
+      "text": "TosiDrop",
+      "link": "https://tosidrop.io",
+      "logo": {
+        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/umbrella_blue.png",
+        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/umbrella_blue.png"
+      }
+    },
+    {
       "text": "VESPR",
       "link": "https://vespr.xyz",
       "logo": {
         "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/vespr_dark_mode.webp",
         "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/vespr_light_mode.webp"
-      }
-    },
-    {
-      "text": "NMKR",
-      "link": "https://nmkr.io",
-      "logo": {
-        "dark": "https://raw.githubusercontent.com/PatrickTobler/koios-artifacts/main/images/projects/nmkr_logo.png",
-        "light": "https://raw.githubusercontent.com/PatrickTobler/koios-artifacts/main/images/projects/nmkr_logo.png"
-      }
-    },
-    {
-      "text": "DCOne Crypto",
-      "link": "https://dconecrypto.finance",
-      "logo": {
-        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/DCOneCrypto.png",
-        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/DCOneCrypto.png"
       }
     }
   ]
