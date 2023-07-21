@@ -47,6 +47,9 @@ cat << EOF > .assetregistry.sql
 CREATE TEMP TABLE tmparc (like grest.asset_registry_cache);
 \COPY tmparc FROM '.assetregistry.csv' DELIMITER ',' CSV;
 INSERT INTO grest.asset_registry_cache SELECT DISTINCT ON (asset_policy,asset_name) * FROM tmparc ON CONFLICT(asset_policy,asset_name) DO UPDATE SET asset_policy=excluded.asset_policy, asset_name=excluded.asset_name, name=excluded.name, description=excluded.description, ticker=excluded.ticker, url=excluded.url, logo=excluded.logo,decimals=excluded.decimals;
+UPDATE grest.asset_info_cache SET decimals=x.decimals FROM
+  (SELECT ma.id, t.decimals FROM tmparc t LEFT JOIN multi_asset ma ON decode(t.asset_name,'hex')=ma.name AND decode(t.asset_policy,'hex')=ma.policy WHERE t.decimals != 0) as x
+  WHERE asset_id = x.id;
 EOF
 
 psql ${DB_NAME} -qb -f .assetregistry.sql >/dev/null && rm -f .assetregistry.sql

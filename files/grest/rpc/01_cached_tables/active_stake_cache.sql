@@ -66,8 +66,7 @@ CREATE FUNCTION grest.active_stake_cache_update (_epoch_no integer)
   AS
 $$
   DECLARE
-  _last_pool_active_stake_cache_epoch_no integer;
-  _last_epoch_active_stake_cache_epoch_no integer;
+  _last_active_stake_validated_epoch integer;
   _last_account_active_stake_cache_epoch_no integer;
   BEGIN
 
@@ -91,14 +90,16 @@ $$
         'Previous query still running but should have completed! Exiting...';
     END IF;
     
-    /* POOL ACTIVE STAKE CACHE */
+    /* GET PREVIOUS RUN's EPOCH_NO */
     SELECT
-      COALESCE(MAX(epoch_no), 0)
+      COALESCE(last_value::integer, 0)
     INTO
-      _last_pool_active_stake_cache_epoch_no
+      _last_active_stake_validated_epoch
     FROM
-      GREST.POOL_ACTIVE_STAKE_CACHE;
+      GREST.CONTROL_TABLE
+    WHERE key = 'last_active_stake_validated_epoch';
 
+    /* POOL ACTIVE STAKE CACHE */
     INSERT INTO GREST.POOL_ACTIVE_STAKE_CACHE
       SELECT
         POOL_HASH.VIEW AS POOL_ID,
@@ -108,7 +109,7 @@ $$
         PUBLIC.EPOCH_STAKE
         INNER JOIN PUBLIC.POOL_HASH ON POOL_HASH.ID = EPOCH_STAKE.POOL_ID
       WHERE
-        EPOCH_STAKE.EPOCH_NO >= _last_pool_active_stake_cache_epoch_no
+        EPOCH_STAKE.EPOCH_NO >= _last_active_stake_validated_epoch
           AND
         EPOCH_STAKE.EPOCH_NO <= _epoch_no
       GROUP BY
@@ -122,12 +123,6 @@ $$
       WHERE POOL_ACTIVE_STAKE_CACHE.AMOUNT IS DISTINCT FROM EXCLUDED.AMOUNT;
     
     /* EPOCH ACTIVE STAKE CACHE */
-    SELECT
-      COALESCE(MAX(epoch_no), 0)
-    INTO _last_epoch_active_stake_cache_epoch_no
-    FROM
-      GREST.EPOCH_ACTIVE_STAKE_CACHE;
-
     INSERT INTO GREST.EPOCH_ACTIVE_STAKE_CACHE
       SELECT
         EPOCH_STAKE.EPOCH_NO,
@@ -135,7 +130,7 @@ $$
       FROM
         PUBLIC.EPOCH_STAKE
       WHERE
-        EPOCH_STAKE.EPOCH_NO >= _last_epoch_active_stake_cache_epoch_no
+        EPOCH_STAKE.EPOCH_NO >= _last_active_stake_validated_epoch
           AND
         EPOCH_STAKE.EPOCH_NO <= _epoch_no
       GROUP BY

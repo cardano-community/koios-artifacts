@@ -388,7 +388,7 @@ BEGIN
           FROM 
             ma_tx_mint MTM
             INNER JOIN MULTI_ASSET MA ON MA.id = MTM.ident
-            INNER JOIN grest.asset_info_cache aic ON aic.asset_id = MA.id
+            LEFT JOIN grest.asset_info_cache aic ON aic.asset_id = MA.id
           WHERE
             MTM.tx_id = ANY (_tx_id_list)
         ) AS tmp

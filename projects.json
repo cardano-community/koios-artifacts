@@ -1,11 +1,11 @@
 {
   "CLI": [
     {
-      "text": "Koios CLI in GoLang",
+      "text": "GoLang CLI",
       "link": "https://github.com/cardano-community/koios-cli"
     },
     {
-      "text": "CardanoSharp CSCLI",
+      "text": "CSharp CSCLI",
       "link": "https://github.com/CardanoSharp/cscli"
     }
   ],
@@ -24,56 +24,56 @@
     },
     {
       "text": "JavaScript Client",
-      "link": "https://meshjs.dev/providers/koios"
+      "link": "https://github.com/MeshJS/mesh"
     },
     {
-      "text": "Python Library - Quixote",
+      "text": "Python Library",
       "link": "https://github.com/cardano-community/koios-python"
     },
     {
-      "text": "Python Library - Apex",
+      "text": "Python Library 2",
       "link": "https://github.com/cardano-apexpool/koios-api-python"
+    },
+    {
+      "text": "TypeScript Library",
+      "link": "https://github.com/adabox-aio/koios-typescript-client"
+    },
+    {
+      "text": "TypeScript Client (Tiny)",
+      "link": "https://github.com/ray-network/koios-tiny-client"
     }
   ],
   "Community Projects/Tools": [
     {
-      "text": "ADABox",
-      "link": "https://explorer.adabox.io/pools",
+      "text": "adabox.io",
+      "link": "https://adabox.io",
       "logo": {
-        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/Koios-logo-dummy.png",
-        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/Koios-logo-dummy.png"
+        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/adabox-logo.webp",
+        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/adabox-logo.webp"
       }
     },
     {
       "text": "Building On Cardano",
       "link": "https://buildingoncardano.com",
       "logo": {
-        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/Koios-logo-dummy.png",
-        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/Koios-logo-dummy.png"
+        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/buildin_on_cardano_dark.webp",
+        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/buildin_on_cardano.webp"
       }
     },
     {
       "text": "CardaStat",
       "link": "https://cardastat.info",
       "logo": {
-        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/Koios-logo-dummy.png",
-        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/Koios-logo-dummy.png"
-      }
-    },
-    {
-      "text": "CNFT.IO",
-      "link": "https://CNFT.IO",
-      "logo": {
-        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/Koios-logo-dummy.png",
-        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/Koios-logo-dummy.png"
+        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/cardastat_dark.webp",
+        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/cardastat_light.webp"
       }
     },
     {
       "text": "CNTools/gLiveview",
       "link": "https://cardano-community.github.io/guild-operators/Scripts/cntools/",
       "logo": {
-         "dark": "https://github.com/cardano-community/guild-operators/raw/alpha/guild.png",
-         "light": "https://github.com/cardano-community/guild-operators/raw/alpha/guild.png"
+        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/guild.webp",
+        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/guild.webp"
       }
     },
     {
@@ -88,8 +88,8 @@
       "text": "Eternl",
       "link": "https://eternl.io/",
       "logo": {
-         "dark": "https://eternl.io/images/eternl-512.png",
-         "light": "https://eternl.io/images/eternl-512.png"
+        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/eternl-512.png",
+        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/eternl-512.png"
       }
     },
     {
@@ -104,24 +104,24 @@
       "text": "MusicBox",
       "link": "https://musicboxnft.com",
       "logo": {
-        "dark": "https://raw.githubusercontent.com/adabox-aio/musicbox-website/main/src/main/resources/static/favicon/android-icon-192x192.png",
-        "light": "https://raw.githubusercontent.com/adabox-aio/musicbox-website/main/src/main/resources/static/favicon/android-icon-192x192.png"
+        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/musicbox-logo.png",
+        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/musicbox-logo.png"
       }
     },
     {
       "text": "Poolpeek",
       "link": "https://poolpeek.com",
       "logo": {
-        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/Koios-logo-dummy.png",
-        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/Koios-logo-dummy.png"
+        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/poolpeek.webp",
+        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/poolpeek.webp"
       }
     },
     {
       "text": "TosiDrop",
       "link": "https://tosidrop.io",
       "logo": {
-        "dark": "https://www.tosidrop.io/img/umbrella_blue.png",
-        "light": "https://www.tosidrop.io/img/umbrella_blue.png"
+        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/umbrella_blue.png",
+        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/umbrella_blue.png"
       }
     },
     {
@@ -130,6 +130,22 @@
       "logo": {
         "dark": "https://www.quixote.systems/wp-content/uploads/2022/06/raw_explorer_logo.png",
         "light": "https://www.quixote.systems/wp-content/uploads/2022/06/raw_explorer_logo.png"
+      }
+    },
+    {
+      "text": "VESPR",
+      "link": "https://vespr.xyz",
+      "logo": {
+        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/vespr_dark_mode.webp",
+        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/vespr_light_mode.webp"
+      }
+    },
+    {
+      "text": "NMKR",
+      "link": "https://nmkr.io",
+      "logo": {
+        "dark": "https://raw.githubusercontent.com/PatrickTobler/koios-artifacts/main/images/projects/nmkr_logo.png",
+        "light": "https://raw.githubusercontent.com/PatrickTobler/koios-artifacts/main/images/projects/nmkr_logo.png"
       }
     }
   ]

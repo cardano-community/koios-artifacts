@@ -146,7 +146,7 @@ parameters:
       description: Asset Name in hexadecimal format (hex), empty asset name returns royalties
       schema:
         type: string
-        example: ##_asset_name_param##
+        example: "##_asset_name_param##"
       in: query
       required: false
       allowEmptyValue: true

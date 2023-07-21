@@ -1,4 +1,4 @@
-CREATE FUNCTION grest.address_assets (_addresses text[])
+CREATE OR REPLACE FUNCTION grest.address_assets (_addresses text[])
   RETURNS TABLE (
     address varchar,
     asset_list jsonb
@@ -14,12 +14,12 @@ BEGIN
       ma.policy,
       ma.name,
       ma.fingerprint,
-      aic.decimals,
+      COALESCE(aic.decimals, 0) as decimals,
       SUM(mtx.quantity) as quantity
     FROM
       MA_TX_OUT MTX
       INNER JOIN MULTI_ASSET MA ON MA.id = MTX.ident
-      INNER JOIN grest.asset_info_cache aic ON aic.asset_id = MA.id
+      LEFT JOIN grest.asset_info_cache aic ON aic.asset_id = MA.id
       INNER JOIN TX_OUT TXO ON TXO.ID = MTX.TX_OUT_ID
       LEFT JOIN TX_IN ON TXO.TX_ID = TX_IN.TX_OUT_ID
         AND TXO.INDEX::smallint = TX_IN.TX_OUT_INDEX::smallint
