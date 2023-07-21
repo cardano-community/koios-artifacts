@@ -147,6 +147,14 @@
         "dark": "https://raw.githubusercontent.com/PatrickTobler/koios-artifacts/main/images/projects/nmkr_logo.png",
         "light": "https://raw.githubusercontent.com/PatrickTobler/koios-artifacts/main/images/projects/nmkr_logo.png"
       }
+    },
+    {
+      "text": "DCOne Crypto",
+      "link": "https://dconecrypto.finance",
+      "logo": {
+        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/DCOneCrypto.png",
+        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/DCOneCrypto.png"
+      }
     }
   ]
 }
