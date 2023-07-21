@@ -147,6 +147,14 @@
         "dark": "https://raw.githubusercontent.com/PatrickTobler/koios-artifacts/main/images/projects/nmkr_logo.png",
         "light": "https://raw.githubusercontent.com/PatrickTobler/koios-artifacts/main/images/projects/nmkr_logo.png"
       }
+    },
+    {
+      "text": "DCOne Crypto",
+      "link": "https://dconecrypto.finance",
+      "logo": {
+        "dark": "https://github.com/DCOneCrypto/StakeAddress-Tracking-Webhook-API/blob/main/logo/DCOneCrypto.png",
+        "light": "https://github.com/DCOneCrypto/StakeAddress-Tracking-Webhook-API/blob/main/logo/DCOneCrypto.png"
+      }
     }
   ]
 }
