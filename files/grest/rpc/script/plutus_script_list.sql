@@ -1,19 +1,19 @@
-CREATE FUNCTION grest.plutus_script_list ()
-  RETURNS TABLE (
-    script_hash text,
-    creation_tx_hash text
-  )
-LANGUAGE PLPGSQL AS
-$$
+CREATE OR REPLACE FUNCTION grest.plutus_script_list()
+RETURNS TABLE (
+  script_hash text,
+  creation_tx_hash text
+)
+LANGUAGE plpgsql
+AS $$
 BEGIN
   RETURN QUERY
   SELECT
-    ENCODE(script.hash, 'hex') as script_hash, 
-    ENCODE(tx.hash, 'hex') as creation_tx_hash
+    ENCODE(script.hash, 'hex') AS script_hash,
+    ENCODE(tx.hash, 'hex') AS creation_tx_hash
   FROM script
     INNER JOIN tx ON tx.id = script.tx_id
   WHERE script.type IN ('plutusV1', 'plutusV2');
 END;
 $$;
 
-COMMENT ON FUNCTION grest.plutus_script_list IS 'Get a list of all plutus script hashes with creation tx hash.';
+COMMENT ON FUNCTION grest.plutus_script_list IS 'Get a list of all plutus script hashes with creation tx hash.'; --noqa: LT01

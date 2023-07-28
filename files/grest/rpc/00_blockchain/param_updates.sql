@@ -1,20 +1,19 @@
-CREATE OR REPLACE FUNCTION grest.param_updates ()
-  RETURNS TABLE (
-    tx_hash text,
-    block_height word31type,
-    block_time integer,
-    epoch_no word31type,
-    data jsonb
-  )
-  LANGUAGE PLPGSQL
-  AS $$
-
+CREATE OR REPLACE FUNCTION grest.param_updates()
+RETURNS TABLE (
+  tx_hash text,
+  block_height word31type,
+  block_time integer,
+  epoch_no word31type,
+  data jsonb
+)
+LANGUAGE plpgsql
+AS $$
 BEGIN
   RETURN QUERY
     SELECT DISTINCT ON (pp.registered_tx_id)
-      ENCODE(t.hash,'hex') as tx_hash,
+      ENCODE(t.hash,'hex') AS tx_hash,
       b.block_no AS block_height,
-      EXTRACT(epoch from b.time)::integer as block_time,
+      EXTRACT(EPOCH FROM b.time)::integer AS block_time,
       b.epoch_no,
       JSONB_STRIP_NULLS(JSONB_BUILD_OBJECT(
           'min_fee_a', pp.min_fee_a,
@@ -47,13 +46,12 @@ BEGIN
           'max_collateral_inputs', pp.max_collateral_inputs,
           'coins_per_utxo_size', pp.coins_per_utxo_size
         )) AS data
-      FROM
-        public.param_proposal pp
-        INNER JOIN tx t ON t.id = pp.registered_tx_id
-        INNER JOIN block b ON t.block_id = b.id
-        LEFT JOIN cost_model CM ON CM.id = pp.cost_model_id
-      ;
+    FROM
+      public.param_proposal pp
+      INNER JOIN tx t ON t.id = pp.registered_tx_id
+      INNER JOIN block b ON t.block_id = b.id
+      LEFT JOIN cost_model CM ON CM.id = pp.cost_model_id;
 END;
 $$;
 
-COMMENT ON FUNCTION grest.param_updates IS 'Parameter updates applied to the network';
+COMMENT ON FUNCTION grest.param_updates IS 'Parameter updates applied to the network'; -- noqa: LT01

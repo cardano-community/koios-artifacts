@@ -136,26 +136,7 @@ info:
 
     # Community projects
 
-    A big thank you to the following projects who are already starting to use Koios from early days. A list of tools, libraries and projects utilising Koios (atleast those who'd like to be named) can be found [here](https://www.koios.rest/api-calls-tools-and-libraries)
-
-    # FAQ
-
-    ### Is there a price attached to using services?
-    For most of the queries, there are no charges. But there are DDoS protection and strict timeout rules (see API Usage) that may prevent heavy consumers from using this *remotely* (for which, there should be an interaction to ensure the usage is proportional to sizing and traffic expected).
-
-    ### Who are the folks behind Koios?
-    It will be increasing list of community builders. But for initial think-tank and efforts, the work done is primarily by [guild-operators](https://cardano-community.github.io/guild-operators)
-    who are a well-recognised team of members behind Cardano tools like CNTools, gLiveView, topologyUpdater, etc. We also run a parallel a short (60-min) epoch blockchain, viz, guild used by many
-    for experiments.
-
-    ### I am only interested in collaborating on queries, where can I find the code and how to collaborate?
-    All the Postgres codebase against db-sync instance is available on [koios-artifacts](https://github.com/cardano-community/koios-artifacts/tree/main/files/grest/rpc) repo on github. Feel free to raise an issue/PR to discuss anything related to those queries.
-
-    ### I am not sure how to set up an instance. Is there an easy start guide?
-    Yes, there is a setup script (expect you to read carefully the help section) and instructions [here](https://cardano-community.github.io/guild-operators/Build/grest/). Should you need any assistance, feel free to hop in to the [discussion group](https://t.me/CardanoKoios).
-
-    ### Too much reading, I want to discuss in person
-    There are bi-weekly calls held that anyone is free to join - or you can drop in to the [telegram group](https://t.me/CardanoKoios) and start a discussion from there.
+    A big thank you to the following projects who are already starting to use Koios from early days. A list of tools, libraries and projects utilising Koios (atleast those who'd like to be named) can be found [here](https://www.koios.rest/community.html)
 
   x-logo:
     url: "https://api.koios.rest/images/koios.png"

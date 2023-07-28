@@ -1,0 +1,18 @@
+[sqlfluff]
+dialect = postgres
+exclude_rules = structure.column_order, references.keywords
+max_line_length=260
+recurse = 0
+capitalisation_policy = upper
+extended_capitalisation_policy = upper
+idented_joins = True
+indented_using_on = False
+tab_space_size = 2
+large_file_skip_byte_limit=35000
+
+[sqlfluff:indentation]
+tab_space_size = 2
+allow_implicit_indents = True
+
+[sqlfluff:rules:convention.count_rows]
+prefer_count_1 = True

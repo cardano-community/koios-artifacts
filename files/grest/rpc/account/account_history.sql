@@ -1,24 +1,24 @@
-CREATE FUNCTION grest.account_history (_stake_addresses text[], _epoch_no integer DEFAULT NULL)
-  RETURNS TABLE (
-    stake_address varchar,
-    history jsonb
-  )
-  LANGUAGE PLPGSQL
-  AS $$
+CREATE OR REPLACE FUNCTION grest.account_history(_stake_addresses text [], _epoch_no integer DEFAULT NULL)
+RETURNS TABLE (
+  stake_address varchar,
+  history jsonb
+)
+LANGUAGE plpgsql
+AS $$
 DECLARE
   sa_id_list integer[];
 BEGIN
   SELECT INTO sa_id_list
-    ARRAY_AGG(STAKE_ADDRESS.ID)
+    ARRAY_AGG(stake_address.id)
   FROM
-    STAKE_ADDRESS
+    stake_address
   WHERE
-    STAKE_ADDRESS.VIEW = ANY(_stake_addresses);
+    stake_address.view = ANY(_stake_addresses);
 
   IF _epoch_no IS NOT NULL THEN
     RETURN QUERY
       SELECT
-        sa.view as stake_address,
+        sa.view AS stake_address,
         JSONB_AGG(
           JSONB_BUILD_OBJECT(
             'pool_id', ph.view,
@@ -27,9 +27,9 @@ BEGIN
           )
         )
       FROM
-        EPOCH_STAKE es
-        LEFT JOIN stake_address sa ON sa.id = es.addr_id
-        LEFT JOIN pool_hash ph ON ph.id = es.pool_id
+        epoch_stake AS es
+        LEFT JOIN stake_address AS sa ON sa.id = es.addr_id
+        LEFT JOIN pool_hash AS ph ON ph.id = es.pool_id
       WHERE
         es.epoch_no = _epoch_no
         AND
@@ -39,7 +39,7 @@ BEGIN
   ELSE
     RETURN QUERY
       SELECT
-        sa.view as stake_address,
+        sa.view AS stake_address,
         JSONB_AGG(
           JSONB_BUILD_OBJECT(
             'pool_id', ph.view,
@@ -48,9 +48,9 @@ BEGIN
           )
         )
       FROM
-        EPOCH_STAKE es
-        LEFT JOIN stake_address sa ON sa.id = es.addr_id
-        LEFT JOIN pool_hash ph ON ph.id = es.pool_id
+        epoch_stake AS es
+        LEFT JOIN stake_address AS sa ON sa.id = es.addr_id
+        LEFT JOIN pool_hash AS ph ON ph.id = es.pool_id
       WHERE
         sa.id = ANY(sa_id_list)
       GROUP BY
@@ -59,5 +59,4 @@ BEGIN
 END;
 $$;
 
-COMMENT ON FUNCTION grest.account_history IS 'Get the active stake history of given accounts';
-
+COMMENT ON FUNCTION grest.account_history IS 'Get the active stake history of given accounts'; -- noqa: LT01

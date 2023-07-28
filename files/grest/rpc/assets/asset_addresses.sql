@@ -1,21 +1,23 @@
-CREATE OR REPLACE FUNCTION grest.asset_address_list (_asset_policy text, _asset_name text default '')
-  RETURNS TABLE (
-    payment_address varchar,
-    quantity text
-  ) LANGUAGE PLPGSQL
-  AS $$
+CREATE OR REPLACE FUNCTION grest.asset_address_list(_asset_policy text, _asset_name text DEFAULT '')
+RETURNS TABLE (
+  payment_address varchar,
+  quantity text
+)
+LANGUAGE plpgsql
+AS $$
 BEGIN
   RETURN QUERY
     SELECT * FROM grest.asset_addresses(_asset_policy, _asset_name);
 END;
 $$;
 
-CREATE OR REPLACE FUNCTION grest.asset_addresses (_asset_policy text, _asset_name text default '')
-  RETURNS TABLE (
-    payment_address varchar,
-    quantity text
-  ) LANGUAGE PLPGSQL
-  AS $$
+CREATE OR REPLACE FUNCTION grest.asset_addresses(_asset_policy text, _asset_name text DEFAULT '')
+RETURNS TABLE (
+  payment_address varchar,
+  quantity text
+)
+LANGUAGE plpgsql
+AS $$
 DECLARE
   _asset_policy_decoded bytea;
   _asset_name_decoded bytea;
@@ -30,8 +32,7 @@ BEGIN
     END,
     'hex'
   ) INTO _asset_name_decoded;
-  SELECT id INTO _asset_id FROM multi_asset ma WHERE ma.policy = _asset_policy_decoded AND ma.name = _asset_name_decoded;
-
+  SELECT id INTO _asset_id FROM multi_asset AS ma WHERE ma.policy = _asset_policy_decoded AND ma.name = _asset_name_decoded;
   RETURN QUERY
     SELECT
       x.address,
@@ -42,18 +43,18 @@ BEGIN
           txo.address,
           mto.quantity
         FROM
-          ma_tx_out mto
-          INNER JOIN tx_out txo ON txo.id = mto.tx_out_id
+          ma_tx_out AS mto
+          INNER JOIN tx_out AS txo ON txo.id = mto.tx_out_id
           LEFT JOIN tx_in ON txo.tx_id = tx_in.tx_out_id
             AND txo.index::smallint = tx_in.tx_out_index::smallint
         WHERE
           mto.ident = _asset_id
           AND tx_in.tx_out_id IS NULL
-      ) x
+      ) AS x
     GROUP BY
       x.address;
 END;
 $$;
 
-COMMENT ON FUNCTION grest.asset_address_list IS 'DEPRECATED!! Use asset_addresses instead.';
-COMMENT ON FUNCTION grest.asset_addresses IS 'Returns a list of addresses with quantity holding the specified asset';
+COMMENT ON FUNCTION grest.asset_address_list IS 'DEPRECATED!! Use asset_addresses instead.'; -- noqa: LT01
+COMMENT ON FUNCTION grest.asset_addresses IS 'Returns a list of addresses with quantity holding the specified asset'; -- noqa: LT01

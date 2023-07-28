@@ -1,25 +1,25 @@
 DROP VIEW IF EXISTS grest.blocks;
 
 CREATE VIEW grest.blocks AS
-  SELECT
-    ENCODE(B.HASH::bytea, 'hex') AS HASH,
-    b.EPOCH_NO AS EPOCH_NO,
-    b.SLOT_NO AS ABS_SLOT,
-    b.EPOCH_SLOT_NO AS EPOCH_SLOT,
-    b.BLOCK_NO AS BLOCK_HEIGHT,
-    b.SIZE AS BLOCK_SIZE,
-    EXTRACT(epoch from b.TIME)::integer AS BLOCK_TIME,
-    b.TX_COUNT,
-    b.VRF_KEY,
-    ph.VIEW AS POOL,
-    b.PROTO_MAJOR,
-    b.PROTO_MINOR,
-    b.OP_CERT_COUNTER
-  FROM
-    BLOCK B
-    LEFT JOIN SLOT_LEADER SL ON SL.ID = B.SLOT_LEADER_ID
-    LEFT JOIN POOL_HASH PH ON PH.ID = SL.POOL_HASH_ID
-  ORDER BY
-    B.ID DESC;
+SELECT
+  ENCODE(b.hash::bytea, 'hex') AS hash,
+  b.epoch_no AS epoch_no,
+  b.slot_no AS abs_slot,
+  b.epoch_slot_no AS epoch_slot,
+  b.block_no AS block_height,
+  b.size AS block_size,
+  EXTRACT(EPOCH FROM b.time)::integer AS block_time,
+  b.tx_count,
+  b.vrf_key,
+  ph.view AS pool,
+  b.proto_major,
+  b.proto_minor,
+  b.op_cert_counter
+FROM
+  block AS b
+LEFT JOIN slot_leader AS sl ON sl.id = b.slot_leader_id
+LEFT JOIN pool_hash AS ph ON ph.id = sl.pool_hash_id
+ORDER BY
+  b.id DESC;
 
 COMMENT ON VIEW grest.blocks IS 'Get detailed information about all blocks (paginated - latest first)';

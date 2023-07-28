@@ -1,13 +1,13 @@
-CREATE FUNCTION grest.pool_stake_snapshot (_pool_bech32 text)
-  RETURNS TABLE (
-    snapshot text,
-    epoch_no bigint,
-    nonce text,
-    pool_stake text,
-    active_stake text
-  )
-  LANGUAGE plpgsql
-  AS $$
+CREATE OR REPLACE FUNCTION grest.pool_stake_snapshot(_pool_bech32 text)
+RETURNS TABLE (
+  snapshot text,
+  epoch_no bigint,
+  nonce text,
+  pool_stake text,
+  active_stake text
+)
+LANGUAGE plpgsql
+AS $$
 DECLARE
   _epoch_no bigint;
   _mark     bigint;
@@ -31,9 +31,9 @@ BEGIN
     pasc.amount::text,
     easc.amount::text
   FROM
-    grest.pool_active_stake_cache pasc
-    INNER JOIN grest.epoch_active_stake_cache easc ON easc.epoch_no = pasc.epoch_no
-    LEFT JOIN grest.epoch_info_cache eic ON eic.epoch_no = pasc.epoch_no
+    grest.pool_active_stake_cache AS pasc
+    INNER JOIN grest.epoch_active_stake_cache AS easc ON easc.epoch_no = pasc.epoch_no
+    LEFT JOIN grest.epoch_info_cache AS eic ON eic.epoch_no = pasc.epoch_no
   WHERE
     pasc.pool_id = _pool_bech32
     AND pasc.epoch_no BETWEEN _go AND _mark
@@ -42,4 +42,4 @@ BEGIN
 END;
 $$;
 
-COMMENT ON FUNCTION grest.pool_stake_snapshot IS 'Returns Mark, Set and Go stake snapshots for the selected pool, useful for leaderlog calculation';
+COMMENT ON FUNCTION grest.pool_stake_snapshot IS 'Returns Mark, Set and Go stake snapshots for the selected pool, useful for leaderlog calculation'; -- noqa: LT01

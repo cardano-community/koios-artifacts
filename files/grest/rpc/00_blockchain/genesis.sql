@@ -1,36 +1,36 @@
-CREATE FUNCTION grest.genesis ()
-  RETURNS TABLE (
-    NETWORKMAGIC varchar,
-    NETWORKID varchar,
-    ACTIVESLOTCOEFF varchar,
-    UPDATEQUORUM varchar,
-    MAXLOVELACESUPPLY varchar,
-    EPOCHLENGTH varchar,
-    SYSTEMSTART integer,
-    SLOTSPERKESPERIOD varchar,
-    SLOTLENGTH varchar,
-    MAXKESREVOLUTIONS varchar,
-    SECURITYPARAM varchar,
-    ALONZOGENESIS varchar
-  )
-  LANGUAGE PLPGSQL
-  AS $$
+CREATE OR REPLACE FUNCTION grest.genesis()
+RETURNS TABLE (
+  networkmagic varchar,
+  networkid varchar,
+  activeslotcoeff varchar,
+  updatequorum varchar,
+  maxlovelacesupply varchar,
+  epochlength varchar,
+  systemstart integer,
+  slotsperkesperiod varchar,
+  slotlength varchar,
+  maxkesrevolutions varchar,
+  securityparam varchar,
+  alonzogenesis varchar
+)
+LANGUAGE plpgsql
+AS $$
 BEGIN
   RETURN QUERY
   SELECT
-    g.NETWORKMAGIC,
-    g.NETWORKID,
-    g.ACTIVESLOTCOEFF,
-    g.UPDATEQUORUM,
-    g.MAXLOVELACESUPPLY,
-    g.EPOCHLENGTH,
-    EXTRACT(epoch from g.SYSTEMSTART::timestamp)::integer,
-    g.SLOTSPERKESPERIOD,
-    g.SLOTLENGTH,
-    g.MAXKESREVOLUTIONS,
-    g.SECURITYPARAM,
-    g.ALONZOGENESIS
+    g.networkmagic,
+    g.networkid,
+    g.activeslotcoeff,
+    g.updatequorum,
+    g.maxlovelacesupply,
+    g.epochlength,
+    EXTRACT(EPOCH FROM g.systemstart::timestamp)::integer,
+    g.slotsperkesperiod,
+    g.slotlength,
+    g.maxkesrevolutions,
+    g.securityparam,
+    g.alonzogenesis
   FROM
-    grest.genesis g;
+    grest.genesis AS g;
 END;
 $$;

@@ -1,20 +1,19 @@
-CREATE OR REPLACE FUNCTION grest.account_assets (_stake_addresses text[])
-  RETURNS TABLE (
-    stake_address varchar,
-    asset_list jsonb
-  )
-  LANGUAGE PLPGSQL
-  AS $$
+CREATE OR REPLACE FUNCTION grest.account_assets(_stake_addresses text [])
+RETURNS TABLE (
+  stake_address varchar,
+  asset_list jsonb
+)
+LANGUAGE plpgsql
+AS $$
 DECLARE
   sa_id_list integer[];
 BEGIN
   SELECT INTO sa_id_list
-    ARRAY_AGG(STAKE_ADDRESS.ID)
+    ARRAY_AGG(stake_address.id)
   FROM
-    STAKE_ADDRESS
+    stake_address
   WHERE
-    STAKE_ADDRESS.VIEW = ANY(_stake_addresses);
-
+    stake_address.view = ANY(_stake_addresses);
   RETURN QUERY
     WITH _all_assets AS (
       SELECT
@@ -22,45 +21,44 @@ BEGIN
         ma.policy,
         ma.name,
         ma.fingerprint,
-        COALESCE(aic.decimals, 0) as decimals,
-        SUM(mtx.quantity) as quantity
+        COALESCE(aic.decimals, 0) AS decimals,
+        SUM(mtx.quantity) AS quantity
       FROM
-        MA_TX_OUT MTX
-        INNER JOIN MULTI_ASSET MA ON MA.id = MTX.ident
-        INNER JOIN TX_OUT TXO ON TXO.ID = MTX.TX_OUT_ID
-        INNER JOIN STAKE_ADDRESS sa ON sa.id = TXO.stake_address_id
-        LEFT JOIN grest.asset_info_cache aic ON aic.asset_id = MA.id
-        LEFT JOIN TX_IN on TXO.TX_ID = TX_IN.TX_OUT_ID
-          AND TXO.INDEX::smallint = TX_IN.TX_OUT_INDEX::smallint
+        ma_tx_out AS mtx
+        INNER JOIN multi_asset AS ma ON ma.id = mtx.ident
+        INNER JOIN tx_out AS txo ON txo.id = mtx.tx_out_id
+        INNER JOIN stake_address AS sa ON sa.id = txo.stake_address_id
+        LEFT JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
+        LEFT JOIN tx_in ON txo.tx_id = tx_in.tx_out_id
+          AND txo.index::smallint = tx_in.tx_out_index::smallint
       WHERE
         sa.id = ANY(sa_id_list)
-        AND TX_IN.TX_OUT_ID IS NULL
+        AND tx_in.tx_out_id IS NULL
       GROUP BY
-        sa.view, MA.policy, MA.name, MA.fingerprint, aic.decimals
+        sa.view, ma.policy, ma.name, ma.fingerprint, aic.decimals
     )
 
-  SELECT
-    assets_grouped.view as stake_address,
-    assets_grouped.assets
-  FROM (
     SELECT
-      aa.view,
-      JSONB_AGG(
-        JSONB_BUILD_OBJECT(
-          'policy_id', ENCODE(aa.policy, 'hex'),
-          'asset_name', ENCODE(aa.name, 'hex'),
-          'fingerprint', aa.fingerprint,
-          'decimals', COALESCE(aa.decimals, 0),
-          'quantity', aa.quantity::text
-        )
-      ) as assets
-    FROM 
-      _all_assets aa
-    GROUP BY
-      aa.view
-  ) assets_grouped;
+      assets_grouped.view AS stake_address,
+      assets_grouped.assets
+    FROM (
+      SELECT
+        aa.view,
+        JSONB_AGG(
+          JSONB_BUILD_OBJECT(
+            'policy_id', ENCODE(aa.policy, 'hex'),
+            'asset_name', ENCODE(aa.name, 'hex'),
+            'fingerprint', aa.fingerprint,
+            'decimals', COALESCE(aa.decimals, 0),
+            'quantity', aa.quantity::text
+          )
+        ) AS assets
+      FROM
+        _all_assets AS aa
+      GROUP BY
+        aa.view
+    ) AS assets_grouped;
 END;
 $$;
 
-COMMENT ON FUNCTION grest.account_assets IS 'Get the native asset balance of given accounts';
-
+COMMENT ON FUNCTION grest.account_assets IS 'Get the native asset balance of given accounts'; -- noqa: LT01

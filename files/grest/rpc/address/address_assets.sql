@@ -1,10 +1,10 @@
-CREATE OR REPLACE FUNCTION grest.address_assets (_addresses text[])
-  RETURNS TABLE (
-    address varchar,
-    asset_list jsonb
-  )
-  LANGUAGE PLPGSQL
-  AS $$
+CREATE OR REPLACE FUNCTION grest.address_assets(_addresses text [])
+RETURNS TABLE (
+  address varchar,
+  asset_list jsonb
+)
+LANGUAGE plpgsql
+AS $$
 BEGIN
   RETURN QUERY
 
@@ -14,20 +14,20 @@ BEGIN
       ma.policy,
       ma.name,
       ma.fingerprint,
-      COALESCE(aic.decimals, 0) as decimals,
-      SUM(mtx.quantity) as quantity
+      COALESCE(aic.decimals, 0) AS decimals,
+      SUM(mtx.quantity) AS quantity
     FROM
-      MA_TX_OUT MTX
-      INNER JOIN MULTI_ASSET MA ON MA.id = MTX.ident
-      LEFT JOIN grest.asset_info_cache aic ON aic.asset_id = MA.id
-      INNER JOIN TX_OUT TXO ON TXO.ID = MTX.TX_OUT_ID
-      LEFT JOIN TX_IN ON TXO.TX_ID = TX_IN.TX_OUT_ID
-        AND TXO.INDEX::smallint = TX_IN.TX_OUT_INDEX::smallint
+      ma_tx_out AS mtx
+      INNER JOIN multi_asset AS ma ON ma.id = mtx.ident
+      LEFT JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
+      INNER JOIN tx_out AS txo ON txo.id = mtx.tx_out_id
+      LEFT JOIN tx_in ON txo.tx_id = tx_in.tx_out_id
+        AND txo.index::smallint = tx_in.tx_out_index::smallint
     WHERE
-      TXO.address = ANY(_addresses)
-      AND TX_IN.tx_out_id IS NULL
+      txo.address = ANY(_addresses)
+      AND tx_in.tx_out_id IS NULL
     GROUP BY
-      TXO.address, MA.policy, MA.name, ma.fingerprint, aic.decimals
+      txo.address, ma.policy, ma.name, ma.fingerprint, aic.decimals
   )
 
   SELECT
@@ -44,14 +44,13 @@ BEGIN
           'decimals', aa.decimals,
           'quantity', aa.quantity::text
         )
-      ) as asset_list
+      ) AS asset_list
     FROM 
-      _all_assets aa
+      _all_assets AS aa
     GROUP BY
       aa.address
   ) assets_grouped;
 END;
 $$;
 
-COMMENT ON FUNCTION grest.address_assets IS 'Get the list of all the assets (policy, name and quantity) for given addresses';
-
+COMMENT ON FUNCTION grest.address_assets IS 'Get the list of all the assets (policy, name and quantity) for given addresses'; --noqa: LT01
