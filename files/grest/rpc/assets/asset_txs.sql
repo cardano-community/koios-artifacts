@@ -1,17 +1,17 @@
-CREATE OR REPLACE FUNCTION grest.asset_txs (
+CREATE OR REPLACE FUNCTION grest.asset_txs(
   _asset_policy text,
-  _asset_name text default '',
+  _asset_name text DEFAULT '',
   _after_block_height integer DEFAULT 0,
-  _history boolean DEFAULT false
+  _history boolean DEFAULT FALSE
 )
-  RETURNS TABLE (
-    tx_hash text,
-    epoch_no word31type,
-    block_height word31type,
-    block_time integer
-  )
-  LANGUAGE PLPGSQL
-  AS $$
+RETURNS TABLE (
+  tx_hash text,
+  epoch_no word31type,
+  block_height word31type,
+  block_time integer
+)
+LANGUAGE plpgsql
+AS $$
 DECLARE
   _asset_policy_decoded bytea;
   _asset_name_decoded bytea;
@@ -26,14 +26,14 @@ BEGIN
     END,
     'hex'
   ) INTO _asset_name_decoded;
-  SELECT id INTO _asset_id FROM multi_asset MA WHERE MA.policy = _asset_policy_decoded AND MA.name = _asset_name_decoded;
+  SELECT id INTO _asset_id FROM multi_asset AS ma WHERE ma.policy = _asset_policy_decoded AND ma.name = _asset_name_decoded;
 
   RETURN QUERY
     SELECT
-      ENCODE(tx_hashes.hash, 'hex') as tx_hash,
+      ENCODE(tx_hashes.hash, 'hex') AS tx_hash,
       tx_hashes.epoch_no,
       tx_hashes.block_no,
-      EXTRACT(epoch from tx_hashes.time)::integer
+      EXTRACT(EPOCH FROM tx_hashes.time)::integer
     FROM (
       SELECT DISTINCT ON (tx.hash)
         tx.hash,
@@ -41,24 +41,24 @@ BEGIN
         block.block_no,
         block.time
       FROM
-        ma_tx_out MTO
-        INNER JOIN tx_out TXO ON TXO.id = MTO.tx_out_id
-        INNER JOIN tx ON tx.id = TXO.tx_id
+        ma_tx_out AS mto
+        INNER JOIN tx_out AS txo ON txo.id = mto.tx_out_id
+        INNER JOIN tx ON tx.id = txo.tx_id
         INNER JOIN block ON block.id = tx.block_id
-        LEFT JOIN tx_in TXI ON TXO.tx_id = TXI.tx_out_id
-          AND TXO.index::smallint = TXI.tx_out_index::smallint
+        LEFT JOIN tx_in AS txi ON txo.tx_id = txi.tx_out_id
+          AND txo.index::smallint = txi.tx_out_index::smallint
       WHERE
-        MTO.ident = _asset_id
+        mto.ident = _asset_id
         AND block.block_no >= _after_block_height
-        AND (_history = true OR TXI.id IS NULL)
+        AND (_history = TRUE OR txi.id IS NULL)
       GROUP BY
         ident,
         tx.hash,
         block.epoch_no,
         block.block_no,
         block.time
-    ) tx_hashes ORDER BY tx_hashes.block_no DESC;
+    ) AS tx_hashes ORDER BY tx_hashes.block_no DESC;
 END;
 $$;
 
-COMMENT ON FUNCTION grest.asset_txs IS 'Get the list of all asset transaction hashes (newest first)';
+COMMENT ON FUNCTION grest.asset_txs IS 'Get the list of all asset transaction hashes (newest first)'; -- noqa: LT01

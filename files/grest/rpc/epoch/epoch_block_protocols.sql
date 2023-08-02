@@ -1,11 +1,11 @@
-CREATE FUNCTION grest.epoch_block_protocols (_epoch_no numeric DEFAULT NULL)
-  RETURNS TABLE (
-    proto_major word31type,
-    proto_minor word31type,
-    blocks bigint
-  )
-  LANGUAGE PLPGSQL
-  AS $$
+CREATE OR REPLACE FUNCTION grest.epoch_block_protocols(_epoch_no numeric DEFAULT NULL)
+RETURNS TABLE (
+  proto_major word31type,
+  proto_minor word31type,
+  blocks bigint
+)
+LANGUAGE plpgsql
+AS $$
 BEGIN
   IF _epoch_no IS NOT NULL THEN
     RETURN QUERY
@@ -26,7 +26,7 @@ BEGIN
         b.proto_minor,
         count(b.*)
       FROM
-        block b
+        block AS b
       WHERE
         b.epoch_no = (SELECT MAX(no) FROM epoch)
       GROUP BY
@@ -35,4 +35,4 @@ BEGIN
 END;
 $$;
 
-COMMENT ON FUNCTION grest.epoch_block_protocols IS 'Get the information about block protocol distribution in epoch';
+COMMENT ON FUNCTION grest.epoch_block_protocols IS 'Get the information about block protocol distribution in epoch'; -- noqa: LT01

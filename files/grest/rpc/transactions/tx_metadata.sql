@@ -1,41 +1,41 @@
-CREATE FUNCTION grest.tx_metadata (_tx_hashes text[])
-  RETURNS TABLE (
-    tx_hash text,
-    metadata jsonb)
-  LANGUAGE PLPGSQL
-  AS $$
+CREATE OR REPLACE FUNCTION grest.tx_metadata(_tx_hashes text [])
+RETURNS TABLE (
+  tx_hash text,
+  metadata jsonb
+)
+LANGUAGE plpgsql
+AS $$
 BEGIN
   RETURN QUERY
   SELECT
-    T1.tx_hash,
-    METADATA_T.metadata
+    t1.tx_hash,
+    metadata_t.metadata
   FROM (
     SELECT
       tx.id,
-      ENCODE(tx.hash, 'hex') as tx_hash
+      ENCODE(tx.hash, 'hex') AS tx_hash
     FROM
       public.tx
     WHERE
-      tx.hash::bytea = ANY (
+      tx.hash::bytea = ANY(
         SELECT
           DECODE(hashes, 'hex')
         FROM
           UNNEST(_tx_hashes) AS hashes
       )
-  ) T1
+  ) AS t1
   LEFT JOIN LATERAL (
     SELECT
       JSONB_OBJECT_AGG(
         tx_metadata.key::text,
         tx_metadata.json
-      ) as metadata
+      ) AS metadata
     FROM
       tx_metadata
     WHERE
-      tx_id = T1.id
-  ) METADATA_T ON TRUE;
+      tx_id = t1.id
+  ) AS metadata_t ON TRUE;
 END;
 $$;
 
-COMMENT ON FUNCTION grest.tx_metadata IS 'Get transaction metadata.';
-
+COMMENT ON FUNCTION grest.tx_metadata IS 'Get transaction metadata.'; -- noqa: LT01

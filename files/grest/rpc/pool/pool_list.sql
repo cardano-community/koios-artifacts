@@ -1,12 +1,12 @@
-CREATE OR REPLACE FUNCTION grest.pool_list ()
-  RETURNS TABLE (
-    pool_id_bech32 character varying,
-    ticker character varying)
-  LANGUAGE plpgsql
-  AS $$
-  # variable_conflict use_column
+CREATE OR REPLACE FUNCTION grest.pool_list()
+RETURNS TABLE (
+  pool_id_bech32 character varying,
+  ticker character varying
+)
+LANGUAGE plpgsql
+AS $$
+# variable_conflict use_column
 BEGIN
-
   RETURN QUERY (
     WITH
       -- Get last pool update for each pool
@@ -20,6 +20,7 @@ BEGIN
           pic.pool_id_bech32,
           pic.tx_id DESC
       ),
+
       _pool_meta AS (
         SELECT
           DISTINCT ON (pic.pool_id_bech32) pool_id_bech32,
@@ -41,8 +42,6 @@ BEGIN
       LEFT JOIN _pool_meta AS pm ON pl.pool_id_bech32 = pm.pool_id_bech32
     WHERE
       pool_status != 'retired'
-
   );
-
 END;
 $$;

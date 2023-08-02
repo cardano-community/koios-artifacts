@@ -1,39 +1,40 @@
-CREATE FUNCTION grest.epoch_params (_epoch_no numeric DEFAULT NULL)
-  RETURNS TABLE (
-    epoch_no word31type,
-    min_fee_a word31type,
-    min_fee_b word31type,
-    max_block_size word31type,
-    max_tx_size word31type,
-    max_bh_size word31type,
-    key_deposit text,
-    pool_deposit text,
-    max_epoch word31type,
-    optimal_pool_count word31type,
-    influence double precision,
-    monetary_expand_rate double precision,
-    treasury_growth_rate double precision,
-    decentralisation double precision,
-    extra_entropy text,
-    protocol_major word31type,
-    protocol_minor word31type,
-    min_utxo_value text,
-    min_pool_cost text,
-    nonce text,
-    block_hash text,
-    cost_models character varying,
-    price_mem double precision,
-    price_step double precision,
-    max_tx_ex_mem word64type,
-    max_tx_ex_steps word64type,
-    max_block_ex_mem word64type,
-    max_block_ex_steps word64type,
-    max_val_size word64type,
-    collateral_percent word31type,
-    max_collateral_inputs word31type,
-    coins_per_utxo_size text)
-  LANGUAGE PLPGSQL
-  AS $$
+CREATE OR REPLACE FUNCTION grest.epoch_params(_epoch_no numeric DEFAULT NULL)
+RETURNS TABLE (
+  epoch_no word31type,
+  min_fee_a word31type,
+  min_fee_b word31type,
+  max_block_size word31type,
+  max_tx_size word31type,
+  max_bh_size word31type,
+  key_deposit text,
+  pool_deposit text,
+  max_epoch word31type,
+  optimal_pool_count word31type,
+  influence double precision,
+  monetary_expand_rate double precision,
+  treasury_growth_rate double precision,
+  decentralisation double precision,
+  extra_entropy text,
+  protocol_major word31type,
+  protocol_minor word31type,
+  min_utxo_value text,
+  min_pool_cost text,
+  nonce text,
+  block_hash text,
+  cost_models character varying,
+  price_mem double precision,
+  price_step double precision,
+  max_tx_ex_mem word64type,
+  max_tx_ex_steps word64type,
+  max_block_ex_mem word64type,
+  max_block_ex_steps word64type,
+  max_val_size word64type,
+  collateral_percent word31type,
+  max_collateral_inputs word31type,
+  coins_per_utxo_size text
+)
+LANGUAGE plpgsql
+AS $$
 BEGIN
   IF _epoch_no IS NULL THEN
     RETURN QUERY
@@ -71,7 +72,7 @@ BEGIN
       ei.p_max_collateral_inputs AS max_collateral_inputs,
       ei.p_coins_per_utxo_size::text AS coins_per_utxo_size
     FROM
-      grest.epoch_info_cache ei
+      grest.epoch_info_cache AS ei
     WHERE
       ei.epoch_no <= (SELECT MAX(epoch.no) FROM public.epoch)
     ORDER BY
@@ -112,12 +113,11 @@ BEGIN
       ei.p_max_collateral_inputs AS max_collateral_inputs,
       ei.p_coins_per_utxo_size::text AS coins_per_utxo_size
     FROM
-      grest.epoch_info_cache ei
+      grest.epoch_info_cache AS ei
     WHERE
       ei.epoch_no = _epoch_no;
   END IF;
 END;
 $$;
 
-COMMENT ON FUNCTION grest.epoch_params IS 'Get the epoch parameters, all epochs if no epoch specified';
-
+COMMENT ON FUNCTION grest.epoch_params IS 'Get the epoch parameters, all epochs if no epoch specified'; -- noqa: LT01

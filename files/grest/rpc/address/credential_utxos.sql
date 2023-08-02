@@ -1,11 +1,11 @@
-CREATE OR REPLACE FUNCTION grest.credential_utxos (_payment_credentials text[])
-  RETURNS TABLE (
-    tx_hash text,
-    tx_index smallint,
-    value text
-  )
-  LANGUAGE PLPGSQL
-  AS $$
+CREATE OR REPLACE FUNCTION grest.credential_utxos(_payment_credentials text [])
+RETURNS TABLE (
+  tx_hash text,
+  tx_index smallint,
+  value text
+)
+LANGUAGE plpgsql
+AS $$
 DECLARE
   _payment_cred_bytea  bytea[];
 
@@ -20,7 +20,7 @@ BEGIN
 
   RETURN QUERY
     SELECT
-      ENCODE(tx.hash, 'hex')::text as tx_hash,
+      ENCODE(tx.hash, 'hex')::text AS tx_hash,
       tx_out.index::smallint,
       tx_out.value::text AS balance
     FROM tx_out
@@ -28,8 +28,7 @@ BEGIN
       LEFT JOIN tx_in ON tx_out.tx_id = tx_in.tx_out_id
         AND tx_out.index = tx_in.tx_out_index
     WHERE
-      payment_cred = any(_payment_cred_bytea)
-      AND
-        tx_in.tx_out_id IS NULL;
+      payment_cred = ANY(_payment_cred_bytea)
+      AND tx_in.tx_out_id IS NULL;
 END;
 $$;

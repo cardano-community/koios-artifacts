@@ -23,4 +23,4 @@ CREATE UNIQUE INDEX IF NOT EXISTS unique_txin ON tx_in USING btree (tx_out_id, t
 CREATE UNIQUE INDEX IF NOT EXISTS unique_withdrawal ON public.withdrawal USING btree (addr_id, tx_id);
 
 /* Help multi asset queries */
-CREATE INDEX IF NOT EXISTS idx_ma_tx_out_ident ON ma_tx_out (ident) ;
+CREATE INDEX IF NOT EXISTS idx_ma_tx_out_ident ON ma_tx_out (ident);

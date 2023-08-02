@@ -1,186 +1,181 @@
-CREATE FUNCTION grest.account_info (_stake_addresses text[])
-  RETURNS TABLE (
-    stake_address varchar,
-    STATUS text,
-    DELEGATED_POOL varchar,
-    TOTAL_BALANCE text,
-    UTXO text,
-    REWARDS text,
-    WITHDRAWALS text,
-    REWARDS_AVAILABLE text,
-    RESERVES text,
-    TREASURY text)
-  LANGUAGE PLPGSQL
-  AS $$
+CREATE OR REPLACE FUNCTION grest.account_info(_stake_addresses text [])
+RETURNS TABLE (
+  stake_address varchar,
+  status text,
+  delegated_pool varchar,
+  total_balance text,
+  utxo text,
+  rewards text,
+  withdrawals text,
+  rewards_available text,
+  reserves text,
+  treasury text
+)
+LANGUAGE plpgsql
+AS $$
 DECLARE
   sa_id_list integer[] DEFAULT NULL;
 BEGIN
   SELECT INTO sa_id_list
-    array_agg(ID)
-  FROM
-    STAKE_ADDRESS
-  WHERE
-    STAKE_ADDRESS.VIEW = ANY(_stake_addresses);
+    array_agg(id)
+  FROM stake_address
+  WHERE stake_address.view = ANY(_stake_addresses);
 
   RETURN QUERY
     WITH latest_withdrawal_txs AS (
       SELECT DISTINCT ON (addr_id)
         addr_id,
         tx_id
-      FROM WITHDRAWAL
-      WHERE ADDR_ID = ANY(sa_id_list)
-      ORDER BY addr_id, TX_ID DESC
+      FROM withdrawal
+      WHERE addr_id = ANY(sa_id_list)
+      ORDER BY addr_id, tx_id DESC
     ),
+
     latest_withdrawal_epochs AS (
       SELECT
         lwt.addr_id,
         b.epoch_no
-      FROM BLOCK b
-        INNER JOIN TX ON TX.BLOCK_ID = b.ID
-        INNER JOIN latest_withdrawal_txs lwt ON tx.id = lwt.tx_id
+      FROM block b
+        INNER JOIN tx ON tx.block_id = b.id
+        INNER JOIN latest_withdrawal_txs AS lwt ON tx.id = lwt.tx_id
     )
 
     SELECT
-      STATUS_T.view as stake_address,
-      CASE WHEN STATUS_T.REGISTERED = TRUE THEN
+      status_t.view AS stake_address,
+      CASE WHEN status_t.registered = TRUE THEN
         'registered'
       ELSE
         'not registered'
-      END AS STATUS,
-      POOL_T.DELEGATED_POOL,
-      CASE WHEN (COALESCE(REWARDS_T.REWARDS, 0) - COALESCE(WITHDRAWALS_T.WITHDRAWALS, 0)) < 0 THEN
-        (COALESCE(UTXO_T.UTXO, 0) + COALESCE(REWARDS_T.REWARDS, 0) - COALESCE(WITHDRAWALS_T.WITHDRAWALS, 0) + COALESCE(RESERVES_T.RESERVES, 0) + COALESCE(TREASURY_T.TREASURY, 0) - (COALESCE(REWARDS_T.REWARDS, 0) - COALESCE(WITHDRAWALS_T.WITHDRAWALS, 0)))::text
+      END AS status,
+      pool_t.delegated_pool,
+      CASE WHEN (COALESCE(rewards_t.rewards, 0) - COALESCE(withdrawals_t.withdrawals, 0)) < 0 THEN
+        (COALESCE(utxo_t.utxo, 0) + COALESCE(rewards_t.rewards, 0) - COALESCE(withdrawals_t.withdrawals, 0) + COALESCE(reserves_t.reserves, 0) + COALESCE(treasury_t.treasury, 0) - (COALESCE(rewards_t.rewards, 0) - COALESCE(withdrawals_t.withdrawals, 0)))::text
       ELSE
-        (COALESCE(UTXO_T.UTXO, 0) + COALESCE(REWARDS_T.REWARDS, 0) - COALESCE(WITHDRAWALS_T.WITHDRAWALS, 0) + COALESCE(RESERVES_T.RESERVES, 0) + COALESCE(TREASURY_T.TREASURY, 0))::text
-      END AS TOTAL_BALANCE,
-      COALESCE(UTXO_T.UTXO, 0)::text AS UTXO,
-      COALESCE(REWARDS_T.REWARDS, 0)::text AS REWARDS,
-      COALESCE(WITHDRAWALS_T.WITHDRAWALS, 0)::text AS WITHDRAWALS,
-      CASE WHEN (COALESCE(REWARDS_T.REWARDS, 0) - COALESCE(WITHDRAWALS_T.WITHDRAWALS, 0)) <= 0 THEN
+        (COALESCE(utxo_t.utxo, 0) + COALESCE(rewards_t.rewards, 0) - COALESCE(withdrawals_t.withdrawals, 0) + COALESCE(reserves_t.reserves, 0) + COALESCE(treasury_t.treasury, 0))::text
+      END AS total_balance,
+      COALESCE(utxo_t.utxo, 0)::text AS utxo,
+      COALESCE(rewards_t.rewards, 0)::text AS rewards,
+      COALESCE(withdrawals_t.withdrawals, 0)::text AS withdrawals,
+      CASE WHEN (COALESCE(rewards_t.rewards, 0) - COALESCE(withdrawals_t.withdrawals, 0)) <= 0 THEN
         '0'
       ELSE
-        (COALESCE(REWARDS_T.REWARDS, 0) - COALESCE(WITHDRAWALS_T.WITHDRAWALS, 0))::text
-      END AS REWARDS_AVAILABLE,
-      COALESCE(RESERVES_T.RESERVES, 0)::text AS RESERVES,
-      COALESCE(TREASURY_T.TREASURY, 0)::text AS TREASURY
-    FROM 
+        (COALESCE(rewards_t.rewards, 0) - COALESCE(withdrawals_t.withdrawals, 0))::text
+      END AS rewards_available,
+      COALESCE(reserves_t.reserves, 0)::text AS reserves,
+      COALESCE(treasury_t.treasury, 0)::text AS treasury
+    FROM
       (
         SELECT
           sas.id,
           sas.view,
           EXISTS (
-            SELECT TRUE FROM STAKE_REGISTRATION
+            SELECT TRUE FROM stake_registration
             WHERE
-              STAKE_REGISTRATION.ADDR_ID = sas.id
+              stake_registration.addr_id = sas.id
               AND NOT EXISTS (
                 SELECT TRUE
-                FROM STAKE_DEREGISTRATION
+                FROM stake_deregistration
                 WHERE
-                  STAKE_DEREGISTRATION.ADDR_ID = STAKE_REGISTRATION.ADDR_ID
-                  AND STAKE_DEREGISTRATION.TX_ID > STAKE_REGISTRATION.TX_ID
+                  stake_deregistration.addr_id = stake_registration.addr_id
+                  AND stake_deregistration.tx_id > stake_registration.tx_id
               )
-          ) AS REGISTERED
+          ) AS registered
         FROM public.stake_address sas
         WHERE sas.id = ANY(sa_id_list)
-      ) STATUS_T
-      LEFT JOIN (
+      ) AS status_t
+    LEFT JOIN (
         SELECT
           delegation.addr_id,
-          POOL_HASH.VIEW AS DELEGATED_POOL
+          pool_hash.view AS delegated_pool
         FROM
-          DELEGATION
-          INNER JOIN POOL_HASH ON POOL_HASH.ID = DELEGATION.POOL_HASH_ID
+          delegation
+          INNER JOIN pool_hash ON pool_hash.id = delegation.pool_hash_id
         WHERE
-          DELEGATION.ADDR_ID = ANY(sa_id_list)
+          delegation.addr_id = ANY(sa_id_list)
           AND NOT EXISTS (
-            SELECT
-              TRUE
-            FROM
-              DELEGATION D
+            SELECT TRUE
+            FROM delegation AS d
             WHERE
-              D.ADDR_ID = DELEGATION.ADDR_ID
-              AND D.ID > DELEGATION.ID)
+              d.addr_id = delegation.addr_id
+              AND d.id > delegation.id)
             AND NOT EXISTS (
-              SELECT
-                TRUE
-              FROM
-                STAKE_DEREGISTRATION
+              SELECT TRUE
+              FROM stake_deregistration
               WHERE
-                STAKE_DEREGISTRATION.ADDR_ID = DELEGATION.ADDR_ID
-                AND STAKE_DEREGISTRATION.TX_ID > DELEGATION.TX_ID)
-      ) POOL_T ON POOL_T.addr_id = status_t.id
-      LEFT JOIN (
+                stake_deregistration.addr_id = delegation.addr_id
+                AND stake_deregistration.tx_id > delegation.tx_id)
+      ) AS pool_t ON pool_t.addr_id = status_t.id
+    LEFT JOIN (
         SELECT
-          TX_OUT.STAKE_ADDRESS_ID,
-          COALESCE(SUM(VALUE), 0) AS UTXO
+          tx_out.stake_address_id,
+          COALESCE(SUM(VALUE), 0) AS utxo
         FROM
-          TX_OUT
-          LEFT JOIN TX_IN ON TX_OUT.TX_ID = TX_IN.TX_OUT_ID
-            AND TX_OUT.INDEX::smallint = TX_IN.TX_OUT_INDEX::smallint
+          tx_out
+          LEFT JOIN tx_in ON tx_out.tx_id = tx_in.tx_out_id
+            AND tx_out.index::smallint = tx_in.tx_out_index::smallint
         WHERE
-          TX_OUT.STAKE_ADDRESS_ID = ANY(sa_id_list)
-          AND TX_IN.TX_OUT_ID IS NULL
+          tx_out.stake_address_id = ANY(sa_id_list)
+          AND tx_in.tx_out_id IS NULL
         GROUP BY
           tx_out.stake_address_id
-      ) UTXO_T ON UTXO_T.stake_address_id = status_t.id
-      LEFT JOIN (
+      ) AS utxo_t ON utxo_t.stake_address_id = status_t.id
+    LEFT JOIN (
         SELECT
-          REWARD.ADDR_ID,
-          COALESCE(SUM(REWARD.AMOUNT), 0) AS REWARDS
+          reward.addr_id,
+          COALESCE(SUM(reward.amount), 0) AS rewards
         FROM
-          REWARD
+          reward
         WHERE
-          REWARD.ADDR_ID = ANY(sa_id_list)
-          AND REWARD.SPENDABLE_EPOCH <= (
-            SELECT MAX(NO)
-            FROM EPOCH
+          reward.addr_id = ANY(sa_id_list)
+          AND reward.SPENDABLE_EPOCH <= (
+            SELECT MAX(no)
+            FROM epoch
           )
         GROUP BY
-          REWARD.ADDR_ID
-      ) REWARDS_T ON REWARDS_T.addr_id = status_t.id
-      LEFT JOIN (
+          reward.addr_id
+      ) AS rewards_t ON rewards_t.addr_id = status_t.id
+    LEFT JOIN (
         SELECT
-          WITHDRAWAL.ADDR_ID,
-          COALESCE(SUM(WITHDRAWAL.AMOUNT), 0) AS WITHDRAWALS
+          withdrawal.addr_id,
+          COALESCE(SUM(withdrawal.amount), 0) AS withdrawals
         FROM
-          WITHDRAWAL
+          withdrawal
         WHERE
-          WITHDRAWAL.ADDR_ID = ANY(sa_id_list)
+          withdrawal.addr_id = ANY(sa_id_list)
         GROUP BY
-          WITHDRAWAL.ADDR_ID
-      ) WITHDRAWALS_T ON WITHDRAWALS_T.addr_id = status_t.id
-      LEFT JOIN (
+          withdrawal.addr_id
+      ) AS withdrawals_t ON withdrawals_t.addr_id = status_t.id
+    LEFT JOIN (
         SELECT
-          RESERVE.ADDR_ID,
-          COALESCE(SUM(RESERVE.AMOUNT), 0) AS RESERVES
+          reserve.addr_id,
+          COALESCE(SUM(reserve.amount), 0) AS reserves
         FROM
-          RESERVE
-          INNER JOIN TX ON TX.ID = RESERVE.TX_ID
-          INNER JOIN BLOCK ON BLOCK.ID = TX.BLOCK_ID
-          INNER JOIN latest_withdrawal_epochs lwe ON lwe.addr_id = reserve.addr_id
+          reserve
+          INNER JOIN tx ON tx.id = reserve.tx_id
+          INNER JOIN block ON block.id = tx.block_id
+          INNER JOIN latest_withdrawal_epochs AS lwe ON lwe.addr_id = reserve.addr_id
         WHERE
-          RESERVE.ADDR_ID = ANY(sa_id_list)
-          AND BLOCK.EPOCH_NO >= lwe.epoch_no
+          reserve.addr_id = ANY(sa_id_list)
+          AND block.epoch_no >= lwe.epoch_no
         GROUP BY
-          RESERVE.ADDR_ID
-      ) RESERVES_T ON RESERVES_T.addr_id = status_t.id
-      LEFT JOIN (
+          reserve.addr_id
+      ) AS reserves_t ON reserves_t.addr_id = status_t.id
+    LEFT JOIN (
         SELECT
-          TREASURY.ADDR_ID,
-          COALESCE(SUM(TREASURY.AMOUNT), 0) AS TREASURY
+          treasury.addr_id,
+          COALESCE(SUM(treasury.amount), 0) AS treasury
         FROM
-          TREASURY
-          INNER JOIN TX ON TX.ID = TREASURY.TX_ID
-          INNER JOIN BLOCK ON BLOCK.ID = TX.BLOCK_ID
-          INNER JOIN latest_withdrawal_epochs lwe ON lwe.addr_id = TREASURY.addr_id
+          treasury
+          INNER JOIN tx ON tx.id = treasury.tx_id
+          INNER JOIN block ON block.id = tx.block_id
+          INNER JOIN latest_withdrawal_epochs AS lwe ON lwe.addr_id = treasury.addr_id
         WHERE
-          TREASURY.ADDR_ID = ANY(sa_id_list)
-          AND BLOCK.EPOCH_NO >= lwe.epoch_no
+          treasury.addr_id = ANY(sa_id_list)
+          AND block.epoch_no >= lwe.epoch_no
         GROUP BY
-          TREASURY.ADDR_ID
-      ) TREASURY_T ON TREASURY_T.addr_id = status_t.id;
+          treasury.addr_id
+      ) AS treasury_t ON treasury_t.addr_id = status_t.id;
 END;
 $$;
 
-COMMENT ON FUNCTION grest.account_info IS 'Get the account info for given stake addresses';
-
+COMMENT ON FUNCTION grest.account_info IS 'Get the account info for given stake addresses'; -- noqa: LT01
