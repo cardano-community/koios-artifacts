@@ -115,13 +115,13 @@ BEGIN
       EXTRACT(EPOCH FROM e.start_time) AS i_first_block_time,
       EXTRACT(EPOCH FROM e.end_time) AS i_last_block_time,
       CASE -- populated in epoch n + 2
-        WHEN e.no <= _curr_epoch - 2 THEN reward_pot.amount 
+        WHEN e.no <= _curr_epoch - 2 THEN reward_pot.amount
         ELSE NULL
       END AS i_total_rewards,
       CASE -- populated in epoch n + 2
         WHEN e.no <= _curr_epoch THEN ROUND(reward_pot.amount / e.blk_count)
         ELSE NULL
-      END AS i_avg_blk_reward, 
+      END AS i_avg_blk_reward,
       last_tx.tx_id AS i_last_tx_id,
       ep.min_fee_a AS p_min_fee_a,
       ep.min_fee_b AS p_min_fee_b,

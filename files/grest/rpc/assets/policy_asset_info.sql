@@ -39,7 +39,7 @@ DECLARE
   _policy_asset_ids bigint[];
 BEGIN
   SELECT DECODE(_asset_policy, 'hex') INTO _asset_policy_decoded;
-  RETURN QUERY 
+  RETURN QUERY
     SELECT
       ENCODE(ma.name, 'hex') AS asset_name,
       ENCODE(ma.name, 'escape') AS asset_name_ascii,
@@ -61,24 +61,19 @@ BEGIN
           'decimals', arc.decimals
         )
       END
-    FROM 
-      multi_asset AS ma
-      INNER JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
-      INNER JOIN tx ON tx.id = aic.last_mint_tx_id
-      LEFT JOIN grest.asset_registry_cache AS arc ON arc.asset_policy = ENCODE(ma.policy,'hex') AND arc.asset_name = ENCODE(ma.name, 'hex')
-      LEFT JOIN LATERAL (
-        SELECT
-          JSONB_OBJECT_AGG(
-            key::text,
-            json
-          ) AS minting_tx_metadata
-        FROM
-          tx_metadata AS tm
-        WHERE
-          tm.tx_id = tx.id
-      ) metadata ON TRUE
-    WHERE
-      ma.policy = _asset_policy_decoded;
+    FROM multi_asset AS ma
+    INNER JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
+    INNER JOIN tx ON tx.id = aic.last_mint_tx_id
+    LEFT JOIN grest.asset_registry_cache AS arc ON arc.asset_policy = ENCODE(ma.policy,'hex') AND arc.asset_name = ENCODE(ma.name, 'hex')
+    LEFT JOIN LATERAL (
+      SELECT JSONB_OBJECT_AGG(
+          key::text,
+          json
+        ) AS minting_tx_metadata
+      FROM tx_metadata AS tm
+      WHERE tm.tx_id = tx.id
+    ) AS metadata ON TRUE
+    WHERE ma.policy = _asset_policy_decoded;
 END;
 $$;
 

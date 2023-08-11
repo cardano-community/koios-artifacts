@@ -16,7 +16,7 @@ BEGIN
       ENCODE(d.hash, 'hex'),
       d.value,
       ENCODE(d.bytes, 'hex')
-    FROM 
+    FROM
       datum AS d
     WHERE
       d.hash = ANY(_datum_hashes_decoded);

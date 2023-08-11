@@ -13,10 +13,8 @@ DECLARE
 BEGIN
   SELECT DECODE(_asset_policy, 'hex') INTO _asset_policy_decoded;
   SELECT DECODE(
-    CASE WHEN _asset_name IS NULL
-      THEN ''
-    ELSE
-      _asset_name
+    CASE WHEN _asset_name IS NULL THEN ''
+    ELSE _asset_name
     END,
     'hex'
   ) INTO _asset_name_decoded;
@@ -48,16 +46,15 @@ BEGIN
                 'key', tm.key::text,
                 'json', tm.json
               )
-            ) 
+            )
           END
         ) AS metadata
-      FROM
-        ma_tx_mint AS mtm
-        INNER JOIN multi_asset AS ma ON ma.id = mtm.ident
-        INNER JOIN tx ON tx.id = MTM.tx_id
-        INNER JOIN block AS b ON b.id = tx.block_id
-        LEFT JOIN tx_metadata AS tm ON tm.tx_id = tx.id
-      WHERE ma.policy = _asset_policy_decoded 
+      FROM ma_tx_mint AS mtm
+      INNER JOIN multi_asset AS ma ON ma.id = mtm.ident
+      INNER JOIN tx ON tx.id = MTM.tx_id
+      INNER JOIN block AS b ON b.id = tx.block_id
+      LEFT JOIN tx_metadata AS tm ON tm.tx_id = tx.id
+      WHERE ma.policy = _asset_policy_decoded
         AND ma.name = _asset_name_decoded
       GROUP BY
         ma.fingerprint,
@@ -66,8 +63,7 @@ BEGIN
         mtm.quantity,
         tm.key
     ) AS minting_data
-    GROUP BY
-      minting_data.fingerprint;
+    GROUP BY minting_data.fingerprint;
 END;
 $$;
 

@@ -116,15 +116,36 @@ schemas:
       items:
         properties:
           pool_id_bech32:
-            type: string
-            nullable: true
-            description: Bech32 representation of pool ID
-            example: pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt
+            $ref: "#/components/schemas/pool_info/items/properties/pool_id_bech32"
+          pool_id_hex:
+            $ref: "#/components/schemas/pool_info/items/properties/pool_id_hex"
+          active_epoch_no:
+            $ref: "#/components/schemas/pool_info/items/properties/active_epoch_no"
+          margin:
+            $ref: "#/components/schemas/pool_info/items/properties/margin"
+          fixed_cost:
+            $ref: "#/components/schemas/pool_info/items/properties/fixed_cost"
+          pledge:
+            $ref: "#/components/schemas/pool_info/items/properties/pledge"
+          reward_addr:
+            $ref: "#/components/schemas/pool_info/items/properties/reward_addr"
+          owners:
+            $ref: "#/components/schemas/pool_info/items/properties/margin"
+          relays:
+            $ref: "#/components/schemas/pool_info/items/properties/margin"
           ticker:
             type: string
             nullable: true
             description: Pool ticker
-            example: JAZZ
+            example: AHL
+          meta_url:
+            $ref: "#/components/schemas/pool_info/items/properties/margin"
+          meta_hash:
+            $ref: "#/components/schemas/pool_info/items/properties/margin"
+          pool_status:
+            $ref: "#/components/schemas/pool_info/items/properties/margin"
+          retiring_epoch:
+            $ref: "#/components/schemas/pool_info/items/properties/margin"
     pool_history_info:
       type: array
       items:
@@ -460,6 +481,8 @@ schemas:
             $ref: "#/components/schemas/pool_info/items/properties/pool_id_bech32"
           relays:
             $ref: "#/components/schemas/pool_info/items/properties/relays"
+          pool_status:
+            $ref: "#/components/schemas/pool_info/items/properties/pool_status"
     pool_metadata:
       type: array
       items:
@@ -473,6 +496,8 @@ schemas:
             $ref: "#/components/schemas/pool_info/items/properties/meta_hash"
           meta_json:
             $ref: "#/components/schemas/pool_info/items/properties/meta_json"
+          pool_status:
+            $ref: "#/components/schemas/pool_info/items/properties/pool_status"
     epoch_info:
       type: array
       items:

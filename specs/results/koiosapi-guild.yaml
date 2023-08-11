@@ -1279,7 +1279,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Pool Relays
-      description: A list of registered relays for all currently registered/retiring (not retired) pools
+      description: A list of registered relays for all pools
   /pool_metadata: #RPC
     post:
       tags:
@@ -1300,7 +1300,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Pool Metadata
-      description: Metadata (on & off-chain) for all currently registered/retiring (not retired) pools
+      description: Metadata (on & off-chain) for all pools
   /native_script_list: #RPC
     get:
       tags:
@@ -2008,15 +2008,36 @@ components:
       items:
         properties:
           pool_id_bech32:
-            type: string
-            nullable: true
-            description: Bech32 representation of pool ID
-            example: pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt
+            $ref: "#/components/schemas/pool_info/items/properties/pool_id_bech32"
+          pool_id_hex:
+            $ref: "#/components/schemas/pool_info/items/properties/pool_id_hex"
+          active_epoch_no:
+            $ref: "#/components/schemas/pool_info/items/properties/active_epoch_no"
+          margin:
+            $ref: "#/components/schemas/pool_info/items/properties/margin"
+          fixed_cost:
+            $ref: "#/components/schemas/pool_info/items/properties/fixed_cost"
+          pledge:
+            $ref: "#/components/schemas/pool_info/items/properties/pledge"
+          reward_addr:
+            $ref: "#/components/schemas/pool_info/items/properties/reward_addr"
+          owners:
+            $ref: "#/components/schemas/pool_info/items/properties/margin"
+          relays:
+            $ref: "#/components/schemas/pool_info/items/properties/margin"
           ticker:
             type: string
             nullable: true
             description: Pool ticker
-            example: JAZZ
+            example: AHL
+          meta_url:
+            $ref: "#/components/schemas/pool_info/items/properties/margin"
+          meta_hash:
+            $ref: "#/components/schemas/pool_info/items/properties/margin"
+          pool_status:
+            $ref: "#/components/schemas/pool_info/items/properties/margin"
+          retiring_epoch:
+            $ref: "#/components/schemas/pool_info/items/properties/margin"
     pool_history_info:
       type: array
       items:
@@ -2352,6 +2373,8 @@ components:
             $ref: "#/components/schemas/pool_info/items/properties/pool_id_bech32"
           relays:
             $ref: "#/components/schemas/pool_info/items/properties/relays"
+          pool_status:
+            $ref: "#/components/schemas/pool_info/items/properties/pool_status"
     pool_metadata:
       type: array
       items:
@@ -2365,6 +2388,8 @@ components:
             $ref: "#/components/schemas/pool_info/items/properties/meta_hash"
           meta_json:
             $ref: "#/components/schemas/pool_info/items/properties/meta_json"
+          pool_status:
+            $ref: "#/components/schemas/pool_info/items/properties/pool_status"
     epoch_info:
       type: array
       items:

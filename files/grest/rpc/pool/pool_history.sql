@@ -34,8 +34,8 @@ BEGIN
     COALESCE(member_rewards, 0)::text,
     COALESCE(epoch_ros, 0)
   FROM grest.pool_history_cache AS phc
-  WHERE phc.pool_id = _pool_bech32 and 
-    (_epoch_no IS NULL OR 
+  WHERE phc.pool_id = _pool_bech32 and
+    (_epoch_no IS NULL OR
         phc.epoch_no = _epoch_no)
    ORDER by phc.epoch_no desc;
 END;

@@ -1138,7 +1138,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Pool Relays
-      description: A list of registered relays for all currently registered/retiring (not retired) pools
+      description: A list of registered relays for all pools
   /pool_metadata: #RPC
     post:
       tags:
@@ -1159,7 +1159,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Pool Metadata
-      description: Metadata (on & off-chain) for all currently registered/retiring (not retired) pools
+      description: Metadata (on & off-chain) for all pools
   /native_script_list: #RPC
     get:
       tags:

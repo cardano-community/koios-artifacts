@@ -45,10 +45,8 @@ BEGIN
           'quantity', aa.quantity::text
         )
       ) AS asset_list
-    FROM 
-      _all_assets AS aa
-    GROUP BY
-      aa.address
+    FROM _all_assets AS aa
+    GROUP BY aa.address
   ) assets_grouped;
 END;
 $$;

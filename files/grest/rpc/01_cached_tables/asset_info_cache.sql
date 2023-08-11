@@ -30,7 +30,7 @@ BEGIN
     WHERE state = 'active'
       AND query ILIKE '%grest.asset_info_cache_update%'
       AND datname = (SELECT current_database())
-  ) THEN 
+  ) THEN
     RAISE EXCEPTION 'Previous asset_info_cache_update query still running but should have completed! Exiting...';
   END IF;
 
@@ -56,7 +56,7 @@ BEGIN
     tx_mint_meta AS (
       SELECT
         mtm.ident,
-        MIN(mtm.tx_id) AS first_mint_tx_id, 
+        MIN(mtm.tx_id) AS first_mint_tx_id,
         MAX(mtm.tx_id) AS last_mint_tx_id
       FROM ma_tx_mint AS mtm
       INNER JOIN tx_metadata AS tm ON tm.tx_id = mtm.tx_id
@@ -74,7 +74,7 @@ BEGIN
     tx_mint_nometa AS (
       SELECT
         mtm.ident,
-        MIN(mtm.tx_id) AS first_mint_tx_id, 
+        MIN(mtm.tx_id) AS first_mint_tx_id,
         MAX(mtm.tx_id) AS last_mint_tx_id
       FROM ma_tx_mint AS mtm
       LEFT JOIN tx_mint_meta ON tx_mint_meta.ident = mtm.ident
@@ -111,7 +111,7 @@ BEGIN
       FROM tx_mint_nometa
     )
 
-  INSERT INTO grest.asset_info_cache  
+  INSERT INTO grest.asset_info_cache
     SELECT
       ma.id,
       MIN(B.time) AS creation_time,

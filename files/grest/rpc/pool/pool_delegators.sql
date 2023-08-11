@@ -11,8 +11,8 @@ AS $$
 DECLARE
   _pool_id bigint;
 BEGIN
-  RETURN QUERY 
-    WITH 
+  RETURN QUERY
+    WITH
       _all_delegations AS (
         SELECT
           sa.id AS stake_address_id,
