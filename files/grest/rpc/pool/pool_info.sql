@@ -77,22 +77,13 @@ BEGIN
       ROUND((live.stake / _saturation_limit) * 100, 2)
     FROM _all_pool_info AS api
     LEFT JOIN LATERAL (
-      (
-        SELECT pod.json
-        FROM public.pool_offline_data AS pod
-        WHERE pod.pool_id = api.pool_hash_id
-          AND pod.pmr_id = api.meta_id
-      )
-      UNION ALL
-      (
-        SELECT pod.json
-        FROM public.pool_offline_data AS pod
-        WHERE pod.pool_id = api.pool_hash_id
-          AND pod.json IS NOT NULL
-        ORDER BY pod.pmr_id DESC
-      )
+      SELECT pod.json
+      FROM public.pool_offline_data AS pod
+      WHERE pod.pool_id = api.pool_hash_id
+        AND pod.pmr_id = api.meta_id
+      ORDER BY pod.pmr_id DESC
       LIMIT 1
-    ) offline_data ON TRUE
+    ) AS offline_data ON TRUE
     LEFT JOIN LATERAL (
       SELECT
         SUM(COUNT(b.id)) OVER () AS cnt,
@@ -106,18 +97,18 @@ BEGIN
         b.op_cert_counter
       ORDER BY b.op_cert_counter DESC
       LIMIT 1
-    ) block_data ON TRUE
+    ) AS block_data ON TRUE
     LEFT JOIN LATERAL(
       SELECT amount::lovelace AS as_sum
       FROM grest.pool_active_stake_cache AS pasc
       WHERE pasc.pool_id = api.pool_id_bech32
         AND pasc.epoch_no = _epoch_no
-    ) active_stake ON TRUE
+    ) AS active_stake ON TRUE
     LEFT JOIN LATERAL(
       SELECT amount::lovelace AS es_sum
       FROM grest.epoch_active_stake_cache AS easc
       WHERE easc.epoch_no = _epoch_no
-    ) epoch_stake ON TRUE
+    ) AS epoch_stake ON TRUE
     LEFT JOIN LATERAL(
       SELECT
         CASE WHEN api.pool_status = 'retired'
@@ -138,7 +129,7 @@ BEGIN
         END AS pledge
       FROM grest.stake_distribution_cache AS sdc
       WHERE sdc.pool_id = api.pool_id_bech32
-    ) live ON TRUE;
+    ) AS live ON TRUE;
 END;
 $$;
 
