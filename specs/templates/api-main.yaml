@@ -1243,7 +1243,11 @@ paths:
 components:
   #!params!#
   #!requestBodies!#
-  securitySchemes: {}
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   #!schemas!#
   headers: {}
   responses:
@@ -1252,7 +1256,7 @@ components:
     NotFound:
       description: The server does not recognise the combination of endpoint and parameters provided
     Unauthorized:
-      description: The selected server has restricted the endpoint to be only usable via authentication. The authentication supplied was not authorized to access the endpoint
+      description: Access token is missing or invalid
     PartialContent:
       description: The result was truncated
     BadRequest:
@@ -1285,4 +1289,5 @@ tags:
   - name: Script
     description: Query information about specific scripts (Smart Contracts)
     x-tag-expanded: false
-security: []
+security:
+  - bearerAuth: []

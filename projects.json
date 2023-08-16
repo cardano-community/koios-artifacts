@@ -41,6 +41,10 @@
     {
       "text": "TypeScript Client (Tiny)",
       "link": "https://github.com/ray-network/koios-tiny-client"
+    },
+    {
+      "text": "Laravel PHP Client",
+      "link": "https://github.com/cardano-blockhouse/cardano-koios-api"
     }
   ],
   "Community Projects/Tools": [

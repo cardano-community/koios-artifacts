@@ -134,6 +134,10 @@ info:
 
     Yet, there may be cases where the above restrictions may need exceptions (for example, an explorer or a wallet might need more connections than above - going beyond the Burst Limit). For such cases, it is best to approach the team and we can work towards a solution.
 
+    # Authentication
+
+    While Koios public tier remains unauthenticated and allows queries without any authentication, it has low limits to prevent actions against an erroraneous query/loop from a consumer. There is also a Free tier which requires setting up Bearer Auth token that is linked to the owner's wallet account (which can be connected to via [Koios website](https://koios.rest/pricing/Pricing.html) ).
+    The examples across this API site already [supports authentication](/#auth), for you to use in the queries.
 
     # Community projects
 
@@ -1889,7 +1893,11 @@ components:
               _asset_list:
                 - ['313534a537bc476c86ff7c57ec511bd7f24a9d15654091b24e9c606e','41484c636f696e']
                 - ['313534a537bc476c86ff7c57ec511bd7f24a9d15654091b24e9c606e','41484c636f696e']
-  securitySchemes: {}
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     tip:
       type: array
@@ -3737,7 +3745,7 @@ components:
     NotFound:
       description: The server does not recognise the combination of endpoint and parameters provided
     Unauthorized:
-      description: The selected server has restricted the endpoint to be only usable via authentication. The authentication supplied was not authorized to access the endpoint
+      description: Access token is missing or invalid
     PartialContent:
       description: The result was truncated
     BadRequest:
@@ -3770,4 +3778,5 @@ tags:
   - name: Script
     description: Query information about specific scripts (Smart Contracts)
     x-tag-expanded: false
-security: []
+security:
+  - bearerAuth: []

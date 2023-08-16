@@ -133,6 +133,10 @@ info:
 
     Yet, there may be cases where the above restrictions may need exceptions (for example, an explorer or a wallet might need more connections than above - going beyond the Burst Limit). For such cases, it is best to approach the team and we can work towards a solution.
 
+    # Authentication
+
+    While Koios public tier remains unauthenticated and allows queries without any authentication, it has low limits to prevent actions against an erroraneous query/loop from a consumer. There is also a Free tier which requires setting up Bearer Auth token that is linked to the owner's wallet account (which can be connected to via [Koios website](https://koios.rest/pricing/Pricing.html) ).
+    The examples across this API site already [supports authentication](/#auth), for you to use in the queries.
 
     # Community projects
 
