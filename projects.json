@@ -161,6 +161,14 @@
       }
     },
     {
+      "text": "Tabulali",
+      "link": "https://eddex.github.io/tabulali/",
+      "logo": {
+        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/tabulali-512.png",
+        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/tabulali-512.png"
+      }
+    },
+    {
       "text": "TosiDrop",
       "link": "https://tosidrop.io",
       "logo": {
