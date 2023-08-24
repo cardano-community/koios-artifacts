@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION grest.account_utxos(_stake_addresses text [], _extended boolean DEFAULT false)
+CREATE OR REPLACE FUNCTION grest.address_utxos(_addresses text [], _extended boolean DEFAULT false)
 RETURNS TABLE (
   tx_hash text,
   tx_index smallint,
@@ -74,7 +74,7 @@ BEGIN
     LEFT JOIN datum ON datum.id = tx_out.inline_datum_id
     LEFT JOIN script ON script.id = tx_out.reference_script_id
     WHERE
-      tx_out.stake_address_id IN (SELECT sa.id FROM stake_address AS sa WHERE sa.view = ANY(_stake_addresses))
+      tx_out.address = ANY(_addresses)
   ;
 END;
 $$;

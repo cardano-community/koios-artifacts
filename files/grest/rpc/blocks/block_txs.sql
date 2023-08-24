@@ -1,7 +1,10 @@
 CREATE OR REPLACE FUNCTION grest.block_txs(_block_hashes text [])
 RETURNS TABLE (
   block_hash text,
-  tx_hashes text []
+  tx_hash text,
+  epoch_no word31type,
+  block_height word31type,
+  block_time integer
 )
 LANGUAGE plpgsql
 AS $$
@@ -21,13 +24,15 @@ BEGIN
 
   RETURN QUERY
     SELECT
-      encode(b.hash, 'hex'),
-      ARRAY_AGG(ENCODE(tx.hash::bytea, 'hex'))
-    FROM
-      public.block AS b
-      INNER JOIN public.tx ON tx.block_id = b.id
+      ENCODE(b.hash, 'hex'),
+      ENCODE(tx.hash, 'hex') AS tx_hash,
+      b.epoch_no,
+      b.block_no AS block_height,
+      EXTRACT(EPOCH FROM b.time)::integer AS block_time
+    FROM public.block AS b
+    INNER JOIN public.tx ON tx.block_id = b.id
     WHERE b.id = ANY(_block_ids)
-    GROUP BY b.hash;
+  ;
 END;
 $$;
 

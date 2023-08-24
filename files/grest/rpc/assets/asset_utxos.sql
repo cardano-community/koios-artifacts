@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION grest.account_utxos(_stake_addresses text [], _extended boolean DEFAULT false)
+CREATE OR REPLACE FUNCTION grest.asset_utxos(_asset_list text [] [], _extended boolean DEFAULT false)
 RETURNS TABLE (
   tx_hash text,
   tx_index smallint,
@@ -18,8 +18,21 @@ RETURNS TABLE (
 LANGUAGE plpgsql
 AS $$
 DECLARE
-  known_addresses varchar[];
+  _asset_id_list bigint[];
 BEGIN
+  -- find all asset id's based ON nested array input
+  SELECT INTO _asset_id_list ARRAY_AGG(id)
+  FROM (
+    SELECT DISTINCT mu.id
+    FROM (
+      SELECT
+        DECODE(al->>0, 'hex') AS policy,
+        DECODE(al->>1, 'hex') AS name
+      FROM JSONB_ARRAY_ELEMENTS(TO_JSONB(_asset_list)) AS al
+    ) AS ald
+    INNER JOIN multi_asset AS mu ON mu.policy = ald.policy AND mu.name = ald.name
+  ) AS tmp;
+
   RETURN QUERY
     SELECT
       ENCODE(tx.hash, 'hex')::text AS tx_hash,
@@ -74,9 +87,9 @@ BEGIN
     LEFT JOIN datum ON datum.id = tx_out.inline_datum_id
     LEFT JOIN script ON script.id = tx_out.reference_script_id
     WHERE
-      tx_out.stake_address_id IN (SELECT sa.id FROM stake_address AS sa WHERE sa.view = ANY(_stake_addresses))
+      mto.ident = ANY(_asset_id_list)
   ;
 END;
 $$;
 
-COMMENT ON FUNCTION grest.address_utxos IS  'Get UTxO details for requested addresses'; -- noqa: LT01
+COMMENT ON FUNCTION grest.asset_utxos IS 'Get UTxO details for requested assets'; -- noqa: LT01

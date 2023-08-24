@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION grest.account_utxos(_stake_addresses text [], _extended boolean DEFAULT false)
+CREATE OR REPLACE FUNCTION grest.utxo_info(_utxo_refs text [], _extended boolean DEFAULT false)
 RETURNS TABLE (
   tx_hash text,
   tx_index smallint,
@@ -18,8 +18,27 @@ RETURNS TABLE (
 LANGUAGE plpgsql
 AS $$
 DECLARE
-  known_addresses varchar[];
+  _tx_hashes_bytea  bytea[];
+  _tx_id_list       bigint[];
 BEGIN
+  -- convert input _tx_hashes array into bytea array
+  CREATE TEMP TABLE utxo_refs AS (
+    SELECT
+      DECODE(SPLIT_PART(ur,'#',1), 'hex') AS tx_hashes,
+      SPLIT_PART(ur,'#',2) AS tx_index
+    FROM UNNEST(_utxo_refs) AS ur
+  );
+
+  -- all tx ids
+  SELECT INTO _tx_id_list ARRAY_AGG(id)
+  FROM (
+    SELECT txo.id
+    FROM tx_out AS txo
+    INNER JOIN tx ON tx.id = txo.tx_id
+    INNER JOIN utxo_refs AS ur ON ur.tx_hashes = tx.hash
+      AND ur.tx_index::smallint = txo.index
+  ) AS tmp;
+
   RETURN QUERY
     SELECT
       ENCODE(tx.hash, 'hex')::text AS tx_hash,
@@ -74,9 +93,10 @@ BEGIN
     LEFT JOIN datum ON datum.id = tx_out.inline_datum_id
     LEFT JOIN script ON script.id = tx_out.reference_script_id
     WHERE
-      tx_out.stake_address_id IN (SELECT sa.id FROM stake_address AS sa WHERE sa.view = ANY(_stake_addresses))
+      tx_out.id = ANY(_tx_id_list)
   ;
+
 END;
 $$;
 
-COMMENT ON FUNCTION grest.address_utxos IS  'Get UTxO details for requested addresses'; -- noqa: LT01
+COMMENT ON FUNCTION grest.utxo_info IS 'Get details for requested UTxO arrays (UTxOs accepted in <hash>#<index> format).'; -- noqa: LT01

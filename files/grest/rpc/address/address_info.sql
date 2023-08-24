@@ -34,10 +34,8 @@ BEGIN
         tx_out.inline_datum_id,
         tx_out.reference_script_id
       FROM tx_out
-      LEFT JOIN tx_in ON tx_in.tx_out_id = tx_out.tx_id
-        AND tx_in.tx_out_index = tx_out.index
       INNER JOIN tx ON tx.id = tx_out.tx_id
-      WHERE tx_in.tx_out_id IS NULL
+      WHERE tx_out.consumed_by_tx_in_id IS NULL
         AND tx_out.address = ANY(_addresses)
     )
 

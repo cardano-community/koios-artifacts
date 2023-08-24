@@ -16,16 +16,12 @@ BEGIN
       ma.fingerprint,
       COALESCE(aic.decimals, 0) AS decimals,
       SUM(mtx.quantity) AS quantity
-    FROM
-      ma_tx_out AS mtx
-      INNER JOIN multi_asset AS ma ON ma.id = mtx.ident
-      LEFT JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
-      INNER JOIN tx_out AS txo ON txo.id = mtx.tx_out_id
-      LEFT JOIN tx_in ON txo.tx_id = tx_in.tx_out_id
-        AND txo.index::smallint = tx_in.tx_out_index::smallint
-    WHERE
-      txo.address = ANY(_addresses)
-      AND tx_in.tx_out_id IS NULL
+    FROM ma_tx_out AS mtx
+    INNER JOIN multi_asset AS ma ON ma.id = mtx.ident
+    LEFT JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
+    INNER JOIN tx_out AS txo ON txo.id = mtx.tx_out_id
+    WHERE txo.address = ANY(_addresses)
+      AND tx_out.consumed_by_tx_in_id IS NULL
     GROUP BY
       txo.address, ma.policy, ma.name, ma.fingerprint, aic.decimals
   )
