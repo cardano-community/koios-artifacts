@@ -85,7 +85,7 @@ BEGIN
     LEFT JOIN multi_asset AS ma ON ma.id = mto.ident
     LEFT JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
     LEFT JOIN datum ON datum.id = tx_out.inline_datum_id
-    LEFT JOIN script ON script.id = tx_out.reference_script_id
+    LEFT JOIN script ON script.tx_id = tx.id
     WHERE
       mto.ident = ANY(_asset_id_list)
   ;

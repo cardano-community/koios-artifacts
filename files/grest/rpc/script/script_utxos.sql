@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION grest.address_utxos(_addresses text [], _extended boolean DEFAULT false)
+CREATE OR REPLACE FUNCTION grest.script_utxos(_script_hash text, _extended boolean DEFAULT false)
 RETURNS TABLE (
   tx_hash text,
   tx_index smallint,
@@ -74,9 +74,9 @@ BEGIN
     LEFT JOIN datum ON datum.id = tx_out.inline_datum_id
     LEFT JOIN script ON script.tx_id = tx.id
     WHERE
-      tx_out.address = ANY(_addresses)
+      script.hash = DECODE(_script_hash,'hex')
   ;
 END;
 $$;
 
-COMMENT ON FUNCTION grest.address_utxos IS  'Get UTxO details for requested addresses'; -- noqa: LT01
+COMMENT ON FUNCTION grest.script_utxos IS  'Get UTxO details for requested scripts'; -- noqa: LT01

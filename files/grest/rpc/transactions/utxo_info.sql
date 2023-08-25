@@ -22,6 +22,7 @@ DECLARE
   _tx_id_list       bigint[];
 BEGIN
   -- convert input _tx_hashes array into bytea array
+  DROP TABLE IF EXISTS utxo_refs;
   CREATE TEMP TABLE utxo_refs AS (
     SELECT
       DECODE(SPLIT_PART(ur,'#',1), 'hex') AS tx_hashes,
@@ -91,7 +92,7 @@ BEGIN
     LEFT JOIN multi_asset AS ma ON ma.id = mto.ident
     LEFT JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
     LEFT JOIN datum ON datum.id = tx_out.inline_datum_id
-    LEFT JOIN script ON script.id = tx_out.reference_script_id
+    LEFT JOIN script ON script.tx_id = tx.id
     WHERE
       tx_out.id = ANY(_tx_id_list)
   ;
