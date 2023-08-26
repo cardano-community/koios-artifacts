@@ -29,11 +29,9 @@ BEGIN
         INNER JOIN tx_out AS txo ON txo.id = mtx.tx_out_id
         INNER JOIN stake_address AS sa ON sa.id = txo.stake_address_id
         LEFT JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
-        LEFT JOIN tx_in ON txo.tx_id = tx_in.tx_out_id
-          AND txo.index::smallint = tx_in.tx_out_index::smallint
       WHERE
         sa.id = ANY(sa_id_list)
-        AND tx_in.tx_out_id IS NULL
+        AND tx_out.consumed_by_tx_in_id IS NULL
       GROUP BY
         sa.view, ma.policy, ma.name, ma.fingerprint, aic.decimals
     )

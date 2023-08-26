@@ -266,7 +266,7 @@ BEGIN
   SELECT (_current_block_height - _last_update_block_height) INTO _last_update_block_diff;
   -- Do nothing until there is a 180 blocks difference in height - 60 minutes theoretical time
   -- 185 in check because last block height considered is 5 blocks behind tip
-  
+
   Raise NOTICE 'Last stake distribution update was % blocks ago...',
     _last_update_block_diff;
     IF (_last_update_block_diff >= 180

@@ -16,8 +16,7 @@ BEGIN
         SELECT
           id,
           ENCODE(name, 'hex') AS asset_name
-        FROM
-          multi_asset AS ma
+        FROM multi_asset AS ma
         WHERE ma.policy = _asset_policy_decoded
       )
 
@@ -31,17 +30,14 @@ BEGIN
           aa.asset_name,
           txo.address,
           mto.quantity
-        FROM
-          _all_assets AS aa
-          INNER JOIN ma_tx_out AS mto ON mto.ident = aa.id
-          INNER JOIN tx_out AS txo ON txo.id = mto.tx_out_id
-          LEFT JOIN tx_in ON txo.tx_id = tx_in.tx_out_id
-            AND txo.index::smallint = tx_in.tx_out_index::smallint
-        WHERE
-          tx_in.tx_out_id IS NULL
+        FROM _all_assets AS aa
+        INNER JOIN ma_tx_out AS mto ON mto.ident = aa.id
+        INNER JOIN tx_out AS txo ON txo.id = mto.tx_out_id
+        WHERE tx_out.consumed_by_tx_in_id IS NULL
       ) AS x
     GROUP BY
-      x.asset_name, x.address;
+      x.asset_name,
+      x.address;
 END;
 $$;
 

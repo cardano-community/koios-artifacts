@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION grest.credential_utxos(_payment_credentials text [], _extended boolean DEFAULT false)
+CREATE OR REPLACE FUNCTION grest.utxo_info(_utxo_refs text [], _extended boolean DEFAULT false)
 RETURNS TABLE (
   tx_hash text,
   tx_index smallint,
@@ -18,12 +18,26 @@ RETURNS TABLE (
 LANGUAGE plpgsql
 AS $$
 DECLARE
-  _payment_cred_bytea  bytea[];
+  _tx_hashes_bytea  bytea[];
+  _tx_id_list       bigint[];
 BEGIN
-  SELECT INTO _payment_cred_bytea ARRAY_AGG(cred_bytea)
+  -- convert input _tx_hashes array into bytea array
+  DROP TABLE IF EXISTS utxo_refs;
+  CREATE TEMP TABLE utxo_refs AS (
+    SELECT
+      DECODE(SPLIT_PART(ur,'#',1), 'hex') AS tx_hashes,
+      SPLIT_PART(ur,'#',2) AS tx_index
+    FROM UNNEST(_utxo_refs) AS ur
+  );
+
+  -- all tx ids
+  SELECT INTO _tx_id_list ARRAY_AGG(id)
   FROM (
-    SELECT DECODE(cred_hex, 'hex') AS cred_bytea
-    FROM UNNEST(_payment_credentials) AS cred_hex
+    SELECT txo.id
+    FROM tx_out AS txo
+    INNER JOIN tx ON tx.id = txo.tx_id
+    INNER JOIN utxo_refs AS ur ON ur.tx_hashes = tx.hash
+      AND ur.tx_index::smallint = txo.index
   ) AS tmp;
 
   RETURN QUERY
@@ -80,9 +94,10 @@ BEGIN
     LEFT JOIN datum ON datum.id = tx_out.inline_datum_id
     LEFT JOIN script ON script.tx_id = tx.id
     WHERE
-      tx_out.payment_cred = ANY(_payment_cred_bytea)
+      tx_out.id = ANY(_tx_id_list)
   ;
+
 END;
 $$;
 
-COMMENT ON FUNCTION grest.credential_utxos IS 'Get UTxO details for requested payment credentials'; -- noqa: LT01
+COMMENT ON FUNCTION grest.utxo_info IS 'Get details for requested UTxO arrays (UTxOs accepted in <hash>#<index> format).'; -- noqa: LT01

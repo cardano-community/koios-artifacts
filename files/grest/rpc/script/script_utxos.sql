@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION grest.credential_utxos(_payment_credentials text [], _extended boolean DEFAULT false)
+CREATE OR REPLACE FUNCTION grest.script_utxos(_script_hash text, _extended boolean DEFAULT false)
 RETURNS TABLE (
   tx_hash text,
   tx_index smallint,
@@ -18,14 +18,8 @@ RETURNS TABLE (
 LANGUAGE plpgsql
 AS $$
 DECLARE
-  _payment_cred_bytea  bytea[];
+  known_addresses varchar[];
 BEGIN
-  SELECT INTO _payment_cred_bytea ARRAY_AGG(cred_bytea)
-  FROM (
-    SELECT DECODE(cred_hex, 'hex') AS cred_bytea
-    FROM UNNEST(_payment_credentials) AS cred_hex
-  ) AS tmp;
-
   RETURN QUERY
     SELECT
       ENCODE(tx.hash, 'hex')::text AS tx_hash,
@@ -80,9 +74,9 @@ BEGIN
     LEFT JOIN datum ON datum.id = tx_out.inline_datum_id
     LEFT JOIN script ON script.tx_id = tx.id
     WHERE
-      tx_out.payment_cred = ANY(_payment_cred_bytea)
+      script.hash = DECODE(_script_hash,'hex')
   ;
 END;
 $$;
 
-COMMENT ON FUNCTION grest.credential_utxos IS 'Get UTxO details for requested payment credentials'; -- noqa: LT01
+COMMENT ON FUNCTION grest.script_utxos IS  'Get UTxO details for requested scripts'; -- noqa: LT01

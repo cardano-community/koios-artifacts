@@ -66,7 +66,7 @@ BEGIN
           LEFT JOIN ma_tx_out AS mto ON mto.tx_out_id = tx_out.id
           LEFT JOIN multi_asset AS ma ON ma.id = mto.ident
           LEFT JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
-        WHERE 
+        WHERE
           tx_in.tx_in_id = ANY(_tx_id_list)
       ),
 
@@ -97,12 +97,12 @@ BEGIN
           LEFT JOIN ma_tx_out AS mto ON mto.tx_out_id = tx_out.id
           LEFT JOIN multi_asset AS ma ON ma.id = mto.ident
           LEFT JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
-        WHERE 
+        WHERE
           tx_out.tx_id = ANY(_tx_id_list)
       )
 
     SELECT
-      ENCODE(atx.tx_hash, 'hex'),      
+      ENCODE(atx.tx_hash, 'hex'),
       COALESCE((
         SELECT JSONB_AGG(tx_inputs)
         FROM (

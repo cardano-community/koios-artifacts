@@ -24,15 +24,15 @@ DECLARE
   _asset_id int;
 BEGIN
   SELECT DECODE(_asset_policy, 'hex') INTO _asset_policy_decoded;
-  SELECT DECODE(
-    CASE WHEN _asset_name IS NULL
-      THEN ''
-    ELSE
-      _asset_name
-    END,
-    'hex'
-  ) INTO _asset_name_decoded;
-  SELECT id INTO _asset_id FROM multi_asset AS ma WHERE ma.policy = _asset_policy_decoded AND ma.name = _asset_name_decoded;
+  SELECT DECODE(CASE
+    WHEN _asset_name IS NULL THEN ''
+    ELSE _asset_name
+    END, 'hex') INTO _asset_name_decoded;
+  SELECT id INTO _asset_id
+  FROM multi_asset AS ma
+  WHERE ma.policy = _asset_policy_decoded
+    AND ma.name = _asset_name_decoded;
+
   RETURN QUERY
     SELECT
       x.address,
@@ -42,17 +42,12 @@ BEGIN
         SELECT
           txo.address,
           mto.quantity
-        FROM
-          ma_tx_out AS mto
-          INNER JOIN tx_out AS txo ON txo.id = mto.tx_out_id
-          LEFT JOIN tx_in ON txo.tx_id = tx_in.tx_out_id
-            AND txo.index::smallint = tx_in.tx_out_index::smallint
-        WHERE
-          mto.ident = _asset_id
-          AND tx_in.tx_out_id IS NULL
+        FROM ma_tx_out AS mto
+        INNER JOIN tx_out AS txo ON txo.id = mto.tx_out_id
+        WHERE mto.ident = _asset_id
+          AND tx_out.consumed_by_tx_in_id IS NULL
       ) AS x
-    GROUP BY
-      x.address;
+    GROUP BY x.address;
 END;
 $$;
 

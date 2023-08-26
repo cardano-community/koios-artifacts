@@ -27,13 +27,10 @@ BEGIN
               txo.address,
               txo.stake_address_id,
               txo.id
-            FROM
-              tx_out AS txo
-              LEFT JOIN tx_in ON txo.tx_id = tx_in.tx_out_id
-              AND txo.index::smallint = tx_in.tx_out_index::smallint
+            FROM tx_out AS txo
             WHERE
               txo.stake_address_id = ANY(sa_id_list)
-              AND tx_in.tx_out_id IS NULL
+              AND tx_out.consumed_by_tx_in_id IS NULL
           ) AS x
       )
 
@@ -57,8 +54,7 @@ BEGIN
               txo.address,
               txo.stake_address_id,
               txo.id
-            FROM
-              tx_out AS txo
+            FROM tx_out AS txo
             WHERE
               txo.stake_address_id = ANY(sa_id_list)
             LIMIT (CASE WHEN _first_only IS TRUE THEN 1 ELSE NULL END)

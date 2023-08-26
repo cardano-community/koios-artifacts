@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION grest.address_txs(_addresses text [], _after_block_height integer DEFAULT 0)
+CREATE OR REPLACE FUNCTION grest.account_txs(_stake_address text, _after_block_height integer DEFAULT 0)
 RETURNS TABLE (
   tx_hash text,
   epoch_no word31type,
@@ -21,7 +21,7 @@ BEGIN
   FROM (
     SELECT tx_id
     FROM tx_out
-    WHERE address = ANY(_addresses)
+    WHERE stake_address_id = ANY(SELECT id FROM stake_address WHERE view = _stake_address)
       AND tx_id >= _tx_id_min
     --
     UNION
@@ -30,8 +30,9 @@ BEGIN
     FROM tx_out
     LEFT JOIN tx_in ON tx_out.tx_id = tx_in.tx_out_id
       AND tx_out.index = tx_in.tx_out_index
-    WHERE tx_in.tx_in_id IS NOT NULL
-      AND tx_out.address = ANY(_addresses)
+    WHERE
+      tx_in.tx_in_id IS NOT NULL
+      AND tx_out.stake_address_id = ANY(SELECT id FROM stake_address WHERE view = _stake_address)
       AND tx_in.tx_in_id >= _tx_id_min
   ) AS tmp;
 
@@ -49,4 +50,4 @@ BEGIN
 END;
 $$;
 
-COMMENT ON FUNCTION grest.address_txs IS 'Get the transaction hash list of a Cardano address array, optionally filtering after specified block height (inclusive).'; -- noqa: LT01
+COMMENT ON FUNCTION grest.account_txs IS 'Get transactions associated with a given stake address'; -- noqa: LT01

@@ -17,11 +17,9 @@ BEGIN
       ma.fingerprint AS fingerprint,
       aic.total_supply::text,
       aic.decimals
-    FROM 
-      multi_asset AS ma
-      INNER JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
-    WHERE
-      ma.policy = _asset_policy_decoded;
+    FROM multi_asset AS ma
+    INNER JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
+    WHERE ma.policy = _asset_policy_decoded;
 END;
 $$;
 
