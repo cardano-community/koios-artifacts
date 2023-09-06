@@ -1,5 +1,17 @@
 {
   "params": {
+    "_utxo_ref1": {
+      "m": "fixme",
+      "g": "f82e568d42604fd71424d193c86ec00c97aead2b8f018e81c3139d9e3770c735#0",
+      "pv": "fixme",
+      "pp": "fixme"
+    },
+    "_utxo_ref2": {
+      "m": "fixme",
+      "g": "88ae22495123c7ee37a0bbe865243757185a302ed5359d1eae9347030628290a#0",
+      "pv": "fixme",
+      "pp": "fixme"
+    },
     "_block_hash": {
       "m": "f6192a1aaa6d3d05b4703891a6b66cd757801c61ace86cbe5ab0d66e07f601ab",
       "g": "bddbbc6df0ad09567a513349bafd56d8ec5c8fcd9ee9db12173624b896350d57",

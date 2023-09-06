@@ -205,7 +205,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/block_txs"
+                $ref: "#/components/schemas/block_txs" todo
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -389,6 +389,29 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Address Transactions
       description: Get the transaction hash list of input address array, optionally filtering after specified block height (inclusive)
+
+  /address_utxos: #RPC #todo new
+    post:
+      tags:
+        - Address
+      requestBody:
+        $ref: "#/components/requestBodies/payment_addresses_with_extended"
+      responses:
+        "200":
+          description: Array of address UTXOs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/utxo_infos"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Address UTXO set information
+      description: Get UTxO set for given addresses
+
   /credential_utxos: #RPC
     post:
       tags:
@@ -401,7 +424,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/credential_utxos"
+                $ref: "#/components/schemas/utxo_infos"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -410,6 +433,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: UTxOs from payment credentials
       description: Get a list of UTxO against input payment credential array including their balances
+
   /address_assets: #RPC
     post:
       tags:
@@ -492,27 +516,52 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Account Information
       description: Get the account information for given stake addresses
-  /account_utxos: #RPC
+
+  /account_txs: #RPC # todo - new
     get:
       tags:
         - Stake Account
       parameters:
         - $ref: "#/components/parameters/_stake_address"
+        - $ref: "#/components/parameters/_after_block_height"
       responses:
         "200":
-          description: Array of account UTxOs associated with stake address
+          description: Array of Txs associated with stake address (account)
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/account_utxos"
+                $ref: "#/components/schemas/address_txs"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
-      summary: Account UTxOs
-      description: Get a list of all UTxOs for a given stake address (account)
+      summary: Account Txs
+      description: Get a list of all Txs for a given stake address (account)
+
+  /account_utxos: #RPC
+    post:
+      tags:
+        - Stake Account
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses_with_extended"
+      responses:
+        "200":
+          description: Array of account UTxOs associated with given stake addresses
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/utxo_infos"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: UTxOs for stake addresses (accounts)
+      description: Get a list of all UTxOs for given stake addresses (account)s
+
   /account_info_cached: #RPC
     post:
       tags:
@@ -791,6 +840,29 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Asset Information (Bulk)
       description: Get the information of a list of assets including first minting & token registry metadata
+
+  /asset_utxos: #RPC # todo new
+    post:
+      tags:
+        - Asset
+      requestBody:
+        $ref: "#/components/requestBodies/asset_list_with_extended"
+      responses:
+        "200":
+          description: Array of UTXOs for given asset list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/utxo_infos"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Asset UTXO Information (Bulk)
+      description: Get the UTXO information of a list of assets including
+
   /asset_history: #RPC
     get:
       tags:
@@ -1219,6 +1291,30 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Script Redeemers
       description: List of all redeemers for a given script hash
+
+  /script_utxos: #RPC todo new
+    get:
+      tags:
+        - Script
+      parameters:
+        - $ref: "#/components/parameters/_script_hash"
+        - $ref: "#/components/parameters/_extended"
+      responses:
+        "200":
+          description: List of UTXOs for a given script hash
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account_utxos"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Script UTXOs
+      description: List of all UTXOs for a given script hash
+
   /datum_info: #RPC
     post:
       tags:
@@ -1240,6 +1336,29 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Datum Information
       description: List of datum information for given datum hashes
+
+  /utxo_info: #RPC #todonew
+    post:
+      tags:
+        - UTXO
+      requestBody:
+        $ref: "#/components/requestBodies/utxo_refs_with_extended"
+      responses:
+        "200":
+          description: Array of UTXO details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/utxo_infos"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: UTXO set information for given references
+      description: Get UTxO set for given references
+
 components:
   #!params!#
   #!requestBodies!#
