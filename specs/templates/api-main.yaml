@@ -205,7 +205,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/block_txs" todo
+                $ref: "#/components/schemas/block_txs"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -1305,7 +1305,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/account_utxos"
+                $ref: "#/components/schemas/utxo_infos"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":

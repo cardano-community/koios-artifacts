@@ -857,10 +857,14 @@ schemas:
         properties:
           block_hash:
             $ref: "#/components/schemas/blocks/items/properties/hash"
-          tx_hashes:
-            type: array
-            items:
-              $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+          tx_hash:
+            $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+          epoch_no:
+            $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+          block_height:
+            $ref: "#/components/schemas/blocks/items/properties/block_height"
+          block_time:
+            $ref: "#/components/schemas/blocks/items/properties/block_time"
     address_info:
       type: array
       items:
@@ -923,21 +927,26 @@ schemas:
         properties:
           address:
             $ref: "#/components/schemas/asset_addresses/items/properties/payment_address"
-          asset_list:
-            $ref: "#/components/schemas/account_assets/items/properties/asset_list"
+      	  policy_id:
+            $ref: "#/components/schemas/asset_info/items/properties/policy_id"
+          asset_name:
+            $ref: "#/components/schemas/asset_info/items/properties/asset_name"
+          fingerprint:
+            $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
+          decimals:
+            type: integer
+            description: Asset decimals
+            example: 6
+          quantity:
+            type: string
+            description: Asset quantity owned by account
+            example: 990000
     credential_txs:
       $ref: "#/components/schemas/address_txs"
+
     credential_utxos:
-      type: array
-      items:
-        type: object
-        properties:
-          tx_hash:
-            $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/tx_hash"
-          tx_index:
-            $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/tx_index"
-          value:
-            $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/value"
+      $ref: "#/components/schemas/utxo_infos"
+
     account_list:
       type: array
       items:
@@ -987,7 +996,7 @@ schemas:
             type: string
             description: Total treasury MIR value of the account
             example: "0"
-    account_utxos:
+    utxo_infos: # renamed from account_utxos
       type: array
       items:
         type: object
@@ -1000,10 +1009,31 @@ schemas:
             $ref: "#/components/schemas/asset_addresses/items/properties/payment_address"
           value:
             $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/value"
+          stake_address:
+            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+          payment_cred:
+            type: string
+            description: Payment credential
+            example: de3c1c527e8826b9cd2030f88f75fc44cd4ce519b9ded9eb794b3794
+          epoch_no:
+            $ref: "#/components/schemas/blocks/items/properties/epoch_no"
           block_height:
             $ref: "#/components/schemas/blocks/items/properties/block_height"
           block_time:
             $ref: "#/components/schemas/blocks/items/properties/block_time"
+          datum_hash:
+            $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_hash"
+          inline_datum:
+            $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/inline_datum"
+          reference_script:
+            $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/reference_script"
+          asset_list:
+            $ref: "#/components/schemas/account_assets/items/properties/asset_list"
+          is_spent:
+            type: boolean
+            description: True if the UTXO has been spent
+            example: true
+
     account_rewards:
       type: array
       items:
@@ -1075,25 +1105,20 @@ schemas:
         properties:
           stake_address:
             $ref: "#/components/schemas/account_history/items/properties/stake_address"
-          asset_list:
-            type: array
-            items:
-              type: object
-              properties:
-                policy_id:
-                  $ref: "#/components/schemas/asset_info/items/properties/policy_id"
-                asset_name:
-                  $ref: "#/components/schemas/asset_info/items/properties/asset_name"
-                fingerprint:
-                  $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
-                decimals:
-                  type: integer
-                  description: Asset decimals
-                  example: 6
-                quantity:
-                  type: string
-                  description: Asset quantity owned by account
-                  example: 990000
+      	  policy_id:
+            $ref: "#/components/schemas/asset_info/items/properties/policy_id"
+          asset_name:
+            $ref: "#/components/schemas/asset_info/items/properties/asset_name"
+          fingerprint:
+            $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
+          decimals:
+            type: integer
+            description: Asset decimals
+            example: 6
+          quantity:
+            type: string
+            description: Asset quantity owned by account
+            example: 990000
     account_history:
       type: array
       items:
