@@ -34,9 +34,9 @@ DECLARE
 BEGIN
   SELECT MAX(epoch.no) INTO _epoch_no FROM public.epoch;
   SELECT FLOOR(supply::bigint / (
-      SELECT p_optimal_pool_count
-      FROM grest.epoch_info_cache
-      WHERE epoch_no = _epoch_no
+      SELECT ep.optimal_pool_count
+      FROM epoch_param AS ep
+      WHERE ep.epoch_no = _epoch_no
     ))::bigint INTO _saturation_limit FROM grest.totals(_epoch_no);
   RETURN QUERY
     WITH

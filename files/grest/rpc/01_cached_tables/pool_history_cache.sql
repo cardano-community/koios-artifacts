@@ -39,9 +39,9 @@ BEGIN
   IF (
     SELECT COUNT(key) != 1
     FROM GREST.CONTROL_TABLE
-    WHERE key = 'epoch_info_cache_last_updated'
+    WHERE key = 'last_active_stake_validated_epoch'
   ) THEN
-    RAISE EXCEPTION 'Epoch Info Cache not yet populated! Exiting...';
+    RAISE EXCEPTION 'Active stake cache not yet populated! Exiting...';
   END IF;
 
   IF _epoch_no_to_insert_from IS NULL THEN
@@ -153,9 +153,9 @@ BEGIN
         ROUND(
           (act.amount / (
             SELECT supply::bigint / (
-                SELECT eic.p_optimal_pool_count
-                FROM grest.epoch_info_cache AS eic
-                WHERE eic.epoch_no = act.epoch_no
+                SELECT ep.optimal_pool_count
+                FROM epoch_param AS ep
+                WHERE ep.epoch_no = act.epoch_no
               )
             FROM grest.totals (act.epoch_no)
             ) * 100
