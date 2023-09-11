@@ -170,6 +170,16 @@ parameters:
       in: query
       required: false
       allowEmptyValue: true
+    _extended:
+      deprecated: false
+      name: _extended
+      description: Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call
+      schema:
+        type: boolean
+        example: "false"
+      in: query
+      required: false
+      allowEmptyValue: true
     _history:
       deprecated: false
       name: _history

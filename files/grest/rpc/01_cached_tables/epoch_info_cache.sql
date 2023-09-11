@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS grest.epoch_info_cache (
   i_avg_blk_reward lovelace,
   i_last_tx_id bigint,
   p_nonce text,
-  p_block_hash text,
+  p_block_hash text
 );
 
 COMMENT ON TABLE grest.epoch_info_cache IS 'Contains detailed info for epochs including protocol parameters';
@@ -76,6 +76,20 @@ BEGIN
   DELETE FROM grest.epoch_info_cache
   WHERE epoch_no >= _epoch_no_to_insert_from;
 
+  DROP TABLE IF EXISTS last_tx_id_subset;
+  CREATE TEMP TABLE last_tx_id_subset (
+    epoch_no bigint,
+    tx_id bigint
+  );
+
+  INSERT INTO last_tx_id_subset
+    SELECT b.epoch_no, MAX(tx.id)
+    FROM block AS b
+    INNER JOIN tx ON tx.block_id = b.id
+    WHERE b.block_no IS NOT NULL
+      AND b.tx_count != 0
+    GROUP BY b.epoch_no;
+
   INSERT INTO grest.epoch_info_cache
     SELECT DISTINCT ON (b.time)
       e.no AS epoch_no,
@@ -93,7 +107,11 @@ BEGIN
         WHEN e.no <= _curr_epoch THEN ROUND(reward_pot.amount / e.blk_count)
         ELSE NULL
       END AS i_avg_blk_reward,
-      last_tx.tx_id AS i_last_tx_id,
+      (
+        SELECT MAX(tx_id)
+        FROM last_tx_id_subset
+        WHERE epoch_no <= e.no
+      ) AS i_last_tx_id,
       ENCODE(ep.nonce, 'hex') AS p_nonce,
       ENCODE(b.hash, 'hex') AS p_block_hash
     FROM epoch AS e
@@ -109,14 +127,6 @@ BEGIN
         GROUP BY
           e.no
       ) AS reward_pot ON TRUE
-    LEFT JOIN LATERAL (
-        SELECT MAX(tx.id) AS tx_id
-        FROM block AS b
-        INNER JOIN tx ON tx.block_id = b.id
-        WHERE b.epoch_no <= e.no
-          AND b.block_no IS NOT NULL
-          AND b.tx_count != 0
-      ) AS last_tx ON TRUE
     WHERE e.no >= _epoch_no_to_insert_from
     ORDER BY
       b.time ASC,

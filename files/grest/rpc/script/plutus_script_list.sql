@@ -1,18 +1,22 @@
 CREATE OR REPLACE FUNCTION grest.plutus_script_list()
 RETURNS TABLE (
   script_hash text,
-  creation_tx_hash text
+  creation_tx_hash text,
+  type text,
+  size word31type
 )
 LANGUAGE plpgsql
 AS $$
 BEGIN
   RETURN QUERY
   SELECT
-    ENCODE(script.hash, 'hex') AS script_hash,
-    ENCODE(tx.hash, 'hex') AS creation_tx_hash
-  FROM script
-    INNER JOIN tx ON tx.id = script.tx_id
-  WHERE script.type IN ('plutusV1', 'plutusV2');
+    ENCODE(s.hash,'hex')::text AS script_hash,
+    ENCODE(tx.hash,'hex')::text AS creation_tx_hash,
+    s.type::text AS type,
+    s.serialised_size AS size
+  FROM script AS s
+    INNER JOIN tx ON tx.id = s.tx_id
+  WHERE s.type IN ('plutusV1', 'plutusV2');
 END;
 $$;
 

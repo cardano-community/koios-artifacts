@@ -91,4 +91,4 @@ BEGIN
 END;
 $$;
 
-COMMENT ON FUNCTION grest.address_utxos IS  'Get UTxO details for requested addresses'; -- noqa: LT01
+COMMENT ON FUNCTION grest.account_utxos IS  'Get UTxO details for requested stake account'; -- noqa: LT01
