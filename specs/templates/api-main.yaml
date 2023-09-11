@@ -409,7 +409,7 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
-      summary: Address UTXO set information
+      summary: Address UTXOs
       description: Get UTxO set for given addresses
 
   /credential_utxos: #RPC
@@ -432,7 +432,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: UTxOs from payment credentials
-      description: Get a list of UTxO against input payment credential array including their balances
+      description: Get UTxO details for requested payment credentials
 
   /address_assets: #RPC
     post:
@@ -841,7 +841,7 @@ paths:
       summary: Asset Information (Bulk)
       description: Get the information of a list of assets including first minting & token registry metadata
 
-  /asset_utxos: #RPC # todo new
+  /asset_utxos: #RPC
     post:
       tags:
         - Asset
@@ -1036,7 +1036,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Pool List
-      description: A list of all currently registered/retiring (not retired) pools
+      description: List of brief info for all pools
   /pool_info: #RPC
     post:
       tags:
@@ -1232,6 +1232,29 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Pool Metadata
       description: Metadata (on & off-chain) for all pools
+
+  /script_info: #RPC
+    post:
+      tags:
+        - Script
+      requestBody:
+        $ref: "#/components/requestBodies/script_hashes"
+      responses:
+        "200":
+          description: List of datum information for given datum hashes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/script_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Datum Information
+      description: List of datum information for given datum hashes
+
   /native_script_list: #RPC
     get:
       tags:
@@ -1242,7 +1265,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/native_script_list"
+                $ref: "#/components/schemas/script_list"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -1261,7 +1284,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/plutus_script_list"
+                $ref: "#/components/schemas/script_list"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -1356,8 +1379,8 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
-      summary: UTXO set information for given references
-      description: Get UTxO set for given references
+      summary: UTXOs Info
+      description: Get UTxO set for requested UTxO references
 
 components:
   #!params!#

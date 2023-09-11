@@ -281,6 +281,22 @@ requestBodies:
                 - ##pool_ids_pool_bech32_ids1_rb##
                 - ##pool_ids_pool_bech32_ids2_rb##
                 - ##pool_ids_pool_bech32_ids3_rb##
+    script_hashes:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              _script_hashes:
+                format: text
+                type: array
+                items:
+                  type: string
+                description: Array of Cardano script hashes
+            example:
+              _script_hashes:
+                  - ##script_hashes1_rb##
+                  - ##script_hashes2_rb##
     datum_hashes:
       content:
         application/json:
@@ -355,7 +371,7 @@ requestBodies:
                 type: array
                 items:
                   type: string
-                description: Array of Cardano utxo references
+                description: Array of Cardano utxo references in the form "hash#index"
               _extended:
                 format: boolean
                 type: boolean
