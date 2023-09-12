@@ -17,8 +17,8 @@ BEGIN
     pic.meta_hash,
     pod.json,
     pic.pool_status
-  FROM grest.pool_hash AS ph
-  LEFT JOIN grest.pool_infor_cache AS pic ON ph.view = pic.pool_id_bech32
+  FROM public.pool_hash AS ph
+  LEFT JOIN grest.pool_info_cache AS pic ON ph.view = pic.pool_id_bech32
   LEFT JOIN public.pool_offline_data AS pod ON pod.pmr_id = pic.meta_id
   WHERE
     CASE
@@ -26,7 +26,7 @@ BEGIN
       WHEN _pool_bech32_ids IS NOT NULL THEN pic.pool_id_bech32 = ANY(SELECT UNNEST(_pool_bech32_ids))
     END
   ORDER BY
-      ph.view,
+      pic.pool_id_bech32,
       pic.tx_id DESC;
 END;
 $$;

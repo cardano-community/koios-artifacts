@@ -93,13 +93,12 @@ BEGIN
       END) AS is_spent
     FROM tx_out
     INNER JOIN tx ON tx_out.tx_id = tx.id
+    INNER JOIN _assets ON tx_out.id = _assets.id
     LEFT JOIN stake_address AS sa ON tx_out.stake_address_id = sa.id
     LEFT JOIN block AS b ON b.id = tx.block_id
     LEFT JOIN datum ON datum.id = tx_out.inline_datum_id
     LEFT JOIN script ON script.tx_id = tx_out.reference_script_id
-    LEFT JOIN _assets ON tx_out.id = _assets.id
-    WHERE mto.ident = ANY(_asset_id_list)
-      AND tx_out.consumed_by_tx_in_id IS NULL
+    WHERE tx_out.consumed_by_tx_in_id IS NULL
   ;
 END;
 $$;

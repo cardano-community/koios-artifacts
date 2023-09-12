@@ -6,38 +6,20 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql
 AS $$
-DECLARE
-  _asset_policy_decoded bytea;
 BEGIN
-  SELECT DECODE(_asset_policy, 'hex') INTO _asset_policy_decoded;
   RETURN QUERY
-    WITH
-      _all_assets AS (
-        SELECT
-          id,
-          ENCODE(name, 'hex') AS asset_name
-        FROM multi_asset AS ma
-        WHERE ma.policy = _asset_policy_decoded
-      )
-
     SELECT
-      x.asset_name,
-      x.address,
-      SUM(x.quantity)::text
-    FROM
-      (
-        SELECT
-          aa.asset_name,
-          txo.address,
-          mto.quantity
-        FROM _all_assets AS aa
-        INNER JOIN ma_tx_out AS mto ON mto.ident = aa.id
-        INNER JOIN tx_out AS txo ON txo.id = mto.tx_out_id
-        WHERE tx_out.consumed_by_tx_in_id IS NULL
-      ) AS x
+      ENCODE(ma.name, 'hex') AS asset_name,
+      txo.address,
+      SUM(mto.quantity)::text
+    FROM multi_asset AS ma
+    INNER JOIN ma_tx_out AS mto ON mto.ident = ma.id
+    INNER JOIN tx_out AS txo ON txo.id = mto.tx_out_id
+    WHERE ma.policy = DECODE(_asset_policy, 'hex')
+      AND txo.consumed_by_tx_in_id IS NULL
     GROUP BY
-      x.asset_name,
-      x.address;
+      ma.name,
+      txo.address;
 END;
 $$;
 

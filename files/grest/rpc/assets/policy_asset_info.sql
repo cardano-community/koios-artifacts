@@ -34,11 +34,7 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql
 AS $$
-DECLARE
-  _asset_policy_decoded bytea;
-  _policy_asset_ids bigint[];
 BEGIN
-  SELECT DECODE(_asset_policy, 'hex') INTO _asset_policy_decoded;
   RETURN QUERY
     SELECT
       ENCODE(ma.name, 'hex') AS asset_name,
@@ -73,7 +69,7 @@ BEGIN
       FROM tx_metadata AS tm
       WHERE tm.tx_id = tx.id
     ) AS metadata ON TRUE
-    WHERE ma.policy = _asset_policy_decoded;
+    WHERE ma.policy = DECODE(_asset_policy, 'hex');
 END;
 $$;
 

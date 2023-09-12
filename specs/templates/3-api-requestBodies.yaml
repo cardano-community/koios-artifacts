@@ -130,7 +130,8 @@ requestBodies:
               _stake_addresses:
                 - ##stake_addresses1_rb##
                 - ##stake_addresses2_rb##
-              todo: add examples referencing all existing param
+              _first_only: false
+              _empty: false
 
     stake_addresses_with_extended:
       content:

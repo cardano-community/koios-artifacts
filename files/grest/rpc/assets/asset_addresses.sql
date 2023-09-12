@@ -45,7 +45,7 @@ BEGIN
         FROM ma_tx_out AS mto
         INNER JOIN tx_out AS txo ON txo.id = mto.tx_out_id
         WHERE mto.ident = _asset_id
-          AND tx_out.consumed_by_tx_in_id IS NULL
+          AND txo.consumed_by_tx_in_id IS NULL
       ) AS x
     GROUP BY x.address;
 END;

@@ -66,15 +66,14 @@ BEGIN
       END) AS is_spent
     FROM tx_out
     INNER JOIN tx ON tx_out.tx_id = tx.id
+    INNER JOIN script ON script.tx_id = tx.id
     LEFT JOIN stake_address AS sa ON tx_out.stake_address_id = sa.id
     LEFT JOIN block AS b ON b.id = tx.block_id
     LEFT JOIN ma_tx_out AS mto ON mto.tx_out_id = tx_out.id
     LEFT JOIN multi_asset AS ma ON ma.id = mto.ident
     LEFT JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
     LEFT JOIN datum ON datum.id = tx_out.inline_datum_id
-    LEFT JOIN script ON script.tx_id = tx.id
-    WHERE
-      script.hash = DECODE(_script_hash,'hex')
+    WHERE script.hash = DECODE(_script_hash,'hex')
   ;
 END;
 $$;

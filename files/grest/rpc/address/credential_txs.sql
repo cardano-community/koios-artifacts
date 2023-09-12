@@ -34,13 +34,11 @@ BEGIN
     --
     UNION
     --
-    SELECT tx_in_id AS tx_id
+    SELECT consumed_by_tx_in_id AS tx_id
     FROM tx_out
-    LEFT JOIN tx_in ON tx_out.tx_id = tx_in.tx_out_id
-      AND tx_out.index = tx_in.tx_out_index
-    WHERE tx_in.tx_in_id IS NOT NULL
+    WHERE tx_out.consumed_by_tx_in_id IS NOT NULL
       AND tx_out.payment_cred = ANY(_payment_cred_bytea)
-      AND tx_in.tx_in_id >= _tx_id_min
+      AND tx_out.consumed_by_tx_in_id >= _tx_id_min
   ) AS tmp;
 
   RETURN QUERY
@@ -52,8 +50,8 @@ BEGIN
     FROM public.tx
     INNER JOIN public.block AS b ON b.id = tx.block_id
     WHERE tx.id = ANY(_tx_id_list)
-      AND block.block_no >= _after_block_height
-    ORDER BY block.block_no DESC;
+      AND b.block_no >= _after_block_height
+    ORDER BY b.block_no DESC;
 END;
 $$;
 

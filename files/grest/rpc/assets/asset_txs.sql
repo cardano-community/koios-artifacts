@@ -45,15 +45,14 @@ BEGIN
       INNER JOIN tx_out AS txo ON txo.id = mto.tx_out_id
       INNER JOIN tx ON tx.id = txo.tx_id
       INNER JOIN block ON block.id = tx.block_id
-      LEFT JOIN tx_in AS txi ON txo.tx_id = txi.tx_out_id
-        AND txo.index::smallint = txi.tx_out_index::smallint
       WHERE
         mto.ident = _asset_id
         AND block.block_no >= _after_block_height
-        AND (_history = TRUE OR txi.id IS NULL)
+        AND (_history = TRUE OR txo.consumed_by_tx_in_id IS NULL)
       GROUP BY
         ident,
         tx.hash,
+        txo.index::smallint,
         block.epoch_no,
         block.block_no,
         block.time

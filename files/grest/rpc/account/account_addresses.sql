@@ -28,9 +28,8 @@ BEGIN
               txo.stake_address_id,
               txo.id
             FROM tx_out AS txo
-            WHERE
-              txo.stake_address_id = ANY(sa_id_list)
-              AND tx_out.consumed_by_tx_in_id IS NULL
+            WHERE txo.stake_address_id = ANY(sa_id_list)
+              AND txo.consumed_by_tx_in_id IS NULL
           ) AS x
       )
 
@@ -55,8 +54,7 @@ BEGIN
               txo.stake_address_id,
               txo.id
             FROM tx_out AS txo
-            WHERE
-              txo.stake_address_id = ANY(sa_id_list)
+            WHERE txo.stake_address_id = ANY(sa_id_list)
             LIMIT (CASE WHEN _first_only IS TRUE THEN 1 ELSE NULL END)
           ) AS x
       )
