@@ -232,6 +232,44 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Param Update Proposals
       description: Get all parameter update proposals submitted to the chain starting Shelley era
+  /reserve_withdrawals: #RPC
+    get:
+      tags:
+        - Network
+      responses:
+        "200":
+          description: Array of withdrawals from reserves against stake accounts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/reserve_withdrawals"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Reserve Withdrawals
+      description: List of all withdrawals from reserves against stake accounts
+  /treasury_withdrawals: #RPC
+    get:
+      tags:
+        - Network
+      responses:
+        "200":
+          description: Array of withdrawals from treasury against stake accounts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/reserve_withdrawals"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Treasury Withdrawals
+      description: List of all withdrawals from treasury against stake accounts
 
   /epoch_info: #RPC
     get:
@@ -1362,6 +1400,48 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Pool Updates (History)
       description: Return all pool updates for all pools or only updates for specific pool if specified
+  /pool_registrations: #RPC
+    get:
+      tags:
+        - Pool
+      parameters:
+        - $ref: "#/components/parameters/_epoch_no"
+      responses:
+        "200":
+          description: Array of historical pool updates
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_registrations"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Pool Registrations
+      description: Return all pool registrations initiated in the requested epoch
+  /pool_retirements: #RPC
+    get:
+      tags:
+        - Pool
+      parameters:
+        - $ref: "#/components/parameters/_epoch_no"
+      responses:
+        "200":
+          description: Array of historical pool updates
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_registrations"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Pool Retirements
+      description: Return all pool retirements initiated in the requested epoch
   /pool_relays: #RPC
     get:
       tags:
@@ -2281,6 +2361,24 @@ components:
             type: string
             description: JSON encoded data with details about the parameter update
             example: {"decentralisation": 0.9}
+    reserve_withdrawals:
+      type: array
+      items:
+        properties:
+          epoch_no:
+            $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+          epoch_slot:
+            $ref: "#/components/schemas/blocks/items/properties/epoch_slot"
+          tx_hash:
+            $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+          block_hash:
+            $ref: "#/components/schemas/blocks/items/properties/hash"
+          block_height:
+            $ref: "#/components/schemas/blocks/items/properties/block_height"
+          amount:
+            $ref: "#/components/schemas/pool_delegators/items/properties/amount"
+          stake_address:
+            $ref: "#/components/schemas/account_history/items/properties/stake_address"
     pool_list:
       type: array
       items:
@@ -2569,6 +2667,26 @@ components:
             type: string
             description: Latest transaction hash used for delegation by the account
             example: 368d08fe86804d637649341d3aec4a9baa7dffa6d00f16de2ba9dba814f1c948
+    pool_registrations:
+      type: array
+      nullable: true
+      items:
+        type: object
+        properties:
+          pool_id_bech32:
+            $ref: "#/components/schemas/pool_info/items/properties/pool_id_bech32"
+          tx_hash:
+            $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+          block_hash:
+            $ref: "#/components/schemas/blocks/items/properties/hash"
+          block_height:
+            $ref: "#/components/schemas/blocks/items/properties/block_height"
+          epoch_no:
+            $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+          epoch_slot:
+            $ref: "#/components/schemas/blocks/items/properties/epoch_slot"
+          active_epoch_no:
+            $ref: "#/components/schemas/pool_updates/items/properties/active_epoch_no"
     pool_delegators_history:
       type: array
       nullable: true
