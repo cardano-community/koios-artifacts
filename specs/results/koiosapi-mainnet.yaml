@@ -14,11 +14,11 @@ info:
     Instead of returning entire row, you can elect which rows you would like to fetch from the endpoint by using the `select` parameter with corresponding columns separated by commas. See example below (first is complete information for tip, while second command gives us 3 columns we are interested in):<br><br>
 
     ``` bash
-    curl "https://api.koios.rest/api/v0/tip"
+    curl "https://api.koios.rest/api/v1/tip"
 
     # [{"hash":"4d44c8a453e677f933c3df42ebcf2fe45987c41268b9cfc9b42ae305e8c3d99a","epoch":317,"abs_slot":51700871,"epoch_slot":120071,"block_height":6806994,"block_time":1643267162}]
 
-    curl "https://api.koios.rest/api/v0/blocks?select=epoch,epoch_slot,block_height"
+    curl "https://api.koios.rest/api/v1/blocks?select=epoch,epoch_slot,block_height"
 
     # [{"epoch":317,"epoch_slot":120071,"block_height":6806994}]
     ```
@@ -27,7 +27,7 @@ info:
 
     You can filter the returned output based on specific conditions using operators against a column within returned result. Consider an example where you would want to query blocks minted in first 3 minutes of epoch 250 (i.e. epoch_slot was less than 180). To do so your query would look like below:<br><br>
     ``` bash
-    curl "https://api.koios.rest/api/v0/blocks?epoch=eq.250&epoch_slot=lt.180"
+    curl "https://api.koios.rest/api/v1/blocks?epoch=eq.250&epoch_slot=lt.180"
 
     # [{"hash":"8fad2808ac6b37064a0fa69f6fe065807703d5235a57442647bbcdba1c02faf8","epoch":250,"abs_slot":22636942,"epoch_slot":142,"block_height":5385757,"block_time":1614203233,"tx_count":65,"vrf_key":"vrf_vk14y9pjprzlsjvjt66mv5u7w7292sxp3kn4ewhss45ayjga5vurgaqhqknuu","pool":null,"op_cert_counter":2},
     #  {"hash":"9d33b02badaedc0dedd0d59f3e0411e5fb4ac94217fb5ee86719e8463c570e16","epoch":250,"abs_slot":22636800,"epoch_slot":0,"block_height":5385756,"block_time":1614203091,"tx_count":10,"vrf_key":"vrf_vk1dkfsejw3h2k7tnguwrauqfwnxa7wj3nkp3yw2yw3400c4nlkluwqzwvka6","pool":null,"op_cert_counter":2}]
@@ -62,7 +62,7 @@ info:
     Consider a simple case where I want query `blocks` endpoint for `block_height` column and focus on `content-range` header to monitor the rows we discussed above.<br><br>
 
     ``` bash
-    curl -s "https://api.koios.rest/api/v0/blocks?select=block_height" -I | grep -i content-range
+    curl -s "https://api.koios.rest/api/v1/blocks?select=block_height" -I | grep -i content-range
 
     # content-range: 0-999/*
 
@@ -71,7 +71,7 @@ info:
     As we can see above, the number of observations returned was 1000 (range being 0-999), but the total size was not queried to avoid wait times. Now, let's modify this default behaviour to query rows beyond the first 999, but this time - also add another clause to limit results by 500. We can do this using `offset=1000` and `limit=500` as below:<br><br>
 
     ``` bash
-    curl -s "https://api.koios.rest/api/v0/blocks?select=block_height&offset=1000&limit=500" -I | grep -i content-range
+    curl -s "https://api.koios.rest/api/v1/blocks?select=block_height&offset=1000&limit=500" -I | grep -i content-range
 
     # content-range: 1000-1499/*
 
@@ -80,7 +80,7 @@ info:
     For GET endpoints, there is also another method to achieve the above, instead of adding parameters to the URL itself, you can specify a `Range` header as below to achieve something similar:<br><br>
 
     ``` bash
-    curl -s "https://api.koios.rest/api/v0/blocks?select=block_height" -H "Range: 1000-1499" -I | grep -i content-range
+    curl -s "https://api.koios.rest/api/v1/blocks?select=block_height" -H "Range: 1000-1499" -I | grep -i content-range
 
     # content-range: 1000-1499/*
 
@@ -94,7 +94,7 @@ info:
     Consider example where you want to check `epoch` and `epoch_slot` for the first 5 blocks created by a particular pool, i.e. you can set order to ascending based on block_height column and add horizontal filter for that pool ID as below:<br><br>
 
     ``` bash
-    curl -s "https://api.koios.rest/api/v0/blocks?pool=eq.pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc&order=block_height.asc&limit=5"
+    curl -s "https://api.koios.rest/api/v1/blocks?pool=eq.pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc&order=block_height.asc&limit=5"
 
     # [{"hash":"610b4c7bbebeeb212bd002885048cc33154ba29f39919d62a3d96de05d315706","epoch":236,"abs_slot":16594295,"epoch_slot":5495,"block_height":5086774,"block_time":1608160586,"tx_count":1,"vrf_key":"vrf_vk18x0e7dx8j37gdxftnn8ru6jcxs7n6acdazc4ykeda2ygjwg9a7ls7ns699","pool":"pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc","op_cert_counter":1},
     # {"hash":"d93d1db5275329ab695d30c06a35124038d8d9af64fc2b0aa082b8aa43da4164","epoch":236,"abs_slot":16597729,"epoch_slot":8929,"block_height":5086944,"block_time":1608164020,"tx_count":7,"vrf_key":"vrf_vk18x0e7dx8j37gdxftnn8ru6jcxs7n6acdazc4ykeda2ygjwg9a7ls7ns699","pool":"pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc","op_cert_counter":1},
@@ -109,13 +109,13 @@ info:
     Below is an example of JSON/CSV output making use of above to print first in JSON (default), and then override response format to CSV.<br><br>
 
     ``` bash
-    curl -s "https://api.koios.rest/api/v0/blocks?select=epoch,epoch_slot,block_time&limit=3"
+    curl -s "https://api.koios.rest/api/v1/blocks?select=epoch,epoch_slot,block_time&limit=3"
 
     # [{"epoch":318,"epoch_slot":27867,"block_time":1643606958},
     # {"epoch":318,"epoch_slot":27841,"block_time":1643606932},
     # {"epoch":318,"epoch_slot":27839,"block_time":1643606930}]
 
-    curl -s "https://api.koios.rest/api/v0/blocks?select=epoch,epoch_slot,block_time&limit=3" -H "Accept: text/csv"
+    curl -s "https://api.koios.rest/api/v1/blocks?select=epoch,epoch_slot,block_time&limit=3" -H "Accept: text/csv"
 
     # epoch,epoch_slot,block_time
     # 318,28491,1643607582
@@ -146,10 +146,10 @@ info:
   x-logo:
     url: "https://api.koios.rest/images/koios.png"
 servers:
-  - url: https://api.koios.rest/api/v0
-  - url: https://guild.koios.rest/api/v0
-  - url: https://preview.koios.rest/api/v0
-  - url: https://preprod.koios.rest/api/v0
+  - url: https://api.koios.rest/api/v1
+  - url: https://guild.koios.rest/api/v1
+  - url: https://preview.koios.rest/api/v1
+  - url: https://preprod.koios.rest/api/v1
 paths:
 
   /tip: #RPC
@@ -496,7 +496,7 @@ paths:
             # If using a CLI-generated tx file, please ensure to deserialise (using `xxd -p -r <<< $(jq .cborHex ${tx.signed}) > ${data}`) first before submitting.
             curl -X POST \
                 --header "Content-Type: application/cbor" \
-                --data-binary ${data} https://api.koios.rest/api/v0/submittx
+                --data-binary @${data} https://api.koios.rest/api/v1/submittx
       responses:
         "202":
           description: OK
@@ -2194,7 +2194,7 @@ components:
             example:
               _asset_list:
                 - ['750900e4999ebe0d58f19b634768ba25e525aaf12403bfe8fe130501','424f4f4b']
-                - ['1d7f33bd23d85e1a25d87d86fac4f199c3197a2f7afeb662a0f34e1e','776f726c646d6f62696c65746f6b656e']
+                - ['f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a','6b6f696f732e72657374']
     asset_list_with_extended:
       content:
         application/json:
@@ -2218,7 +2218,7 @@ components:
             example:
               _asset_list:
                 - ['750900e4999ebe0d58f19b634768ba25e525aaf12403bfe8fe130501','424f4f4b']
-                - ['1d7f33bd23d85e1a25d87d86fac4f199c3197a2f7afeb662a0f34e1e','776f726c646d6f62696c65746f6b656e']
+                - ['f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a','6b6f696f732e72657374']
               _extended: true
     utxo_refs_with_extended:
       content:
@@ -3301,6 +3301,7 @@ components:
             type: string
             description: Payment credential
             example: de3c1c527e8826b9cd2030f88f75fc44cd4ce519b9ded9eb794b3794
+            nullable: true
           epoch_no:
             $ref: "#/components/schemas/blocks/items/properties/epoch_no"
           block_height:

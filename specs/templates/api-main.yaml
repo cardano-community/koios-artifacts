@@ -1,10 +1,10 @@
 openapi: 3.0.2
 #!info!#
 servers:
-  - url: https://api.koios.rest/api/v0
-  - url: https://guild.koios.rest/api/v0
-  - url: https://preview.koios.rest/api/v0
-  - url: https://preprod.koios.rest/api/v0
+  - url: https://api.koios.rest/api/v1
+  - url: https://guild.koios.rest/api/v1
+  - url: https://preview.koios.rest/api/v1
+  - url: https://preprod.koios.rest/api/v1
 paths:
 
   /tip: #RPC
@@ -351,7 +351,7 @@ paths:
             # If using a CLI-generated tx file, please ensure to deserialise (using `xxd -p -r <<< $(jq .cborHex ${tx.signed}) > ${data}`) first before submitting.
             curl -X POST \
                 --header "Content-Type: application/cbor" \
-                --data-binary ${data} https://api.koios.rest/api/v0/submittx
+                --data-binary @${data} https://api.koios.rest/api/v1/submittx
       responses:
         "202":
           description: OK

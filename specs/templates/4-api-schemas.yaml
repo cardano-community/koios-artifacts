@@ -1051,6 +1051,7 @@ schemas:
             type: string
             description: Payment credential
             example: de3c1c527e8826b9cd2030f88f75fc44cd4ce519b9ded9eb794b3794
+            nullable: true
           epoch_no:
             $ref: "#/components/schemas/blocks/items/properties/epoch_no"
           block_height:
