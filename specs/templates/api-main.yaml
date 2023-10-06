@@ -1486,18 +1486,17 @@ paths:
       x-code-samples:
         - lang: "Shell"
           source: |
-            # Assuming ${data} is a raw binary serialized transaction on the file-system.
-            # If using a CLI-generated tx file, please ensure to deserialise (using `xxd -p -r <<< $(jq .cborHex ${tx.signed}) > ${data}`) first before submitting.
+            # Assuming ${data} contains a CBOR-serialized signed transaction (base16-encoded) as documented on Ogmios v6 site.
             curl -X POST \
                 --header "Content-Type: application/cbor" \
-                --data-binary @${data} https://api.koios.rest/api/ogmios/?EvaluateTransaction
+                --data-binary ${data} https://api.koios.rest/api/ogmios/?SubmitTransaction
       responses:
         "200":
           description: OK
         "400":
           description: An error occured while querying transaction.
       summary: Submit Transaction
-      description: Submit a signed and serialized transaction to the network.
+      description: Submit a signed and serialized transaction to the network. Please refer to Ogmios documentation [here](https://ogmios.dev/api/#operation-publish-/?SubmitTransaction) for complete spec
 
 components:
   #!params!#
