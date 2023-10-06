@@ -1461,6 +1461,43 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Datum Information
       description: List of datum information for given datum hashes
+  /ogmios/?EvaluateTransaction: #ogmios-api
+    post:
+      tags:
+        - Ogmios
+      x-code-samples:
+        - lang: "Shell"
+          source: |
+            # Assuming ${data} contains EvaluateTransaction payload as documented on Ogmios v6 site.
+            curl -X POST \
+                --header "Content-Type: application/cbor" \
+                --data-binary ${data} https://api.koios.rest/api/ogmios/?EvaluateTransaction
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: An error occured while submitting transaction.
+      summary: Evaluate Transaction
+      description: Evaluate execution units of scripts in a well-formed transaction. Please refer to Ogmios documentation [here](https://ogmios.dev/api/#operation-publish-/?EvaluateTransaction) for complete spec
+  /ogmios/?SubmitTransaction: #ogmios-api
+    post:
+      tags:
+        - Ogmios
+      x-code-samples:
+        - lang: "Shell"
+          source: |
+            # Assuming ${data} is a raw binary serialized transaction on the file-system.
+            # If using a CLI-generated tx file, please ensure to deserialise (using `xxd -p -r <<< $(jq .cborHex ${tx.signed}) > ${data}`) first before submitting.
+            curl -X POST \
+                --header "Content-Type: application/cbor" \
+                --data-binary @${data} https://api.koios.rest/api/ogmios/?EvaluateTransaction
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: An error occured while querying transaction.
+      summary: Submit Transaction
+      description: Submit a signed and serialized transaction to the network.
 
 components:
   #!params!#
