@@ -957,28 +957,6 @@ paths:
       summary: Asset Token Registry
       description: Get a list of assets registered via token registry on github
   /asset_info: #RPC
-    get:
-      deprecated: true
-      tags:
-        - Asset
-      parameters:
-        - $ref: "#/components/parameters/_asset_policy"
-        - $ref: "#/components/parameters/_asset_name"
-      responses:
-        "200":
-          description: Array of detailed asset information
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/asset_info"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      summary: Asset Information
-      description: Get the information of an asset including first minting & token registry metadata
     post:
       tags:
         - Asset
@@ -1018,7 +996,7 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
-      summary: Asset UTXO Information (Bulk)
+      summary: Asset UTXOs
       description: Get the UTXO information of a list of assets including
   /asset_history: #RPC
     get:
@@ -1631,18 +1609,17 @@ paths:
       x-code-samples:
         - lang: "Shell"
           source: |
-            # Assuming ${data} is a raw binary serialized transaction on the file-system.
-            # If using a CLI-generated tx file, please ensure to deserialise (using `xxd -p -r <<< $(jq .cborHex ${tx.signed}) > ${data}`) first before submitting.
+            # Assuming ${data} contains a CBOR-serialized signed transaction (base16-encoded) as documented on Ogmios v6 site.
             curl -X POST \
                 --header "Content-Type: application/cbor" \
-                --data-binary @${data} https://api.koios.rest/api/ogmios/?EvaluateTransaction
+                --data-binary ${data} https://api.koios.rest/api/ogmios/?SubmitTransaction
       responses:
         "200":
           description: OK
         "400":
           description: An error occured while querying transaction.
       summary: Submit Transaction
-      description: Submit a signed and serialized transaction to the network.
+      description: Submit a signed and serialized transaction to the network. Please refer to Ogmios documentation [here](https://ogmios.dev/api/#operation-publish-/?SubmitTransaction) for complete spec
 
 components:
   parameters:
@@ -3976,6 +3953,11 @@ components:
               decimals:
                 type: integer
                 example: 0
+          cip68_metadata:
+            type: object
+            description: CIP 68 metadata if present for asset
+            nullable: true
+            example: {"222": {"fields": [{"map": [{"k": {"bytes": "6e616d65"}, "v": {"bytes": "74657374"}}]}], "constructor": 0}}
     asset_history:
       type: array
       items:
