@@ -812,28 +812,6 @@ paths:
       summary: Asset Token Registry
       description: Get a list of assets registered via token registry on github
   /asset_info: #RPC
-    get:
-      deprecated: true
-      tags:
-        - Asset
-      parameters:
-        - $ref: "#/components/parameters/_asset_policy"
-        - $ref: "#/components/parameters/_asset_name"
-      responses:
-        "200":
-          description: Array of detailed asset information
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/asset_info"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      summary: Asset Information
-      description: Get the information of an asset including first minting & token registry metadata
     post:
       tags:
         - Asset
@@ -873,7 +851,7 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
-      summary: Asset UTXO Information (Bulk)
+      summary: Asset UTXOs
       description: Get the UTXO information of a list of assets including
   /asset_history: #RPC
     get:

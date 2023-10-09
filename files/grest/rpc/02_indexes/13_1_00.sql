@@ -5,7 +5,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS unique_col_txout ON public.collateral_tx_out U
 CREATE UNIQUE INDEX IF NOT EXISTS unique_delegation ON public.delegation USING btree (tx_id, cert_index);
 CREATE UNIQUE INDEX IF NOT EXISTS unique_epoch_param ON public.epoch_param USING btree (epoch_no, block_id);
 CREATE UNIQUE INDEX IF NOT EXISTS unique_ma_tx_mint ON public.ma_tx_mint USING btree (ident, tx_id);
-CREATE UNIQUE INDEX IF NOT EXISTS unique_ma_tx_out ON public.ma_tx_out USING btree (ident, tx_out_id);
+CREATE UNIQUE INDEX IF NOT EXISTS unique_ma_tx_out ON public.ma_tx_out USING btree (ident, tx_out_id DESC);
 CREATE UNIQUE INDEX IF NOT EXISTS unique_param_proposal ON public.param_proposal USING btree (key, registered_tx_id);
 CREATE UNIQUE INDEX IF NOT EXISTS unique_pool_owner ON public.pool_owner USING btree (addr_id, pool_update_id);
 CREATE UNIQUE INDEX IF NOT EXISTS unique_pool_relay ON public.pool_relay USING btree (update_id, ipv4, ipv6, dns_name);

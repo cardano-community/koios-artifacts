@@ -1689,6 +1689,11 @@ schemas:
               decimals:
                 type: integer
                 example: 0
+          cip68_metadata:
+            type: object
+            description: CIP 68 metadata if present for asset
+            nullable: true
+            example: {"222": {"fields": [{"map": [{"k": {"bytes": "6e616d65"}, "v": {"bytes": "74657374"}}]}], "constructor": 0}}
     asset_history:
       type: array
       items:
