@@ -2499,26 +2499,32 @@ components:
             $ref: "#/components/schemas/pool_updates/items/properties/active_epoch_no"
           vrf_key_hash:
             type: string
+            nullable: true
             description: Pool VRF key hash
             example: 25efdad1bc12944d38e4e3c26c43565bec84973a812737b163b289e87d0d5ed3
           margin:
             type: number
+            nullable: true
             description: Margin (decimal format)
             example: 0.1
           fixed_cost:
             type: string
+            nullable: true
             description: Pool fixed cost per epoch
             example: "500000000"
           pledge:
             type: string
+            nullable: true
             description: Pool pledge in lovelace
             example: "64000000000000"
           reward_addr:
             type: string
+            nullable: true
             description: Pool reward address
             example: stake1uy6yzwsxxc28lfms0qmpxvyz9a7y770rtcqx9y96m42cttqwvp4m5
           owners:
             type: array
+            nullable: true
             items:
               type: string
               description: Pool (co)owner address
@@ -2749,6 +2755,7 @@ components:
           active_epoch_no:
             type: integer
             description: Epoch number in which the update becomes active
+            nullable: true
             example: 324
           vrf_key_hash:
             $ref: "#/components/schemas/pool_info/items/properties/vrf_key_hash"
@@ -2770,8 +2777,11 @@ components:
             $ref: "#/components/schemas/pool_info/items/properties/meta_hash"
           meta_json:
             $ref: "#/components/schemas/pool_info/items/properties/meta_json"
-          pool_status:
-            $ref: "#/components/schemas/pool_info/items/properties/pool_status"
+          update_type:
+            type: string
+            description: Type of update task
+            enum: ["registration", "deregistration"]
+            example: registered
           retiring_epoch:
             $ref: "#/components/schemas/pool_info/items/properties/retiring_epoch"
     pool_relays:
