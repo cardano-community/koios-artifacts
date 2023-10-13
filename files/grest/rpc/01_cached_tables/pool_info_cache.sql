@@ -55,7 +55,7 @@ BEGIN
   ORDER BY pr.id
   LIMIT 1;
 
-  IF _retiring_epoch IS NULL THEN 
+  IF _retiring_epoch IS NULL THEN
     _pool_status := 'registered';
   ELSIF _retiring_epoch > _current_epoch_no THEN
     _pool_status := 'retiring';
@@ -69,7 +69,7 @@ BEGIN
     tx_hash,
     block_time,
     pool_hash_id,
-    pool_id_bech32, 
+    pool_id_bech32,
     pool_id_hex,
     active_epoch_no,
     vrf_key_hash,
@@ -88,7 +88,7 @@ BEGIN
     SELECT
       _tx_id,
       _update_id,
-      encode(tx.hash::bytea, 'hex'), 
+      encode(tx.hash::bytea, 'hex'),
       EXTRACT(EPOCH FROM b.time),
       _hash_id,
       ph.view,
@@ -174,7 +174,7 @@ BEGIN
   ORDER BY pr.id
   LIMIT 1;
 
-  IF _retiring_epoch IS NULL THEN 
+  IF _retiring_epoch IS NULL THEN
     _pool_status := 'registered';
   ELSIF _retiring_epoch > _current_epoch_no THEN
     _pool_status := 'retiring';
@@ -222,8 +222,8 @@ BEGIN
     END IF;
 
   ELSIF (tg_table_name = 'pool_relay') THEN
-    SELECT pic.id INTO _latest_pool_update_id 
-    FROM grest.pool_info_cache AS pic 
+    SELECT pic.id INTO _latest_pool_update_id
+    FROM grest.pool_info_cache AS pic
     INNER JOIN public.pool_update AS pu ON pu.hash_id = pic.pool_hash_id AND pu.registered_tx_id = pic.tx_id
     WHERE pu.id = new.update_id;
 

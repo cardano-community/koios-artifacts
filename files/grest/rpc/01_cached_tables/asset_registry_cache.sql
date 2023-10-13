@@ -38,7 +38,7 @@ BEGIN
     decimals
   )
   VALUES(
-    _asset_policy, 
+    _asset_policy,
     _asset_name,
     _name,
     _description,

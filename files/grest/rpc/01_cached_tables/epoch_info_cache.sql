@@ -9,37 +9,8 @@ CREATE TABLE IF NOT EXISTS grest.epoch_info_cache (
   i_total_rewards lovelace,
   i_avg_blk_reward lovelace,
   i_last_tx_id bigint,
-  p_min_fee_a word31type,
-  p_min_fee_b word31type,
-  p_max_block_size word31type,
-  p_max_tx_size word31type,
-  p_max_bh_size word31type,
-  p_key_deposit lovelace,
-  p_pool_deposit lovelace,
-  p_max_epoch word31type,
-  p_optimal_pool_count word31type,
-  p_influence double precision,
-  p_monetary_expand_rate double precision,
-  p_treasury_growth_rate double precision,
-  p_decentralisation double precision,
-  p_extra_entropy text,
-  p_protocol_major word31type,
-  p_protocol_minor word31type,
-  p_min_utxo_value lovelace,
-  p_min_pool_cost lovelace,
   p_nonce text,
-  p_block_hash text,
-  p_cost_models character varying,
-  p_price_mem double precision,
-  p_price_step double precision,
-  p_max_tx_ex_mem word64type,
-  p_max_tx_ex_steps word64type,
-  p_max_block_ex_mem word64type,
-  p_max_block_ex_steps word64type,
-  p_max_val_size word64type,
-  p_collateral_percent word31type,
-  p_max_collateral_inputs word31type,
-  p_coins_per_utxo_size lovelace
+  p_block_hash text
 );
 
 COMMENT ON TABLE grest.epoch_info_cache IS 'Contains detailed info for epochs including protocol parameters';
@@ -105,6 +76,20 @@ BEGIN
   DELETE FROM grest.epoch_info_cache
   WHERE epoch_no >= _epoch_no_to_insert_from;
 
+  DROP TABLE IF EXISTS last_tx_id_subset;
+  CREATE TEMP TABLE last_tx_id_subset (
+    epoch_no bigint,
+    tx_id bigint
+  );
+
+  INSERT INTO last_tx_id_subset
+    SELECT b.epoch_no, MAX(tx.id)
+    FROM block AS b
+    INNER JOIN tx ON tx.block_id = b.id
+    WHERE b.block_no IS NOT NULL
+      AND b.tx_count != 0
+    GROUP BY b.epoch_no;
+
   INSERT INTO grest.epoch_info_cache
     SELECT DISTINCT ON (b.time)
       e.no AS epoch_no,
@@ -115,45 +100,20 @@ BEGIN
       EXTRACT(EPOCH FROM e.start_time) AS i_first_block_time,
       EXTRACT(EPOCH FROM e.end_time) AS i_last_block_time,
       CASE -- populated in epoch n + 2
-        WHEN e.no <= _curr_epoch - 2 THEN reward_pot.amount 
+        WHEN e.no <= _curr_epoch - 2 THEN reward_pot.amount
         ELSE NULL
       END AS i_total_rewards,
       CASE -- populated in epoch n + 2
         WHEN e.no <= _curr_epoch THEN ROUND(reward_pot.amount / e.blk_count)
         ELSE NULL
-      END AS i_avg_blk_reward, 
-      last_tx.tx_id AS i_last_tx_id,
-      ep.min_fee_a AS p_min_fee_a,
-      ep.min_fee_b AS p_min_fee_b,
-      ep.max_block_size AS p_max_block_size,
-      ep.max_tx_size AS p_max_tx_size,
-      ep.max_bh_size AS p_max_bh_size,
-      ep.key_deposit AS p_key_deposit,
-      ep.pool_deposit AS p_pool_deposit,
-      ep.max_epoch AS p_max_epoch,
-      ep.optimal_pool_count AS p_optimal_pool_count,
-      ep.influence AS p_influence,
-      ep.monetary_expand_rate AS p_monetary_expand_rate,
-      ep.treasury_growth_rate AS p_treasury_growth_rate,
-      ep.decentralisation AS p_decentralisation,
-      ENCODE(ep.extra_entropy, 'hex') AS p_extra_entropy,
-      ep.protocol_major AS p_protocol_major,
-      ep.protocol_minor AS p_protocol_minor,
-      ep.min_utxo_value AS p_min_utxo_value,
-      ep.min_pool_cost AS p_min_pool_cost,
+      END AS i_avg_blk_reward,
+      (
+        SELECT MAX(tx_id)
+        FROM last_tx_id_subset
+        WHERE epoch_no <= e.no
+      ) AS i_last_tx_id,
       ENCODE(ep.nonce, 'hex') AS p_nonce,
-      ENCODE(b.hash, 'hex') AS p_block_hash,
-      cm.costs AS p_cost_models,
-      ep.price_mem AS p_price_mem,
-      ep.price_step AS p_price_step,
-      ep.max_tx_ex_mem AS p_max_tx_ex_mem,
-      ep.max_tx_ex_steps AS p_max_tx_ex_steps,
-      ep.max_block_ex_mem AS p_max_block_ex_mem,
-      ep.max_block_ex_steps AS p_max_block_ex_steps,
-      ep.max_val_size AS p_max_val_size,
-      ep.collateral_percent AS p_collateral_percent,
-      ep.max_collateral_inputs AS p_max_collateral_inputs,
-      ep.coins_per_utxo_size AS p_coins_per_utxo_size
+      ENCODE(b.hash, 'hex') AS p_block_hash
     FROM epoch AS e
     LEFT JOIN epoch_param AS ep ON ep.epoch_no = e.no
     LEFT JOIN cost_model AS cm ON cm.id = ep.cost_model_id
@@ -167,14 +127,6 @@ BEGIN
         GROUP BY
           e.no
       ) AS reward_pot ON TRUE
-    LEFT JOIN LATERAL (
-        SELECT MAX(tx.id) AS tx_id
-        FROM block AS b
-        INNER JOIN tx ON tx.block_id = b.id
-        WHERE b.epoch_no <= e.no
-          AND b.block_no IS NOT NULL
-          AND b.tx_count != 0
-      ) AS last_tx ON TRUE
     WHERE e.no >= _epoch_no_to_insert_from
     ORDER BY
       b.time ASC,

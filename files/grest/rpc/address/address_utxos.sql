@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION grest.account_utxos(_stake_addresses text [], _extended boolean DEFAULT false)
+CREATE OR REPLACE FUNCTION grest.address_utxos(_addresses text [], _extended boolean DEFAULT false)
 RETURNS TABLE (
   tx_hash text,
   tx_index smallint,
@@ -38,7 +38,7 @@ BEGIN
         INNER JOIN ma_tx_out AS mto ON mto.tx_out_id = txo.id
         LEFT JOIN multi_asset AS ma ON ma.id = mto.ident
         LEFT JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
-        WHERE txo.stake_address_id  IN (SELECT sa.id FROM stake_address AS sa WHERE sa.view = ANY(_stake_addresses))
+        WHERE txo.address = ANY(_addresses)
           AND txo.consumed_by_tx_in_id IS NULL
         GROUP BY txo.id
       )
@@ -85,10 +85,10 @@ BEGIN
     LEFT JOIN datum ON datum.id = tx_out.inline_datum_id
     LEFT JOIN script ON script.tx_id = tx_out.reference_script_id
     LEFT JOIN _assets ON tx_out.id = _assets.id
-    WHERE tx_out.stake_address_id IN (SELECT sa.id FROM stake_address AS sa WHERE sa.view = ANY(_stake_addresses))
+    WHERE tx_out.address = ANY(_addresses)
       AND tx_out.consumed_by_tx_in_id IS NULL
   ;
 END;
 $$;
 
-COMMENT ON FUNCTION grest.account_utxos IS  'Get UTxO details for requested stake account'; -- noqa: LT01
+COMMENT ON FUNCTION grest.address_utxos IS  'Get UTxO details for requested addresses'; -- noqa: LT01

@@ -16,14 +16,15 @@ DECLARE
 BEGIN
   SELECT DECODE(_asset_policy, 'hex') INTO _asset_policy_decoded;
   SELECT DECODE(
-    CASE WHEN _asset_name IS NULL
-      THEN ''
-    ELSE
-      _asset_name
+    CASE WHEN _asset_name IS NULL THEN ''
+    ELSE _asset_name
     END,
     'hex'
   ) INTO _asset_name_decoded;
-  SELECT id INTO _asset_id FROM multi_asset AS ma WHERE ma.policy = _asset_policy_decoded AND ma.name = _asset_name_decoded;
+  SELECT id INTO _asset_id
+  FROM multi_asset AS ma
+  WHERE ma.policy = _asset_policy_decoded
+    AND ma.name = _asset_name_decoded;
   RETURN QUERY
     with _asset_utxos AS (
       SELECT
@@ -32,48 +33,34 @@ BEGIN
         txo.index AS tx_out_idx,
         txo.address AS address,
         txo.stake_address_id AS sa_id
-      FROM
-        ma_tx_out AS mto
-        INNER JOIN tx_out AS txo ON txo.id = mto.tx_out_id
-        LEFT JOIN tx_in AS txi ON txi.tx_out_id = txo.tx_id
-      WHERE
-        mto.ident = _asset_id
-        AND
-        txi.tx_out_id IS NULL)
-  
+      FROM ma_tx_out AS mto
+      INNER JOIN tx_out AS txo ON txo.id = mto.tx_out_id
+      LEFT JOIN tx_in AS txi ON txi.tx_out_id = txo.tx_id
+      WHERE mto.ident = _asset_id
+        AND txi.tx_out_id IS NULL)
+
     SELECT
       _asset_policy,
       _asset_name,
       ma.fingerprint,
       (
-        SELECT
-          COUNT(DISTINCT(txo.tx_id))
-        FROM
-          ma_tx_out mto
-          INNER JOIN tx_out txo ON txo.id = mto.tx_out_id
-        WHERE
-          ident = _asset_id
+        SELECT COUNT(DISTINCT(txo.tx_id))
+        FROM ma_tx_out mto
+        INNER JOIN tx_out txo ON txo.id = mto.tx_out_id
+        WHERE ident = _asset_id
       ) AS total_transactions,
       (
-        SELECT
-          COUNT(DISTINCT(_asset_utxos.sa_id))
-        FROM
-          _asset_utxos
-        WHERE
-          _asset_utxos.sa_id IS NOT NULL
+        SELECT COUNT(DISTINCT(_asset_utxos.sa_id))
+        FROM _asset_utxos
+        WHERE _asset_utxos.sa_id IS NOT NULL
       ) AS staked_wallets,
       (
-        SELECT
-          COUNT(DISTINCT(_asset_utxos.address))
-        FROM
-          _asset_utxos
-        WHERE
-          _asset_utxos.sa_id IS NULL
+        SELECT COUNT(DISTINCT(_asset_utxos.address))
+        FROM _asset_utxos
+        WHERE _asset_utxos.sa_id IS NULL
       ) AS unstaked_addresses
-    FROM 
-      multi_asset AS ma
-    WHERE
-      ma.id = _asset_id;
+    FROM multi_asset AS ma
+    WHERE ma.id = _asset_id;
   END;
 $$;
 

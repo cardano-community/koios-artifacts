@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION grest.account_utxos(_stake_addresses text [], _extended boolean DEFAULT false)
+CREATE OR REPLACE FUNCTION grest.utxo_info(_utxo_refs text [], _extended boolean DEFAULT false)
 RETURNS TABLE (
   tx_hash text,
   tx_index smallint,
@@ -18,8 +18,28 @@ RETURNS TABLE (
 LANGUAGE plpgsql
 AS $$
 DECLARE
-  known_addresses varchar[];
+  _tx_hashes_bytea  bytea[];
+  _tx_id_list       bigint[];
 BEGIN
+  -- convert input _tx_hashes array into bytea array
+  DROP TABLE IF EXISTS utxo_refs;
+  CREATE TEMP TABLE utxo_refs AS (
+    SELECT
+      DECODE(SPLIT_PART(ur,'#',1), 'hex') AS tx_hashes,
+      SPLIT_PART(ur,'#',2) AS tx_index
+    FROM UNNEST(_utxo_refs) AS ur
+  );
+
+  -- all tx ids
+  SELECT INTO _tx_id_list ARRAY_AGG(id)
+  FROM (
+    SELECT txo.id
+    FROM tx_out AS txo
+    INNER JOIN tx ON tx.id = txo.tx_id
+    INNER JOIN utxo_refs AS ur ON ur.tx_hashes = tx.hash
+      AND ur.tx_index::smallint = txo.index
+  ) AS tmp;
+
   RETURN QUERY
     WITH
       _assets AS (
@@ -38,8 +58,7 @@ BEGIN
         INNER JOIN ma_tx_out AS mto ON mto.tx_out_id = txo.id
         LEFT JOIN multi_asset AS ma ON ma.id = mto.ident
         LEFT JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
-        WHERE txo.stake_address_id  IN (SELECT sa.id FROM stake_address AS sa WHERE sa.view = ANY(_stake_addresses))
-          AND txo.consumed_by_tx_in_id IS NULL
+        WHERE txo.id = ANY(_tx_id_list)
         GROUP BY txo.id
       )
     SELECT
@@ -85,10 +104,10 @@ BEGIN
     LEFT JOIN datum ON datum.id = tx_out.inline_datum_id
     LEFT JOIN script ON script.tx_id = tx_out.reference_script_id
     LEFT JOIN _assets ON tx_out.id = _assets.id
-    WHERE tx_out.stake_address_id IN (SELECT sa.id FROM stake_address AS sa WHERE sa.view = ANY(_stake_addresses))
-      AND tx_out.consumed_by_tx_in_id IS NULL
+    WHERE tx_out.id = ANY(_tx_id_list)
   ;
+
 END;
 $$;
 
-COMMENT ON FUNCTION grest.account_utxos IS  'Get UTxO details for requested stake account'; -- noqa: LT01
+COMMENT ON FUNCTION grest.utxo_info IS 'Get details for requested UTxO arrays (UTxOs accepted in <hash>#<index> format).'; -- noqa: LT01

@@ -35,6 +35,29 @@ requestBodies:
               _addresses:
                 - ##payment_addresses1_rb##
                 - ##payment_addresses2_rb##
+    payment_addresses_with_extended:
+      content:
+        application/json:
+          schema:
+            required:
+              - _addresses
+            type: object
+            properties:
+              _addresses:
+                format: text
+                type: array
+                items:
+                  type: string
+                description: Array of Cardano payment address(es) in bech32 format
+              _extended:
+                format: boolean
+                type: boolean
+                description: Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call
+            example:
+              _addresses:
+                - ##payment_addresses1_rb##
+                - ##payment_addresses2_rb##
+              _extended: true
     address_txs:
       content:
         application/json:
@@ -107,6 +130,32 @@ requestBodies:
               _stake_addresses:
                 - ##stake_addresses1_rb##
                 - ##stake_addresses2_rb##
+              _first_only: false
+              _empty: false
+
+    stake_addresses_with_extended:
+      content:
+        application/json:
+          schema:
+            required:
+              - _stake_addresses
+            type: object
+            properties:
+              _stake_addresses:
+                format: text
+                type: array
+                items:
+                  type: string
+                description: Array of Cardano stake address(es) in bech32 format
+              _extended:
+                format: boolean
+                type: boolean
+                description: Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call
+            example:
+              _stake_addresses:
+                - ##stake_addresses1_rb##
+                - ##stake_addresses2_rb##
+              _extended: true
     stake_addresses:
       content:
         application/json:
@@ -162,10 +211,15 @@ requestBodies:
                 items:
                   type: string
                 description: Array of Cardano payment credential(s) in hex format
+              _extended:
+                format: boolean
+                type: boolean
+                description: Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call           
             example:
               _payment_credentials:
                 - ##credential_txs_payment_credentials1_rb##
                 - ##credential_txs_payment_credentials2_rb##
+              _extended: true
     tx_ids:
       content:
         application/json:
@@ -227,6 +281,22 @@ requestBodies:
                 - ##pool_ids_pool_bech32_ids1_rb##
                 - ##pool_ids_pool_bech32_ids2_rb##
                 - ##pool_ids_pool_bech32_ids3_rb##
+    script_hashes:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              _script_hashes:
+                format: text
+                type: array
+                items:
+                  type: string
+                description: Array of Cardano script hashes
+            example:
+              _script_hashes:
+                  - ##script_hashes1_rb##
+                  - ##script_hashes2_rb##
     datum_hashes:
       content:
         application/json:
@@ -263,3 +333,51 @@ requestBodies:
               _asset_list:
                 - ##asset1_rb##
                 - ##asset2_rb##
+    asset_list_with_extended:
+      content:
+        application/json:
+          schema:
+            required:
+              - _asset_list
+            type: object
+            properties:
+              _asset_list:
+                format: text
+                type: array
+                description: Array of array of policy ID and asset names (hex)
+                items:
+                  type: array
+                  items:
+                    type: string
+              _extended:
+                format: boolean
+                type: boolean
+                description: Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call
+            example:
+              _asset_list:
+                - ##asset1_rb##
+                - ##asset2_rb##
+              _extended: true
+    utxo_refs_with_extended:
+      content:
+        application/json:
+          schema:
+            required:
+              - _utxo_refs
+            type: object
+            properties:
+              _utxo_refs:
+                format: text
+                type: array
+                items:
+                  type: string
+                description: Array of Cardano utxo references in the form "hash#index"
+              _extended:
+                format: boolean
+                type: boolean
+                description: Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call           
+            example:
+              _utxo_refs:
+                - ##utxo_ref1_rb##
+                - ##utxo_ref2_rb##
+              _extended: false

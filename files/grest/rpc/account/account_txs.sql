@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION grest.credential_txs(_payment_credentials text [], _after_block_height integer DEFAULT 0)
+CREATE OR REPLACE FUNCTION grest.account_txs(_stake_address text, _after_block_height integer DEFAULT 0)
 RETURNS TABLE (
   tx_hash text,
   epoch_no word31type,
@@ -8,17 +8,9 @@ RETURNS TABLE (
 LANGUAGE plpgsql
 AS $$
 DECLARE
-  _payment_cred_bytea  bytea[];
   _tx_id_min bigint;
-  _tx_id_list     bigint[];
+  _tx_id_list bigint[];
 BEGIN
-  -- convert input _payment_credentials array into bytea array
-  SELECT INTO _payment_cred_bytea ARRAY_AGG(cred_bytea)
-  FROM (
-    SELECT DECODE(cred_hex, 'hex') AS cred_bytea
-    FROM UNNEST(_payment_credentials) AS cred_hex
-  ) AS tmp;
-
   SELECT INTO _tx_id_min id
     FROM tx
     WHERE block_id >= (SELECT id FROM block WHERE block_no >= _after_block_height ORDER BY id limit 1)
@@ -29,15 +21,16 @@ BEGIN
   FROM (
     SELECT tx_id
     FROM tx_out
-    WHERE payment_cred = ANY(_payment_cred_bytea)
+    WHERE stake_address_id = ANY(SELECT id FROM stake_address WHERE view = _stake_address)
       AND tx_id >= _tx_id_min
     --
     UNION
     --
     SELECT consumed_by_tx_in_id AS tx_id
     FROM tx_out
-    WHERE tx_out.consumed_by_tx_in_id IS NOT NULL
-      AND tx_out.payment_cred = ANY(_payment_cred_bytea)
+    WHERE
+      tx_out.consumed_by_tx_in_id IS NULL
+      AND tx_out.stake_address_id = ANY(SELECT id FROM stake_address WHERE view = _stake_address)
       AND tx_out.consumed_by_tx_in_id >= _tx_id_min
   ) AS tmp;
 
@@ -55,4 +48,4 @@ BEGIN
 END;
 $$;
 
-COMMENT ON FUNCTION grest.credential_txs IS 'Get the transaction hash list of a payment credentials array, optionally filtering after specified block height (inclusive).'; --noqa: LT01
+COMMENT ON FUNCTION grest.account_txs IS 'Get transactions associated with a given stake address'; -- noqa: LT01

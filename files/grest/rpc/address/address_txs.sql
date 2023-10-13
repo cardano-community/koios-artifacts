@@ -19,42 +19,33 @@ BEGIN
   -- all tx_out & tx_in tx ids
   SELECT INTO _tx_id_list ARRAY_AGG(tx_id)
   FROM (
-    SELECT
-      tx_id
-    FROM
-      tx_out
-    WHERE
-      address = ANY(_addresses)
+    SELECT tx_id
+    FROM tx_out
+    WHERE address = ANY(_addresses)
       AND tx_id >= _tx_id_min
     --
     UNION
     --
-    SELECT
-      tx_in_id AS tx_id
-    FROM
-      tx_out
-      LEFT JOIN tx_in ON tx_out.tx_id = tx_in.tx_out_id
-        AND tx_out.index = tx_in.tx_out_index
-    WHERE
-      tx_in.tx_in_id IS NOT NULL
+    SELECT consumed_by_tx_in_id AS tx_id
+    FROM tx_out
+    LEFT JOIN tx_in ON tx_out.tx_id = tx_in.tx_out_id
+      AND tx_out.index = tx_in.tx_out_index
+    WHERE tx_out.consumed_by_tx_in_id IS NOT NULL
       AND tx_out.address = ANY(_addresses)
-      AND tx_in.tx_in_id >= _tx_id_min
+      AND tx_out.consumed_by_tx_in_id >= _tx_id_min
   ) AS tmp;
 
   RETURN QUERY
     SELECT
       DISTINCT(ENCODE(tx.hash, 'hex')) AS tx_hash,
-      block.epoch_no,
-      block.block_no,
-      EXTRACT(EPOCH FROM block.time)::integer
-    FROM
-      public.tx
-      INNER JOIN public.block ON block.id = tx.block_id
-    WHERE
-      tx.id = ANY(_tx_id_list)
-      AND block.block_no >= _after_block_height
-    ORDER BY
-      block.block_no DESC;
+      b.epoch_no,
+      b.block_no AS block_height,
+      EXTRACT(EPOCH FROM b.time)::integer AS block_time
+    FROM public.tx
+    INNER JOIN public.block AS b ON b.id = tx.block_id
+    WHERE tx.id = ANY(_tx_id_list)
+      AND b.block_no >= _after_block_height
+    ORDER BY b.block_no DESC;
 END;
 $$;
 

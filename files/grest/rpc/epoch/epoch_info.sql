@@ -44,9 +44,8 @@ BEGIN
     eas.amount::text AS active_stake,
     ei.i_total_rewards::text AS total_rewards,
     ei.i_avg_blk_reward::text AS avg_blk_reward
-  FROM
-    grest.epoch_info_cache AS ei
-    LEFT JOIN grest.epoch_active_stake_cache AS eas ON eas.epoch_no = ei.epoch_no
+  FROM grest.epoch_info_cache AS ei
+  LEFT JOIN grest.epoch_active_stake_cache AS eas ON eas.epoch_no = ei.epoch_no
   WHERE
     CASE WHEN _epoch_no IS NULL THEN
       ei.epoch_no <= (SELECT MAX(epoch.no) FROM public.epoch)
@@ -54,7 +53,7 @@ BEGIN
       ei.epoch_no = _epoch_no
     END
     AND
-    (_include_next_epoch OR ei.i_first_block_time::integer is not null);
+    (_include_next_epoch OR ei.i_first_block_time::integer IS NOT NULL);
 END;
 $$;
 

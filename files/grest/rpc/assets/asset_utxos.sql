@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION grest.account_utxos(_stake_addresses text [], _extended boolean DEFAULT false)
+CREATE OR REPLACE FUNCTION grest.asset_utxos(_asset_list text [] [], _extended boolean DEFAULT false)
 RETURNS TABLE (
   tx_hash text,
   tx_index smallint,
@@ -18,8 +18,21 @@ RETURNS TABLE (
 LANGUAGE plpgsql
 AS $$
 DECLARE
-  known_addresses varchar[];
+  _asset_id_list bigint[];
 BEGIN
+  -- find all asset id's based ON nested array input
+  SELECT INTO _asset_id_list ARRAY_AGG(id)
+  FROM (
+    SELECT DISTINCT mu.id
+    FROM (
+      SELECT
+        DECODE(al->>0, 'hex') AS policy,
+        DECODE(al->>1, 'hex') AS name
+      FROM JSONB_ARRAY_ELEMENTS(TO_JSONB(_asset_list)) AS al
+    ) AS ald
+    INNER JOIN multi_asset AS mu ON mu.policy = ald.policy AND mu.name = ald.name
+  ) AS tmp;
+
   RETURN QUERY
     WITH
       _assets AS (
@@ -38,7 +51,7 @@ BEGIN
         INNER JOIN ma_tx_out AS mto ON mto.tx_out_id = txo.id
         LEFT JOIN multi_asset AS ma ON ma.id = mto.ident
         LEFT JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
-        WHERE txo.stake_address_id  IN (SELECT sa.id FROM stake_address AS sa WHERE sa.view = ANY(_stake_addresses))
+        WHERE mto.ident = ANY(_asset_id_list)
           AND txo.consumed_by_tx_in_id IS NULL
         GROUP BY txo.id
       )
@@ -80,15 +93,14 @@ BEGIN
       END) AS is_spent
     FROM tx_out
     INNER JOIN tx ON tx_out.tx_id = tx.id
+    INNER JOIN _assets ON tx_out.id = _assets.id
     LEFT JOIN stake_address AS sa ON tx_out.stake_address_id = sa.id
     LEFT JOIN block AS b ON b.id = tx.block_id
     LEFT JOIN datum ON datum.id = tx_out.inline_datum_id
     LEFT JOIN script ON script.tx_id = tx_out.reference_script_id
-    LEFT JOIN _assets ON tx_out.id = _assets.id
-    WHERE tx_out.stake_address_id IN (SELECT sa.id FROM stake_address AS sa WHERE sa.view = ANY(_stake_addresses))
-      AND tx_out.consumed_by_tx_in_id IS NULL
+    WHERE tx_out.consumed_by_tx_in_id IS NULL
   ;
 END;
 $$;
 
-COMMENT ON FUNCTION grest.account_utxos IS  'Get UTxO details for requested stake account'; -- noqa: LT01
+COMMENT ON FUNCTION grest.asset_utxos IS 'Get UTxO details for requested assets'; -- noqa: LT01

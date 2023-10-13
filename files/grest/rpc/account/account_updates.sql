@@ -9,7 +9,7 @@ DECLARE
   sa_id_list integer[] DEFAULT NULL;
 BEGIN
   SELECT INTO sa_id_list
-    ARRAY_AGG(stake_address.id) 
+    ARRAY_AGG(stake_address.id)
   FROM
     stake_address
   WHERE

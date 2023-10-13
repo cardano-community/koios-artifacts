@@ -16,11 +16,9 @@ BEGIN
       DISTINCT ON (tx_out.address) tx_out.address,
       sa.view AS stake_address,
       COALESCE(tx_out.address_has_script, 'false') AS script_address
-    FROM
-      tx_out
-      LEFT JOIN stake_address sa ON sa.id = tx_out.stake_address_id
-    WHERE
-      tx_out.address = ANY(_addresses);
+    FROM tx_out
+    LEFT JOIN stake_address AS sa ON sa.id = tx_out.stake_address_id
+    WHERE tx_out.address = ANY(_addresses);
 
   RETURN QUERY
     WITH _all_utxos AS (
@@ -35,15 +33,10 @@ BEGIN
         tx_out.data_hash,
         tx_out.inline_datum_id,
         tx_out.reference_script_id
-      FROM
-        tx_out
-        LEFT JOIN tx_in ON tx_in.tx_out_id = tx_out.tx_id
-          AND tx_in.tx_out_index = tx_out.index
-        INNER JOIN tx ON tx.id = tx_out.tx_id
-      WHERE
-        tx_in.tx_out_id IS NULL
-        AND
-        tx_out.address = ANY(_addresses)
+      FROM tx_out
+      INNER JOIN tx ON tx.id = tx_out.tx_id
+      WHERE tx_out.consumed_by_tx_in_id IS NULL
+        AND tx_out.address = ANY(_addresses)
     )
 
     SELECT
@@ -57,7 +50,7 @@ BEGIN
         ) THEN
           JSONB_AGG(
             JSONB_BUILD_OBJECT(
-              'tx_hash', ENCODE(au.hash, 'hex'), 
+              'tx_hash', ENCODE(au.hash, 'hex'),
               'tx_index', au.index,
               'block_height', block.block_no,
               'block_time', EXTRACT(EPOCH FROM block.time)::integer,
@@ -98,12 +91,10 @@ BEGIN
                       'decimals', COALESCE(aic.decimals, 0),
                       'quantity', mtx.quantity::text
                     ))
-                  FROM
-                    ma_tx_out AS mtx
-                    INNER JOIN multi_asset AS ma ON ma.id = mtx.ident
-                    LEFT JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
-                  WHERE
-                    mtx.tx_out_id = au.txo_id
+                  FROM ma_tx_out AS mtx
+                  INNER JOIN multi_asset AS ma ON ma.id = mtx.ident
+                  LEFT JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
+                  WHERE mtx.tx_out_id = au.txo_id
                 ),
                 JSONB_BUILD_ARRAY()
               )
@@ -112,14 +103,15 @@ BEGIN
         ELSE
           '[]'::jsonb
         END AS utxo_set
-      FROM
-        _known_addresses AS ka
-        LEFT OUTER JOIN _all_utxos AS au ON au.address = ka.address
-        LEFT JOIN public.block ON block.id = au.block_id
-        LEFT JOIN datum ON datum.id = au.inline_datum_id
-        LEFT JOIN script ON script.id = au.reference_script_id
+      FROM _known_addresses AS ka
+      LEFT OUTER JOIN _all_utxos AS au ON au.address = ka.address
+      LEFT JOIN public.block ON block.id = au.block_id
+      LEFT JOIN datum ON datum.id = au.inline_datum_id
+      LEFT JOIN script ON script.id = au.reference_script_id
       GROUP BY
-        ka.address, ka.stake_address, ka.script_address;
+        ka.address,
+        ka.stake_address,
+        ka.script_address;
     DROP TABLE _known_addresses;
 END;
 $$;

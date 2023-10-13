@@ -1,7 +1,7 @@
 openapi: 3.0.2
 info:
   title: Koios API
-  version: 1.0.10
+  version: v1.1.0rc
   description: |
     Koios is best described as a Decentralized and Elastic RESTful query layer for exploring data on Cardano blockchain to consume within applications/wallets/explorers/etc. This page not only provides an OpenAPI Spec for live implementation, but also ability to execute live demo from client browser against each endpoint with pre-filled examples.
 
@@ -14,11 +14,11 @@ info:
     Instead of returning entire row, you can elect which rows you would like to fetch from the endpoint by using the `select` parameter with corresponding columns separated by commas. See example below (first is complete information for tip, while second command gives us 3 columns we are interested in):<br><br>
 
     ``` bash
-    curl "https://api.koios.rest/api/v0/tip"
+    curl "https://api.koios.rest/api/v1/tip"
 
     # [{"hash":"4d44c8a453e677f933c3df42ebcf2fe45987c41268b9cfc9b42ae305e8c3d99a","epoch":317,"abs_slot":51700871,"epoch_slot":120071,"block_height":6806994,"block_time":1643267162}]
 
-    curl "https://api.koios.rest/api/v0/blocks?select=epoch,epoch_slot,block_height"
+    curl "https://api.koios.rest/api/v1/blocks?select=epoch,epoch_slot,block_height"
 
     # [{"epoch":317,"epoch_slot":120071,"block_height":6806994}]
     ```
@@ -27,7 +27,7 @@ info:
 
     You can filter the returned output based on specific conditions using operators against a column within returned result. Consider an example where you would want to query blocks minted in first 3 minutes of epoch 250 (i.e. epoch_slot was less than 180). To do so your query would look like below:<br><br>
     ``` bash
-    curl "https://api.koios.rest/api/v0/blocks?epoch=eq.250&epoch_slot=lt.180"
+    curl "https://api.koios.rest/api/v1/blocks?epoch=eq.250&epoch_slot=lt.180"
 
     # [{"hash":"8fad2808ac6b37064a0fa69f6fe065807703d5235a57442647bbcdba1c02faf8","epoch":250,"abs_slot":22636942,"epoch_slot":142,"block_height":5385757,"block_time":1614203233,"tx_count":65,"vrf_key":"vrf_vk14y9pjprzlsjvjt66mv5u7w7292sxp3kn4ewhss45ayjga5vurgaqhqknuu","pool":null,"op_cert_counter":2},
     #  {"hash":"9d33b02badaedc0dedd0d59f3e0411e5fb4ac94217fb5ee86719e8463c570e16","epoch":250,"abs_slot":22636800,"epoch_slot":0,"block_height":5385756,"block_time":1614203091,"tx_count":10,"vrf_key":"vrf_vk1dkfsejw3h2k7tnguwrauqfwnxa7wj3nkp3yw2yw3400c4nlkluwqzwvka6","pool":null,"op_cert_counter":2}]
@@ -62,7 +62,7 @@ info:
     Consider a simple case where I want query `blocks` endpoint for `block_height` column and focus on `content-range` header to monitor the rows we discussed above.<br><br>
 
     ``` bash
-    curl -s "https://api.koios.rest/api/v0/blocks?select=block_height" -I | grep -i content-range
+    curl -s "https://api.koios.rest/api/v1/blocks?select=block_height" -I | grep -i content-range
 
     # content-range: 0-999/*
 
@@ -71,7 +71,7 @@ info:
     As we can see above, the number of observations returned was 1000 (range being 0-999), but the total size was not queried to avoid wait times. Now, let's modify this default behaviour to query rows beyond the first 999, but this time - also add another clause to limit results by 500. We can do this using `offset=1000` and `limit=500` as below:<br><br>
 
     ``` bash
-    curl -s "https://api.koios.rest/api/v0/blocks?select=block_height&offset=1000&limit=500" -I | grep -i content-range
+    curl -s "https://api.koios.rest/api/v1/blocks?select=block_height&offset=1000&limit=500" -I | grep -i content-range
 
     # content-range: 1000-1499/*
 
@@ -80,7 +80,7 @@ info:
     For GET endpoints, there is also another method to achieve the above, instead of adding parameters to the URL itself, you can specify a `Range` header as below to achieve something similar:<br><br>
 
     ``` bash
-    curl -s "https://api.koios.rest/api/v0/blocks?select=block_height" -H "Range: 1000-1499" -I | grep -i content-range
+    curl -s "https://api.koios.rest/api/v1/blocks?select=block_height" -H "Range: 1000-1499" -I | grep -i content-range
 
     # content-range: 1000-1499/*
 
@@ -94,7 +94,7 @@ info:
     Consider example where you want to check `epoch` and `epoch_slot` for the first 5 blocks created by a particular pool, i.e. you can set order to ascending based on block_height column and add horizontal filter for that pool ID as below:<br><br>
 
     ``` bash
-    curl -s "https://api.koios.rest/api/v0/blocks?pool=eq.pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc&order=block_height.asc&limit=5"
+    curl -s "https://api.koios.rest/api/v1/blocks?pool=eq.pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc&order=block_height.asc&limit=5"
 
     # [{"hash":"610b4c7bbebeeb212bd002885048cc33154ba29f39919d62a3d96de05d315706","epoch":236,"abs_slot":16594295,"epoch_slot":5495,"block_height":5086774,"block_time":1608160586,"tx_count":1,"vrf_key":"vrf_vk18x0e7dx8j37gdxftnn8ru6jcxs7n6acdazc4ykeda2ygjwg9a7ls7ns699","pool":"pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc","op_cert_counter":1},
     # {"hash":"d93d1db5275329ab695d30c06a35124038d8d9af64fc2b0aa082b8aa43da4164","epoch":236,"abs_slot":16597729,"epoch_slot":8929,"block_height":5086944,"block_time":1608164020,"tx_count":7,"vrf_key":"vrf_vk18x0e7dx8j37gdxftnn8ru6jcxs7n6acdazc4ykeda2ygjwg9a7ls7ns699","pool":"pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc","op_cert_counter":1},
@@ -109,13 +109,13 @@ info:
     Below is an example of JSON/CSV output making use of above to print first in JSON (default), and then override response format to CSV.<br><br>
 
     ``` bash
-    curl -s "https://api.koios.rest/api/v0/blocks?select=epoch,epoch_slot,block_time&limit=3"
+    curl -s "https://api.koios.rest/api/v1/blocks?select=epoch,epoch_slot,block_time&limit=3"
 
     # [{"epoch":318,"epoch_slot":27867,"block_time":1643606958},
     # {"epoch":318,"epoch_slot":27841,"block_time":1643606932},
     # {"epoch":318,"epoch_slot":27839,"block_time":1643606930}]
 
-    curl -s "https://api.koios.rest/api/v0/blocks?select=epoch,epoch_slot,block_time&limit=3" -H "Accept: text/csv"
+    curl -s "https://api.koios.rest/api/v1/blocks?select=epoch,epoch_slot,block_time&limit=3" -H "Accept: text/csv"
 
     # epoch,epoch_slot,block_time
     # 318,28491,1643607582
@@ -134,6 +134,10 @@ info:
 
     Yet, there may be cases where the above restrictions may need exceptions (for example, an explorer or a wallet might need more connections than above - going beyond the Burst Limit). For such cases, it is best to approach the team and we can work towards a solution.
 
+    # Authentication
+
+    While Koios public tier remains unauthenticated and allows queries without any authentication, it has low limits to prevent actions against an erroraneous query/loop from a consumer. There is also a Free tier which requires setting up Bearer Auth token that is linked to the owner's wallet account (which can be connected to via [Koios website](https://koios.rest/pricing/Pricing.html) ).
+    The examples across this API site already [supports authentication](/#auth), for you to use in the queries.
 
     # Community projects
 
@@ -142,11 +146,12 @@ info:
   x-logo:
     url: "https://api.koios.rest/images/koios.png"
 servers:
-  - url: https://api.koios.rest/api/v0
-  - url: https://guild.koios.rest/api/v0
-  - url: https://preview.koios.rest/api/v0
-  - url: https://preprod.koios.rest/api/v0
+  - url: https://api.koios.rest/api/v1
+  - url: https://guild.koios.rest/api/v1
+  - url: https://preview.koios.rest/api/v1
+  - url: https://preprod.koios.rest/api/v1
 paths:
+
   /tip: #RPC
     get:
       tags:
@@ -227,6 +232,45 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Param Update Proposals
       description: Get all parameter update proposals submitted to the chain starting Shelley era
+  /reserve_withdrawals: #RPC
+    get:
+      tags:
+        - Network
+      responses:
+        "200":
+          description: Array of withdrawals from reserves against stake accounts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/reserve_withdrawals"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Reserve Withdrawals
+      description: List of all withdrawals from reserves against stake accounts
+  /treasury_withdrawals: #RPC
+    get:
+      tags:
+        - Network
+      responses:
+        "200":
+          description: Array of withdrawals from treasury against stake accounts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/reserve_withdrawals"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Treasury Withdrawals
+      description: List of all withdrawals from treasury against stake accounts
+
   /epoch_info: #RPC
     get:
       tags:
@@ -294,6 +338,7 @@ paths:
       summary: Epoch's Block Protocols
       description: >-
         Get the information about block protocol distribution in epoch
+
   /blocks:
     get:
       tags:
@@ -355,6 +400,28 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Block Transactions
       description: Get a list of all transactions included in provided blocks
+
+  /utxo_info: #RPC
+    post:
+      tags:
+        - Transactions
+      requestBody:
+        $ref: "#/components/requestBodies/utxo_refs_with_extended"
+      responses:
+        "200":
+          description: Array of UTXO details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/utxo_infos"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: UTxO Info
+      description: Get UTxO set for requested UTxO references
   /tx_info: #RPC
     post:
       tags:
@@ -376,27 +443,6 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Transaction Information
       description: Get detailed information about transaction(s)
-  /tx_utxos: #RPC
-    post:
-      tags:
-        - Transactions
-      requestBody:
-        $ref: "#/components/requestBodies/tx_ids"
-      responses:
-        "200":
-          description: Array of inputs and outputs for given transaction(s)
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/tx_utxos"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      summary: Transaction UTxOs [DEPRECATED]
-      description: Get UTxO set (inputs/outputs) of transactions.
   /tx_metadata: #RPC
     post:
       tags:
@@ -450,7 +496,7 @@ paths:
             # If using a CLI-generated tx file, please ensure to deserialise (using `xxd -p -r <<< $(jq .cborHex ${tx.signed}) > ${data}`) first before submitting.
             curl -X POST \
                 --header "Content-Type: application/cbor" \
-                --data-binary ${data} https://api.koios.rest/api/v0/submittx
+                --data-binary @${data} https://api.koios.rest/api/v1/submittx
       responses:
         "202":
           description: OK
@@ -486,8 +532,31 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
-      summary: Transaction Status (Block Confirmations)
+      summary: Transaction Status
       description: Get the number of block confirmations for a given transaction hash list
+  /tx_utxos: #RPC
+    post:
+      tags:
+        - Transactions
+      deprecated: true
+      requestBody:
+        $ref: "#/components/requestBodies/tx_ids"
+      responses:
+        "200":
+          description: Array of inputs and outputs for given transaction(s)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tx_utxos"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Transaction UTxOs
+      description: Get UTxO set (inputs/outputs) of transactions [DEPRECATED - Use /utxo_info instead].
+
   /address_info: #RPC
     post:
       tags:
@@ -509,6 +578,48 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Address Information
       description: Get address info - balance, associated stake address (if any) and UTxO set for given addresses
+  /address_utxos: #RPC
+    post:
+      tags:
+        - Address
+      requestBody:
+        $ref: "#/components/requestBodies/payment_addresses_with_extended"
+      responses:
+        "200":
+          description: Array of address UTXOs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/utxo_infos"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Address UTXOs
+      description: Get UTxO set for given addresses
+  /credential_utxos: #RPC
+    post:
+      tags:
+        - Address
+      requestBody:
+        $ref: "#/components/requestBodies/credential_utxos"
+      responses:
+        "200":
+          description: Array of UTxOs with balances
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/utxo_infos"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: UTxOs from payment credentials
+      description: Get UTxO details for requested payment credentials
   /address_txs: #RPC
     post:
       tags:
@@ -530,27 +641,27 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Address Transactions
       description: Get the transaction hash list of input address array, optionally filtering after specified block height (inclusive)
-  /credential_utxos: #RPC
+  /credential_txs: #RPC
     post:
       tags:
         - Address
       requestBody:
-        $ref: "#/components/requestBodies/credential_utxos"
+        $ref: "#/components/requestBodies/credential_txs"
       responses:
         "200":
-          description: Array of UTxOs with balances
+          description: Array of transaction hashes
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/credential_utxos"
+                $ref: "#/components/schemas/address_txs"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
-      summary: UTxOs from payment credentials
-      description: Get a list of UTxO against input payment credential array including their balances
+      summary: Transactions from payment credentials
+      description: Get the transaction hash list of input payment credential array, optionally filtering after specified block height (inclusive)
   /address_assets: #RPC
     post:
       tags:
@@ -572,27 +683,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Address Assets
       description: Get the list of all the assets (policy, name and quantity) for given addresses
-  /credential_txs: #RPC
-    post:
-      tags:
-        - Address
-      requestBody:
-        $ref: "#/components/requestBodies/credential_txs"
-      responses:
-        "200":
-          description: Array of transaction hashes
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/credential_txs"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      summary: Transactions from payment credentials
-      description: Get the transaction hash list of input payment credential array, optionally filtering after specified block height (inclusive)
+
   /account_list:
     get:
       tags:
@@ -633,27 +724,6 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Account Information
       description: Get the account information for given stake addresses
-  /account_utxos: #RPC
-    get:
-      tags:
-        - Stake Account
-      parameters:
-        - $ref: "#/components/parameters/_stake_address"
-      responses:
-        "200":
-          description: Array of account UTxOs associated with stake address
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/account_utxos"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      summary: Account UTxOs
-      description: Get a list of all UTxOs for a given stake address (account)
   /account_info_cached: #RPC
     post:
       tags:
@@ -674,7 +744,50 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Account Information (Cached)
-      description: Get the cached account information for given stake addresses, effective for registered accounts
+      description: Get the cached account information for given stake addresses (effective for performance query against registered accounts)
+  /account_utxos: #RPC
+    post:
+      tags:
+        - Stake Account
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses_with_extended"
+      responses:
+        "200":
+          description: Array of account UTxOs associated with given stake addresses
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/utxo_infos"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: UTxOs for stake addresses (accounts)
+      description: Get a list of all UTxOs for given stake addresses (account)s
+  /account_txs: #RPC
+    get:
+      tags:
+        - Stake Account
+      parameters:
+        - $ref: "#/components/parameters/_stake_address"
+        - $ref: "#/components/parameters/_after_block_height"
+      responses:
+        "200":
+          description: Array of Txs associated with stake address (account)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/address_txs"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Account Txs
+      description: Get a list of all Txs for a given stake address (account)
   /account_rewards: #RPC
     post:
       tags:
@@ -783,6 +896,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Account History
       description: Get the staking history of given stake addresses (accounts)
+
   /asset_list:
     get:
       tags:
@@ -802,6 +916,27 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Asset List
       description: Get the list of all native assets (paginated)
+  /policy_asset_list: #RPC
+    get:
+      tags:
+        - Asset
+      parameters:
+        - $ref: "#/components/parameters/_asset_policy"
+      responses:
+        "200":
+          description: Array of detailed information of assets under the same policy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/policy_asset_list"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Policy Asset List
+      description: Get the list of asset under the given policy (including balances)
   /asset_token_registry:
     get:
       tags:
@@ -821,6 +956,70 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Asset Token Registry
       description: Get a list of assets registered via token registry on github
+  /asset_info: #RPC
+    post:
+      tags:
+        - Asset
+      requestBody:
+        $ref: "#/components/requestBodies/asset_list"
+      responses:
+        "200":
+          description: Array of detailed asset information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/asset_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Asset Information (Bulk)
+      description: Get the information of a list of assets including first minting & token registry metadata
+  /asset_utxos: #RPC
+    post:
+      tags:
+        - Asset
+      requestBody:
+        $ref: "#/components/requestBodies/asset_list_with_extended"
+      responses:
+        "200":
+          description: Array of UTXOs for given asset list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/utxo_infos"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Asset UTXOs
+      description: Get the UTXO information of a list of assets including
+  /asset_history: #RPC
+    get:
+      tags:
+        - Asset
+      parameters:
+        - $ref: "#/components/parameters/_asset_policy"
+        - $ref: "#/components/parameters/_asset_name"
+      responses:
+        "200":
+          description: Array of asset mint/burn history
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/asset_history"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Asset History
+      description: Get the mint/burn history of an asset
   /asset_addresses: #RPC
     get:
       tags:
@@ -846,28 +1045,6 @@ paths:
         `Note - Due to cardano's UTxO design and usage from projects, asset to addresses map can be infinite. Thus, for a small subset of active projects 
         with millions of transactions, these might end up with timeouts (HTTP code 504) on free layer. Such large-scale projects are free to subscribe to 
         query layers to have a dedicated cache table for themselves served via Koios.`
-  /asset_address_list: #RPC
-    get:
-      tags:
-        - Asset
-      parameters:
-        - $ref: "#/components/parameters/_asset_policy"
-        - $ref: "#/components/parameters/_asset_name"
-      responses:
-        "200":
-          description: Array of payment addresses holding the given token (including balances)
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/asset_addresses"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      summary: Asset Address List [DEPRECATED]
-      description: Get the list of all addresses holding a given asset (replaced by asset_addresses)
   /asset_nft_address: #RPC
     get:
       tags:
@@ -890,70 +1067,6 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: NFT Address
       description: Get the address where specified NFT currently reside on.
-  /asset_info: #RPC
-    get:
-      tags:
-        - Asset
-      parameters:
-        - $ref: "#/components/parameters/_asset_policy"
-        - $ref: "#/components/parameters/_asset_name"
-      responses:
-        "200":
-          description: Array of detailed asset information
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/asset_info"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      summary: Asset Information
-      description: Get the information of an asset including first minting & token registry metadata
-    post:
-      tags:
-        - Asset
-      requestBody:
-        $ref: "#/components/requestBodies/asset_list"
-      responses:
-        "200":
-          description: Array of detailed asset information
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/asset_info"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      summary: Asset Information (Bulk)
-      description: Get the information of a list of assets including first minting & token registry metadata
-  /asset_history: #RPC
-    get:
-      tags:
-        - Asset
-      parameters:
-        - $ref: "#/components/parameters/_asset_policy"
-        - $ref: "#/components/parameters/_asset_name"
-      responses:
-        "200":
-          description: Array of asset mint/burn history
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/asset_history"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      summary: Asset History
-      description: Get the mint/burn history of an asset
   /policy_asset_addresses: #RPC
     get:
       tags:
@@ -999,48 +1112,6 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Policy Asset Information
       description: Get the information for all assets under the same policy
-  /asset_policy_info: #RPC
-    get:
-      tags:
-        - Asset
-      parameters:
-        - $ref: "#/components/parameters/_asset_policy"
-      responses:
-        "200":
-          description: Array of detailed information of assets under the same policy
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/policy_asset_info"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      summary: Asset Policy Information [DEPRECATED]
-      description: Get the information for all assets under the same policy (replaced by asset_addresses)
-  /policy_asset_list: #RPC
-    get:
-      tags:
-        - Asset
-      parameters:
-        - $ref: "#/components/parameters/_asset_policy"
-      responses:
-        "200":
-          description: Array of detailed information of assets under the same policy
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/policy_asset_list"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      summary: Policy Asset List
-      description: Get the list of asset under the given policy (including balances)
   /asset_summary: #RPC
     get:
       tags:
@@ -1074,11 +1145,11 @@ paths:
         - $ref: "#/components/parameters/_history"
       responses:
         "200":
-          description: Array of Tx hashes that included the given asset
+          description: An array of Tx hashes that included the given asset (latest first)
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/asset_txs"
+                $ref: "#/components/schemas/address_txs"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -1087,6 +1158,52 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Asset Transactions
       description: Get the list of current or all asset transaction hashes (newest first)
+  /asset_address_list: #RPC
+    get:
+      tags:
+        - Asset
+      deprecated: true
+      parameters:
+        - $ref: "#/components/parameters/_asset_policy"
+        - $ref: "#/components/parameters/_asset_name"
+      responses:
+        "200":
+          description: Array of payment addresses holding the given token (including balances)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/asset_addresses"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Asset Address List
+      description: Get the list of all addresses holding a given asset [DEPRECATED - replaced by asset_addresses]
+  /asset_policy_info: #RPC
+    get:
+      deprecated: true
+      tags:
+        - Asset
+      parameters:
+        - $ref: "#/components/parameters/_asset_policy"
+      responses:
+        "200":
+          description: Array of detailed information of assets under the same policy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/policy_asset_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Asset Policy Information
+      description: Get the information for all assets under the same policy (DEPRECATED - replaced by policy_asset_info)
+
   /pool_list: #RPC
     get:
       tags:
@@ -1105,7 +1222,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Pool List
-      description: A list of all currently registered/retiring (not retired) pools
+      description: List of brief info for all pools
   /pool_info: #RPC
     post:
       tags:
@@ -1261,6 +1378,48 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Pool Updates (History)
       description: Return all pool updates for all pools or only updates for specific pool if specified
+  /pool_registrations: #RPC
+    get:
+      tags:
+        - Pool
+      parameters:
+        - $ref: "#/components/parameters/_epoch_no"
+      responses:
+        "200":
+          description: Array of historical pool updates
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_registrations"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Pool Registrations
+      description: Return all pool registrations initiated in the requested epoch
+  /pool_retirements: #RPC
+    get:
+      tags:
+        - Pool
+      parameters:
+        - $ref: "#/components/parameters/_epoch_no"
+      responses:
+        "200":
+          description: Array of historical pool updates
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_registrations"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Pool Retirements
+      description: Return all pool retirements initiated in the requested epoch
   /pool_relays: #RPC
     get:
       tags:
@@ -1279,7 +1438,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Pool Relays
-      description: A list of registered relays for all currently registered/retiring (not retired) pools
+      description: A list of registered relays for all pools
   /pool_metadata: #RPC
     post:
       tags:
@@ -1300,7 +1459,29 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Pool Metadata
-      description: Metadata (on & off-chain) for all currently registered/retiring (not retired) pools
+      description: Metadata (on & off-chain) for all pools
+
+  /script_info: #RPC
+    post:
+      tags:
+        - Script
+      requestBody:
+        $ref: "#/components/requestBodies/script_hashes"
+      responses:
+        "200":
+          description: List of datum information for given datum hashes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/script_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Datum Information
+      description: List of datum information for given datum hashes
   /native_script_list: #RPC
     get:
       tags:
@@ -1311,7 +1492,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/native_script_list"
+                $ref: "#/components/schemas/script_list"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -1330,7 +1511,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/plutus_script_list"
+                $ref: "#/components/schemas/script_list"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -1360,6 +1541,28 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Script Redeemers
       description: List of all redeemers for a given script hash
+  /script_utxos: #RPC
+    get:
+      tags:
+        - Script
+      parameters:
+        - $ref: "#/components/parameters/_script_hash"
+        - $ref: "#/components/parameters/_extended"
+      responses:
+        "200":
+          description: List of UTXOs for a given script hash
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/utxo_infos"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Script UTXOs
+      description: List of all UTXOs for a given script hash
   /datum_info: #RPC
     post:
       tags:
@@ -1381,6 +1584,43 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Datum Information
       description: List of datum information for given datum hashes
+  /ogmios/?EvaluateTransaction: #ogmios-api
+    post:
+      tags:
+        - Ogmios
+      x-code-samples:
+        - lang: "Shell"
+          source: |
+            # Assuming ${data} contains EvaluateTransaction payload as documented on Ogmios v6 site.
+            curl -X POST \
+                --header "Content-Type: application/cbor" \
+                --data-binary ${data} https://api.koios.rest/api/ogmios/?EvaluateTransaction
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: An error occured while submitting transaction.
+      summary: Evaluate Transaction
+      description: Evaluate execution units of scripts in a well-formed transaction. Please refer to Ogmios documentation [here](https://ogmios.dev/api/#operation-publish-/?EvaluateTransaction) for complete spec
+  /ogmios/?SubmitTransaction: #ogmios-api
+    post:
+      tags:
+        - Ogmios
+      x-code-samples:
+        - lang: "Shell"
+          source: |
+            # Assuming ${data} contains a CBOR-serialized signed transaction (base16-encoded) as documented on Ogmios v6 site.
+            curl -X POST \
+                --header "Content-Type: application/cbor" \
+                --data-binary ${data} https://api.koios.rest/api/ogmios/?SubmitTransaction
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: An error occured while querying transaction.
+      summary: Submit Transaction
+      description: Submit a signed and serialized transaction to the network. Please refer to Ogmios documentation [here](https://ogmios.dev/api/#operation-publish-/?SubmitTransaction) for complete spec
+
 components:
   parameters:
     select:
@@ -1460,7 +1700,7 @@ components:
       description: Epoch Number to fetch details for
       schema:
         type: string
-        example: 1950
+        example: 6219
       in: query
       required: false
       allowEmptyValue: true
@@ -1554,6 +1794,16 @@ components:
       in: query
       required: false
       allowEmptyValue: true
+    _extended:
+      deprecated: false
+      name: _extended
+      description: Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call
+      schema:
+        type: boolean
+        example: "false"
+      in: query
+      required: false
+      allowEmptyValue: true
     _history:
       deprecated: false
       name: _history
@@ -1600,7 +1850,7 @@ components:
       description: Script hash in hexadecimal format (hex)
       schema:
         type: string
-        example: 160301a01ee86d8e46cbe3aef1e3bf69bfa28c65d5be2dde56a37af8
+        example: 1392eec7d575292ae1523da65ff1b4b021886e917c8c43de54aa7cbd
       in: query
       required: true
       allowEmptyValue: false
@@ -1661,6 +1911,29 @@ components:
               _addresses:
                 - addr_test1qzmtfv43a8ncx6ve92ja6yy25npn9raz9pu5a2tfxsqv9gy9ktf0pu6yu4zjh9r37fzx3h4tsxqdjhu3t4d5ffdsfz9s6ska3z
                 - addr_test1vq67g5u8ls4vm4wdvs0r8xvsuej66nvaqedyrj2tcz6tuycz275pu
+    payment_addresses_with_extended:
+      content:
+        application/json:
+          schema:
+            required:
+              - _addresses
+            type: object
+            properties:
+              _addresses:
+                format: text
+                type: array
+                items:
+                  type: string
+                description: Array of Cardano payment address(es) in bech32 format
+              _extended:
+                format: boolean
+                type: boolean
+                description: Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call
+            example:
+              _addresses:
+                - addr_test1qzmtfv43a8ncx6ve92ja6yy25npn9raz9pu5a2tfxsqv9gy9ktf0pu6yu4zjh9r37fzx3h4tsxqdjhu3t4d5ffdsfz9s6ska3z
+                - addr_test1vq67g5u8ls4vm4wdvs0r8xvsuej66nvaqedyrj2tcz6tuycz275pu
+              _extended: true
     address_txs:
       content:
         application/json:
@@ -1733,6 +2006,32 @@ components:
               _stake_addresses:
                 - stake_test17zt9x005zkd2usz2vhvktyzqsuwz25gmgnaqdka5hcj9m2qfg2py2
                 - stake_test1uzzm95hs7dzw23ftj3cly3rgm64crqxet7g46k6y5kcy3zcs3mpjd
+              _first_only: false
+              _empty: false
+
+    stake_addresses_with_extended:
+      content:
+        application/json:
+          schema:
+            required:
+              - _stake_addresses
+            type: object
+            properties:
+              _stake_addresses:
+                format: text
+                type: array
+                items:
+                  type: string
+                description: Array of Cardano stake address(es) in bech32 format
+              _extended:
+                format: boolean
+                type: boolean
+                description: Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call
+            example:
+              _stake_addresses:
+                - stake_test17zt9x005zkd2usz2vhvktyzqsuwz25gmgnaqdka5hcj9m2qfg2py2
+                - stake_test1uzzm95hs7dzw23ftj3cly3rgm64crqxet7g46k6y5kcy3zcs3mpjd
+              _extended: true
     stake_addresses:
       content:
         application/json:
@@ -1788,10 +2087,15 @@ components:
                 items:
                   type: string
                 description: Array of Cardano payment credential(s) in hex format
+              _extended:
+                format: boolean
+                type: boolean
+                description: Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call           
             example:
               _payment_credentials:
                 - b6b4b2b1e9e78369992aa5dd108aa4c3328fa228794ea9693400c2a0
                 - 35e45387fc2acdd5cd641e339990e665ad4d9d065a41c94bc0b4be13
+              _extended: true
     tx_ids:
       content:
         application/json:
@@ -1853,6 +2157,22 @@ components:
                 - pool19st4a2vvu78tjtyywjte2eml3kx6ynersgd2nyw0y4jvyhlfu0u
                 - pool1uul8pytp2p0xq4ckjn3l294km0m7fuef46teehvh3x5tk46sfx3
                 - pool1us9ww725p0vygae5zaydme3apt7wg9se2yemhl8mgwkes3tlrqp
+    script_hashes:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              _script_hashes:
+                format: text
+                type: array
+                items:
+                  type: string
+                description: Array of Cardano script hashes
+            example:
+              _script_hashes:
+                  - a08a267e92456ba48e157dd7e77bdd35aba0fc50fe625a10a6a7fc5e
+                  - 1f3a4aa08cfa0e47fff200578f0d4847b6890b7093a765773feb35de
     datum_hashes:
       content:
         application/json:
@@ -1889,7 +2209,59 @@ components:
               _asset_list:
                 - ['313534a537bc476c86ff7c57ec511bd7f24a9d15654091b24e9c606e','41484c636f696e']
                 - ['313534a537bc476c86ff7c57ec511bd7f24a9d15654091b24e9c606e','41484c636f696e']
-  securitySchemes: {}
+    asset_list_with_extended:
+      content:
+        application/json:
+          schema:
+            required:
+              - _asset_list
+            type: object
+            properties:
+              _asset_list:
+                format: text
+                type: array
+                description: Array of array of policy ID and asset names (hex)
+                items:
+                  type: array
+                  items:
+                    type: string
+              _extended:
+                format: boolean
+                type: boolean
+                description: Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call
+            example:
+              _asset_list:
+                - ['313534a537bc476c86ff7c57ec511bd7f24a9d15654091b24e9c606e','41484c636f696e']
+                - ['313534a537bc476c86ff7c57ec511bd7f24a9d15654091b24e9c606e','41484c636f696e']
+              _extended: true
+    utxo_refs_with_extended:
+      content:
+        application/json:
+          schema:
+            required:
+              - _utxo_refs
+            type: object
+            properties:
+              _utxo_refs:
+                format: text
+                type: array
+                items:
+                  type: string
+                description: Array of Cardano utxo references in the form "hash#index"
+              _extended:
+                format: boolean
+                type: boolean
+                description: Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call           
+            example:
+              _utxo_refs:
+                - f82e568d42604fd71424d193c86ec00c97aead2b8f018e81c3139d9e3770c735#0
+                - 88ae22495123c7ee37a0bbe865243757185a302ed5359d1eae9347030628290a#0
+              _extended: false
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     tip:
       type: array
@@ -2003,20 +2375,59 @@ components:
             type: string
             description: JSON encoded data with details about the parameter update
             example: {"decentralisation": 0.9}
+    reserve_withdrawals:
+      type: array
+      items:
+        properties:
+          epoch_no:
+            $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+          epoch_slot:
+            $ref: "#/components/schemas/blocks/items/properties/epoch_slot"
+          tx_hash:
+            $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+          block_hash:
+            $ref: "#/components/schemas/blocks/items/properties/hash"
+          block_height:
+            $ref: "#/components/schemas/blocks/items/properties/block_height"
+          amount:
+            $ref: "#/components/schemas/pool_delegators/items/properties/amount"
+          stake_address:
+            $ref: "#/components/schemas/account_history/items/properties/stake_address"
     pool_list:
       type: array
       items:
         properties:
           pool_id_bech32:
-            type: string
-            nullable: true
-            description: Bech32 representation of pool ID
-            example: pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt
+            $ref: "#/components/schemas/pool_info/items/properties/pool_id_bech32"
+          pool_id_hex:
+            $ref: "#/components/schemas/pool_info/items/properties/pool_id_hex"
+          active_epoch_no:
+            $ref: "#/components/schemas/pool_info/items/properties/active_epoch_no"
+          margin:
+            $ref: "#/components/schemas/pool_info/items/properties/margin"
+          fixed_cost:
+            $ref: "#/components/schemas/pool_info/items/properties/fixed_cost"
+          pledge:
+            $ref: "#/components/schemas/pool_info/items/properties/pledge"
+          reward_addr:
+            $ref: "#/components/schemas/pool_info/items/properties/reward_addr"
+          owners:
+            $ref: "#/components/schemas/pool_info/items/properties/margin"
+          relays:
+            $ref: "#/components/schemas/pool_info/items/properties/margin"
           ticker:
             type: string
             nullable: true
             description: Pool ticker
-            example: JAZZ
+            example: AHL
+          meta_url:
+            $ref: "#/components/schemas/pool_info/items/properties/margin"
+          meta_hash:
+            $ref: "#/components/schemas/pool_info/items/properties/margin"
+          pool_status:
+            $ref: "#/components/schemas/pool_info/items/properties/margin"
+          retiring_epoch:
+            $ref: "#/components/schemas/pool_info/items/properties/margin"
     pool_history_info:
       type: array
       items:
@@ -2088,26 +2499,32 @@ components:
             $ref: "#/components/schemas/pool_updates/items/properties/active_epoch_no"
           vrf_key_hash:
             type: string
+            nullable: true
             description: Pool VRF key hash
             example: 25efdad1bc12944d38e4e3c26c43565bec84973a812737b163b289e87d0d5ed3
           margin:
             type: number
+            nullable: true
             description: Margin (decimal format)
             example: 0.1
           fixed_cost:
             type: string
+            nullable: true
             description: Pool fixed cost per epoch
             example: "500000000"
           pledge:
             type: string
+            nullable: true
             description: Pool pledge in lovelace
             example: "64000000000000"
           reward_addr:
             type: string
+            nullable: true
             description: Pool reward address
             example: stake1uy6yzwsxxc28lfms0qmpxvyz9a7y770rtcqx9y96m42cttqwvp4m5
           owners:
             type: array
+            nullable: true
             items:
               type: string
               description: Pool (co)owner address
@@ -2270,6 +2687,26 @@ components:
             type: string
             description: Latest transaction hash used for delegation by the account
             example: 368d08fe86804d637649341d3aec4a9baa7dffa6d00f16de2ba9dba814f1c948
+    pool_registrations:
+      type: array
+      nullable: true
+      items:
+        type: object
+        properties:
+          pool_id_bech32:
+            $ref: "#/components/schemas/pool_info/items/properties/pool_id_bech32"
+          tx_hash:
+            $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+          block_hash:
+            $ref: "#/components/schemas/blocks/items/properties/hash"
+          block_height:
+            $ref: "#/components/schemas/blocks/items/properties/block_height"
+          epoch_no:
+            $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+          epoch_slot:
+            $ref: "#/components/schemas/blocks/items/properties/epoch_slot"
+          active_epoch_no:
+            $ref: "#/components/schemas/pool_updates/items/properties/active_epoch_no"
     pool_delegators_history:
       type: array
       nullable: true
@@ -2318,6 +2755,7 @@ components:
           active_epoch_no:
             type: integer
             description: Epoch number in which the update becomes active
+            nullable: true
             example: 324
           vrf_key_hash:
             $ref: "#/components/schemas/pool_info/items/properties/vrf_key_hash"
@@ -2339,8 +2777,11 @@ components:
             $ref: "#/components/schemas/pool_info/items/properties/meta_hash"
           meta_json:
             $ref: "#/components/schemas/pool_info/items/properties/meta_json"
-          pool_status:
-            $ref: "#/components/schemas/pool_info/items/properties/pool_status"
+          update_type:
+            type: string
+            description: Type of update task
+            enum: ["registration", "deregistration"]
+            example: registered
           retiring_epoch:
             $ref: "#/components/schemas/pool_info/items/properties/retiring_epoch"
     pool_relays:
@@ -2352,6 +2793,8 @@ components:
             $ref: "#/components/schemas/pool_info/items/properties/pool_id_bech32"
           relays:
             $ref: "#/components/schemas/pool_info/items/properties/relays"
+          pool_status:
+            $ref: "#/components/schemas/pool_info/items/properties/pool_status"
     pool_metadata:
       type: array
       items:
@@ -2365,6 +2808,8 @@ components:
             $ref: "#/components/schemas/pool_info/items/properties/meta_hash"
           meta_json:
             $ref: "#/components/schemas/pool_info/items/properties/meta_json"
+          pool_status:
+            $ref: "#/components/schemas/pool_info/items/properties/pool_status"
     epoch_info:
       type: array
       items:
@@ -2533,8 +2978,8 @@ components:
             description: The hash of the first block where these parameters are valid
             example: f9dc2a2fc3a2db09a71af007a740261de585afc9e3022b8e30535592ff4dd9e5
           cost_models:
-            type: string
-            description: The per language cost models
+            type: object
+            description: The per language cost model in JSON
             example: null
             nullable: true
           price_mem:
@@ -2724,17 +3169,21 @@ components:
         properties:
           block_hash:
             $ref: "#/components/schemas/blocks/items/properties/hash"
-          tx_hashes:
-            type: array
-            items:
-              $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+          tx_hash:
+            $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+          epoch_no:
+            $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+          block_height:
+            $ref: "#/components/schemas/blocks/items/properties/block_height"
+          block_time:
+            $ref: "#/components/schemas/blocks/items/properties/block_time"
     address_info:
       type: array
       items:
         type: object
         properties:
           address:
-            $ref: "#/components/schemas/asset_addresses/items/properties/payment_address"
+            $ref: "#/components/schemas/utxo_infos/items/properties/address"
           balance:
             type: string
             description: Sum of all UTxO values beloning to address
@@ -2753,9 +3202,9 @@ components:
               type: object
               properties:
                 tx_hash:
-                  $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/tx_hash"
+                  $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
                 tx_index:
-                  $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/tx_index"
+                  $ref: "#/components/schemas/utxo_infos/items/properties/tx_index"
                 block_height:
                   $ref: "#/components/schemas/blocks/items/properties/block_height"
                 block_time:
@@ -2769,7 +3218,7 @@ components:
                 reference_script:
                   $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/reference_script"
                 asset_list:
-                  $ref: "#/components/schemas/account_assets/items/properties/asset_list"
+                  $ref: "#/components/schemas/utxo_infos/items/properties/asset_list"
     address_txs:
       type: array
       items:
@@ -2789,22 +3238,17 @@ components:
         type: object
         properties:
           address:
-            $ref: "#/components/schemas/asset_addresses/items/properties/payment_address"
-          asset_list:
-            $ref: "#/components/schemas/account_assets/items/properties/asset_list"
-    credential_txs:
-      $ref: "#/components/schemas/address_txs"
-    credential_utxos:
-      type: array
-      items:
-        type: object
-        properties:
-          tx_hash:
-            $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/tx_hash"
-          tx_index:
-            $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/tx_index"
-          value:
-            $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/value"
+            $ref: "#/components/schemas/utxo_infos/items/properties/address"
+          policy_id:
+            $ref: "#/components/schemas/asset_info/items/properties/policy_id"
+          asset_name:
+            $ref: "#/components/schemas/asset_info/items/properties/asset_name"
+          fingerprint:
+            $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
+          decimals:
+            $ref: "#/components/schemas/asset_info/items/properties/token_registry_metadata/properties/decimals"
+          quantity:
+            $ref: "#/components/schemas/asset_addresses/items/properties/quantity"
     account_list:
       type: array
       items:
@@ -2825,7 +3269,9 @@ components:
             enum: ["registered", "not registered"]
             example: registered
           delegated_pool:
-            $ref: "#/components/schemas/pool_list/items/properties/pool_id_bech32"
+            nullable: true
+            allOf:
+            - $ref: "#/components/schemas/pool_list/items/properties/pool_id_bech32"
           total_balance:
             type: string
             description: Total balance of the account including UTxO, rewards and MIRs (in lovelace)
@@ -2854,23 +3300,67 @@ components:
             type: string
             description: Total treasury MIR value of the account
             example: "0"
-    account_utxos:
+    utxo_infos:
       type: array
       items:
         type: object
         properties:
           tx_hash:
-            $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/tx_hash"
+            type: string
+            description: Hash identifier of the transaction
+            example: f144a8264acf4bdfe2e1241170969c930d64ab6b0996a4a45237b623f1dd670e
           tx_index:
-            $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/tx_index"
+            type: integer
+            description: Index of UTxO in the transaction 
+            example: 0
           address:
-            $ref: "#/components/schemas/asset_addresses/items/properties/payment_address"
+            type: string
+            description: A Cardano payment/base address (bech32 encoded)
+            example: addr1qxkfe8s6m8qt5436lec3f0320hrmpppwqgs2gah4360krvyssntpwjcz303mx3h4avg7p29l3zd8u3jyglmewds9ezrqdc3cxp
           value:
             $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/value"
+          stake_address:
+            $ref: "#/components/schemas/address_info/items/properties/stake_address"
+          payment_cred:
+            type: string
+            description: Payment credential
+            example: de3c1c527e8826b9cd2030f88f75fc44cd4ce519b9ded9eb794b3794
+            nullable: true
+          epoch_no:
+            $ref: "#/components/schemas/blocks/items/properties/epoch_no"
           block_height:
             $ref: "#/components/schemas/blocks/items/properties/block_height"
           block_time:
             $ref: "#/components/schemas/blocks/items/properties/block_time"
+          datum_hash:
+            $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_hash"
+          inline_datum:
+            $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/inline_datum"
+          reference_script:
+            $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/reference_script"
+          asset_list:
+            type: array
+            nullable: true
+            description: An array of assets on the UTxO
+            items:
+              properties:
+                policy_id:
+                  $ref: "#/components/schemas/asset_info/items/properties/policy_id"
+                asset_name:
+                  $ref: "#/components/schemas/asset_info/items/properties/asset_name"
+                fingerprint:
+                  $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
+                decimals:
+                  $ref: "#/components/schemas/asset_info/items/properties/token_registry_metadata/properties/decimals"
+                quantity:
+                  type: string
+                  description: Quantity of assets on the UTxO
+                  example: 1
+          is_spent:
+            type: boolean
+            description: True if the UTXO has been spent
+            example: true
+
     account_rewards:
       type: array
       items:
@@ -2915,7 +3405,7 @@ components:
                   enum: ["registration", "delegation", "withdrawal", "deregistration"]
                   example: "registration"
                 tx_hash:
-                  $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+                  $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
                 epoch_no:
                   $ref: "#/components/schemas/blocks/items/properties/epoch_no"
                 epoch_slot:
@@ -2934,7 +3424,7 @@ components:
           addresses:
             type: array
             items:
-              $ref: "#/components/schemas/asset_addresses/items/properties/payment_address"
+              $ref: "#/components/schemas/utxo_infos/items/properties/address"
     account_assets:
       type: array
       items:
@@ -2942,25 +3432,16 @@ components:
         properties:
           stake_address:
             $ref: "#/components/schemas/account_history/items/properties/stake_address"
-          asset_list:
-            type: array
-            items:
-              type: object
-              properties:
-                policy_id:
-                  $ref: "#/components/schemas/asset_info/items/properties/policy_id"
-                asset_name:
-                  $ref: "#/components/schemas/asset_info/items/properties/asset_name"
-                fingerprint:
-                  $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
-                decimals:
-                  type: integer
-                  description: Asset decimals
-                  example: 6
-                quantity:
-                  type: string
-                  description: Asset quantity owned by account
-                  example: 990000
+          policy_id:
+            $ref: "#/components/schemas/asset_info/items/properties/policy_id"
+          asset_name:
+            $ref: "#/components/schemas/asset_info/items/properties/asset_name"
+          fingerprint:
+            $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
+          decimals:
+            $ref: "#/components/schemas/asset_info/items/properties/token_registry_metadata/properties/decimals"
+          quantity:
+            $ref: "#/components/schemas/asset_addresses/items/properties/quantity"
     account_history:
       type: array
       items:
@@ -2992,9 +3473,7 @@ components:
         type: object
         properties:
           tx_hash:
-            type: string
-            description: Hash identifier of the transaction
-            example: f144a8264acf4bdfe2e1241170969c930d64ab6b0996a4a45237b623f1dd670e
+            $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
           block_hash:
             $ref: "#/components/schemas/blocks/items/properties/hash"
           block_height:
@@ -3061,25 +3540,17 @@ components:
                   type: object
                   properties:
                     bech32:
-                      type: string
-                      description: A Cardano payment/base address (bech32 encoded) where funds were sent or change to be returned
-                      example: addr1q80rc8zj06yzdwwdyqc03rm4l3zv6n89rxuaak0t099n09yssntpwjcz303mx3h4avg7p29l3zd8u3jyglmewds9ezrqad9mkw
+                      $ref: "#/components/schemas/utxo_infos/items/properties/address"
                     cred:
                       type: string
                       description: Payment credential
                       example: de3c1c527e8826b9cd2030f88f75fc44cd4ce519b9ded9eb794b3794
                 stake_addr:
-                  nullable: true
-                  allOf:
-                  - $ref: "#/components/schemas/account_history/items/properties/stake_address"
+                  $ref: "#/components/schemas/address_info/items/properties/stake_address"
                 tx_hash:
-                  type: string
-                  description: Hash of transaction for UTxO
-                  example: f144a8264acf4bdfe2e1241170969c930d64ab6b0996a4a45237b623f1dd670e
+                  $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
                 tx_index:
-                  type: integer
-                  description: Index of UTxO in the transaction 
-                  example: 0
+                  $ref: "#/components/schemas/utxo_infos/items/properties/tx_index"
                 value:
                   type: string
                   description: Total sum of ADA on the UTxO
@@ -3129,23 +3600,7 @@ components:
                       description: Value (json)
                       example: null
                 asset_list:
-                  type: array
-                  nullable: true
-                  description: An array of assets on the UTxO
-                  items:
-                    properties:
-                      policy_id:
-                        $ref: "#/components/schemas/asset_info/items/properties/policy_id"
-                      asset_name:
-                        $ref: "#/components/schemas/asset_info/items/properties/asset_name"
-                      fingerprint:
-                        $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
-                      decimals:
-                        $ref: "#/components/schemas/account_assets/items/properties/asset_list/items/properties/decimals"
-                      quantity:
-                        type: string
-                        description: Quantity of assets on the UTxO
-                        example: 1
+                  $ref: "#/components/schemas/utxo_infos/items/properties/asset_list"
           withdrawals:
             type: array
             description: Array of withdrawals with-in a transaction
@@ -3174,7 +3629,7 @@ components:
                 fingerprint:
                   $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
                 decimals:
-                  $ref: "#/components/schemas/account_assets/items/properties/asset_list/items/properties/decimals"
+                  $ref: "#/components/schemas/asset_info/items/properties/token_registry_metadata/properties/decimals"
                 quantity:
                   type: string
                   description: Quantity of minted assets (negative on burn)
@@ -3212,7 +3667,7 @@ components:
             items:
               properties:
                 script_hash:
-                  $ref: "#/components/schemas/plutus_script_list/items/properties/script_hash"
+                  $ref: "#/components/schemas/script_info/items/properties/script_hash"
                 script_json:
                   type: object
                   description: JSON representation of the timelock script (null for other script types)
@@ -3237,6 +3692,7 @@ components:
                     }
           plutus_contracts:
             type: array
+            nullable: true
             description: Plutus contracts present in transaction (if any)
             items:
               properties:
@@ -3246,15 +3702,11 @@ components:
                   example: addr1w999n67e86jn6xal07pzxtrmqynspgx0fwmcmpua4wc6yzsxpljz3
                   nullable: true
                 script_hash:
-                  $ref: "#/components/schemas/plutus_script_list/items/properties/script_hash"
+                  $ref: "#/components/schemas/script_info/items/properties/script_hash"
                 bytecode:
-                  type: string
-                  description: CBOR-encoded Plutus script data
-                  example: 5911ea010000332333222332233223322332232323332223233322232333333332222222232333222323333222232323322323332223233322232323322332232323333322222332233223322332233223322223223223232533530333330083333573466e1cd55cea8032400046460a000264646464646666ae68cdc39aab9d5004480008cccc8888cccc16c01000c008004dd71aba15004375c6ae85400cdd71aba15002375a6ae84d5d1280111a8279a982819ab9c491035054310005149926135744a00226ae8940044d55cf280089baa001357426aae79401c8d4124d4c128cd5ce2481035054310004b499263333573466e1d40112002205323333573466e1d40152000205523504a35304b335738921035054310004c49926498cccd5cd19b8735573aa004900011980599191919191919191919191999ab9a3370e6aae754029200023333333333019335027232323333573466e1cd55cea8012400046603e60746ae854008c0b0d5d09aba2500223505935305a3357389201035054310005b49926135573ca00226ea8004d5d0a80519a8138141aba150093335502e75ca05a6ae854020ccd540b9d728169aba1500733502704335742a00c66a04e66aa0a8098eb4d5d0a8029919191999ab9a3370e6aae754009200023350213232323333573466e1cd55cea80124000466a05266a084eb4d5d0a80118239aba135744a00446a0ba6a60bc66ae712401035054310005f49926135573ca00226ea8004d5d0a8011919191999ab9a3370e6aae7540092000233502733504275a6ae854008c11cd5d09aba2500223505d35305e3357389201035054310005f49926135573ca00226ea8004d5d09aba2500223505935305a3357389201035054310005b49926135573ca00226ea8004d5d0a80219a813bae35742a00666a04e66aa0a8eb88004d5d0a801181c9aba135744a00446a0aa6a60ac66ae71241035054310005749926135744a00226ae8940044d5d1280089aba25001135744a00226ae8940044d5d1280089aba25001135573ca00226ea8004d5d0a8011919191999ab9a3370ea00290031180f181d9aba135573ca00646666ae68cdc3a801240084603a608a6ae84d55cf280211999ab9a3370ea00690011180e98181aba135573ca00a46666ae68cdc3a80224000460406eb8d5d09aab9e50062350503530513357389201035054310005249926499264984d55cea80089baa001357426ae8940088d4124d4c128cd5ce249035054310004b49926104a1350483530493357389201035054350004a4984d55cf280089baa001135573a6ea80044dd50009109198008018011000911111111109199999999980080580500480400380300280200180110009109198008018011000891091980080180109000891091980080180109000891091980080180109000909111180200290911118018029091111801002909111180080290008919118011bac0013200135503b2233335573e0024a01c466a01a60086ae84008c00cd5d100101991919191999ab9a3370e6aae75400d200023330073232323333573466e1cd55cea8012400046601a60626ae854008cd404c0b4d5d09aba25002235036353037335738921035054310003849926135573ca00226ea8004d5d0a801999aa805bae500a35742a00466a01eeb8d5d09aba25002235032353033335738921035054310003449926135744a00226aae7940044dd50009110919980080200180110009109198008018011000899aa800bae75a224464460046eac004c8004d540d488c8cccd55cf80112804919a80419aa81898031aab9d5002300535573ca00460086ae8800c0b84d5d08008891001091091198008020018900089119191999ab9a3370ea002900011a80418029aba135573ca00646666ae68cdc3a801240044a01046a0526a605466ae712401035054310002b499264984d55cea80089baa001121223002003112200112001232323333573466e1cd55cea8012400046600c600e6ae854008dd69aba135744a00446a0466a604866ae71241035054310002549926135573ca00226ea80048848cc00400c00880048c8cccd5cd19b8735573aa002900011bae357426aae7940088d407cd4c080cd5ce24810350543100021499261375400224464646666ae68cdc3a800a40084a00e46666ae68cdc3a8012400446a014600c6ae84d55cf280211999ab9a3370ea00690001280511a8111a981199ab9c490103505431000244992649926135573aa00226ea8004484888c00c0104488800844888004480048c8cccd5cd19b8750014800880188cccd5cd19b8750024800080188d4068d4c06ccd5ce249035054310001c499264984d55ce9baa0011220021220012001232323232323333573466e1d4005200c200b23333573466e1d4009200a200d23333573466e1d400d200823300b375c6ae854014dd69aba135744a00a46666ae68cdc3a8022400c46601a6eb8d5d0a8039bae357426ae89401c8cccd5cd19b875005480108cc048c050d5d0a8049bae357426ae8940248cccd5cd19b875006480088c050c054d5d09aab9e500b23333573466e1d401d2000230133016357426aae7940308d407cd4c080cd5ce2481035054310002149926499264992649926135573aa00826aae79400c4d55cf280109aab9e500113754002424444444600e01044244444446600c012010424444444600a010244444440082444444400644244444446600401201044244444446600201201040024646464646666ae68cdc3a800a400446660106eb4d5d0a8021bad35742a0066eb4d5d09aba2500323333573466e1d400920002300a300b357426aae7940188d4040d4c044cd5ce2490350543100012499264984d55cea80189aba25001135573ca00226ea80048488c00800c888488ccc00401401000c80048c8c8cccd5cd19b875001480088c018dd71aba135573ca00646666ae68cdc3a80124000460106eb8d5d09aab9e500423500a35300b3357389201035054310000c499264984d55cea80089baa001212230020032122300100320011122232323333573466e1cd55cea80124000466aa016600c6ae854008c014d5d09aba25002235007353008335738921035054310000949926135573ca00226ea8004498480048004448848cc00400c008448004848c0040088004888848cccc00401401000c00880044880084880048004448c8c00400488cc00cc008008004c8ccc888c8c8cc88cc88ccc888c8c8c8c8cc88c8c8cc88c8cccc8888c8c8c8c8c8c8c8c8ccc888c8ccc888ccc888cccccccc88888888cc88ccccc88888cccc8888cc88cc88cc88ccc888cc88cc88cc88cc88cc88c8c8c8cc88c8c8c8c8c8c8cc88c8c8c8c8c8c8cc888c888c8c94cd4c1240104cc0352401297369676e617475726520646f6573206e6f74206d617463682063726561746f7220696e20646174756d0033223530200022222222222533535032333553068120015027253353079333573466e3c0300041ec1e84d40d4004540d000c841ec41e54008c04540144cc054cc03524012f65787065637465642063726561746f7220746f2067657420616c6c206f66207768617420736865206f72646572656400330153350133335500e305c12001504f350481223335501b2253353070333505006353353502a3235302900122335304c0022350300012502f300e00221001132635300b335738920117696e76616c6964207075626c6963206b657920686173680000c498c05540244cc010c0340080044004004c8d4c08400488888888880254010ccd41354138c1894014c04920c08db7013350133335500e305c12001504f350481223335501b22533530703005002133004335506500d30100020011001001300d5004333504d504e30625005333504d504e533535026301a00321300a300d0011630124830236dc04cc0352401276f6e6c79206d617463686573206f66207061697273206f66206f726465727320616c6c6f77656400533535063350481223335501b225335307030050021330040020011001001300d50041306a162215335350650011306c16221533535067001107222130701623253353502732353024001222001500121333504e223530280022235302a0032232335304e0052335304f004253353077333573466e3c0080041e41e05400c41e081e08cd4c13c01081e094cd4c1dcccd5cd19b8f002001079078150031078153353502e0032153353502f00221335304c0022335304d002233530510022335305200223306d002001207b23353052002207b23306d00200122207b222335304f004207b2225335307c333573466e1c01800c1f81f454cd4c1f0ccd5cd19b8700500207e07d1333573466e1c0100041f81f441f441f441d854cd4d40b8004841d841d8c03140094cd4d40a0c07001484cd54190034c03c0045841b84c0300044d4c068004880084d4c02800480044800480048d4c0680048880088d4c06400488800c8d4c05000488888888880288d4c05400488004894cd4c184004418c4cd5ce001031089119aa8011a82600090009091800801100091a982c0009111002119a82999aa82b245003350533355056489000015054505412233355304b120013500550032353550560012233355304e120013500850062353550590012233353550490012330614800000488cc1880080048cc184005200000133040002001133500400105a22533530590021001105a123350492233353500400322002002001353500200122001122123300100300212001112232001320013550582253353504e00110032213300600230040012353003001223530070022222222222533335302600b21501b21501b21501b2133355305012001500f2353015001225335306353353063333573466e3cd4c0bc00888008d4c0bc010880081941904ccd5cd19b8735302f0022200135302f00422001065064106413501f0031501e00b13350432253353500d002210031001500c2212330010030022001222222222212333333333300100b00a009008007006005004003002200122123300100300220012221233300100400300220012212330010030022001121223002003112200112001122123300100300212001122123300100300212001122123300100300212001121222300300411222002112220011200121222230040052122223003005212222300200521222230010052001221233001003002200121222222230070082212222222330060090082122222223005008122222220041222222200322122222223300200900822122222223300100900820012122300200322212233300100500400320012122300200321223001003200112335001501d501e1220021220012001120011200113002012133500b2233300301300200150162223355300e1200123535501a00122335501d002335530111200123535501d001223355020002333535500d00123300a4800000488cc02c0080048cc028005200000133004002001223355300c1200123535501800122335501b00233353550080012335530101200123535501c00122335501f00235500f001001223335550080150020012335530101200123535501c00122335501f00235500d0010013335550030100020011112223335530041200150153355300c1200123535501800122335501b00235500b0013335530041200122353550190022253353021333553011120013500d33500f22533530230021025100102223535501c001223300a0020050061003133501900400350160013355300c120012353550180012232335501c00330010053200135502322533535019001135500b0032213535501e00222533530263300c00200813355010007001130060030023200135501c221122253353501500110022213300500233355300712001005004001112122230030041122122233002005004112122230010041120011233500722333535004003220020020013535002001220011221233001003002120013200135501422112253353500c0011500e22133500f3004002335530061200100400132001355013221122253353500c00113535006003220012213335350080052200230040023335530071200100500400112212330010030021200122333573466e3c00800404404088cdc000100088911801000919991119a80319aa80480199a80319aa804801000a803a8039a980380091110019a980380091110011a98038009111000889100109109119800802001890008891091980080180108900091110919998008028020018011000900211199ab9a3371000400200800a244004244002400222464600200244660066004004003
+                  $ref: "#/components/schemas/script_info/items/properties/bytes"
                 size:
-                  type: integer
-                  description: The size of the CBOR serialised script (in bytes)
-                  example: 234895
+                  $ref: "#/components/schemas/script_info/items/properties/size"
                 valid_contract:
                   type: boolean
                   description: True if the contract is valid or there is no contract
@@ -3314,17 +3766,11 @@ components:
                       description: Payment credential
                       example: de3c1c527e8826b9cd2030f88f75fc44cd4ce519b9ded9eb794b3794
                 stake_addr:
-                  nullable: true
-                  allOf:
-                  - $ref: "#/components/schemas/account_history/items/properties/stake_address"
+                  $ref: "#/components/schemas/address_info/items/properties/stake_address"
                 tx_hash:
-                  type: string
-                  description: Hash of transaction for UTxO
-                  example: f144a8264acf4bdfe2e1241170969c930d64ab6b0996a4a45237b623f1dd670e
+                  $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
                 tx_index:
-                  type: integer
-                  description: Index of UTxO in the transaction 
-                  example: 0
+                  $ref: "#/components/schemas/utxo_infos/items/properties/tx_index"
                 value:
                   type: string
                   description: Total sum of ADA on the UTxO
@@ -3339,7 +3785,7 @@ components:
       items:
         properties:
           tx_hash:
-            $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+            $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
           metadata:
             type: object
             nullable: true
@@ -3360,7 +3806,7 @@ components:
       items:
         properties:
           tx_hash:
-            $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+            $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
           num_confirmations:
             type: integer
             description: Number of block confirmations
@@ -3414,9 +3860,7 @@ components:
       items:
         properties:
           payment_address:
-            type: string
-            description: A Cardano payment/base address (bech32 encoded) for transaction's input UTxO
-            example: addr1qxkfe8s6m8qt5436lec3f0320hrmpppwqgs2gah4360krvyssntpwjcz303mx3h4avg7p29l3zd8u3jyglmewds9ezrqdc3cxp
+            $ref: "#/components/schemas/utxo_infos/items/properties/address"
           quantity:
             type: string
             description: Asset balance on the payment address
@@ -3427,7 +3871,7 @@ components:
       items:
         properties:
           payment_address:
-            $ref: "#/components/schemas/asset_addresses/items/properties/payment_address"
+            $ref: "#/components/schemas/utxo_infos/items/properties/address"
     asset_summary:
       type: array
       items:
@@ -3519,6 +3963,11 @@ components:
               decimals:
                 type: integer
                 example: 0
+          cip68_metadata:
+            type: object
+            description: CIP 68 metadata if present for asset
+            nullable: true
+            example: {"222": {"fields": [{"map": [{"k": {"bytes": "6e616d65"}, "v": {"bytes": "74657374"}}]}], "constructor": 0}}
     asset_history:
       type: array
       items:
@@ -3559,7 +4008,7 @@ components:
           asset_name:
             $ref: "#/components/schemas/asset_info/items/properties/asset_name"
           payment_address:
-            $ref: "#/components/schemas/asset_addresses/items/properties/payment_address"
+            $ref: "#/components/schemas/utxo_infos/items/properties/address"
           quantity:
             $ref: "#/components/schemas/asset_addresses/items/properties/quantity"
     policy_asset_info:
@@ -3599,67 +4048,65 @@ components:
           total_supply:
             $ref: "#/components/schemas/asset_info/items/properties/total_supply"
           decimals:
-            $ref: "#/components/schemas/account_assets/items/properties/asset_list/items/properties/decimals"
-    asset_txs:
-      type: array
-      description: An array of Tx hashes that included the given asset (latest first)
-      items:
-        properties:
-          tx_hash:
-            $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
-          epoch_no:
-            $ref: "#/components/schemas/blocks/items/properties/epoch_no"
-          block_height:
-            $ref: "#/components/schemas/blocks/items/properties/block_height"
-          block_time:
-            $ref: "#/components/schemas/blocks/items/properties/block_time"
-    native_script_list:
-      type: array
-      items:
-        properties:
-          script_hash:
-            $ref: "#/components/schemas/plutus_script_list/items/properties/script_hash"
-          creation_tx_hash:
-            $ref: "#/components/schemas/plutus_script_list/items/properties/creation_tx_hash"
-          type:
-            type: string
-            description: Type of the script
-            enum: ["timelock", "multisig"]
-            example: timelock
-    plutus_script_list:
+            $ref: "#/components/schemas/asset_info/items/properties/token_registry_metadata/properties/decimals"
+    script_info:
       type: array
       items:
         properties:
           script_hash:
             type: string
             description: Hash of a script
-            example: d8480dc869b94b80e81ec91b0abe307279311fe0e7001a9488f61ff8
+            example: bfa7ffa9b2e164873db6ac6d0528c82e212963bc62e10fd1d81da4af
           creation_tx_hash:
             type: string
             description: Hash of the script creation transaction
-            example: fda6c7697009237975ffc30f36666addf4c6e2a2c6f90411a24431b700baaab1
+            example: 255f061502ad83230351fbcf2d9fade1b5d118d332f92c9861075010a1fe3fbe
+          type:
+            type: string
+            description: Type of the script
+            enum: ["plutusV1","plutusV2","timelock","multisig"]
+            example: plutusV1
+          value:
+            type: object
+            nullable: true
+            description: Data in JSON format
+            example: null
+          bytes:
+            type: string
+            description: Script bytes (cborSeq)
+            example: 5907f4010000332323232323232323233223232323232332232323232322223232533532533533355300712001323212330012233350052200200200100235001220011233001225335002101710010142325335333573466e3cd400488008d4020880080580544ccd5cd19b873500122001350082200101601510153500122002353500122002222222222200a101413357389201115554784f206e6f7420636f6e73756d6564000133333573466e1cd55cea8012400046644246600200600464646464646464646464646666ae68cdc39aab9d500a480008cccccccccc888888888848cccccccccc00402c02802402001c01801401000c008cd40508c8c8cccd5cd19b8735573aa0049000119910919800801801180f9aba150023019357426ae8940088c98d4cd5ce01581501481409aab9e5001137540026ae854028cd4050054d5d0a804999aa80bbae501635742a010666aa02eeb94058d5d0a80399a80a0109aba15006335014335502402275a6ae854014c8c8c8cccd5cd19b8735573aa00490001199109198008018011919191999ab9a3370e6aae754009200023322123300100300233502575a6ae854008c098d5d09aba2500223263533573805e05c05a05826aae7940044dd50009aba150023232323333573466e1cd55cea8012400046644246600200600466a04aeb4d5d0a80118131aba135744a004464c6a66ae700bc0b80b40b04d55cf280089baa001357426ae8940088c98d4cd5ce01581501481409aab9e5001137540026ae854010cd4051d71aba15003335014335502475c40026ae854008c070d5d09aba2500223263533573804e04c04a04826ae8940044d5d1280089aba25001135744a00226ae8940044d5d1280089aba25001135744a00226aae7940044dd50009aba150023232323333573466e1d400520062321222230040053019357426aae79400c8cccd5cd19b875002480108c848888c008014c06cd5d09aab9e500423333573466e1d400d20022321222230010053015357426aae7940148cccd5cd19b875004480008c848888c00c014dd71aba135573ca00c464c6a66ae7008808408007c0780740704d55cea80089baa001357426ae8940088c98d4cd5ce00d80d00c80c080c89931a99ab9c4910350543500019018135573ca00226ea8004c8004d5405888448894cd40044d400c88004884ccd401488008c010008ccd54c01c4800401401000448c88c008dd6000990009aa80b111999aab9f00125009233500830043574200460066ae880080548c8c8c8cccd5cd19b8735573aa00690001199911091998008020018011919191999ab9a3370e6aae7540092000233221233001003002301735742a00466a01c02c6ae84d5d1280111931a99ab9c01b01a019018135573ca00226ea8004d5d0a801999aa803bae500635742a00466a014eb8d5d09aba2500223263533573802e02c02a02826ae8940044d55cf280089baa0011335500175ceb44488c88c008dd5800990009aa80a11191999aab9f0022500823350073355017300635573aa004600a6aae794008c010d5d100180a09aba100111220021221223300100400312232323333573466e1d4005200023212230020033005357426aae79400c8cccd5cd19b8750024800884880048c98d4cd5ce00980900880800789aab9d500113754002464646666ae68cdc39aab9d5002480008cc8848cc00400c008c014d5d0a8011bad357426ae8940088c98d4cd5ce00800780700689aab9e5001137540024646666ae68cdc39aab9d5001480008dd71aba135573ca004464c6a66ae7003803403002c4dd500089119191999ab9a3370ea00290021091100091999ab9a3370ea00490011190911180180218031aba135573ca00846666ae68cdc3a801a400042444004464c6a66ae7004404003c0380340304d55cea80089baa0012323333573466e1d40052002200523333573466e1d40092000200523263533573801a01801601401226aae74dd5000891001091000919191919191999ab9a3370ea002900610911111100191999ab9a3370ea004900510911111100211999ab9a3370ea00690041199109111111198008048041bae35742a00a6eb4d5d09aba2500523333573466e1d40112006233221222222233002009008375c6ae85401cdd71aba135744a00e46666ae68cdc3a802a400846644244444446600c01201060186ae854024dd71aba135744a01246666ae68cdc3a8032400446424444444600e010601a6ae84d55cf280591999ab9a3370ea00e900011909111111180280418071aba135573ca018464c6a66ae7004c04804404003c03803403002c0284d55cea80209aab9e5003135573ca00426aae7940044dd50009191919191999ab9a3370ea002900111999110911998008028020019bad35742a0086eb4d5d0a8019bad357426ae89400c8cccd5cd19b875002480008c8488c00800cc020d5d09aab9e500623263533573801801601401201026aae75400c4d5d1280089aab9e500113754002464646666ae68cdc3a800a400446424460020066eb8d5d09aab9e500323333573466e1d400920002321223002003375c6ae84d55cf280211931a99ab9c009008007006005135573aa00226ea800444888c8c8cccd5cd19b8735573aa0049000119aa80518031aba150023005357426ae8940088c98d4cd5ce00480400380309aab9e5001137540029309000a490350543100112212330010030021123230010012233003300200200133512233002489209366f09fe40eaaeb17d3cb6b0b61e087d664174c39a48a986f86b2b0ba6e2a7b00480008848cc00400c0088005
+          size:
+            type: integer
+            description: The size of the CBOR serialised script (in bytes)
+            example: 2039
+    script_list:
+      type: array
+      items:
+        properties:
+          script_hash:
+            $ref: "#/components/schemas/script_info/items/properties/script_hash"
+          creation_tx_hash:
+            $ref: "#/components/schemas/script_info/items/properties/creation_tx_hash"
+          type:
+            $ref: "#/components/schemas/script_info/items/properties/type"
+          size:
+            $ref: "#/components/schemas/script_info/items/properties/size"
     script_redeemers:
       type: array
       items:
         type: object
         properties:
           script_hash:
-            type: string
-            description: Hash of Transaction for which details are being shown
-            example: f144a8264acf4bdfe2e1241170969c930d64ab6b0996a4a45237b623f1dd670e
+            $ref: "#/components/schemas/script_info/items/properties/script_hash"
           redeemers:
             type: array
             items:
               type: object
               properties:
                 tx_hash:
-                  type: string
-                  description: Hash of Transaction containing the redeemer
-                  example: fda6c7697009237975ffc30f36666addf4c6e2a2c6f90411a24431b700baaab1
+                  $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
                 tx_index:
-                  type: integer
-                  description: The index of the redeemer pointer in the transaction
-                  example: 0
+                  $ref: "#/components/schemas/utxo_infos/items/properties/tx_index"
                 unit_mem:
                   description: The budget in Memory to run a script
                   example: 520448
@@ -3691,20 +4138,20 @@ components:
                   nullable: true
                   example: 5a595ce795815e81d22a1a522cf3987d546dc5bb016de61b002edd63a5413ec4
                 datum_value:
-                  type: object
-                  description: The actual data in json format
-                  example: { "bytes": "3c33" }
+                  $ref: "#/components/schemas/script_info/items/properties/value"
     datum_info:
       type: array
       items:
         type: object
         properties:
-          hash:
+          datum_hash:
             $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_hash"
+          creation_tx_hash:
+            $ref: "#/components/schemas/script_info/items/properties/creation_tx_hash"
           value:
-            $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_value"
+            $ref: "#/components/schemas/script_info/items/properties/value"
           bytes:
-            $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/inline_datum/properties/bytes"
+            $ref: "#/components/schemas/script_info/items/properties/bytes"
   headers: {}
   responses:
     OK:
@@ -3712,7 +4159,7 @@ components:
     NotFound:
       description: The server does not recognise the combination of endpoint and parameters provided
     Unauthorized:
-      description: The selected server has restricted the endpoint to be only usable via authentication. The authentication supplied was not authorized to access the endpoint
+      description: Access token is missing or invalid
     PartialContent:
       description: The result was truncated
     BadRequest:
@@ -3730,11 +4177,11 @@ tags:
   - name: Transactions
     description: Query blockchain transaction details
     x-tag-expanded: false
+  - name: Stake Account
+    description: Query details about specific stake account addresses
+    x-tag-expanded: false
   - name: Address
     description: Query information about specific address(es)
-    x-tag-expanded: false
-  - name: Account
-    description: Query details about specific stake account addresses
     x-tag-expanded: false
   - name: Asset
     description: Query Asset related informations
@@ -3745,4 +4192,5 @@ tags:
   - name: Script
     description: Query information about specific scripts (Smart Contracts)
     x-tag-expanded: false
-security: []
+security:
+  - bearerAuth: []

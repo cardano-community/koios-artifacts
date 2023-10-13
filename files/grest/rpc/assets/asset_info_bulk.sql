@@ -10,7 +10,8 @@ RETURNS TABLE (
   burn_cnt bigint,
   creation_time integer,
   minting_tx_metadata jsonb,
-  token_registry_metadata jsonb
+  token_registry_metadata jsonb,
+  cip68_metadata jsonb
 )
 LANGUAGE plpgsql
 AS $$
@@ -52,7 +53,8 @@ BEGIN
           'logo', arc.logo,
           'decimals', arc.decimals
         )
-      END
+      END,
+      cip68.metadata
     FROM
       multi_asset AS ma
       INNER JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
@@ -69,6 +71,52 @@ BEGIN
         WHERE
           tm.tx_id = tx.id
       ) metadata ON TRUE
+      LEFT JOIN LATERAL (
+        -- CIP-68 supported labels
+        -- 100 = 000643b0 (ref, metadata)
+        -- 222 = 000de140 (NFT)
+        -- 333 = 0014df10 (FT)
+        -- 444 = 001bc280 (RFT)
+        SELECT
+          CASE
+            WHEN datum.value IS NULL THEN NULL
+          ELSE
+            JSONB_BUILD_OBJECT(
+              CASE
+                WHEN STARTS_WITH(ENCODE(ma.name, 'hex'), '000de140') THEN '222'
+                WHEN STARTS_WITH(ENCODE(ma.name, 'hex'), '0014df10') THEN '333'
+                WHEN STARTS_WITH(ENCODE(ma.name, 'hex'), '001bc280') THEN '444'
+                ELSE '0'
+              END,
+              datum.value
+            )
+          END AS metadata
+        FROM
+          tx_out
+          INNER JOIN datum ON datum.hash = tx_out.data_hash
+        WHERE
+          tx_out.id = (
+            SELECT
+              (SELECT MAX(tx_out_id) FROM ma_tx_out WHERE ident = _ma.id) as tx_id
+            FROM
+              multi_asset _ma
+            WHERE
+              _ma.policy = MA.policy
+              AND
+              _ma.name = (
+                SELECT
+                  CASE WHEN
+                    STARTS_WITH(ENCODE(ma.name, 'hex'), '000de140')
+                    OR
+                    STARTS_WITH(ENCODE(ma.name, 'hex'), '0014df10')
+                    OR
+                    STARTS_WITH(ENCODE(ma.name, 'hex'), '001bc280')
+                  THEN CONCAT('\x000643b0', SUBSTRING(ENCODE(ma.name, 'hex'), 9))::bytea
+                  ELSE null
+                  END
+              )
+          )
+      ) cip68 ON TRUE
     WHERE
       ma.id = ANY(_asset_id_list);
 

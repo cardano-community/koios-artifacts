@@ -663,9 +663,9 @@ BEGIN
                 ind.hash AS ind_hash,
                 ind.value AS ind_value
               FROM redeemer
-                INNER JOIN tx_in ON tx_in.redeemer_id = redeemer.id
-                INNER JOIN tx_out AS inutxo ON inutxo.tx_id = tx_in.tx_out_id AND inutxo.index = tx_in.tx_out_index
-                INNER JOIN datum AS ind ON ind.hash = inutxo.data_hash
+              INNER JOIN tx_in ON tx_in.redeemer_id = redeemer.id
+              INNER JOIN tx_out AS inutxo ON inutxo.tx_id = tx_in.tx_out_id AND inutxo.index = tx_in.tx_out_index
+              INNER JOIN datum AS ind ON ind.hash = inutxo.data_hash
               WHERE redeemer.tx_id = ANY(_tx_id_list)
             )
 
@@ -845,7 +845,7 @@ BEGIN
       COALESCE((SELECT ans.list FROM _all_native_scripts AS ans WHERE ans.tx_id = atx.id), JSONB_BUILD_ARRAY()),
       COALESCE((SELECT apc.list FROM _all_plutus_contracts AS apc WHERE apc.tx_id = atx.id), JSONB_BUILD_ARRAY())
     FROM _all_tx AS atx
-    WHERE atx.tx_hash = ANY(_tx_hashes_bytea)
+    WHERE atx.id = ANY(_tx_id_list)
   );
 
 END;

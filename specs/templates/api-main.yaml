@@ -1,11 +1,12 @@
 openapi: 3.0.2
 #!info!#
 servers:
-  - url: https://api.koios.rest/api/v0
-  - url: https://guild.koios.rest/api/v0
-  - url: https://preview.koios.rest/api/v0
-  - url: https://preprod.koios.rest/api/v0
+  - url: https://api.koios.rest/api/v1
+  - url: https://guild.koios.rest/api/v1
+  - url: https://preview.koios.rest/api/v1
+  - url: https://preprod.koios.rest/api/v1
 paths:
+
   /tip: #RPC
     get:
       tags:
@@ -86,6 +87,45 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Param Update Proposals
       description: Get all parameter update proposals submitted to the chain starting Shelley era
+  /reserve_withdrawals: #RPC
+    get:
+      tags:
+        - Network
+      responses:
+        "200":
+          description: Array of withdrawals from reserves against stake accounts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/reserve_withdrawals"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Reserve Withdrawals
+      description: List of all withdrawals from reserves against stake accounts
+  /treasury_withdrawals: #RPC
+    get:
+      tags:
+        - Network
+      responses:
+        "200":
+          description: Array of withdrawals from treasury against stake accounts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/reserve_withdrawals"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Treasury Withdrawals
+      description: List of all withdrawals from treasury against stake accounts
+
   /epoch_info: #RPC
     get:
       tags:
@@ -153,6 +193,7 @@ paths:
       summary: Epoch's Block Protocols
       description: >-
         Get the information about block protocol distribution in epoch
+
   /blocks:
     get:
       tags:
@@ -214,6 +255,28 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Block Transactions
       description: Get a list of all transactions included in provided blocks
+
+  /utxo_info: #RPC
+    post:
+      tags:
+        - Transactions
+      requestBody:
+        $ref: "#/components/requestBodies/utxo_refs_with_extended"
+      responses:
+        "200":
+          description: Array of UTXO details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/utxo_infos"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: UTxO Info
+      description: Get UTxO set for requested UTxO references
   /tx_info: #RPC
     post:
       tags:
@@ -235,27 +298,6 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Transaction Information
       description: Get detailed information about transaction(s)
-  /tx_utxos: #RPC
-    post:
-      tags:
-        - Transactions
-      requestBody:
-        $ref: "#/components/requestBodies/tx_ids"
-      responses:
-        "200":
-          description: Array of inputs and outputs for given transaction(s)
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/tx_utxos"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      summary: Transaction UTxOs [DEPRECATED]
-      description: Get UTxO set (inputs/outputs) of transactions.
   /tx_metadata: #RPC
     post:
       tags:
@@ -309,7 +351,7 @@ paths:
             # If using a CLI-generated tx file, please ensure to deserialise (using `xxd -p -r <<< $(jq .cborHex ${tx.signed}) > ${data}`) first before submitting.
             curl -X POST \
                 --header "Content-Type: application/cbor" \
-                --data-binary ${data} https://api.koios.rest/api/v0/submittx
+                --data-binary @${data} https://api.koios.rest/api/v1/submittx
       responses:
         "202":
           description: OK
@@ -345,8 +387,31 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
-      summary: Transaction Status (Block Confirmations)
+      summary: Transaction Status
       description: Get the number of block confirmations for a given transaction hash list
+  /tx_utxos: #RPC
+    post:
+      tags:
+        - Transactions
+      deprecated: true
+      requestBody:
+        $ref: "#/components/requestBodies/tx_ids"
+      responses:
+        "200":
+          description: Array of inputs and outputs for given transaction(s)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tx_utxos"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Transaction UTxOs
+      description: Get UTxO set (inputs/outputs) of transactions [DEPRECATED - Use /utxo_info instead].
+
   /address_info: #RPC
     post:
       tags:
@@ -368,6 +433,48 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Address Information
       description: Get address info - balance, associated stake address (if any) and UTxO set for given addresses
+  /address_utxos: #RPC
+    post:
+      tags:
+        - Address
+      requestBody:
+        $ref: "#/components/requestBodies/payment_addresses_with_extended"
+      responses:
+        "200":
+          description: Array of address UTXOs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/utxo_infos"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Address UTXOs
+      description: Get UTxO set for given addresses
+  /credential_utxos: #RPC
+    post:
+      tags:
+        - Address
+      requestBody:
+        $ref: "#/components/requestBodies/credential_utxos"
+      responses:
+        "200":
+          description: Array of UTxOs with balances
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/utxo_infos"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: UTxOs from payment credentials
+      description: Get UTxO details for requested payment credentials
   /address_txs: #RPC
     post:
       tags:
@@ -389,27 +496,27 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Address Transactions
       description: Get the transaction hash list of input address array, optionally filtering after specified block height (inclusive)
-  /credential_utxos: #RPC
+  /credential_txs: #RPC
     post:
       tags:
         - Address
       requestBody:
-        $ref: "#/components/requestBodies/credential_utxos"
+        $ref: "#/components/requestBodies/credential_txs"
       responses:
         "200":
-          description: Array of UTxOs with balances
+          description: Array of transaction hashes
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/credential_utxos"
+                $ref: "#/components/schemas/address_txs"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
-      summary: UTxOs from payment credentials
-      description: Get a list of UTxO against input payment credential array including their balances
+      summary: Transactions from payment credentials
+      description: Get the transaction hash list of input payment credential array, optionally filtering after specified block height (inclusive)
   /address_assets: #RPC
     post:
       tags:
@@ -431,27 +538,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Address Assets
       description: Get the list of all the assets (policy, name and quantity) for given addresses
-  /credential_txs: #RPC
-    post:
-      tags:
-        - Address
-      requestBody:
-        $ref: "#/components/requestBodies/credential_txs"
-      responses:
-        "200":
-          description: Array of transaction hashes
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/credential_txs"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      summary: Transactions from payment credentials
-      description: Get the transaction hash list of input payment credential array, optionally filtering after specified block height (inclusive)
+
   /account_list:
     get:
       tags:
@@ -492,27 +579,6 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Account Information
       description: Get the account information for given stake addresses
-  /account_utxos: #RPC
-    get:
-      tags:
-        - Stake Account
-      parameters:
-        - $ref: "#/components/parameters/_stake_address"
-      responses:
-        "200":
-          description: Array of account UTxOs associated with stake address
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/account_utxos"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      summary: Account UTxOs
-      description: Get a list of all UTxOs for a given stake address (account)
   /account_info_cached: #RPC
     post:
       tags:
@@ -533,7 +599,50 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Account Information (Cached)
-      description: Get the cached account information for given stake addresses, effective for registered accounts
+      description: Get the cached account information for given stake addresses (effective for performance query against registered accounts)
+  /account_utxos: #RPC
+    post:
+      tags:
+        - Stake Account
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses_with_extended"
+      responses:
+        "200":
+          description: Array of account UTxOs associated with given stake addresses
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/utxo_infos"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: UTxOs for stake addresses (accounts)
+      description: Get a list of all UTxOs for given stake addresses (account)s
+  /account_txs: #RPC
+    get:
+      tags:
+        - Stake Account
+      parameters:
+        - $ref: "#/components/parameters/_stake_address"
+        - $ref: "#/components/parameters/_after_block_height"
+      responses:
+        "200":
+          description: Array of Txs associated with stake address (account)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/address_txs"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Account Txs
+      description: Get a list of all Txs for a given stake address (account)
   /account_rewards: #RPC
     post:
       tags:
@@ -642,6 +751,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Account History
       description: Get the staking history of given stake addresses (accounts)
+
   /asset_list:
     get:
       tags:
@@ -661,6 +771,27 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Asset List
       description: Get the list of all native assets (paginated)
+  /policy_asset_list: #RPC
+    get:
+      tags:
+        - Asset
+      parameters:
+        - $ref: "#/components/parameters/_asset_policy"
+      responses:
+        "200":
+          description: Array of detailed information of assets under the same policy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/policy_asset_list"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Policy Asset List
+      description: Get the list of asset under the given policy (including balances)
   /asset_token_registry:
     get:
       tags:
@@ -680,6 +811,70 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Asset Token Registry
       description: Get a list of assets registered via token registry on github
+  /asset_info: #RPC
+    post:
+      tags:
+        - Asset
+      requestBody:
+        $ref: "#/components/requestBodies/asset_list"
+      responses:
+        "200":
+          description: Array of detailed asset information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/asset_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Asset Information (Bulk)
+      description: Get the information of a list of assets including first minting & token registry metadata
+  /asset_utxos: #RPC
+    post:
+      tags:
+        - Asset
+      requestBody:
+        $ref: "#/components/requestBodies/asset_list_with_extended"
+      responses:
+        "200":
+          description: Array of UTXOs for given asset list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/utxo_infos"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Asset UTXOs
+      description: Get the UTXO information of a list of assets including
+  /asset_history: #RPC
+    get:
+      tags:
+        - Asset
+      parameters:
+        - $ref: "#/components/parameters/_asset_policy"
+        - $ref: "#/components/parameters/_asset_name"
+      responses:
+        "200":
+          description: Array of asset mint/burn history
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/asset_history"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Asset History
+      description: Get the mint/burn history of an asset
   /asset_addresses: #RPC
     get:
       tags:
@@ -705,28 +900,6 @@ paths:
         `Note - Due to cardano's UTxO design and usage from projects, asset to addresses map can be infinite. Thus, for a small subset of active projects 
         with millions of transactions, these might end up with timeouts (HTTP code 504) on free layer. Such large-scale projects are free to subscribe to 
         query layers to have a dedicated cache table for themselves served via Koios.`
-  /asset_address_list: #RPC
-    get:
-      tags:
-        - Asset
-      parameters:
-        - $ref: "#/components/parameters/_asset_policy"
-        - $ref: "#/components/parameters/_asset_name"
-      responses:
-        "200":
-          description: Array of payment addresses holding the given token (including balances)
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/asset_addresses"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      summary: Asset Address List [DEPRECATED]
-      description: Get the list of all addresses holding a given asset (replaced by asset_addresses)
   /asset_nft_address: #RPC
     get:
       tags:
@@ -749,70 +922,6 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: NFT Address
       description: Get the address where specified NFT currently reside on.
-  /asset_info: #RPC
-    get:
-      tags:
-        - Asset
-      parameters:
-        - $ref: "#/components/parameters/_asset_policy"
-        - $ref: "#/components/parameters/_asset_name"
-      responses:
-        "200":
-          description: Array of detailed asset information
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/asset_info"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      summary: Asset Information
-      description: Get the information of an asset including first minting & token registry metadata
-    post:
-      tags:
-        - Asset
-      requestBody:
-        $ref: "#/components/requestBodies/asset_list"
-      responses:
-        "200":
-          description: Array of detailed asset information
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/asset_info"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      summary: Asset Information (Bulk)
-      description: Get the information of a list of assets including first minting & token registry metadata
-  /asset_history: #RPC
-    get:
-      tags:
-        - Asset
-      parameters:
-        - $ref: "#/components/parameters/_asset_policy"
-        - $ref: "#/components/parameters/_asset_name"
-      responses:
-        "200":
-          description: Array of asset mint/burn history
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/asset_history"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      summary: Asset History
-      description: Get the mint/burn history of an asset
   /policy_asset_addresses: #RPC
     get:
       tags:
@@ -858,48 +967,6 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Policy Asset Information
       description: Get the information for all assets under the same policy
-  /asset_policy_info: #RPC
-    get:
-      tags:
-        - Asset
-      parameters:
-        - $ref: "#/components/parameters/_asset_policy"
-      responses:
-        "200":
-          description: Array of detailed information of assets under the same policy
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/policy_asset_info"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      summary: Asset Policy Information [DEPRECATED]
-      description: Get the information for all assets under the same policy (replaced by asset_addresses)
-  /policy_asset_list: #RPC
-    get:
-      tags:
-        - Asset
-      parameters:
-        - $ref: "#/components/parameters/_asset_policy"
-      responses:
-        "200":
-          description: Array of detailed information of assets under the same policy
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/policy_asset_list"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      summary: Policy Asset List
-      description: Get the list of asset under the given policy (including balances)
   /asset_summary: #RPC
     get:
       tags:
@@ -933,11 +1000,11 @@ paths:
         - $ref: "#/components/parameters/_history"
       responses:
         "200":
-          description: Array of Tx hashes that included the given asset
+          description: An array of Tx hashes that included the given asset (latest first)
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/asset_txs"
+                $ref: "#/components/schemas/address_txs"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -946,6 +1013,52 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Asset Transactions
       description: Get the list of current or all asset transaction hashes (newest first)
+  /asset_address_list: #RPC
+    get:
+      tags:
+        - Asset
+      deprecated: true
+      parameters:
+        - $ref: "#/components/parameters/_asset_policy"
+        - $ref: "#/components/parameters/_asset_name"
+      responses:
+        "200":
+          description: Array of payment addresses holding the given token (including balances)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/asset_addresses"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Asset Address List
+      description: Get the list of all addresses holding a given asset [DEPRECATED - replaced by asset_addresses]
+  /asset_policy_info: #RPC
+    get:
+      deprecated: true
+      tags:
+        - Asset
+      parameters:
+        - $ref: "#/components/parameters/_asset_policy"
+      responses:
+        "200":
+          description: Array of detailed information of assets under the same policy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/policy_asset_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Asset Policy Information
+      description: Get the information for all assets under the same policy (DEPRECATED - replaced by policy_asset_info)
+
   /pool_list: #RPC
     get:
       tags:
@@ -964,7 +1077,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Pool List
-      description: A list of all currently registered/retiring (not retired) pools
+      description: List of brief info for all pools
   /pool_info: #RPC
     post:
       tags:
@@ -1120,6 +1233,48 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Pool Updates (History)
       description: Return all pool updates for all pools or only updates for specific pool if specified
+  /pool_registrations: #RPC
+    get:
+      tags:
+        - Pool
+      parameters:
+        - $ref: "#/components/parameters/_epoch_no"
+      responses:
+        "200":
+          description: Array of historical pool updates
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_registrations"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Pool Registrations
+      description: Return all pool registrations initiated in the requested epoch
+  /pool_retirements: #RPC
+    get:
+      tags:
+        - Pool
+      parameters:
+        - $ref: "#/components/parameters/_epoch_no"
+      responses:
+        "200":
+          description: Array of historical pool updates
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_registrations"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Pool Retirements
+      description: Return all pool retirements initiated in the requested epoch
   /pool_relays: #RPC
     get:
       tags:
@@ -1138,7 +1293,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Pool Relays
-      description: A list of registered relays for all currently registered/retiring (not retired) pools
+      description: A list of registered relays for all pools
   /pool_metadata: #RPC
     post:
       tags:
@@ -1159,7 +1314,29 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Pool Metadata
-      description: Metadata (on & off-chain) for all currently registered/retiring (not retired) pools
+      description: Metadata (on & off-chain) for all pools
+
+  /script_info: #RPC
+    post:
+      tags:
+        - Script
+      requestBody:
+        $ref: "#/components/requestBodies/script_hashes"
+      responses:
+        "200":
+          description: List of datum information for given datum hashes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/script_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Datum Information
+      description: List of datum information for given datum hashes
   /native_script_list: #RPC
     get:
       tags:
@@ -1170,7 +1347,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/native_script_list"
+                $ref: "#/components/schemas/script_list"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -1189,7 +1366,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/plutus_script_list"
+                $ref: "#/components/schemas/script_list"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -1219,6 +1396,28 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Script Redeemers
       description: List of all redeemers for a given script hash
+  /script_utxos: #RPC
+    get:
+      tags:
+        - Script
+      parameters:
+        - $ref: "#/components/parameters/_script_hash"
+        - $ref: "#/components/parameters/_extended"
+      responses:
+        "200":
+          description: List of UTXOs for a given script hash
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/utxo_infos"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Script UTXOs
+      description: List of all UTXOs for a given script hash
   /datum_info: #RPC
     post:
       tags:
@@ -1240,10 +1439,51 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Datum Information
       description: List of datum information for given datum hashes
+  /ogmios/?EvaluateTransaction: #ogmios-api
+    post:
+      tags:
+        - Ogmios
+      x-code-samples:
+        - lang: "Shell"
+          source: |
+            # Assuming ${data} contains EvaluateTransaction payload as documented on Ogmios v6 site.
+            curl -X POST \
+                --header "Content-Type: application/cbor" \
+                --data-binary ${data} https://api.koios.rest/api/ogmios/?EvaluateTransaction
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: An error occured while submitting transaction.
+      summary: Evaluate Transaction
+      description: Evaluate execution units of scripts in a well-formed transaction. Please refer to Ogmios documentation [here](https://ogmios.dev/api/#operation-publish-/?EvaluateTransaction) for complete spec
+  /ogmios/?SubmitTransaction: #ogmios-api
+    post:
+      tags:
+        - Ogmios
+      x-code-samples:
+        - lang: "Shell"
+          source: |
+            # Assuming ${data} contains a CBOR-serialized signed transaction (base16-encoded) as documented on Ogmios v6 site.
+            curl -X POST \
+                --header "Content-Type: application/cbor" \
+                --data-binary ${data} https://api.koios.rest/api/ogmios/?SubmitTransaction
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: An error occured while querying transaction.
+      summary: Submit Transaction
+      description: Submit a signed and serialized transaction to the network. Please refer to Ogmios documentation [here](https://ogmios.dev/api/#operation-publish-/?SubmitTransaction) for complete spec
+
 components:
   #!params!#
   #!requestBodies!#
-  securitySchemes: {}
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   #!schemas!#
   headers: {}
   responses:
@@ -1252,7 +1492,7 @@ components:
     NotFound:
       description: The server does not recognise the combination of endpoint and parameters provided
     Unauthorized:
-      description: The selected server has restricted the endpoint to be only usable via authentication. The authentication supplied was not authorized to access the endpoint
+      description: Access token is missing or invalid
     PartialContent:
       description: The result was truncated
     BadRequest:
@@ -1270,11 +1510,11 @@ tags:
   - name: Transactions
     description: Query blockchain transaction details
     x-tag-expanded: false
+  - name: Stake Account
+    description: Query details about specific stake account addresses
+    x-tag-expanded: false
   - name: Address
     description: Query information about specific address(es)
-    x-tag-expanded: false
-  - name: Account
-    description: Query details about specific stake account addresses
     x-tag-expanded: false
   - name: Asset
     description: Query Asset related informations
@@ -1285,4 +1525,5 @@ tags:
   - name: Script
     description: Query information about specific scripts (Smart Contracts)
     x-tag-expanded: false
-security: []
+security:
+  - bearerAuth: []
