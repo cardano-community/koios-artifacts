@@ -160,6 +160,13 @@
         "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/raywallet.png"
       }
     },
+    {"text": "Stakepool Operator Scripts",
+      "link": "https://github.com/gitmachtl/scripts",
+      "logo": {
+        "dark": "https://raw.githubusercontent.com/gitmachtl/cardano-related-stuff/master/sposcripts_logo_640x640.png",
+        "light": "https://raw.githubusercontent.com/gitmachtl/cardano-related-stuff/master/sposcripts_logo_640x640.png"
+      }
+    },
     {
       "text": "Tabulali",
       "link": "https://eddex.github.io/tabulali/",
