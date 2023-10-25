@@ -35,9 +35,17 @@ BEGIN
 
   RETURN QUERY
     WITH
+      _txo_list AS (
+        SELECT
+          txo.id
+        FROM tx_out AS txo
+        INNER JOIN ma_tx_out AS mto ON mto.tx_out_id = txo.id
+        WHERE mto.ident = ANY(_asset_id_list)
+          AND txo.consumed_by_tx_in_id IS NULL
+      ),
       _assets AS (
         SELECT
-          txo.id,
+          txol.id,
           JSONB_AGG(CASE WHEN ma.policy IS NULL THEN NULL
             ELSE JSONB_BUILD_OBJECT(
             'policy_id', ENCODE(ma.policy, 'hex'),
@@ -47,13 +55,11 @@ BEGIN
             'quantity', mto.quantity::text
             )
           END) as assets
-        FROM tx_out AS txo
-        INNER JOIN ma_tx_out AS mto ON mto.tx_out_id = txo.id
+        FROM _txo_list AS txol
+        INNER JOIN ma_tx_out AS mto ON mto.tx_out_id = txol.id
         LEFT JOIN multi_asset AS ma ON ma.id = mto.ident
         LEFT JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
-        WHERE mto.ident = ANY(_asset_id_list)
-          AND txo.consumed_by_tx_in_id IS NULL
-        GROUP BY txo.id
+        GROUP BY txol.id
       )
     SELECT
       ENCODE(tx.hash, 'hex')::text AS tx_hash,
