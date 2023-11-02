@@ -12,14 +12,14 @@ cat <<-EOF
 	
 	To run the endpoint validation tests, use the below:
 	
-	  schemathesis --pre-run not_empty_response run --request-timeout 5000 --hypothesis-seed 1 https://guild.koios.rest/koiosapi.yaml \\
-	               --hypothesis-phases=explicit,generate --hypothesis-max-examples=1 -v --hypothesis-verbosity quiet -b http://127.0.0.1:8053/api/v0 -c all
+	  schemathesis --pre-run not_empty_response run --request-timeout 5000 https://guild.koios.rest/koiosapi.yaml --hypothesis-phases=explicit \\
+	      --hypothesis-verbosity quiet -b http://127.0.0.1:8053/api/v1 -c all --validate-schema=true -H "Content-Type: application/json"
 	
-	      where http://127.0.0.1:8053/api/v0 is the URL of instance you want to test, and guild.koios.rest is the target enviornment for testing.
+	      where http://127.0.0.1:8053/api/v1 is the URL of instance you want to test, and guild.koios.rest is the target enviornment for testing.
 	
 	To run the data validations tests, use the below:
 	
-	  pytest --local-url http://127.0.0.1:8053/api/v0 --compare-url https://guild.koios.rest/api/v0 --api-schema-file ../specs/results/koiosapi-guild.yaml -x -v
+	  pytest --local-url http://127.0.0.1:8053/api/v1 --compare-url https://guild.koios.rest/api/v1 --api-schema-file ../specs/results/koiosapi-guild.yaml -x -v
 	
 	  Arguments:
 	      local-url		:	"URL of instance you want to test"

@@ -60,6 +60,16 @@ parameters:
       in: query
       required: true
       allowEmptyValue: false
+    _after_block_height:
+      deprecated: false
+      name: _after_block_height
+      description: Block height for specifying time delta
+      schema:
+        type: integer
+        example: 50000
+      in: query
+      required: false
+      allowEmptyValue: true
     _epoch_no:
       deprecated: false
       name: _epoch_no
@@ -133,10 +143,60 @@ parameters:
     _asset_name:
       deprecated: false
       name: _asset_name
-      description: Asset Name in hexadecimal format (hex)
+      description: Asset Name in hexadecimal format (hex), empty asset name returns royalties
       schema:
         type: string
-        example: ##_asset_name_param##
+        example: "##_asset_name_param##"
+      in: query
+      required: false
+      allowEmptyValue: true
+    _asset_policy_nft:
+      deprecated: false
+      name: _asset_policy
+      description: NFT Policy ID in hexadecimal format (hex)
+      schema:
+        type: string
+        example: ##_asset_policy_nft_param##
+      in: query
+      required: true
+      allowEmptyValue: false
+    _asset_name_nft:
+      deprecated: false
+      name: _asset_name
+      description: NFT Name in hexadecimal format (hex)
+      schema:
+        type: string
+        example: ##_asset_name_nft_param##
+      in: query
+      required: false
+      allowEmptyValue: true
+    _extended:
+      deprecated: false
+      name: _extended
+      description: Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call
+      schema:
+        type: boolean
+        example: "false"
+      in: query
+      required: false
+      allowEmptyValue: true
+    _history:
+      deprecated: false
+      name: _history
+      description: Include all historical transactions, setting to false includes only the non-empty ones
+      schema:
+        type: boolean
+        example: "false"
+      in: query
+      required: false
+      allowEmptyValue: false
+    _include_next_epoch:
+      deprecated: false
+      name: _include_next_epoch
+      description: Include information about nearing but not yet started epoch, to get access to active stake snapshot information if available
+      schema:
+        type: boolean
+        example: "false"
       in: query
       required: false
       allowEmptyValue: true
@@ -170,3 +230,23 @@ parameters:
       in: query
       required: true
       allowEmptyValue: false
+    _first_only:
+      deprecated: false
+      name: _first_only
+      description: Returns the first entry only (overrides _empty to true)
+      schema:
+        type: boolean
+        example: "false"
+      in: query
+      required: false
+      allowEmptyValue: true
+    _empty:
+      deprecated: false
+      name: _empty
+      description: Include zero quantity entries
+      schema:
+        type: boolean
+        example: "false"
+      in: query
+      required: false
+      allowEmptyValue: true

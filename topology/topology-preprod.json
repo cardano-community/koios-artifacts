@@ -1,0 +1,10 @@
+{
+  "Providers": [
+    {"name":"rdlrt","addr":"209.145.50.190","port":18050},
+    {"name":"eden","addr":"eden-preprod.koios.rest","port":8053},
+    {"name":"ola-ssl","addr":"koios-preprod.ahlnet.nu","port":2155,"ssl":"true"},
+    {"name":"homer","addr":"154.12.248.114","port":8053},
+    {"name":"huths0lo-ssl","addr":"koios-preprod.themorphiumio","port":8453,"ssl":"true"}
+  ],
+  "Consumers": []
+}
