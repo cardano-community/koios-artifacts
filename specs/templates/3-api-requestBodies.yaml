@@ -74,7 +74,7 @@ requestBodies:
                 description: Array of Cardano payment address(es) in bech32 format
               _after_block_height:
                 format: integer
-                type: integer
+                type: number
                 description: Only fetch information after specific block height
             example:
               _addresses:
@@ -97,7 +97,7 @@ requestBodies:
                 description: Array of Cardano stake address(es) in bech32 format
               _epoch_no:
                 format: integer
-                type: integer
+                type: number
                 description: Only fetch information for a specific epoch
             example:
               _stake_addresses:
@@ -190,7 +190,7 @@ requestBodies:
                 description: Array of Cardano payment credential(s) in hex format
               _after_block_height:
                 format: integer
-                type: integer
+                type: number
                 description: Only fetch information after specific block height
             example:
               _payment_credentials:
@@ -381,3 +381,138 @@ requestBodies:
                 - ##utxo_ref1_rb##
                 - ##utxo_ref2_rb##
               _extended: false
+    ogmios:
+      content:
+        application/json:
+          schema:
+            required:
+              - jsonrpc
+              - method
+            type: object
+            properties:
+              jsonrpc:
+                format: text
+                type: string
+                description: Identifier for JSON-RPC 2.0 standard
+                example: "2.0"
+              method:
+                format: text
+                type: string
+                description: The Ogmios method to be called (see more details [here](#tag--Ogmios)) or browse examples tab
+                enum: ["queryNetwork/blockHeight","queryNetwork/genesisConfiguration","queryNetwork/startTime","queryNetwork/tip","queryLedgerState/epoch","queryLedgerState/eraStart","queryLedgerState/eraSummaries","queryLedgerState/liveStakeDistribution","queryLedgerState/protocolParameters","queryLedgerState/proposedProtocolParameters","queryLedgerState/stakePools","submitTransaction","evaluateTransaction"]
+                example: "queryNetwork/tip"
+              params:
+                type: object
+                description: Any parameters relevant to the specific method to be called
+                nullable: true
+          examples:
+            blockHeight:
+              description: Query the network’s highest block number.
+              value: |
+                {
+                  "jsonrpc": "2.0",
+                  "method": "queryNetwork/blockHeight"
+                }
+            genesisConfiguration:
+              description: Query the genesis configuration of a given era.
+              value: |
+                {
+                  "jsonrpc": "2.0",
+                  "method": "queryNetwork/genesisConfiguration",
+                  "params": {
+                    "era": "shelley"
+                  }
+                }
+            startTimeTime:
+              description: Query the network start time.
+              value: |
+                {
+                  "jsonrpc": "2.0",
+                  "method": "queryNetwork/startTime"
+                }
+            tip:
+              description: Query tip of the Network
+              value: |
+                {
+                  "jsonrpc": "2.0",
+                  "method": "queryNetwork/tip"
+                }
+            epoch:
+              description: Query the current epoch of the ledger.
+              value: |
+                {
+                  "jsonrpc": "2.0",
+                  "method": "queryLedgerState/epoch"
+                }
+            eraStart:
+              description: Query information regarding the beginning of the current ledger era.
+              value: |
+                {
+                  "jsonrpc": "2.0",
+                  "method": "queryLedgerState/eraStart"
+                }
+            eraSummaries:
+              description: Query era bounds and slot parameters details, required for proper sloting arithmetic.
+              value: |
+                {
+                  "jsonrpc": "2.0",
+                  "method": "queryLedgerState/eraSummaries"
+                }
+            liveStakeDistribution:
+              description: Query distribution of the stake across all known stake pools, relative to the total stake in the network.
+              value: |
+                {
+                  "jsonrpc": "2.0",
+                  "method": "queryLedgerState/liveStakeDistribution"
+                }
+            protocolParameters:
+              description: Query the current protocol parameters.
+              value: |
+                {
+                  "jsonrpc": "2.0",
+                  "method": "queryLedgerState/protocolParameters"
+                }
+            proposedProtocolParameters:
+              description: Query the last update proposal w.r.t. protocol parameters, if any.
+              value: |
+                {
+                  "jsonrpc": "2.0",
+                  "method": "queryLedgerState/proposedProtocolParameters"
+                }
+            StakePools:
+              description: Query the list of all stake pool identifiers currently registered and active.
+              value: |
+                {
+                  "jsonrpc": "2.0",
+                  "method": "queryLedgerState/stakePools"
+                }
+            submitTransaction:
+              description: Submit a signed and serialized transaction to the network.
+              value: |
+                {
+                  "jsonrpc": "2.0",
+                  "method": "submitTransaction",
+                  "params": {
+                  "transaction": {
+                    "cbor": "<CBOR-serialized signed transaction (base16)>"
+                  }
+                }
+            evaluateTransaction:
+              description: Evaluate execution units of scripts in a well-formed transaction.
+              value: |
+                {
+                  "jsonrpc": "2.0",
+                  "method": "evaluateTransaction",
+                  "params": {
+                    "transaction": {
+                      "cbor": "<CBOR-serialized signed transaction (base16)>"
+                    },
+                    "additionalUtxo": [
+                      {
+                        ...
+                      }
+                    ]
+                  }
+                }
+
+            

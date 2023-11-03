@@ -65,7 +65,7 @@ parameters:
       name: _after_block_height
       description: Block height for specifying time delta
       schema:
-        type: integer
+        type: number
         example: 50000
       in: query
       required: false

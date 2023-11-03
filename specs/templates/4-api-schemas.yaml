@@ -40,7 +40,7 @@ schemas:
             example: 45000000000000000
             description: Maximum smallest units (lovelaces) supply for the blockchain
           systemstart:
-            type: integer
+            type: number
             description: UNIX timestamp of the first block (genesis) on chain
             example: 1506203091
           activeslotcoeff:
@@ -72,7 +72,7 @@ schemas:
       items:
         properties:
           epoch_no:
-            type: integer
+            type: number
             description: Epoch number
             example: 294
           circulation:
@@ -170,7 +170,7 @@ schemas:
         type: object
         properties:
           epoch_no:
-            type: integer
+            type: number
             description: Epoch for which the pool history data is shown
             example: 312
           active_stake:
@@ -186,12 +186,12 @@ schemas:
             description: Saturation percentage of a pool at the time of snapshot (2 decimals)
             example: 45.32
           block_cnt:
-            type: integer
+            type: number
             nullable: true
             description: Number of blocks pool created in that epoch
             example: 14
           delegator_cnt:
-            type: integer
+            type: number
             description: Number of delegators to the pool for that epoch snapshot
             example: 1432
           margin:
@@ -331,7 +331,7 @@ schemas:
             enum: ["registered", "retiring", "retired"]
             example: registered
           retiring_epoch:
-            type: integer
+            type: number
             description: Announced retiring epoch (nullable)
             example: null
             nullable: true
@@ -341,7 +341,7 @@ schemas:
             description: Pool latest operational certificate hash
             example: 37eb004c0dd8a221ac3598ca1c6d6257fb5207ae9857b7c163ae0f39259d6cc0
           op_cert_counter:
-            type: integer
+            type: number
             nullable: true
             description: Pool latest operational certificate counter value
             example: 8
@@ -356,7 +356,7 @@ schemas:
             description: Pool relative active stake share
             example: 0.0034839235
           block_count:
-            type: integer
+            type: number
             nullable: true
             description: Total pool blocks on chain
             example: 4509
@@ -371,7 +371,7 @@ schemas:
             description: Pool live stake
             example: "64328627680963"
           live_delegators:
-            type: integer
+            type: number
             description: Pool live delegator count
             example: 5
           live_saturation:
@@ -390,7 +390,7 @@ schemas:
             description: Type of snapshot ("Mark", "Set" or "Go")
             example: "Mark"
           epoch_no:
-            type: integer
+            type: number
             description: Epoch number for the snapshot entry
             example: 324
           nonce:
@@ -416,7 +416,7 @@ schemas:
             description: Current delegator live stake (in lovelace)
             example: 64328591517480
           active_epoch_no:
-            type: integer
+            type: number
             description: Epoch number in which the delegation becomes active
             example: 324
           latest_delegation_tx_hash:
@@ -454,7 +454,7 @@ schemas:
           amount:
             $ref: "#/components/schemas/pool_delegators/items/properties/amount"
           epoch_no:
-            type: integer
+            type: number
             description: Epoch number for the delegation history
             example: 324
     pool_blocks:
@@ -489,7 +489,7 @@ schemas:
           pool_id_hex:
             $ref: "#/components/schemas/pool_info/items/properties/pool_id_hex"
           active_epoch_no:
-            type: integer
+            type: number
             description: Epoch number in which the update becomes active
             nullable: true
             example: 324
@@ -552,7 +552,7 @@ schemas:
         type: object
         properties:
           epoch_no:
-            type: integer
+            type: number
             description: Epoch number
             example: 294
           out_sum:
@@ -564,27 +564,27 @@ schemas:
             description: Total fees incurred by transactions in epoch
             example: 74325855210
           tx_count:
-            type: integer
+            type: number
             description: Number of transactions submitted in epoch
             example: 357919
           blk_count:
-            type: integer
+            type: number
             description: Number of blocks created in epoch
             example: 17321
           start_time:
-            type: integer
+            type: number
             description: UNIX timestamp of the epoch start
             example: 1506203091
           end_time:
-            type: integer
+            type: number
             description: UNIX timestamp of the epoch end
             example: 1506635091
           first_block_time:
-            type: integer
+            type: number
             description: UNIX timestamp of the epoch's first block
             example: 1506635091
           last_block_time:
-            type: integer
+            type: number
             description: UNIX timestamp of the epoch's last block
             example: 1506635091
           active_stake:
@@ -604,34 +604,35 @@ schemas:
             nullable: true
     epoch_params:
       type: array
+      description: Epoch parameters (all fields nullable for pre-Shelley/Gougen epochs except first block hash)
       items:
         properties:
           epoch_no:
-            type: integer
+            type: number
             description: Epoch number
             example: 294
           min_fee_a:
-            type: integer
+            type: number
             description: The 'a' parameter to calculate the minimum transaction fee
             example: 44
             nullable: true
           min_fee_b:
-            type: integer
+            type: number
             description: The 'b' parameter to calculate the minimum transaction fee
             example: 155381
             nullable: true
           max_block_size:
-            type: integer
+            type: number
             description: The maximum block size (in bytes)
             example: 65536
             nullable: true
           max_tx_size:
-            type: integer
+            type: number
             description: The maximum transaction size (in bytes)
             example: 16384
             nullable: true
           max_bh_size:
-            type: integer
+            type: number
             description: The maximum block header size (in bytes)
             example: 1100
             nullable: true
@@ -646,12 +647,12 @@ schemas:
             example: 500000000
             nullable: true
           max_epoch:
-            type: integer
+            type: number
             description: The maximum number of epochs in the future that a pool retirement is allowed to be scheduled for
             example: 18
             nullable: true
           optimal_pool_count:
-            type: integer
+            type: number
             description: The optimal number of stake pools
             example: 500
             nullable: true
@@ -685,12 +686,12 @@ schemas:
             example: d982e06fd33e7440b43cefad529b7ecafbaa255e38178ad4189a37e4ce9bf1fa
             nullable: true
           protocol_major:
-            type: integer
+            type: number
             description: The protocol major version
             example: 5
             nullable: true
           protocol_minor:
-            type: integer
+            type: number
             description: The protocol minor version
             example: 0
             nullable: true
@@ -756,12 +757,12 @@ schemas:
             example: 5000
             nullable: true
           collateral_percent:
-            type: integer
+            type: number
             description: The percentage of the tx fee which must be provided as collateral when including non-native scripts
             example: 150
             nullable: true
           max_collateral_inputs:
-            type: integer
+            type: number
             description: The maximum number of collateral inputs allowed in a transaction
             example: 3
             nullable: true
@@ -775,15 +776,15 @@ schemas:
       items:
         properties:
           proto_major:
-            type: integer
+            type: number
             description: Protocol major version
             example: 6
           proto_minor:
-            type: integer
+            type: number
             description: Protocol major version
             example: 2
           blocks:
-            type: integer
+            type: number
             description: Amount of blocks with specified major and protocol combination
             example: 2183
     blocks:
@@ -796,32 +797,32 @@ schemas:
             description: Hash of the block
             example: e8c6992d52cd74b577b79251e0351be25070797a0dbc486b2c284d0bf7aeea9c
           epoch_no:
-            type: integer
+            type: number
             description: Epoch number of the block
             example: 321
           abs_slot:
-            type: integer
+            type: number
             description: Absolute slot number of the block
             example: 53384242
           epoch_slot:
-            type: integer
+            type: number
             description: Slot number of the block in epoch
             example: 75442
           block_height:
-            type: integer
+            type: number
             description: Block height
             nullable: true
             example: 42325043
           block_size:
-            type: integer
+            type: number
             description: Block size in bytes
             example: 79109
           block_time:
-            type: integer
+            type: number
             description: UNIX timestamp of the block
             example: 1506635091
           tx_count:
-            type: integer
+            type: number
             description: Number of transactions in the block
             example: 44
           vrf_key:
@@ -834,7 +835,7 @@ schemas:
             example: pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc
             nullable: true
           op_cert_counter:
-            type: integer
+            type: number
             description: Counter value of the operational certificate used to create this block
             example: 8
           proto_major:
@@ -887,7 +888,7 @@ schemas:
             example: 2346834
             nullable: true
           num_confirmations:
-            type: integer
+            type: number
             description: Number of confirmations for the block
             example: 664275
           parent_hash:
@@ -1046,7 +1047,7 @@ schemas:
             description: Hash identifier of the transaction
             example: f144a8264acf4bdfe2e1241170969c930d64ab6b0996a4a45237b623f1dd670e
           tx_index:
-            type: integer
+            type: number
             description: Index of UTxO in the transaction 
             example: 0
           address:
@@ -1196,7 +1197,7 @@ schemas:
                   description: Bech32 representation of pool ID
                   example: pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt
                 epoch_no:
-                  type: integer
+                  type: number
                   description: Epoch number
                   example: 301
                 active_stake:
@@ -1221,15 +1222,15 @@ schemas:
           absolute_slot:
             $ref: "#/components/schemas/blocks/items/properties/abs_slot"
           tx_timestamp:
-            type: integer
+            type: number
             description: UNIX timestamp of the transaction
             example: 1506635091
           tx_block_index:
-            type: integer
+            type: number
             description: Index of transaction within block
             example: 6
           tx_size:
-            type: integer
+            type: number
             description: Size in bytes of transaction
             example: 391
           total_output:
@@ -1319,7 +1320,7 @@ schemas:
                       description: Hash of referenced script
                       example: 67f33146617a5e61936081db3b2117cbf59bd2123748f58ac9678656
                     size:
-                      type: integer
+                      type: number
                       description: Size in bytes
                       example: 14
                     type:
@@ -1379,7 +1380,7 @@ schemas:
             items:
               properties:
                 index:
-                  type: integer
+                  type: number
                   nullable: true
                   description: Certificate index
                   example: 0
@@ -1544,7 +1545,7 @@ schemas:
           tx_hash:
             $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
           num_confirmations:
-            type: integer
+            type: number
             description: Number of block confirmations
             example: 17
             nullable: true
@@ -1619,15 +1620,15 @@ schemas:
           fingerprint:
             $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
           total_transactions:
-            type: integer
+            type: number
             description: Total number of transactions including the given asset
             example: 89416
           staked_wallets:
-            type: integer
+            type: number
             description: Total number of registered wallets holding the given asset
             example: 548
           unstaked_addresses:
-            type: integer
+            type: number
             description: Total number of payment addresses (not belonging to registered wallets) holding the given asset
             example: 245
     asset_info:
@@ -1660,15 +1661,15 @@ schemas:
             description: Total supply for the asset
             example: "35000"
           mint_cnt:
-            type: integer
+            type: number
             description: Count of total mint transactions
             example: 1
           burn_cnt:
-            type: integer
+            type: number
             description: Count of total burn transactions
             example: 5
           creation_time:
-            type: integer
+            type: number
             description: UNIX timestamp of the first asset mint
             example: 1506635091
           minting_tx_metadata:
@@ -1697,7 +1698,7 @@ schemas:
                 description: A PNG image file as a byte string
                 example: iVBORw0KGgoAAAANSUhEUgAAAPoAAAD6CAYAAACI7Fo9AAAACXBIWXMAAA7EAAAOxAGVKw4bAAADnmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSfvu78nIGlkPSdXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQnPz4KPHg6eG1wbWV0YSB4bWxuczp4PSdhZG9iZTpuczptZXRhLyc
               decimals:
-                type: integer
+                type: number
                 example: 0
           cip68_metadata:
             type: object
@@ -1812,7 +1813,7 @@ schemas:
             description: Script bytes (cborSeq)
             example: 5907f4010000332323232323232323233223232323232332232323232322223232533532533533355300712001323212330012233350052200200200100235001220011233001225335002101710010142325335333573466e3cd400488008d4020880080580544ccd5cd19b873500122001350082200101601510153500122002353500122002222222222200a101413357389201115554784f206e6f7420636f6e73756d6564000133333573466e1cd55cea8012400046644246600200600464646464646464646464646666ae68cdc39aab9d500a480008cccccccccc888888888848cccccccccc00402c02802402001c01801401000c008cd40508c8c8cccd5cd19b8735573aa0049000119910919800801801180f9aba150023019357426ae8940088c98d4cd5ce01581501481409aab9e5001137540026ae854028cd4050054d5d0a804999aa80bbae501635742a010666aa02eeb94058d5d0a80399a80a0109aba15006335014335502402275a6ae854014c8c8c8cccd5cd19b8735573aa00490001199109198008018011919191999ab9a3370e6aae754009200023322123300100300233502575a6ae854008c098d5d09aba2500223263533573805e05c05a05826aae7940044dd50009aba150023232323333573466e1cd55cea8012400046644246600200600466a04aeb4d5d0a80118131aba135744a004464c6a66ae700bc0b80b40b04d55cf280089baa001357426ae8940088c98d4cd5ce01581501481409aab9e5001137540026ae854010cd4051d71aba15003335014335502475c40026ae854008c070d5d09aba2500223263533573804e04c04a04826ae8940044d5d1280089aba25001135744a00226ae8940044d5d1280089aba25001135744a00226aae7940044dd50009aba150023232323333573466e1d400520062321222230040053019357426aae79400c8cccd5cd19b875002480108c848888c008014c06cd5d09aab9e500423333573466e1d400d20022321222230010053015357426aae7940148cccd5cd19b875004480008c848888c00c014dd71aba135573ca00c464c6a66ae7008808408007c0780740704d55cea80089baa001357426ae8940088c98d4cd5ce00d80d00c80c080c89931a99ab9c4910350543500019018135573ca00226ea8004c8004d5405888448894cd40044d400c88004884ccd401488008c010008ccd54c01c4800401401000448c88c008dd6000990009aa80b111999aab9f00125009233500830043574200460066ae880080548c8c8c8cccd5cd19b8735573aa00690001199911091998008020018011919191999ab9a3370e6aae7540092000233221233001003002301735742a00466a01c02c6ae84d5d1280111931a99ab9c01b01a019018135573ca00226ea8004d5d0a801999aa803bae500635742a00466a014eb8d5d09aba2500223263533573802e02c02a02826ae8940044d55cf280089baa0011335500175ceb44488c88c008dd5800990009aa80a11191999aab9f0022500823350073355017300635573aa004600a6aae794008c010d5d100180a09aba100111220021221223300100400312232323333573466e1d4005200023212230020033005357426aae79400c8cccd5cd19b8750024800884880048c98d4cd5ce00980900880800789aab9d500113754002464646666ae68cdc39aab9d5002480008cc8848cc00400c008c014d5d0a8011bad357426ae8940088c98d4cd5ce00800780700689aab9e5001137540024646666ae68cdc39aab9d5001480008dd71aba135573ca004464c6a66ae7003803403002c4dd500089119191999ab9a3370ea00290021091100091999ab9a3370ea00490011190911180180218031aba135573ca00846666ae68cdc3a801a400042444004464c6a66ae7004404003c0380340304d55cea80089baa0012323333573466e1d40052002200523333573466e1d40092000200523263533573801a01801601401226aae74dd5000891001091000919191919191999ab9a3370ea002900610911111100191999ab9a3370ea004900510911111100211999ab9a3370ea00690041199109111111198008048041bae35742a00a6eb4d5d09aba2500523333573466e1d40112006233221222222233002009008375c6ae85401cdd71aba135744a00e46666ae68cdc3a802a400846644244444446600c01201060186ae854024dd71aba135744a01246666ae68cdc3a8032400446424444444600e010601a6ae84d55cf280591999ab9a3370ea00e900011909111111180280418071aba135573ca018464c6a66ae7004c04804404003c03803403002c0284d55cea80209aab9e5003135573ca00426aae7940044dd50009191919191999ab9a3370ea002900111999110911998008028020019bad35742a0086eb4d5d0a8019bad357426ae89400c8cccd5cd19b875002480008c8488c00800cc020d5d09aab9e500623263533573801801601401201026aae75400c4d5d1280089aab9e500113754002464646666ae68cdc3a800a400446424460020066eb8d5d09aab9e500323333573466e1d400920002321223002003375c6ae84d55cf280211931a99ab9c009008007006005135573aa00226ea800444888c8c8cccd5cd19b8735573aa0049000119aa80518031aba150023005357426ae8940088c98d4cd5ce00480400380309aab9e5001137540029309000a490350543100112212330010030021123230010012233003300200200133512233002489209366f09fe40eaaeb17d3cb6b0b61e087d664174c39a48a986f86b2b0ba6e2a7b00480008848cc00400c0088005
           size:
-            type: integer
+            type: number
             description: The size of the CBOR serialised script (in bytes)
             example: 2039
     script_list:
@@ -1850,7 +1851,7 @@ schemas:
                   additionalProperties:
                     oneOf:
                       - type: string
-                      - type: integer
+                      - type: number
                 unit_steps:
                   description: The budget in Cpu steps to run a script
                   example: 211535239
@@ -1858,7 +1859,7 @@ schemas:
                   additionalProperties:
                     oneOf:
                       - type: string
-                      - type: integer
+                      - type: number
                 fee:
                   type: string
                   description: The budget in fees to run a script - the fees depend on the ExUnits and the current prices
@@ -1888,3 +1889,28 @@ schemas:
             $ref: "#/components/schemas/script_info/items/properties/value"
           bytes:
             $ref: "#/components/schemas/script_info/items/properties/bytes"
+    ogmiostip:
+      type: object
+      properties:
+        jsonrpc:
+          format: text
+          type: string
+          description: Identifier for JSON-RPC 2.0 standard
+          example: "2.0"
+        method:
+          format: text
+          type: string
+          description: The Ogmios method that was called in the request
+          example: "queryNetwork/tip"
+        result:
+          type: object
+          description: Result of the query
+          properties:
+            slot:
+              type: number
+              description: Absolute slot number on chain
+              example: 59886800
+            id:
+              type: string
+              description: Block Hash (Blake2b 32-byte hash digest, encoded in base16)
+              example: "df5678c9774b7bc8c60a4c83b63c3676e618640ad05f7d1ee775b68939cf77d1"
