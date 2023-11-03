@@ -1889,3 +1889,28 @@ schemas:
             $ref: "#/components/schemas/script_info/items/properties/value"
           bytes:
             $ref: "#/components/schemas/script_info/items/properties/bytes"
+    ogmiostip:
+      type: object
+      properties:
+        jsonrpc:
+          format: text
+          type: string
+          description: Identifier for JSON-RPC 2.0 standard
+          example: "2.0"
+        method:
+          format: text
+          type: string
+          description: The Ogmios method that was called in the request
+          example: "queryNetwork/tip"
+        result:
+          type: object
+          description: Result of the query
+          properties:
+            slot:
+              type: number
+              description: Absolute slot number on chain
+              example: 59886800
+            id:
+              type: string
+              description: Block Hash (Blake2b 32-byte hash digest, encoded in base16)
+              example: "df5678c9774b7bc8c60a4c83b63c3676e618640ad05f7d1ee775b68939cf77d1"

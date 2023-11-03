@@ -381,3 +381,40 @@ requestBodies:
                 - ##utxo_ref1_rb##
                 - ##utxo_ref2_rb##
               _extended: false
+    ogmios:
+      content:
+        application/json:
+          schema:
+            required:
+              - jsonrpc
+              - method
+            type: object
+            properties:
+              jsonrpc:
+                format: text
+                type: string
+                description: Identifier for JSON-RPC 2.0 standard
+                example: "2.0"
+              method:
+                format: text
+                type: string
+                description: The Ogmios method to be called (see more details [here](#tag--Ogmios))
+                enum:
+                  - "queryNetwork/blockHeight"
+                  - "queryNetwork/genesisConfiguration"
+                  - "queryNetwork/startTime"
+                  - "queryNetwork/tip"
+                  - "queryLedgerState/epoch"
+                  - "queryLedgerState/eraStart"
+                  - "queryLedgerState/eraSummaries"
+                  - "queryLedgerState/liveStakeDistribution"
+                  - "queryLedgerState/protocolParameters"
+                  - "queryLedgerState/proposedProtocolParameters"
+                  - "queryLedgerState/stakePools"
+                  - "submitTransaction"
+                  - "evaluateTransaction"
+                example: "queryNetwork/tip"
+              params:
+                type: object
+                description: Any parameters relevant to the specific method to be called
+                nullable: true

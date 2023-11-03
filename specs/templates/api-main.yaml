@@ -1439,43 +1439,30 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Datum Information
       description: List of datum information for given datum hashes
-  /ogmios/?EvaluateTransaction: #ogmios-api
+  /ogmios/: #ogmios-api
     post:
       tags:
         - Ogmios
-      x-code-samples:
-        - lang: "Shell"
-          source: |
-            # Assuming ${data} contains EvaluateTransaction payload as documented on Ogmios v6 site.
-            curl -X POST \
-                --header "Content-Type: application/cbor" \
-                --data-binary ${data} https://api.koios.rest/api/ogmios/?EvaluateTransaction
+      requestBody:
+        $ref: "#/components/requestBodies/ogmios"
       responses:
         "200":
-          description: OK
+          description: Current tip of the chain, identified by a slot and a block header hash.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ogmiostip"
         "400":
           description: An error occured while submitting transaction.
-      summary: Evaluate Transaction
-      description: Evaluate execution units of scripts in a well-formed transaction. Please refer to Ogmios documentation [here](https://ogmios.dev/api/#operation-publish-/?EvaluateTransaction) for complete spec
-  /ogmios/?SubmitTransaction: #ogmios-api
-    post:
-      tags:
-        - Ogmios
-      x-code-samples:
-        - lang: "Shell"
-          source: |
-            # Assuming ${data} contains a CBOR-serialized signed transaction (base16-encoded) as documented on Ogmios v6 site.
-            curl -X POST \
-                --header "Content-Type: application/cbor" \
-                --data-binary ${data} https://api.koios.rest/api/ogmios/?SubmitTransaction
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: An error occured while querying transaction.
-      summary: Submit Transaction
-      description: Submit a signed and serialized transaction to the network. Please refer to Ogmios documentation [here](https://ogmios.dev/api/#operation-publish-/?SubmitTransaction) for complete spec
+      summary: Query Example
+      description: |
+        Query the current tip of the Network.
 
+        <br>
+        <div style="background-color: #222; padding: 12px 0px 12px 12px;border-left: 5px solid  rgb(173, 44, 44);font-size: var(--font-size-regular);">
+        We do support transparent forwarding for various methods from Ogmios, you can read about those <a href="#tag--Ogmios">here</a>.
+        </div>
+        
 components:
   #!params!#
   #!requestBodies!#
@@ -1525,5 +1512,34 @@ tags:
   - name: Script
     description: Query information about specific scripts (Smart Contracts)
     x-tag-expanded: false
+  - name: Ogmios
+    description: |
+      Various stateless queries against Ogmios v6 instance. Please note that ogmios follows JSON-RPC 2.0 method, the example spec on koios.rest is *ONLY* for `queryNetwork/tip`,
+      but all the methods listed below are all accepted. Instead of duplicating specs, we would refer you directly to Ogmios documentation [here](https://ogmios.dev/api) for complete specs.
+
+        <br>
+        <div style="background-color: #222; padding: 12px 0px 12px 12px;border-left: 5px solid  rgb(173, 44, 44);font-size: var(--font-size-regular);">
+        Note that for queries to be stateless across instances on the globe, we cannot acquire local state as successive calls will be across different instances. Also, we'd want to avoid getting an instance DDoS'd with large queries.
+        Thus, we will only expose the following methods from monitoring servers, instance providers can expose entire ogmios endpoints if desirable:
+        </div>
+
+
+        ### Network
+        - [queryNetwork/blockHeight](https://ogmios.dev/api/#operation-publish-/?QueryNetworkBlockHeight)
+        - [queryNetwork/genesisConfiguration](https://ogmios.dev/api/#operation-publish-/?QueryNetworkGenesisConfiguration)
+        - [queryNetwork/startTime](https://ogmios.dev/api/#operation-publish-/?QueryNetworkStartTime)
+        - [queryNetwork/tip](https://ogmios.dev/api/#operation-publish-/?QueryNetworkTip)
+        ### Ledger-State
+        - [queryLedgerState/epoch](https://ogmios.dev/api/#operation-publish-/?QueryLedgerStateEpoch)
+        - [queryLedgerState/eraStart](https://ogmios.dev/api/#operation-publish-/?QueryLedgerStateEraStart)
+        - [queryLedgerState/eraSummaries](https://ogmios.dev/api/#operation-publish-/?QueryLedgerStateEraSummaries)
+        - [queryLedgerState/liveStakeDistribution](https://ogmios.dev/api/#operation-publish-/?QueryLedgerStateLiveStakeDistribution)
+        - [queryLedgerState/protocolParameters](https://ogmios.dev/api/#operation-publish-/?QueryLedgerStateProtocolParameters)
+        - [queryLedgerState/proposedProtocolParameters](https://ogmios.dev/api/#operation-publish-/?QueryLedgerStateProposedProtocolParameters)
+        - [queryLedgerState/stakePools](https://ogmios.dev/api/#operation-publish-/?QueryLedgerStateStakePools)
+        ### Transactions
+        - [submitTransaction](https://ogmios.dev/mini-protocols/local-tx-submission/#submitting-transactions)
+        - [evaluateTransaction](https://ogmios.dev/mini-protocols/local-tx-submission/#evaluating-transactions)
+    x-tag-expanded: true
 security:
   - bearerAuth: []
