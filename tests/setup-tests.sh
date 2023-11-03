@@ -22,9 +22,9 @@ cat <<-EOF
 	  pytest --local-url http://127.0.0.1:8053/api/v1 --compare-url https://guild.koios.rest/api/v1 --api-schema-file ../specs/results/koiosapi-guild.yaml -x -v
 	
 	  Arguments:
-	      local-run		:	URL of instance you want to test"
-	      compare-url	:	Source-of-truth instance to compare returned data against"
-	      api-schema-file	:	The API specs/schema file you want to use as input for validation"
+	      local-url		:	"URL of instance you want to test"
+	      compare-url	:	"Source-of-truth instance to compare returned data against"
+	      api-schema-file	:	"The API specs/schema file you want to use as input for validation"
 	
 	To enter Python virtualenv, type 'source koios-tests/bin/activate'.
 	To exit from Python virtualenv, you can run 'deactivate'.
