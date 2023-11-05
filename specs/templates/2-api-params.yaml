@@ -1,65 +1,4 @@
 parameters:
-    select:
-      name: select
-      description: Filtering Columns
-      schema:
-        type: string
-      in: query
-      required: false
-    on_conflict:
-      name: on_conflict
-      description: On Conflict
-      schema:
-        type: string
-      in: query
-      required: false
-    order:
-      name: order
-      description: Ordering
-      schema:
-        type: string
-      in: query
-      required: false
-    range:
-      name: Range
-      description: Limiting and Pagination
-      schema:
-        type: string
-      in: header
-      required: false
-    rangeUnit:
-      name: Range-Unit
-      description: Limiting and Pagination
-      schema:
-        default: items
-        type: string
-      in: header
-      required: false
-    offset:
-      name: offset
-      description: Limiting and Pagination
-      schema:
-        type: string
-      in: query
-      required: false
-    limit:
-      name: limit
-      description: Limiting and Pagination
-      schema:
-        type: string
-      in: query
-      required: false
-      example: 10
-    _block_hash:
-      deprecated: false
-      name: _block_hash
-      description: Block Hash in hex format
-      schema:
-        type: string
-        example: ##_block_hash_param##
-      in: query
-      required: true
-      allowEmptyValue: false
     _after_block_height:
       deprecated: false
       name: _after_block_height
@@ -76,57 +15,17 @@ parameters:
       description: Epoch Number to fetch details for
       schema:
         type: string
-        example: ##_epoch_no_param##
+      example: "##_epoch_no_param##"
       in: query
       required: false
       allowEmptyValue: true
-    _earned_epoch_no:
-      deprecated: false
-      name: _epoch_no
-      description: Filter for earned rewards Epoch Number
-      schema:
-        type: string
-        example: ##_earned_epoch_no_param##
-      in: query
-      required: false
-      allowEmptyValue: true
-    _any_address:
-      deprecated: false
-      name: _address
-      description: Cardano payment or staking address in bech32 format
-      schema:
-        type: string
-        example: ##_any_address_param##
-      in: query
-      required: true
-      allowEmptyValue: false
-    _address:
-      deprecated: false
-      name: _address
-      description: Cardano payment address in bech32 format
-      schema:
-        type: string
-        example: ##_address_param##
-      in: query
-      required: true
-      allowEmptyValue: false
-    _address_assets:
-      deprecated: false
-      name: _address
-      description: Cardano payment address in bech32 format
-      schema:
-        type: string
-        example: ##_address_assets_param##
-      in: query
-      required: true
-      allowEmptyValue: false
     _stake_address:
       deprecated: false
       name: _stake_address
       description: Cardano staking address (reward account) in bech32 format
       schema:
         type: string
-        example: ##_stake_address_param##
+      example: "##_stake_address_param##"
       in: query
       required: true
       allowEmptyValue: false
@@ -136,7 +35,7 @@ parameters:
       description: Asset Policy ID in hexadecimal format (hex)
       schema:
         type: string
-        example: ##_asset_policy_param##
+      example: "##_asset_policy_param##"
       in: query
       required: true
       allowEmptyValue: false
@@ -146,7 +45,7 @@ parameters:
       description: Asset Name in hexadecimal format (hex), empty asset name returns royalties
       schema:
         type: string
-        example: "##_asset_name_param##"
+      example: "##_asset_name_param##"
       in: query
       required: false
       allowEmptyValue: true
@@ -156,7 +55,7 @@ parameters:
       description: NFT Policy ID in hexadecimal format (hex)
       schema:
         type: string
-        example: ##_asset_policy_nft_param##
+      example: "##_asset_policy_nft_param##"
       in: query
       required: true
       allowEmptyValue: false
@@ -166,7 +65,7 @@ parameters:
       description: NFT Name in hexadecimal format (hex)
       schema:
         type: string
-        example: ##_asset_name_nft_param##
+      example: "##_asset_name_nft_param##"
       in: query
       required: false
       allowEmptyValue: true
@@ -176,7 +75,7 @@ parameters:
       description: Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call
       schema:
         type: boolean
-        example: "false"
+      example: false
       in: query
       required: false
       allowEmptyValue: true
@@ -186,7 +85,7 @@ parameters:
       description: Include all historical transactions, setting to false includes only the non-empty ones
       schema:
         type: boolean
-        example: "false"
+      example: false
       in: query
       required: false
       allowEmptyValue: false
@@ -196,7 +95,7 @@ parameters:
       description: Include information about nearing but not yet started epoch, to get access to active stake snapshot information if available
       schema:
         type: boolean
-        example: "false"
+      example: false
       in: query
       required: false
       allowEmptyValue: true
@@ -206,7 +105,7 @@ parameters:
       description: Pool ID in bech32 format
       schema:
         type: string
-        example: ##_pool_bech32_param##
+      example: "##_pool_bech32_param##"
       in: query
       required: true
       allowEmptyValue: false
@@ -216,7 +115,7 @@ parameters:
       description: Pool ID in bech32 format (optional)
       schema:
         type: string
-        example: ##_pool_bech32_optional_param##
+      example: "##_pool_bech32_optional_param##"
       in: query
       required: false
       allowEmptyValue: true
@@ -226,27 +125,7 @@ parameters:
       description: Script hash in hexadecimal format (hex)
       schema:
         type: string
-        example: ##_script_hash_param##
+      example: "##_script_hash_param##"
       in: query
       required: true
       allowEmptyValue: false
-    _first_only:
-      deprecated: false
-      name: _first_only
-      description: Returns the first entry only (overrides _empty to true)
-      schema:
-        type: boolean
-        example: "false"
-      in: query
-      required: false
-      allowEmptyValue: true
-    _empty:
-      deprecated: false
-      name: _empty
-      description: Include zero quantity entries
-      schema:
-        type: boolean
-        example: "false"
-      in: query
-      required: false
-      allowEmptyValue: true

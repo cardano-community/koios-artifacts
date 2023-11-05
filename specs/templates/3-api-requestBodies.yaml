@@ -17,6 +17,7 @@ requestBodies:
                 - ##block_info1_rb##
                 - ##block_info2_rb##
                 - ##block_info3_rb##
+      description: Array of block hashes
     payment_addresses:
       content:
         application/json:
@@ -35,6 +36,7 @@ requestBodies:
               _addresses:
                 - ##payment_addresses1_rb##
                 - ##payment_addresses2_rb##
+      description: Array of Cardano payment address(es)
     payment_addresses_with_extended:
       content:
         application/json:
@@ -58,6 +60,7 @@ requestBodies:
                 - ##payment_addresses1_rb##
                 - ##payment_addresses2_rb##
               _extended: true
+      description: Array of Cardano payment address(es) with extended flag to toggle additional fields
     address_txs:
       content:
         application/json:
@@ -81,6 +84,7 @@ requestBodies:
                 - ##payment_addresses1_rb##
                 - ##payment_addresses2_rb##
               _after_block_height: ##address_txs_after_block_height_rb##
+      description: Array of Cardano payment address(es)
     stake_addresses_with_epoch_no:
       content:
         application/json:
@@ -104,6 +108,7 @@ requestBodies:
                 - ##stake_addresses1_rb##
                 - ##stake_addresses2_rb##
               _epoch_no: ##epoch_no_rb##
+      description: Array of Cardano stake address(es) in bech32 format with optional epoch no to filter by
     stake_addresses_with_first_only_and_empty:
       content:
         application/json:
@@ -132,7 +137,7 @@ requestBodies:
                 - ##stake_addresses2_rb##
               _first_only: false
               _empty: false
-
+      description: Array of Cardano stake credential(s) in bech32 format alongwith flag to return first only or used UTxOs
     stake_addresses_with_extended:
       content:
         application/json:
@@ -156,6 +161,7 @@ requestBodies:
                 - ##stake_addresses1_rb##
                 - ##stake_addresses2_rb##
               _extended: true
+      description: Array of Cardano stake credential(s) in bech32 format alongwith extended flag to return additional columns
     stake_addresses:
       content:
         application/json:
@@ -174,6 +180,7 @@ requestBodies:
               _stake_addresses:
                 - ##stake_addresses1_rb##
                 - ##stake_addresses2_rb##
+      description: Array of Cardano stake credential(s) in bech32 format
     credential_txs:
       content:
         application/json:
@@ -197,6 +204,7 @@ requestBodies:
                 - ##credential_txs_payment_credentials1_rb##
                 - ##credential_txs_payment_credentials2_rb##
               _after_block_height: ##address_txs_after_block_height_rb##
+      description: Array of Cardano payment credential(s) in hex format alongwith filtering based on blockheight
     credential_utxos:
       content:
         application/json:
@@ -220,6 +228,7 @@ requestBodies:
                 - ##credential_txs_payment_credentials1_rb##
                 - ##credential_txs_payment_credentials2_rb##
               _extended: true
+      description: Array of Cardano payment credential(s) in hex format
     tx_ids:
       content:
         application/json:
@@ -238,6 +247,7 @@ requestBodies:
               _tx_hashes:
                 - ##tx_ids_tx_hashes1_rb##
                 - ##tx_ids_tx_hashes2_rb##
+      description: Array of Cardano Transaction hashes
     txbin:
       content:
         application/cbor:
@@ -245,6 +255,7 @@ requestBodies:
             type: string
             format: binary
             example: ##txbin_rb##
+      description: Serialised Cardano Transaction
     pool_ids:
       content:
         application/json:
@@ -264,6 +275,7 @@ requestBodies:
                 - ##pool_ids_pool_bech32_ids1_rb##
                 - ##pool_ids_pool_bech32_ids2_rb##
                 - ##pool_ids_pool_bech32_ids3_rb##
+      description: Array of Cardano pool IDs (bech32 format)
     pool_ids_optional:
       content:
         application/json:
@@ -281,6 +293,7 @@ requestBodies:
                 - ##pool_ids_pool_bech32_ids1_rb##
                 - ##pool_ids_pool_bech32_ids2_rb##
                 - ##pool_ids_pool_bech32_ids3_rb##
+      description: Array of Cardano pool IDs (bech32 format) [Optional]
     script_hashes:
       content:
         application/json:
@@ -297,6 +310,7 @@ requestBodies:
               _script_hashes:
                   - ##script_hashes1_rb##
                   - ##script_hashes2_rb##
+      description: Array of Cardano script hashes
     datum_hashes:
       content:
         application/json:
@@ -313,6 +327,7 @@ requestBodies:
               _datum_hashes:
                   - ##datum_hashes1_rb##
                   - ##datum_hashes2_rb##
+      description: Array of Cardano datum hashes
     asset_list:
       content:
         application/json:
@@ -333,6 +348,7 @@ requestBodies:
               _asset_list:
                 - ##asset1_rb##
                 - ##asset2_rb##
+      description: Array of array of policyID and asset names (hex)
     asset_list_with_extended:
       content:
         application/json:
@@ -358,6 +374,7 @@ requestBodies:
                 - ##asset1_rb##
                 - ##asset2_rb##
               _extended: true
+      description: Array of array of policyID and asset names (hex) alongwith extended flag to return additional columns
     utxo_refs_with_extended:
       content:
         application/json:
@@ -381,6 +398,7 @@ requestBodies:
                 - ##utxo_ref1_rb##
                 - ##utxo_ref2_rb##
               _extended: false
+      description: Array of Cardano UTxO references in the form "hash#index" with extended flag to toggle additional fields
     ogmios:
       content:
         application/json:
@@ -408,111 +426,41 @@ requestBodies:
           examples:
             blockHeight:
               description: Query the network’s highest block number.
-              value: |
-                {
-                  "jsonrpc": "2.0",
-                  "method": "queryNetwork/blockHeight"
-                }
+              value: { "jsonrpc": "2.0", "method": "queryNetwork/blockHeight" }
             genesisConfiguration:
               description: Query the genesis configuration of a given era.
-              value: |
-                {
-                  "jsonrpc": "2.0",
-                  "method": "queryNetwork/genesisConfiguration",
-                  "params": {
-                    "era": "shelley"
-                  }
-                }
+              value: { "jsonrpc": "2.0", "method": "queryNetwork/genesisConfiguration", "params": { "era": "shelley" } }
             startTimeTime:
               description: Query the network start time.
-              value: |
-                {
-                  "jsonrpc": "2.0",
-                  "method": "queryNetwork/startTime"
-                }
+              value: { "jsonrpc": "2.0", "method": "queryNetwork/startTime" }
             tip:
               description: Query tip of the Network
-              value: |
-                {
-                  "jsonrpc": "2.0",
-                  "method": "queryNetwork/tip"
-                }
+              value: { "jsonrpc": "2.0", "method": "queryNetwork/tip" }
             epoch:
               description: Query the current epoch of the ledger.
-              value: |
-                {
-                  "jsonrpc": "2.0",
-                  "method": "queryLedgerState/epoch"
-                }
+              value: { "jsonrpc": "2.0", "method": "queryLedgerState/epoch" }
             eraStart:
               description: Query information regarding the beginning of the current ledger era.
-              value: |
-                {
-                  "jsonrpc": "2.0",
-                  "method": "queryLedgerState/eraStart"
-                }
+              value: { "jsonrpc": "2.0", "method": "queryLedgerState/eraStart" }
             eraSummaries:
               description: Query era bounds and slot parameters details, required for proper sloting arithmetic.
-              value: |
-                {
-                  "jsonrpc": "2.0",
-                  "method": "queryLedgerState/eraSummaries"
-                }
+              value: { "jsonrpc": "2.0", "method": "queryLedgerState/eraSummaries" }
             liveStakeDistribution:
               description: Query distribution of the stake across all known stake pools, relative to the total stake in the network.
-              value: |
-                {
-                  "jsonrpc": "2.0",
-                  "method": "queryLedgerState/liveStakeDistribution"
-                }
+              value: { "jsonrpc": "2.0", "method": "queryLedgerState/liveStakeDistribution" }
             protocolParameters:
               description: Query the current protocol parameters.
-              value: |
-                {
-                  "jsonrpc": "2.0",
-                  "method": "queryLedgerState/protocolParameters"
-                }
+              value: { "jsonrpc": "2.0", "method": "queryLedgerState/protocolParameters" }
             proposedProtocolParameters:
               description: Query the last update proposal w.r.t. protocol parameters, if any.
-              value: |
-                {
-                  "jsonrpc": "2.0",
-                  "method": "queryLedgerState/proposedProtocolParameters"
-                }
+              value: { "jsonrpc": "2.0", "method": "queryLedgerState/proposedProtocolParameters" }
             StakePools:
               description: Query the list of all stake pool identifiers currently registered and active.
-              value: |
-                {
-                  "jsonrpc": "2.0",
-                  "method": "queryLedgerState/stakePools"
-                }
+              value: { "jsonrpc": "2.0", "method": "queryLedgerState/stakePools" }
             submitTransaction:
               description: Submit a signed and serialized transaction to the network.
-              value: |
-                {
-                  "jsonrpc": "2.0",
-                  "method": "submitTransaction",
-                  "params": {
-                  "transaction": {
-                    "cbor": "<CBOR-serialized signed transaction (base16)>"
-                  }
-                }
+              value: { "jsonrpc": "2.0", "method": "submitTransaction", "params": { "transaction": { "cbor": "<CBOR-serialized signed transaction (base16)>" } } }
             evaluateTransaction:
               description: Evaluate execution units of scripts in a well-formed transaction.
-              value: |
-                {
-                  "jsonrpc": "2.0",
-                  "method": "evaluateTransaction",
-                  "params": {
-                    "transaction": {
-                      "cbor": "<CBOR-serialized signed transaction (base16)>"
-                    },
-                    "additionalUtxo": [
-                      {
-                        ...
-                      }
-                    ]
-                  }
-                }
-
-            
+              value: { "jsonrpc": "2.0", "method": "evaluateTransaction", "params": { "transaction": { "cbor": "<CBOR-serialized signed transaction (base16)>" }, "additionalUtxo": [ { ... } ] } }
+      description: JSON-RPC 2.0 standard request body

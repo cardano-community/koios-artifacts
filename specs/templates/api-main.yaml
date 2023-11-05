@@ -1,4 +1,4 @@
-openapi: 3.0.2
+openapi: 3.1.0
 #!info!#
 servers:
   - url: https://api.koios.rest/api/v1
@@ -13,7 +13,7 @@ paths:
         - Network
       responses:
         "200":
-          description: Array of block summary (limit+paginated)
+          description: Success!!
           content:
             application/json:
               schema:
@@ -26,13 +26,14 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Query Chain Tip
       description: Get the tip info about the latest block seen by chain
+      operationId: tip
   /genesis: #RPC
     get:
       tags:
         - Network
       responses:
         "200":
-          description: Array of genesis parameters used to start each era on chain
+          description: Success!!
           content:
             application/json:
               schema:
@@ -45,6 +46,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Get Genesis info
       description: Get the Genesis parameters used to start specific era on chain
+      operationId: genesis
   /totals: #RPC
     get:
       tags:
@@ -53,7 +55,7 @@ paths:
         - $ref: "#/components/parameters/_epoch_no"
       responses:
         "200":
-          description: Array of supply/reserves/utxo/fees/treasury stats
+          description: Success!!
           content:
             application/json:
               schema:
@@ -68,13 +70,14 @@ paths:
       description: >-
         Get the circulating utxo, treasury, rewards, supply and reserves in
         lovelace for specified epoch, all epochs if empty
+      operationId: totals
   /param_updates: #RPC
     get:
       tags:
         - Network
       responses:
         "200":
-          description: Array of unique param update proposals submitted on chain
+          description: Success!!
           content:
             application/json:
               schema:
@@ -87,13 +90,14 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Param Update Proposals
       description: Get all parameter update proposals submitted to the chain starting Shelley era
+      operationId: param_updates
   /reserve_withdrawals: #RPC
     get:
       tags:
         - Network
       responses:
         "200":
-          description: Array of withdrawals from reserves against stake accounts
+          description: Success!!
           content:
             application/json:
               schema:
@@ -106,13 +110,14 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Reserve Withdrawals
       description: List of all withdrawals from reserves against stake accounts
+      operationId: reserve_withdrawals
   /treasury_withdrawals: #RPC
     get:
       tags:
         - Network
       responses:
         "200":
-          description: Array of withdrawals from treasury against stake accounts
+          description: Success!!
           content:
             application/json:
               schema:
@@ -125,6 +130,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Treasury Withdrawals
       description: List of all withdrawals from treasury against stake accounts
+      operationId: treasury_withdrawals
 
   /epoch_info: #RPC
     get:
@@ -135,7 +141,7 @@ paths:
         - $ref: "#/components/parameters/_include_next_epoch"
       responses:
         "200":
-          description: Array of detailed summary for each epoch
+          description: Success!!
           content:
             application/json:
               schema:
@@ -148,6 +154,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Epoch Information
       description: Get the epoch information, all epochs if no epoch specified
+      operationId: epoch_info
   /epoch_params: #RPC
     get:
       tags:
@@ -156,7 +163,7 @@ paths:
         - $ref: "#/components/parameters/_epoch_no"
       responses:
         "200":
-          description: Array of protocol parameters for each epoch
+          description: Success!!
           content:
             application/json:
               schema:
@@ -171,6 +178,7 @@ paths:
       description: >-
         Get the protocol parameters for specific epoch, returns information
         about all epochs if no epoch specified
+      operationId: epoch_params
   /epoch_block_protocols: #RPC
     get:
       tags:
@@ -179,7 +187,7 @@ paths:
         - $ref: "#/components/parameters/_epoch_no"
       responses:
         "200":
-          description: Array of distinct block protocol versions counts in epoch
+          description: Success!!
           content:
             application/json:
               schema:
@@ -193,6 +201,7 @@ paths:
       summary: Epoch's Block Protocols
       description: >-
         Get the information about block protocol distribution in epoch
+      operationId: epoch_block_protocols
 
   /blocks:
     get:
@@ -200,7 +209,7 @@ paths:
         - Block
       responses:
         "200":
-          description: Array of block information
+          description: Success!!
           content:
             application/json:
               schema:
@@ -213,6 +222,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Block List
       description: Get summarised details about all blocks (paginated - latest first)
+      operationId: blocks
   /block_info: #RPC
     post:
       tags:
@@ -221,7 +231,7 @@ paths:
         $ref: "#/components/requestBodies/block_hashes"
       responses:
         "200":
-          description: Array of detailed block information
+          description: Success
           content:
             application/json:
               schema:
@@ -234,6 +244,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Block Information
       description: Get detailed information about a specific block
+      operationId: block_info
   /block_txs: #RPC
     post:
       tags:
@@ -242,7 +253,7 @@ paths:
         $ref: "#/components/requestBodies/block_hashes"
       responses:
         "200":
-          description: Array of transactions hashes
+          description: Success!!
           content:
             application/json:
               schema:
@@ -255,6 +266,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Block Transactions
       description: Get a list of all transactions included in provided blocks
+      operationId: block_txs
 
   /utxo_info: #RPC
     post:
@@ -264,7 +276,7 @@ paths:
         $ref: "#/components/requestBodies/utxo_refs_with_extended"
       responses:
         "200":
-          description: Array of UTXO details
+          description: Success!
           content:
             application/json:
               schema:
@@ -277,6 +289,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: UTxO Info
       description: Get UTxO set for requested UTxO references
+      operationId: utxo_info
   /tx_info: #RPC
     post:
       tags:
@@ -285,7 +298,7 @@ paths:
         $ref: "#/components/requestBodies/tx_ids"
       responses:
         "200":
-          description: Array of detailed information about transaction(s)
+          description: Success!!
           content:
             application/json:
               schema:
@@ -298,6 +311,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Transaction Information
       description: Get detailed information about transaction(s)
+      operationId: tx_info
   /tx_metadata: #RPC
     post:
       tags:
@@ -306,7 +320,7 @@ paths:
         $ref: "#/components/requestBodies/tx_ids"
       responses:
         "200":
-          description: Array of metadata information present in each of the transactions queried
+          description: Success!!
           content:
             application/json:
               schema:
@@ -319,13 +333,14 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Transaction Metadata
       description: Get metadata information (if any) for given transaction(s)
+      operationId: tx_metadata
   /tx_metalabels: #RPC
     get:
       tags:
         - Transactions
       responses:
         "200":
-          description: Array of known metadata labels
+          description: Success!!
           content:
             application/json:
               schema:
@@ -338,6 +353,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Transaction Metadata Labels
       description: Get a list of all transaction metalabels
+      operationId: tx_metalabels
   /submittx: #submit-api
     post:
       tags:
@@ -363,11 +379,12 @@ paths:
                 format: hex
                 minLength: 64
                 maxLength: 64
-                example: 92bcd06b25dfbd89b578d536b4d3b7dd269b7c2aa206ed518012cffe0444d67f
+              example: 92bcd06b25dfbd89b578d536b4d3b7dd269b7c2aa206ed518012cffe0444d67f
         "400":
           description: An error occured while submitting transaction.
       summary: Submit Transaction
       description: Submit an already serialized transaction to the network.
+      operationId: submittx
   /tx_status: #RPC
     post:
       tags:
@@ -376,7 +393,7 @@ paths:
         $ref: "#/components/requestBodies/tx_ids"
       responses:
         "200":
-          description: Array of transaction confirmation counts
+          description: Success!!
           content:
             application/json:
               schema:
@@ -389,6 +406,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Transaction Status
       description: Get the number of block confirmations for a given transaction hash list
+      operationId: tx_status
   /tx_utxos: #RPC
     post:
       tags:
@@ -398,7 +416,7 @@ paths:
         $ref: "#/components/requestBodies/tx_ids"
       responses:
         "200":
-          description: Array of inputs and outputs for given transaction(s)
+          description: Success!!
           content:
             application/json:
               schema:
@@ -411,6 +429,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Transaction UTxOs
       description: Get UTxO set (inputs/outputs) of transactions [DEPRECATED - Use /utxo_info instead].
+      operationId: tx_utxos
 
   /address_info: #RPC
     post:
@@ -420,7 +439,7 @@ paths:
         $ref: "#/components/requestBodies/payment_addresses"
       responses:
         "200":
-          description: Array of address information
+          description: Success!!
           content:
             application/json:
               schema:
@@ -433,6 +452,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Address Information
       description: Get address info - balance, associated stake address (if any) and UTxO set for given addresses
+      operationId: address_info
   /address_utxos: #RPC
     post:
       tags:
@@ -441,7 +461,7 @@ paths:
         $ref: "#/components/requestBodies/payment_addresses_with_extended"
       responses:
         "200":
-          description: Array of address UTXOs
+          description: Success!!
           content:
             application/json:
               schema:
@@ -454,6 +474,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Address UTXOs
       description: Get UTxO set for given addresses
+      operationId: address_utxos
   /credential_utxos: #RPC
     post:
       tags:
@@ -462,7 +483,7 @@ paths:
         $ref: "#/components/requestBodies/credential_utxos"
       responses:
         "200":
-          description: Array of UTxOs with balances
+          description: Success!!
           content:
             application/json:
               schema:
@@ -475,6 +496,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: UTxOs from payment credentials
       description: Get UTxO details for requested payment credentials
+      operationId: credential_utxos
   /address_txs: #RPC
     post:
       tags:
@@ -483,7 +505,7 @@ paths:
         $ref: "#/components/requestBodies/address_txs"
       responses:
         "200":
-          description: Array of transaction hashes
+          description: Success!!
           content:
             application/json:
               schema:
@@ -496,6 +518,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Address Transactions
       description: Get the transaction hash list of input address array, optionally filtering after specified block height (inclusive)
+      operationId: address_txs
   /credential_txs: #RPC
     post:
       tags:
@@ -504,7 +527,7 @@ paths:
         $ref: "#/components/requestBodies/credential_txs"
       responses:
         "200":
-          description: Array of transaction hashes
+          description: Array of transaction hashes for given credential(s)
           content:
             application/json:
               schema:
@@ -517,6 +540,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Transactions from payment credentials
       description: Get the transaction hash list of input payment credential array, optionally filtering after specified block height (inclusive)
+      operationId: credential_txs
   /address_assets: #RPC
     post:
       tags:
@@ -525,7 +549,7 @@ paths:
         $ref: "#/components/requestBodies/payment_addresses"
       responses:
         "200":
-          description: Array of address-owned assets
+          description: Success!!
           content:
             application/json:
               schema:
@@ -538,6 +562,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Address Assets
       description: Get the list of all the assets (policy, name and quantity) for given addresses
+      operationId: address_assets
 
   /account_list:
     get:
@@ -545,7 +570,7 @@ paths:
         - Stake Account
       responses:
         "200":
-          description: Array of account (stake address) IDs
+          description: Success!!
           content:
             application/json:
               schema:
@@ -558,6 +583,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Account List
       description: Get a list of all stake addresses that have atleast 1 transaction
+      operationId: account_list
   /account_info: #RPC
     post:
       tags:
@@ -566,7 +592,7 @@ paths:
         $ref: "#/components/requestBodies/stake_addresses"
       responses:
         "200":
-          description: Array of account information
+          description: Success!!
           content:
             application/json:
               schema:
@@ -579,6 +605,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Account Information
       description: Get the account information for given stake addresses
+      operationId: account_info
   /account_info_cached: #RPC
     post:
       tags:
@@ -587,7 +614,7 @@ paths:
         $ref: "#/components/requestBodies/stake_addresses"
       responses:
         "200":
-          description: Array of account information
+          description: Success!!
           content:
             application/json:
               schema:
@@ -600,6 +627,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Account Information (Cached)
       description: Get the cached account information for given stake addresses (effective for performance query against registered accounts)
+      operationId: account_info_cached
   /account_utxos: #RPC
     post:
       tags:
@@ -608,7 +636,7 @@ paths:
         $ref: "#/components/requestBodies/stake_addresses_with_extended"
       responses:
         "200":
-          description: Array of account UTxOs associated with given stake addresses
+          description: Success!!
           content:
             application/json:
               schema:
@@ -621,6 +649,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: UTxOs for stake addresses (accounts)
       description: Get a list of all UTxOs for given stake addresses (account)s
+      operationId: account_utxos
   /account_txs: #RPC
     get:
       tags:
@@ -630,7 +659,7 @@ paths:
         - $ref: "#/components/parameters/_after_block_height"
       responses:
         "200":
-          description: Array of Txs associated with stake address (account)
+          description: Success!!
           content:
             application/json:
               schema:
@@ -643,6 +672,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Account Txs
       description: Get a list of all Txs for a given stake address (account)
+      operationId: account_txs
   /account_rewards: #RPC
     post:
       tags:
@@ -651,7 +681,7 @@ paths:
         $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
       responses:
         "200":
-          description: Array of reward history information
+          description: Success!!
           content:
             application/json:
               schema:
@@ -665,6 +695,7 @@ paths:
       summary: Account Rewards
       description: >-
         Get the full rewards history (including MIR) for given stake addresses
+      operationId: account_rewards
   /account_updates: #RPC
     post:
       tags:
@@ -673,7 +704,7 @@ paths:
         $ref: "#/components/requestBodies/stake_addresses"
       responses:
         "200":
-          description: Array of account updates information
+          description: Success!!
           content:
             application/json:
               schema:
@@ -688,6 +719,7 @@ paths:
       description: >-
         Get the account updates (registration, deregistration, delegation and
         withdrawals) for given stake addresses
+      operationId: account_updates
   /account_addresses: #RPC
     post:
       tags:
@@ -696,7 +728,7 @@ paths:
         $ref: "#/components/requestBodies/stake_addresses_with_first_only_and_empty"
       responses:
         "200":
-          description: Array of payment addresses
+          description: Success!!
           content:
             application/json:
               schema:
@@ -709,6 +741,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Account Addresses
       description: Get all addresses associated with given staking accounts
+      operationId: account_addresses
   /account_assets: #RPC
     post:
       tags:
@@ -717,7 +750,7 @@ paths:
         $ref: "#/components/requestBodies/stake_addresses"
       responses:
         "200":
-          description: Array of assets owned by account
+          description: Success!!
           content:
             application/json:
               schema:
@@ -730,6 +763,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Account Assets
       description: Get the native asset balance for a given stake address
+      operationId: account_assets
   /account_history: #RPC
     post:
       tags:
@@ -738,7 +772,7 @@ paths:
         $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
       responses:
         "200":
-          description: Array of active stake values per epoch
+          description: Success!!
           content:
             application/json:
               schema:
@@ -751,6 +785,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Account History
       description: Get the staking history of given stake addresses (accounts)
+      operationId: account_history
 
   /asset_list:
     get:
@@ -758,7 +793,7 @@ paths:
         - Asset
       responses:
         "200":
-          description: Array of policy IDs and asset names
+          description: Success!!
           content:
             application/json:
               schema:
@@ -771,6 +806,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Asset List
       description: Get the list of all native assets (paginated)
+      operationId: asset_list
   /policy_asset_list: #RPC
     get:
       tags:
@@ -779,7 +815,7 @@ paths:
         - $ref: "#/components/parameters/_asset_policy"
       responses:
         "200":
-          description: Array of detailed information of assets under the same policy
+          description: Array of brief information of assets under the same policy
           content:
             application/json:
               schema:
@@ -792,13 +828,14 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Policy Asset List
       description: Get the list of asset under the given policy (including balances)
+      operationId: policy_asset_list
   /asset_token_registry:
     get:
       tags:
         - Asset
       responses:
         "200":
-          description: Array of token registry information for each asset
+          description: Success!!
           content:
             application/json:
               schema:
@@ -811,6 +848,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Asset Token Registry
       description: Get a list of assets registered via token registry on github
+      operationId: asset_token_registry
   /asset_info: #RPC
     post:
       tags:
@@ -832,6 +870,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Asset Information (Bulk)
       description: Get the information of a list of assets including first minting & token registry metadata
+      operationId: asset_info
   /asset_utxos: #RPC
     post:
       tags:
@@ -840,7 +879,7 @@ paths:
         $ref: "#/components/requestBodies/asset_list_with_extended"
       responses:
         "200":
-          description: Array of UTXOs for given asset list
+          description: Success!!
           content:
             application/json:
               schema:
@@ -853,6 +892,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Asset UTXOs
       description: Get the UTXO information of a list of assets including
+      operationId: asset_utxos
   /asset_history: #RPC
     get:
       tags:
@@ -875,6 +915,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Asset History
       description: Get the mint/burn history of an asset
+      operationId: asset_history
   /asset_addresses: #RPC
     get:
       tags:
@@ -884,7 +925,7 @@ paths:
         - $ref: "#/components/parameters/_asset_name"
       responses:
         "200":
-          description: Array of payment addresses holding the given token (including balances)
+          description: Success!
           content:
             application/json:
               schema:
@@ -900,6 +941,7 @@ paths:
         `Note - Due to cardano's UTxO design and usage from projects, asset to addresses map can be infinite. Thus, for a small subset of active projects 
         with millions of transactions, these might end up with timeouts (HTTP code 504) on free layer. Such large-scale projects are free to subscribe to 
         query layers to have a dedicated cache table for themselves served via Koios.`
+      operationId: asset_addresses
   /asset_nft_address: #RPC
     get:
       tags:
@@ -922,6 +964,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: NFT Address
       description: Get the address where specified NFT currently reside on.
+      operationId: asset_nft_address
   /policy_asset_addresses: #RPC
     get:
       tags:
@@ -946,6 +989,7 @@ paths:
         `Note - Due to cardano's UTxO design and usage from projects, asset to addresses map can be infinite. Thus, for a small subset of active projects 
         with millions of transactions, these might end up with timeouts (HTTP code 504) on free layer. Such large-scale projects are free to subscribe to 
         query layers to have a dedicated cache table for themselves served via Koios.`
+      operationId: policy_asset_addresses
   /policy_asset_info: #RPC
     get:
       tags:
@@ -967,6 +1011,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Policy Asset Information
       description: Get the information for all assets under the same policy
+      operationId: policy_asset_info
   /asset_summary: #RPC
     get:
       tags:
@@ -989,6 +1034,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Asset Summary
       description: Get the summary of an asset (total transactions exclude minting/total wallets include only wallets with asset balance)
+      operationId: asset_summary
   /asset_txs: #RPC
     get:
       tags:
@@ -1013,6 +1059,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Asset Transactions
       description: Get the list of current or all asset transaction hashes (newest first)
+      operationId: asset_txs
   /asset_address_list: #RPC
     get:
       tags:
@@ -1023,7 +1070,7 @@ paths:
         - $ref: "#/components/parameters/_asset_name"
       responses:
         "200":
-          description: Array of payment addresses holding the given token (including balances)
+          description: Array of payment addresses holding the given token (including balances) [DEPRECATED - replaced by asset_addresses]
           content:
             application/json:
               schema:
@@ -1036,6 +1083,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Asset Address List
       description: Get the list of all addresses holding a given asset [DEPRECATED - replaced by asset_addresses]
+      operationId: asset_address_list
   /asset_policy_info: #RPC
     get:
       deprecated: true
@@ -1045,7 +1093,7 @@ paths:
         - $ref: "#/components/parameters/_asset_policy"
       responses:
         "200":
-          description: Array of detailed information of assets under the same policy
+          description: Array of detailed information of assets under the same policy [DEPRECATED - replaced by policy_asset_info]
           content:
             application/json:
               schema:
@@ -1058,6 +1106,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Asset Policy Information
       description: Get the information for all assets under the same policy (DEPRECATED - replaced by policy_asset_info)
+      operationId: asset_policy_info
 
   /pool_list: #RPC
     get:
@@ -1065,7 +1114,7 @@ paths:
         - Pool
       responses:
         "200":
-          description: Array of pool IDs and tickers
+          description: Success!!
           content:
             application/json:
               schema:
@@ -1078,6 +1127,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Pool List
       description: List of brief info for all pools
+      operationId: pool_list
   /pool_info: #RPC
     post:
       tags:
@@ -1086,7 +1136,7 @@ paths:
         $ref: "#/components/requestBodies/pool_ids"
       responses:
         "200":
-          description: Array of pool information
+          description: Success!!
           content:
             application/json:
               schema:
@@ -1099,6 +1149,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Pool Information
       description: Current pool statuses and details for a specified list of pool ids
+      operationId: pool_info
   /pool_stake_snapshot: #RPC
     get:
       tags:
@@ -1107,7 +1158,7 @@ paths:
         - $ref: "#/components/parameters/_pool_bech32"
       responses:
         "200":
-          description: Array of pool stake information for 3 snapshots
+          description: Success!!
           content:
             application/json:
               schema:
@@ -1120,6 +1171,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Pool Stake Snapshot
       description: Returns Mark, Set and Go stake snapshots for the selected pool, useful for leaderlog calculation
+      operationId: pool_stake_snapshot
   /pool_delegators: #RPC
     get:
       tags:
@@ -1128,7 +1180,7 @@ paths:
         - $ref: "#/components/parameters/_pool_bech32"
       responses:
         "200":
-          description: Array of pool delegator information
+          description: Success!!
           content:
             application/json:
               schema:
@@ -1141,6 +1193,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Pool Delegators List
       description: Return information about live delegators for a given pool.
+      operationId: pool_delegators
   /pool_delegators_history: #RPC
     get:
       tags:
@@ -1150,7 +1203,7 @@ paths:
         - $ref: "#/components/parameters/_epoch_no"
       responses:
         "200":
-          description: Array of pool delegator information
+          description: Success!!
           content:
             application/json:
               schema:
@@ -1163,6 +1216,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Pool Delegators History
       description: Return information about active delegators (incl. history) for a given pool and epoch number (all epochs if not specified).
+      operationId: pool_delegators_history
   /pool_blocks: #RPC
     get:
       tags:
@@ -1172,7 +1226,7 @@ paths:
         - $ref: "#/components/parameters/_epoch_no"
       responses:
         "200":
-          description: Array of blocks created by pool
+          description: Success!!
           content:
             application/json:
               schema:
@@ -1187,6 +1241,7 @@ paths:
       description: >-
         Return information about blocks minted by a given pool for all epochs
         (or _epoch_no if provided)
+      operationId: pool_blocks
   /pool_history: #RPC
     get:
       tags:
@@ -1196,7 +1251,7 @@ paths:
         - $ref: "#/components/parameters/_epoch_no"
       responses:
         "200":
-          description: Array of pool history information
+          description: Success!!
           content:
             application/json:
               schema:
@@ -1211,16 +1266,16 @@ paths:
       description: >-
         Return information about pool stake, block and reward history in a given epoch _epoch_no
         (or all epochs that pool existed for, in descending order if no _epoch_no was provided)
+      operationId: pool_history
   /pool_updates: #RPC
     get:
       tags:
         - Pool
       parameters:
         - $ref: "#/components/parameters/_pool_bech32_optional"
-          required: false
       responses:
         "200":
-          description: Array of historical pool updates
+          description: Success!!
           content:
             application/json:
               schema:
@@ -1233,6 +1288,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Pool Updates (History)
       description: Return all pool updates for all pools or only updates for specific pool if specified
+      operationId: pool_updates
   /pool_registrations: #RPC
     get:
       tags:
@@ -1241,7 +1297,7 @@ paths:
         - $ref: "#/components/parameters/_epoch_no"
       responses:
         "200":
-          description: Array of historical pool updates
+          description: Success!!
           content:
             application/json:
               schema:
@@ -1254,6 +1310,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Pool Registrations
       description: Return all pool registrations initiated in the requested epoch
+      operationId: pool_registrations
   /pool_retirements: #RPC
     get:
       tags:
@@ -1262,7 +1319,7 @@ paths:
         - $ref: "#/components/parameters/_epoch_no"
       responses:
         "200":
-          description: Array of historical pool updates
+          description: Success!!
           content:
             application/json:
               schema:
@@ -1275,13 +1332,14 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Pool Retirements
       description: Return all pool retirements initiated in the requested epoch
+      operationId: pool_retirements
   /pool_relays: #RPC
     get:
       tags:
         - Pool
       responses:
         "200":
-          description: Array of pool relay information
+          description: Success!!
           content:
             application/json:
               schema:
@@ -1294,6 +1352,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Pool Relays
       description: A list of registered relays for all pools
+      operationId: pool_relays
   /pool_metadata: #RPC
     post:
       tags:
@@ -1302,7 +1361,7 @@ paths:
         $ref: "#/components/requestBodies/pool_ids_optional"
       responses:
         "200":
-          description: Array of pool metadata
+          description: Success!!
           content:
             application/json:
               schema:
@@ -1315,6 +1374,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Pool Metadata
       description: Metadata (on & off-chain) for all pools
+      operationId: pool_metadata
 
   /script_info: #RPC
     post:
@@ -1324,7 +1384,7 @@ paths:
         $ref: "#/components/requestBodies/script_hashes"
       responses:
         "200":
-          description: List of datum information for given datum hashes
+          description: Array of information for scripts requested
           content:
             application/json:
               schema:
@@ -1335,8 +1395,9 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
-      summary: Datum Information
-      description: List of datum information for given datum hashes
+      summary: Script Information
+      description: List of script information for given script hashes
+      operationId: script_info
   /native_script_list: #RPC
     get:
       tags:
@@ -1356,6 +1417,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Native Script List
       description: List of all existing native script hashes along with their creation transaction hashes
+      operationId: native_script_list
   /plutus_script_list: #RPC
     get:
       tags:
@@ -1375,6 +1437,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Plutus Script List
       description: List of all existing Plutus script hashes along with their creation transaction hashes
+      operationId: plutus_script_list
   /script_redeemers: #RPC
     get:
       tags:
@@ -1383,7 +1446,7 @@ paths:
         - $ref: "#/components/parameters/_script_hash"
       responses:
         "200":
-          description: List of all redeemers for a given script hash
+          description: Array of all redeemers for a given script hash
           content:
             application/json:
               schema:
@@ -1396,6 +1459,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Script Redeemers
       description: List of all redeemers for a given script hash
+      operationId: script_redeemers
   /script_utxos: #RPC
     get:
       tags:
@@ -1418,6 +1482,7 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Script UTXOs
       description: List of all UTXOs for a given script hash
+      operationId: script_utxos
   /datum_info: #RPC
     post:
       tags:
@@ -1426,7 +1491,7 @@ paths:
         $ref: "#/components/requestBodies/datum_hashes"
       responses:
         "200":
-          description: List of datum information for given datum hashes
+          description: Array of datum information for given datum hashes
           content:
             application/json:
               schema:
@@ -1439,7 +1504,8 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Datum Information
       description: List of datum information for given datum hashes
-  /ogmios/: #ogmios-api
+      operationId: datum_info
+  /ogmios: #ogmios-api
     post:
       tags:
         - Ogmios
@@ -1453,7 +1519,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ogmiostip"
         "400":
-          description: An error occured while submitting transaction.
+          $ref: "#/components/responses/BadRequest"
       summary: Query Example
       description: |
         Query the current tip of the Network.
@@ -1462,6 +1528,7 @@ paths:
         <div style="background-color: #222; padding: 12px 0px 12px 12px;border-left: 5px solid  rgb(173, 44, 44);font-size: var(--font-size-regular);">
         We do support transparent forwarding for various methods from Ogmios, you can read about those <a href="#tag--Ogmios">here</a>.
         </div>
+      operationId: ogmios
         
 components:
   #!params!#
@@ -1471,17 +1538,14 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+      description: JWT Bearer Auth token generated via https://koios.rest Profile page. Using this token value allows consumers to use higher limits than public unauthenticated requests.
   #!schemas!#
   headers: {}
   responses:
-    OK:
-      description: Success!
     NotFound:
       description: The server does not recognise the combination of endpoint and parameters provided
     Unauthorized:
       description: Access token is missing or invalid
-    PartialContent:
-      description: The result was truncated
     BadRequest:
       description: The server cannot process the request due to invalid input
 tags:
