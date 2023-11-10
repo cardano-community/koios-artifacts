@@ -25,4 +25,4 @@ AS $$
   WHERE b.epoch_no = _epoch_no;
 $$;
 
-COMMENT ON FUNCTION grest.pool_registrations IS 'A list of all pool retirements initiated in the requested epoch'; --noqa: LT01
+COMMENT ON FUNCTION grest.pool_retirements IS 'A list of all pool retirements initiated in the requested epoch'; --noqa: LT01
