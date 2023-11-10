@@ -1323,7 +1323,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/pool_registrations"
+                $ref: "#/components/schemas/pool_retirements"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":

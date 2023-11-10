@@ -1475,7 +1475,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/pool_registrations"
+                $ref: "#/components/schemas/pool_retirements"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -2745,7 +2745,7 @@ components:
             description: Latest transaction hash used for delegation by the account
             example: 368d08fe86804d637649341d3aec4a9baa7dffa6d00f16de2ba9dba814f1c948
     pool_registrations:
-      description: Array of pool registrations/retirements
+      description: Array of pool registrations
       type: array
       items:
         type: object
@@ -2764,6 +2764,26 @@ components:
             $ref: "#/components/schemas/blocks/items/properties/epoch_slot"
           active_epoch_no:
             $ref: "#/components/schemas/pool_updates/items/properties/active_epoch_no"
+    pool_retirements:
+      description: Array of pool retirements
+      type: array
+      items:
+        type: object
+        properties:
+          pool_id_bech32:
+            $ref: "#/components/schemas/pool_info/items/properties/pool_id_bech32"
+          tx_hash:
+            $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+          block_hash:
+            $ref: "#/components/schemas/blocks/items/properties/hash"
+          block_height:
+            $ref: "#/components/schemas/blocks/items/properties/block_height"
+          epoch_no:
+            $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+          epoch_slot:
+            $ref: "#/components/schemas/blocks/items/properties/epoch_slot"
+          retiring_epoch:
+            $ref: "#/components/schemas/pool_updates/items/properties/retiring_epoch"
     pool_delegators_history:
       description: Array of pool delegators (historical)
       type:
