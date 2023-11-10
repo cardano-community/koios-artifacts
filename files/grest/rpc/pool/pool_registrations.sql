@@ -6,7 +6,7 @@ RETURNS TABLE (
   block_height word31type,
   epoch_no word31type,
   epoch_slot word31type,
-  active_epoch_no word31type
+  active_epoch_no bigint
 )
 LANGUAGE SQL STABLE
 AS $$
