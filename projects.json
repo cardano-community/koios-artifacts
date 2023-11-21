@@ -176,6 +176,14 @@
       }
     },
     {
+      "text": "Tekmirio",
+      "link": "https://tekmirio.xyz",
+      "logo": {
+        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/temkirio.png",
+        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/temkirio.png"
+      }
+    },
+    {
       "text": "TosiDrop",
       "link": "https://tosidrop.io",
       "logo": {
@@ -189,14 +197,6 @@
       "logo": {
         "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/vespr_dark.webp",
         "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/vespr_light.webp"
-      }
-    },
-    {
-      "text": "TEKMIRIO",
-      "link": "https://tekmirio.xyz",
-      "logo": {
-        "dark": "https://github.com/santonode/santonode/blob/main/Temkirio-embed.png",
-        "light": "https://github.com/santonode/santonode/blob/main/Temkirio-embed.png"
       }
     }
   ]
