@@ -176,6 +176,14 @@
       }
     },
     {
+      "text": "Tekmirio",
+      "link": "https://tekmirio.xyz",
+      "logo": {
+        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/temkirio.png",
+        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/temkirio.png"
+      }
+    },
+    {
       "text": "TosiDrop",
       "link": "https://tosidrop.io",
       "logo": {
