@@ -7,7 +7,6 @@ random_asset_address = ""
 
 @pytest.mark.order(1)
 def test_asset_list_endpoint(api_schema, local_url, compare_url):
-    global random_asset_address
 
     asset_list_response = get_request(f"{local_url}/asset_list")
     api_schema["/asset_list"]["GET"].validate_response(asset_list_response)
@@ -38,7 +37,6 @@ def test_asset_list_endpoint(api_schema, local_url, compare_url):
 
 @pytest.mark.order(2)
 def test_address_info_endpoint(api_schema, compare_url, local_url):
-    global random_asset_address
 
     address_info_response = get_request(
         f"{local_url}/address_info?_address={random_asset_address}"

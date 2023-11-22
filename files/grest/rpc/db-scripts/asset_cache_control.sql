@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS grest.asset_cache_control AS (
 );
 
 CREATE TABLE IF NOT EXISTS grest.asset_tx_out_cache AS (
-  SELECT id AS ma_id, id AS txo_id, quantity FROM ma_tx_out AS mto LIMIT 0
+  SELECT id AS ma_id, id AS txo_id, quantity FROM ma_tx_out LIMIT 0
 );
 CREATE INDEX IF NOT EXISTS idx_atoc_txoid ON grest.asset_tx_out_cache USING btree (txo_id);
 

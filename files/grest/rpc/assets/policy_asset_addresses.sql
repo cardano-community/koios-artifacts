@@ -13,8 +13,8 @@ BEGIN
       txo.address,
       SUM(mto.quantity)::text
     FROM multi_asset AS ma
-    INNER JOIN ma_tx_out AS mto ON mto.ident = ma.id
-    INNER JOIN tx_out AS txo ON txo.id = mto.tx_out_id
+    LEFT JOIN ma_tx_out AS mto ON mto.ident = ma.id
+    LEFT JOIN tx_out AS txo ON txo.id = mto.tx_out_id
     WHERE ma.policy = DECODE(_asset_policy, 'hex')
       AND txo.consumed_by_tx_in_id IS NULL
     GROUP BY

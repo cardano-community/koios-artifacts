@@ -15,4 +15,3 @@ CREATE TABLE grest.genesis (
   SECURITYPARAM varchar,
   ALONZOGENESIS varchar
 );
-
