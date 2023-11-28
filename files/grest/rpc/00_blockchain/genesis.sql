@@ -13,10 +13,8 @@ RETURNS TABLE (
   securityparam varchar,
   alonzogenesis varchar
 )
-LANGUAGE plpgsql
+LANGUAGE sql STABLE
 AS $$
-BEGIN
-  RETURN QUERY
   SELECT
     g.networkmagic,
     g.networkid,
@@ -30,7 +28,5 @@ BEGIN
     g.maxkesrevolutions,
     g.securityparam,
     g.alonzogenesis
-  FROM
-    grest.genesis AS g;
-END;
+  FROM grest.genesis AS g;
 $$;

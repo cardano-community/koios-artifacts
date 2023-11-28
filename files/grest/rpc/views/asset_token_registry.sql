@@ -10,7 +10,6 @@ SELECT
   url,
   decimals,
   logo
-FROM
-  grest.asset_registry_cache;
+FROM grest.asset_registry_cache;
 
 COMMENT ON VIEW grest.asset_token_registry IS 'Get a list of assets registered via token registry on github';

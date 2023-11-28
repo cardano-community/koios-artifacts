@@ -21,10 +21,9 @@ BEGIN
   SELECT INTO _asset_id_list ARRAY_AGG(id)
   FROM (
     SELECT DISTINCT mu.id
-    FROM
-       multi_asset AS mu
-    WHERE
-      mu.policy = DECODE(_asset_policy, 'hex') AND mu.name = DECODE(_asset_name, 'hex')
+    FROM multi_asset AS mu
+    WHERE mu.policy = DECODE(_asset_policy, 'hex')
+      AND mu.name = DECODE(_asset_name, 'hex')
   ) AS tmp;
   RETURN QUERY
     SELECT
@@ -49,24 +48,16 @@ BEGIN
           'decimals', arc.decimals
         )
       END
-    FROM
-      multi_asset AS ma
+    FROM multi_asset AS ma
       INNER JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
       INNER JOIN tx ON tx.id = aic.last_mint_tx_id
       LEFT JOIN grest.asset_registry_cache AS arc ON arc.asset_policy = ENCODE(ma.policy,'hex') AND arc.asset_name = ENCODE(ma.name,'hex')
       LEFT JOIN LATERAL (
-        SELECT
-          JSONB_OBJECT_AGG(
-            key::text,
-            json
-          ) AS minting_tx_metadata
-        FROM
-          tx_metadata AS tm
-        WHERE
-          tm.tx_id = tx.id
+        SELECT JSONB_OBJECT_AGG(key::text, json ) AS minting_tx_metadata
+        FROM tx_metadata AS tm
+        WHERE tm.tx_id = tx.id
       ) metadata ON TRUE
-    WHERE
-      ma.id = ANY(_asset_id_list);
+    WHERE ma.id = ANY(_asset_id_list);
 
 END;
 $$;

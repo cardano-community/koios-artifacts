@@ -10,6 +10,7 @@
 --------------------------------------------------------------------------------
 -- GREST SCHEMA --
 CREATE SCHEMA IF NOT EXISTS grest;
+CREATE SCHEMA IF NOT EXISTS grestv0;
 
 -- WEB_ANON USER --
 DO $$
@@ -31,26 +32,29 @@ EXCEPTION
 END;
 $$;
 
-GRANT USAGE ON SCHEMA public TO authenticator,web_anon;
-GRANT USAGE ON SCHEMA grest TO authenticator,web_anon;
-GRANT SELECT ON ALL TABLES IN SCHEMA public TO authenticator,web_anon;
-GRANT SELECT ON ALL TABLES IN SCHEMA grest TO authenticator,web_anon;
+GRANT USAGE ON SCHEMA public TO authenticator, web_anon;
+GRANT USAGE ON SCHEMA grest TO authenticator, web_anon;
+GRANT USAGE ON SCHEMA grestv0 TO authenticator, web_anon;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO authenticator, web_anon;
+GRANT SELECT ON ALL TABLES IN SCHEMA grest TO authenticator, web_anon;
+GRANT SELECT ON ALL TABLES IN SCHEMA grestv0 TO authenticator, web_anon;
 GRANT web_anon TO authenticator;
 ALTER ROLE authenticator SET statement_timeout = 125000;
 
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT
-SELECT
-  ON TABLES TO web_anon,authenticator;
+SELECT ON TABLES TO authenticator, web_anon;
 
 ALTER DEFAULT PRIVILEGES IN SCHEMA grest GRANT
-SELECT
-  ON TABLES TO web_anon,authenticator;
+SELECT ON TABLES TO authenticator, web_anon;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA grestv0 GRANT
+SELECT ON TABLES TO authenticator, web_anon;
 
 ALTER ROLE web_anon SET search_path TO grest, public;
 ALTER ROLE authenticator SET search_path TO grest, public;
 
 -- CONTROL TABLE --
-CREATE TABLE IF NOT EXISTS GREST.CONTROL_TABLE (
+CREATE TABLE IF NOT EXISTS grest.control_table (
   key text PRIMARY KEY,
   last_value text NOT NULL,
   artifacts text
@@ -61,19 +65,20 @@ DROP TABLE IF EXISTS grest.genesis;
 
 -- Data Types are intentionally kept varchar for single ID row to avoid future edge cases
 CREATE TABLE grest.genesis (
-  NETWORKMAGIC varchar,
-  NETWORKID varchar,
-  ACTIVESLOTCOEFF varchar,
-  UPDATEQUORUM varchar,
-  MAXLOVELACESUPPLY varchar,
-  EPOCHLENGTH varchar,
-  SYSTEMSTART varchar,
-  SLOTSPERKESPERIOD varchar,
-  SLOTLENGTH varchar,
-  MAXKESREVOLUTIONS varchar,
-  SECURITYPARAM varchar,
-  ALONZOGENESIS varchar
+  networkmagic varchar,
+  networkid varchar,
+  activeslotcoeff varchar,
+  updatequorum varchar,
+  maxlovelacesupply varchar,
+  epochlength varchar,
+  systemstart varchar,
+  slotsperkesperiod varchar,
+  slotlength varchar,
+  maxkesrevolutions varchar,
+  securityparam varchar,
+  alonzogenesis varchar
 );
+
 
 -- DROP EXISTING FUNCTIONS
 DO
@@ -111,11 +116,12 @@ END
 $do$;
 
 -- HELPER FUNCTIONS --
-CREATE FUNCTION grest.get_query_pids_partial_match (_query text)
-  RETURNS TABLE (
-    pid integer)
-  LANGUAGE plpgsql
-  AS $$
+CREATE FUNCTION grest.get_query_pids_partial_match(_query text)
+RETURNS TABLE (
+  pid integer
+)
+LANGUAGE plpgsql
+AS $$
 BEGIN
   RETURN QUERY
   SELECT
@@ -130,7 +136,7 @@ BEGIN
 END;
 $$;
 
-CREATE PROCEDURE grest.kill_queries_partial_match (_query text)
+CREATE PROCEDURE grest.kill_queries_partial_match(_query text)
 LANGUAGE plpgsql
 AS $$
 DECLARE
@@ -148,10 +154,10 @@ BEGIN
 END;
 $$;
 
-CREATE FUNCTION grest.update_control_table (_key text, _last_value text, _artifacts text default null)
-  RETURNS void
-  LANGUAGE plpgsql
-  AS
+CREATE FUNCTION grest.update_control_table(_key text, _last_value text, _artifacts text DEFAULT NULL)
+RETURNS void
+LANGUAGE plpgsql
+AS
 $$
   BEGIN
     INSERT INTO
@@ -168,6 +174,6 @@ $$
 $$;
 
 -- Refresh asset token registry cache from github, to avoid stale deletes
-DELETE FROM grest.control_table WHERE key='asset_registry_commit';
+DELETE FROM grest.control_table WHERE key = 'asset_registry_commit';
 -- DATABASE INDEXES --
 -- Empty

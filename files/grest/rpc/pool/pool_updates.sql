@@ -87,5 +87,3 @@ END;
 $$;
 
 COMMENT ON FUNCTION grest.pool_updates IS 'Return all pool_updates for all pools or only updates for specific pool if specified'; -- noqa: LT01
-
-SELECT grest.pool_updates();

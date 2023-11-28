@@ -8,7 +8,7 @@ RETURNS TABLE (
   epoch_slot word31type,
   active_epoch_no bigint
 )
-LANGUAGE SQL STABLE
+LANGUAGE sql STABLE
 AS $$
   SELECT
     ph.view,

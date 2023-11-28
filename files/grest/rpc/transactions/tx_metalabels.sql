@@ -1,4 +1,3 @@
-DROP FUNCTION IF EXISTS grest.tx_metalabels;
 CREATE OR REPLACE FUNCTION grest.tx_metalabels()
 RETURNS TABLE (key text)
 LANGUAGE plpgsql
