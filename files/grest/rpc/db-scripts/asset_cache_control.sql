@@ -31,4 +31,9 @@ INSERT INTO grest.asset_cache_control VALUES (DECODE('92292852e3820cfbe99874b284
 INSERT INTO grest.asset_cache_control VALUES (DECODE('de9b756719341e79785aa13c164e7fe68c189ed04d61c9876b2fe53f', 'hex')); -- MuesliSwap_AMM
 INSERT INTO grest.asset_cache_control VALUES (DECODE('10a49b996e2402269af553a8a96fb8eb90d79e9eca79e2b4223057b6', 'hex')); -- GERO
 INSERT INTO grest.asset_cache_control VALUES (DECODE('750900e4999ebe0d58f19b634768ba25e525aaf12403bfe8fe130501', 'hex')); -- BOOK
+INSERT INTO grest.asset_cache_control VALUES (DECODE('e38748c08c510a4a5d712922a0f91269b8446ac565068f653c517475', 'hex')); -- preprod KUt1
+INSERT INTO grest.asset_cache_control VALUES (DECODE('602866d30452bf3ea0af2d6b4007389eed5542d2572808cba3eb991f', 'hex')); -- preprod tokenA
+INSERT INTO grest.asset_cache_control VALUES (DECODE('af6c50cb85c8df17f539437c01b405ab9b62b03140d872e787d7a279', 'hex')); -- preprod tokenB
+INSERT INTO grest.asset_cache_control VALUES (DECODE('c462512684cf5a5ee0b176326c724d5879a37a4977d3bf1e4edc39f6', 'hex')); -- preview mTOSI
+INSERT INTO grest.asset_cache_control VALUES (DECODE('c462512684cf5a5ee0b176326c724d5879a37a4977d3bf1e4edc39f6', 'hex')); -- preview BLUE/GREEN/PURPLE/RAINBOW/RED/YELLOW
 -- INSERT INTO grest.asset_cache_control VALUES (DECODE('', 'hex')); -- 
