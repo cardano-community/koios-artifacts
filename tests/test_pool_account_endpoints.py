@@ -7,7 +7,6 @@ pool_reward_address = ""
 
 @pytest.mark.order(1)
 def test_pool_list_endpoint(api_schema, local_url, compare_url):
-    global pool_reward_address
 
     pool_list_response = get_request(f"{local_url}/pool_list")
     api_schema["/pool_list"]["GET"].validate_response(pool_list_response)
@@ -31,7 +30,6 @@ def test_pool_list_endpoint(api_schema, local_url, compare_url):
 
 @pytest.mark.order(2)
 def test_account_info_endpoint(api_schema, local_url, compare_url):
-    global pool_reward_address
 
     account_info_response = get_request(
         f"{local_url}/account_info?_address={pool_reward_address}"

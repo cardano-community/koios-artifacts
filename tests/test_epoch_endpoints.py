@@ -8,7 +8,6 @@ random_epoch_no = ""
 
 @pytest.mark.order(1)
 def test_epoch_info_endpoint(api_schema, local_url, compare_url):
-    global random_epoch_no
 
     epoch_info_response = get_request(f"{local_url}/epoch_info")
     api_schema["/epoch_info"]["GET"].validate_response(epoch_info_response)
@@ -25,7 +24,6 @@ def test_epoch_info_endpoint(api_schema, local_url, compare_url):
 
 @pytest.mark.order(2)
 def test_epoch_params_endpoint(api_schema, compare_url, local_url):
-    global random_epoch_no
 
     epoch_params_response = get_request(
         f"{local_url}/epoch_params?_epoch_no={random_epoch_no}"

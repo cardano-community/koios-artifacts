@@ -15,11 +15,9 @@ SELECT
   b.proto_major,
   b.proto_minor,
   b.op_cert_counter
-FROM
-  block AS b
-LEFT JOIN slot_leader AS sl ON sl.id = b.slot_leader_id
-LEFT JOIN pool_hash AS ph ON ph.id = sl.pool_hash_id
-ORDER BY
-  b.id DESC;
+FROM block AS b
+LEFT JOIN slot_leader AS sl ON b.slot_leader_id = sl.id
+LEFT JOIN pool_hash AS ph ON sl.pool_hash_id = ph.id
+ORDER BY b.id DESC;
 
 COMMENT ON VIEW grest.blocks IS 'Get detailed information about all blocks (paginated - latest first)';

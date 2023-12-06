@@ -3,12 +3,8 @@ RETURNS TABLE (
   script_hash text,
   redeemers jsonb
 )
-LANGUAGE plpgsql
+LANGUAGE sql STABLE
 AS $$
-DECLARE _script_hash_bytea bytea;
-BEGIN
-  SELECT INTO _script_hash_bytea DECODE(_script_hash, 'hex');
-  RETURN QUERY
   SELECT
     _script_hash,
     JSONB_AGG(
@@ -27,9 +23,8 @@ BEGIN
   FROM redeemer
   INNER JOIN TX ON tx.id = redeemer.tx_id
   INNER JOIN REDEEMER_DATA rd ON rd.id = redeemer.redeemer_data_id
-  WHERE redeemer.script_hash = _script_hash_bytea
+  WHERE redeemer.script_hash = DECODE(_script_hash, 'hex')
   GROUP BY redeemer.script_hash;
-END;
 $$;
 
 COMMENT ON FUNCTION grest.script_redeemers IS 'Get all redeemers for a given script hash.'; --noqa: LT01

@@ -18,10 +18,10 @@ def populate_spec(network, outf):
   template=template.replace("#!requestBodies!#", str(pathlib.Path(apirequestBodiesfile).read_text()).rstrip())
   template=template.replace("#!schemas!#", str(pathlib.Path(apischemafile).read_text()).rstrip())
   print("Creating " + outf + " using koiosapi.yaml as template...")
-  for e in examples["params"]:
-    template=template.replace(str("##" + str(e) + "_param##"), str(examples["params"][e][str(network)]))
-  for e in examples["requestBodies"]:
-    template=template.replace("##" + str(e) + "_rb##", str(examples["requestBodies"][e][str(network)]))
+  for ep in examples["params"]:
+    template=template.replace(str("##" + str(ep) + "_param##"), str(examples["params"][ep][str(network)]))
+  for erb in examples["requestBodies"]:
+    template=template.replace("##" + str(erb) + "_rb##", str(examples["requestBodies"][erb][str(network)]))
   with open(outf, 'w') as f:
     f.write(template)
 

@@ -7,14 +7,8 @@ RETURNS TABLE (
   bytes text,
   size word31type
 )
-LANGUAGE plpgsql
+LANGUAGE sql STABLE
 AS $$
-DECLARE
-  _script_hashes_decoded bytea[];
-BEGIN
-  SELECT INTO _script_hashes_decoded ARRAY_AGG(DECODE(s_hash, 'hex'))
-  FROM UNNEST(_script_hashes) AS s_hash;
-  RETURN QUERY
     SELECT
       ENCODE(s.hash,'hex') AS script_hash,
       ENCODE(tx.hash,'hex') AS creation_tx_hash,
@@ -24,9 +18,8 @@ BEGIN
       s.serialised_size AS size
     FROM script AS s
       INNER JOIN tx ON tx.id = s.tx_id
-    WHERE s.hash = ANY(_script_hashes_decoded)
+    WHERE s.hash IN (SELECT DECODE(s_hash, 'hex') FROM UNNEST(_script_hashes) AS s_hash)
   ;
-END;
 $$;
 
 COMMENT ON FUNCTION grest.script_info IS  'Get information about a given script FROM hashes.'; -- noqa: LT01

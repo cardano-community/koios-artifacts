@@ -2,7 +2,6 @@
 dialect = postgres
 exclude_rules = structure.column_order, references.keywords
 max_line_length=260
-recurse = 0
 capitalisation_policy = upper
 extended_capitalisation_policy = upper
 idented_joins = True

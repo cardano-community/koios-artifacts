@@ -7,10 +7,8 @@ RETURNS TABLE (
   block_no word31type,
   block_time integer
 )
-LANGUAGE plpgsql
+LANGUAGE sql STABLE
 AS $$
-BEGIN
-  RETURN QUERY
   SELECT
     ENCODE(b.hash::bytea, 'hex') AS block_hash,
     b.epoch_no AS epoch_no,
@@ -18,12 +16,9 @@ BEGIN
     b.epoch_slot_no AS epoch_slot,
     b.block_no,
     EXTRACT(EPOCH FROM b.time)::integer
-  FROM
-    block b
-  ORDER BY
-    b.id DESC
+  FROM block b
+  ORDER BY b.id DESC
   LIMIT 1;
-END;
 $$;
 
 COMMENT ON FUNCTION grest.tip IS 'Get the tip info about the latest block seen by chain'; -- noqa: LT01

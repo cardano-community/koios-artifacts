@@ -1,4 +1,4 @@
-CREATE OR REPLACE function grest.epoch_summary_corrections_update()
+CREATE OR REPLACE FUNCTION grest.epoch_summary_corrections_update()
 RETURNS void
 LANGUAGE plpgsql
 AS $$

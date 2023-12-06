@@ -8,7 +8,7 @@ RETURNS TABLE (
   amount text,
   stake_address text
 )
-LANGUAGE SQL STABLE
+LANGUAGE sql STABLE
 AS $$
   SELECT
     b.epoch_no,

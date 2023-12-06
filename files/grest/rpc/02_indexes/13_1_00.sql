@@ -1,4 +1,4 @@
-/* Unique Indexes that got dropped at 13.1.0.0 */
+/* Indexes additional to vanila dbsync instance */
 CREATE UNIQUE INDEX IF NOT EXISTS unique_ada_pots ON public.ada_pots USING btree (block_id);
 CREATE UNIQUE INDEX IF NOT EXISTS unique_col_txin ON public.collateral_tx_in USING btree (tx_in_id, tx_out_id, tx_out_index);
 CREATE UNIQUE INDEX IF NOT EXISTS unique_col_txout ON public.collateral_tx_out USING btree (tx_id, index);
@@ -21,6 +21,6 @@ CREATE UNIQUE INDEX IF NOT EXISTS unique_treasury ON public.treasury USING btree
 CREATE UNIQUE INDEX IF NOT EXISTS unique_tx_metadata ON public.tx_metadata USING btree (key, tx_id);
 CREATE UNIQUE INDEX IF NOT EXISTS unique_txin ON tx_in USING btree (tx_out_id, tx_out_index);
 CREATE UNIQUE INDEX IF NOT EXISTS unique_withdrawal ON public.withdrawal USING btree (addr_id, tx_id);
-
-/* Help multi asset queries */
-CREATE INDEX IF NOT EXISTS idx_ma_tx_out_ident ON ma_tx_out (ident);
+CREATE INDEX IF NOT EXISTS idx_ma_tx_out_ident ON ma_tx_out (ident) INCLUDE (tx_out_id, quantity);
+CREATE INDEX IF NOT EXISTS idx_collateral_tx_in_tx_in_id ON collateral_tx_in (tx_in_id);
+CREATE INDEX IF NOT EXISTS idx_reference_tx_in_tx_in_id ON reference_tx_in (tx_in_id);
