@@ -1,8 +1,3 @@
--- Drop triggers first that depend on grest.functions()
-SELECT 'DROP TRIGGER ' || trigger_name || ' ON ' || event_object_table || ';'
-FROM information_schema.triggers
-WHERE trigger_schema = 'public';
-
 -- Recreate grest schema
 DROP SCHEMA IF EXISTS grest CASCADE;
 
