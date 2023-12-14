@@ -38,7 +38,9 @@ BEGIN
       FROM tx_out
       INNER JOIN ma_tx_out mto ON mto.tx_out_id = tx_out.id
       WHERE mto.ident = _asset_id
-        AND tx_out.consumed_by_tx_in_id IS NULL;
+        AND tx_out.consumed_by_tx_in_id IS NULL
+      ORDER BY tx_out.id DESC
+      LIMIT 1;
   END IF;
 END;
 $$;
