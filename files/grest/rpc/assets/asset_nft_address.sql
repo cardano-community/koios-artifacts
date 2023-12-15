@@ -23,14 +23,25 @@ BEGIN
     AND ma.name = _asset_name_decoded
     AND aic.total_supply = 1;
 
-  RETURN QUERY
-    SELECT address
-    FROM tx_out
-    WHERE id = (
-      SELECT MAX(tx_out_id)
-      FROM ma_tx_out
-      WHERE ident = _asset_id
-    );
+  IF EXISTS (SELECT * FROM ma_tx_mint WHERE ident = _asset_id and quantity < 0 LIMIT 1) THEN
+    RETURN QUERY
+      SELECT address
+      FROM tx_out
+      WHERE id = (
+        SELECT MAX(tx_out_id)
+        FROM ma_tx_out
+        WHERE ident = _asset_id
+      );
+  ELSE
+    RETURN QUERY
+      SELECT address
+      FROM tx_out
+      INNER JOIN ma_tx_out mto ON mto.tx_out_id = tx_out.id
+      WHERE mto.ident = _asset_id
+        AND tx_out.consumed_by_tx_in_id IS NULL
+      ORDER BY tx_out.id DESC
+      LIMIT 1;
+  END IF;
 END;
 $$;
 

@@ -115,6 +115,11 @@ BEGIN
 END
 $do$;
 
+-- DROP EXISTING GREST ADDED TRIGGERS ON PUBLIC SCHEMA
+FOR r IN (SELECT trigger_name, event_object_table FROM information_schema.triggers WHERE trigger_schema = 'public' AND action_statement LIKE '%grest.%') LOOP
+  EXECUTE 'DROP TRIGGER IF EXISTS ' || quote_ident(r.trigger_name) || ' ON ' || quote_ident(r.event_object_table);
+END LOOP;
+
 -- HELPER FUNCTIONS --
 CREATE FUNCTION grest.get_query_pids_partial_match(_query text)
 RETURNS TABLE (
