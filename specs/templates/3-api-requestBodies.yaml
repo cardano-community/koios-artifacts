@@ -18,6 +18,55 @@ requestBodies:
                 - ##block_info2_rb##
                 - ##block_info3_rb##
       description: Array of block hashes
+    block_tx_info:
+      content:
+        application/json:
+          schema:
+            required:
+              - _block_hashes
+            type: object
+            properties:
+              _block_hashes:
+                format: text
+                type: array
+                items:
+                  $ref: "#/components/schemas/blocks/items/properties/hash"
+              _inputs:
+                format: boolean
+                type: boolean
+                description: Controls whether to include transaction inputs in the result
+              _metadata:
+                format: boolean
+                type: boolean
+                description: Controls whether to include transaction metadata in the result
+              _assets:
+                format: boolean
+                type: boolean
+                description: Controls whether to include assets involved within transaction the result
+              _withdrawals:
+                format: boolean
+                type: boolean
+                description: Controls whether to include any stake account reward withdrawals in the result
+              _certs:
+                format: boolean
+                type: boolean
+                description: Controls whether to include transaction certificates in the result
+              _scripts:
+                format: boolean
+                type: boolean
+                description: Controls whether to include any details regarding collateral/reference/datum/script objects in the result
+            example:
+              _block_hashes:
+                - ##block_info1_rb##
+                - ##block_info2_rb##
+                - ##block_info3_rb##
+              _inputs: false
+              _metadata: false
+              _assets: false
+              _withdrawals: false
+              _certs: false
+              _scripts: false
+      description: Array of block hashes
     payment_addresses:
       content:
         application/json:

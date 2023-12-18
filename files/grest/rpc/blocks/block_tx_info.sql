@@ -1,9 +1,9 @@
 CREATE OR REPLACE FUNCTION grest.block_tx_info(
   _block_hashes text[],
-  _withdrawals  boolean DEFAULT false,
   _inputs       boolean DEFAULT false,
   _metadata     boolean DEFAULT false,
   _assets       boolean DEFAULT false,
+  _withdrawals  boolean DEFAULT false,
   _certs        boolean DEFAULT false,
   _scripts      boolean DEFAULT false
 )
@@ -82,8 +82,7 @@ BEGIN
           tx.deposit,
           tx.invalid_before,
           tx.invalid_hereafter  AS invalid_after
-        FROM
-          tx
+        FROM tx
           INNER JOIN block AS b ON tx.block_id = b.id
         WHERE tx.id = ANY(_tx_id_list)
       ),
@@ -128,8 +127,7 @@ BEGIN
               )
             END
           ) AS reference_script
-        FROM
-          collateral_tx_in
+        FROM collateral_tx_in
           INNER JOIN tx_out ON tx_out.tx_id = collateral_tx_in.tx_out_id
             AND tx_out.index = collateral_tx_in.tx_out_index
           INNER JOIN tx ON tx_out.tx_id = tx.id
@@ -141,8 +139,7 @@ BEGIN
           LEFT JOIN script ON _scripts IS TRUE AND script.id = tx_out.reference_script_id
         WHERE
           (_inputs IS TRUE AND _scripts IS TRUE)
-          AND
-          collateral_tx_in.tx_in_id = ANY(_tx_id_list)
+          AND collateral_tx_in.tx_in_id = ANY(_tx_id_list)
       ),
 
       _all_reference_inputs AS (
@@ -198,8 +195,7 @@ BEGIN
           LEFT JOIN script ON _scripts IS TRUE AND script.id = tx_out.reference_script_id
         WHERE
           (_inputs IS TRUE AND _scripts IS TRUE)
-          AND
-          reference_tx_in.tx_in_id = ANY(_tx_id_list)
+          AND reference_tx_in.tx_in_id = ANY(_tx_id_list)
       ),
 
       _all_inputs AS (
@@ -253,10 +249,8 @@ BEGIN
           LEFT JOIN grest.asset_info_cache AS aic ON _assets IS TRUE AND aic.asset_id = ma.id
           LEFT JOIN datum ON _scripts IS TRUE AND datum.id = tx_out.inline_datum_id
           LEFT JOIN script ON _scripts IS TRUE AND script.id = tx_out.reference_script_id
-        WHERE
-          _inputs IS TRUE
-          AND
-          tx_in.tx_in_id = ANY(_tx_id_list)
+        WHERE _inputs IS TRUE
+          AND tx_in.tx_in_id = ANY(_tx_id_list)
       ),
 
       _all_collateral_outputs AS (
@@ -308,10 +302,8 @@ BEGIN
           LEFT JOIN grest.asset_info_cache AS aic ON _assets IS TRUE AND aic.asset_id = ma.id
           LEFT JOIN datum ON _scripts IS TRUE AND datum.id = tx_out.inline_datum_id
           LEFT JOIN script ON _scripts IS TRUE AND script.id = tx_out.reference_script_id
-        WHERE
-          _scripts IS TRUE
-          AND
-          tx_out.tx_id = ANY(_tx_id_list)
+        WHERE _scripts IS TRUE
+          AND tx_out.tx_id = ANY(_tx_id_list)
       ),
 
       _all_outputs AS (
@@ -354,8 +346,7 @@ BEGIN
               )
             END
           ) AS reference_script
-        FROM
-          tx_out
+        FROM tx_out
           INNER JOIN tx ON tx_out.tx_id = tx.id
           LEFT JOIN stake_address AS sa ON tx_out.stake_address_id = sa.id
           LEFT JOIN ma_tx_out AS mto ON _assets IS TRUE AND mto.tx_out_id = tx_out.id
@@ -363,8 +354,7 @@ BEGIN
           LEFT JOIN grest.asset_info_cache AS aic ON _assets IS TRUE AND aic.asset_id = ma.id
           LEFT JOIN datum ON _scripts IS TRUE AND datum.id = tx_out.inline_datum_id
           LEFT JOIN script ON _scripts IS TRUE AND script.id = tx_out.reference_script_id
-        WHERE
-          tx_out.tx_id = ANY(_tx_id_list)
+        WHERE tx_out.tx_id = ANY(_tx_id_list)
       ),
 
       _all_withdrawals AS (
@@ -378,13 +368,10 @@ BEGIN
               'amount', w.amount::text,
               'stake_addr', sa.view
             ) AS data
-          FROM
-            withdrawal AS w
+          FROM withdrawal AS w
             INNER JOIN stake_address AS sa ON w.addr_id = sa.id
-          WHERE
-            _withdrawals IS TRUE
-            AND
-            w.tx_id = ANY(_tx_id_list)
+          WHERE _withdrawals IS TRUE
+            AND w.tx_id = ANY(_tx_id_list)
         ) AS tmp
         GROUP BY tx_id
       ),
@@ -403,14 +390,11 @@ BEGIN
               'decimals', COALESCE(aic.decimals, 0),
               'quantity', mtm.quantity::text
             ) AS data
-          FROM
-            ma_tx_mint AS mtm
+          FROM ma_tx_mint AS mtm
             INNER JOIN multi_asset AS ma ON ma.id = mtm.ident
             LEFT JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
-          WHERE
-            _assets IS TRUE
-            AND
-            mtm.tx_id = ANY(_tx_id_list)
+          WHERE _assets IS TRUE
+            AND mtm.tx_id = ANY(_tx_id_list)
         ) AS tmp
         GROUP BY tx_id
       ),
@@ -424,9 +408,8 @@ BEGIN
           ) AS list
         FROM
           tx_metadata AS tm
-        WHERE
-          _metadata IS TRUE AND
-          tm.tx_id = ANY(_tx_id_list)
+        WHERE _metadata IS TRUE
+          AND tm.tx_id = ANY(_tx_id_list)
         GROUP BY tx_id
       ),
 
@@ -444,12 +427,10 @@ BEGIN
                 'stake_address', sa.view
               )
             ) AS data
-          FROM
-            public.stake_registration AS sr
+          FROM public.stake_registration AS sr
             INNER JOIN public.stake_address AS sa ON sa.id = sr.addr_id
-          WHERE
-            _certs IS TRUE AND
-            sr.tx_id = ANY(_tx_id_list)
+          WHERE _certs IS TRUE
+            AND sr.tx_id = ANY(_tx_id_list)
           --
           UNION ALL
           --
@@ -462,12 +443,10 @@ BEGIN
                 'stake_address', sa.view
               )
             ) AS data
-          FROM
-            public.stake_deregistration AS sd
+          FROM public.stake_deregistration AS sd
             INNER JOIN public.stake_address AS sa ON sa.id = sd.addr_id
-          WHERE
-            _certs IS TRUE AND
-            sd.tx_id = ANY(_tx_id_list)
+          WHERE _certs IS TRUE
+            AND sd.tx_id = ANY(_tx_id_list)
           --
           UNION ALL
           --
@@ -482,13 +461,11 @@ BEGIN
                 'pool_id_hex', ENCODE(ph.hash_raw, 'hex')
               )
             ) AS data
-          FROM
-            public.delegation AS d
+          FROM public.delegation AS d
             INNER JOIN public.stake_address AS sa ON sa.id = d.addr_id
             INNER JOIN public.pool_hash AS ph ON ph.id = d.pool_hash_id
-          WHERE
-            _certs IS TRUE AND
-            d.tx_id = ANY(_tx_id_list)
+          WHERE _certs IS TRUE
+            AND d.tx_id = ANY(_tx_id_list)
           --
           UNION ALL
           --
@@ -502,12 +479,10 @@ BEGIN
                 'amount', t.amount::text
               )
             ) AS data
-          FROM
-            public.treasury AS t
+          FROM public.treasury AS t
             INNER JOIN public.stake_address AS sa ON sa.id = t.addr_id
-          WHERE
-            _certs IS TRUE AND
-            t.tx_id = ANY(_tx_id_list)
+          WHERE _certs IS TRUE
+            AND t.tx_id = ANY(_tx_id_list)
           --
           UNION ALL
           --
@@ -521,11 +496,10 @@ BEGIN
                 'amount', r.amount::text
               )
             ) AS data
-          FROM
-            public.reserve AS r
+          FROM public.reserve AS r
             INNER JOIN public.stake_address AS sa ON sa.id = r.addr_id
-          WHERE
-            r.tx_id = ANY(_tx_id_list)
+          WHERE _certs IS TRUE
+            AND r.tx_id = ANY(_tx_id_list)
           --
           UNION ALL
           --
@@ -539,11 +513,9 @@ BEGIN
                 'reserves', pt.reserves::text
               )
             ) AS data
-          FROM
-            public.pot_transfer AS pt
-          WHERE
-            _certs IS TRUE AND
-            pt.tx_id = ANY(_tx_id_list)
+          FROM public.pot_transfer AS pt
+          WHERE _certs IS TRUE
+            AND pt.tx_id = ANY(_tx_id_list)
           --
           UNION ALL
           --
@@ -585,12 +557,10 @@ BEGIN
                 'coins_per_utxo_size', pp.coins_per_utxo_size
               ))
             ) AS data
-          FROM
-            public.param_proposal AS pp
+          FROM public.param_proposal AS pp
             INNER JOIN cost_model AS cm ON cm.id = pp.cost_model_id
-          WHERE
-            _certs IS TRUE AND
-            pp.registered_tx_id = ANY(_tx_id_list)
+          WHERE _certs IS TRUE
+            AND pp.registered_tx_id = ANY(_tx_id_list)
           --
           UNION ALL
           --
@@ -605,12 +575,10 @@ BEGIN
                 'retiring epoch', pr.retiring_epoch
               )
             ) AS data
-          FROM
-            public.pool_retire AS pr
+          FROM public.pool_retire AS pr
             INNER JOIN public.pool_hash AS ph ON ph.id = pr.hash_id
-          WHERE
-            _certs IS TRUE AND
-            pr.announced_tx_id = ANY(_tx_id_list)
+          WHERE _certs IS TRUE
+            AND pr.announced_tx_id = ANY(_tx_id_list)
           --
           UNION ALL
           --
@@ -634,12 +602,10 @@ BEGIN
                 'meta_hash', pic.meta_hash
               )
             ) AS data
-          FROM
-            grest.pool_info_cache AS pic
+          FROM grest.pool_info_cache AS pic
             INNER JOIN public.pool_update AS pu ON pu.registered_tx_id = pic.tx_id
-          WHERE
-            _certs IS TRUE AND
-            pic.tx_id = ANY(_tx_id_list)
+          WHERE _certs IS TRUE
+            AND pic.tx_id = ANY(_tx_id_list)
         ) AS tmp
         GROUP BY tx_id
       ),
@@ -655,16 +621,11 @@ BEGIN
               'script_hash', ENCODE(script.hash, 'hex'),
               'script_json', script.json
             ) AS data
-          FROM
-            script
-          WHERE
-            _scripts IS TRUE
-            AND
-            script.tx_id = ANY(_tx_id_list)
-            AND
-            script.type = 'timelock'
+          FROM script
+          WHERE _scripts IS TRUE
+            AND script.tx_id = ANY(_tx_id_list)
+            AND script.type = 'timelock'
         ) AS tmp
-
         GROUP BY tx_id
       ),
 
@@ -692,10 +653,8 @@ BEGIN
                 INNER JOIN tx ON redeemer.tx_id = tx.id
                 INNER JOIN redeemer_data AS rd ON rd.id = redeemer.redeemer_data_id
                 INNER JOIN script ON redeemer.script_hash = script.hash
-              WHERE
-              _scripts IS TRUE
-              AND
-              redeemer.tx_id = ANY(_tx_id_list)
+              WHERE _scripts IS TRUE
+                AND redeemer.tx_id = ANY(_tx_id_list)
             ),
 
             spend_redeemers AS (
@@ -708,10 +667,8 @@ BEGIN
               INNER JOIN tx_in ON tx_in.redeemer_id = redeemer.id
               INNER JOIN tx_out AS inutxo ON inutxo.tx_id = tx_in.tx_out_id AND inutxo.index = tx_in.tx_out_index
               INNER JOIN datum AS ind ON ind.hash = inutxo.data_hash
-              WHERE
-                _scripts IS TRUE
-                AND
-                redeemer.tx_id = ANY(_tx_id_list)
+              WHERE _scripts IS TRUE
+                AND redeemer.tx_id = ANY(_tx_id_list)
             )
 
           SELECT
@@ -748,12 +705,9 @@ BEGIN
                   ) END
               )
             ) AS data
-          FROM
-            all_redeemers AS ar
-          WHERE
-            _scripts IS TRUE
+          FROM all_redeemers AS ar
+          WHERE _scripts IS TRUE
         ) AS tmp
-
         GROUP BY tx_id
       )
 
