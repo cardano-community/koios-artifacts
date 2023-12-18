@@ -98,68 +98,33 @@ BEGIN
           tx_out.index                        AS tx_index,
           tx_out.value::text                  AS value,
           ENCODE(tx_out.data_hash, 'hex')     AS datum_hash,
-          (CASE WHEN _assets IS NOT TRUE THEN NULL
+          (CASE WHEN ma.policy IS NULL THEN NULL
             ELSE
-              (
-                SELECT
-                  (CASE WHEN ma.policy IS NULL THEN NULL
-                    ELSE
-                      JSONB_BUILD_OBJECT(
-                        'policy_id', ENCODE(ma.policy, 'hex'),
-                        'asset_name', ENCODE(ma.name, 'hex'),
-                        'fingerprint', ma.fingerprint,
-                        'decimals', aic.decimals,
-                        'quantity', mto.quantity::text
-                      )
-                    END
-                  ) AS asset_list_object
-                FROM
-                  ma_tx_out AS mto
-                  INNER JOIN multi_asset AS ma ON ma.id = mto.ident
-                  INNER JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
-                WHERE
-                  mto.tx_out_id = tx_out.id
+              JSONB_BUILD_OBJECT(
+                'policy_id', ENCODE(ma.policy, 'hex'),
+                'asset_name', ENCODE(ma.name, 'hex'),
+                'fingerprint', ma.fingerprint,
+                'decimals', aic.decimals,
+                'quantity', mto.quantity::text
               )
             END
           ) AS asset_list,
-          (CASE WHEN _scripts IS NOT TRUE THEN NULL
+          (CASE WHEN tx_out.inline_datum_id IS NULL THEN NULL
             ELSE
-              (
-                SELECT
-                  (CASE WHEN tx_out.inline_datum_id IS NULL THEN NULL
-                    ELSE
-                      JSONB_BUILD_OBJECT(
-                        'bytes', ENCODE(datum.bytes, 'hex'),
-                        'value', datum.value
-                      )
-                    END
-                  ) AS inline_datum_object
-                FROM
-                  datum
-                WHERE
-                  datum.id = tx_out.inline_datum_id
+              JSONB_BUILD_OBJECT(
+                'bytes', ENCODE(datum.bytes, 'hex'),
+                'value', datum.value
               )
             END
           ) AS inline_datum,
-          (CASE WHEN _scripts IS NOT TRUE THEN NULL
+          (CASE WHEN tx_out.reference_script_id IS NULL THEN NULL
             ELSE
-              (
-                SELECT
-                  (CASE WHEN tx_out.reference_script_id IS NULL THEN NULL
-                    ELSE
-                      JSONB_BUILD_OBJECT(
-                        'hash', ENCODE(script.hash, 'hex'),
-                        'bytes', ENCODE(script.bytes, 'hex'),
-                        'value', script.json,
-                        'type', script.type::text,
-                        'size', script.serialised_size
-                      )
-                    END
-                  ) AS reference_script_object
-                FROM
-                  script
-                WHERE
-                  script.id = tx_out.reference_script_id
+              JSONB_BUILD_OBJECT(
+                'hash', ENCODE(script.hash, 'hex'),
+                'bytes', ENCODE(script.bytes, 'hex'),
+                'value', script.json,
+                'type', script.type::text,
+                'size', script.serialised_size
               )
             END
           ) AS reference_script
@@ -169,6 +134,11 @@ BEGIN
             AND tx_out.index = collateral_tx_in.tx_out_index
           INNER JOIN tx ON tx_out.tx_id = tx.id
           LEFT JOIN stake_address AS sa ON tx_out.stake_address_id = sa.id
+          LEFT JOIN ma_tx_out AS mto ON _assets IS TRUE AND mto.tx_out_id = tx_out.id
+          LEFT JOIN multi_asset AS ma ON _assets IS TRUE AND ma.id = mto.ident
+          LEFT JOIN grest.asset_info_cache AS aic ON _assets IS TRUE AND aic.asset_id = ma.id
+          LEFT JOIN datum ON _scripts IS TRUE AND datum.id = tx_out.inline_datum_id
+          LEFT JOIN script ON _scripts IS TRUE AND script.id = tx_out.reference_script_id
         WHERE
           (_inputs IS TRUE AND _scripts IS TRUE)
           AND
@@ -185,68 +155,33 @@ BEGIN
           tx_out.index                        AS tx_index,
           tx_out.value::text                  AS value,
           ENCODE(tx_out.data_hash, 'hex')     AS datum_hash,
-          (CASE WHEN _assets IS NOT TRUE THEN NULL
+          (CASE WHEN ma.policy IS NULL THEN NULL
             ELSE
-              (
-                SELECT
-                  (CASE WHEN ma.policy IS NULL THEN NULL
-                    ELSE
-                      JSONB_BUILD_OBJECT(
-                        'policy_id', ENCODE(ma.policy, 'hex'),
-                        'asset_name', ENCODE(ma.name, 'hex'),
-                        'fingerprint', ma.fingerprint,
-                        'decimals', aic.decimals,
-                        'quantity', mto.quantity::text
-                      )
-                    END
-                  ) AS asset_list_object
-                FROM
-                  ma_tx_out AS mto
-                  INNER JOIN multi_asset AS ma ON ma.id = mto.ident
-                  INNER JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
-                WHERE
-                  mto.tx_out_id = tx_out.id
+              JSONB_BUILD_OBJECT(
+                'policy_id', ENCODE(ma.policy, 'hex'),
+                'asset_name', ENCODE(ma.name, 'hex'),
+                'fingerprint', ma.fingerprint,
+                'decimals', aic.decimals,
+                'quantity', mto.quantity::text
               )
             END
           ) AS asset_list,
-          (CASE WHEN _scripts IS NOT TRUE THEN NULL
+          (CASE WHEN tx_out.inline_datum_id IS NULL THEN NULL
             ELSE
-              (
-                SELECT
-                  (CASE WHEN tx_out.inline_datum_id IS NULL THEN NULL
-                    ELSE
-                      JSONB_BUILD_OBJECT(
-                        'bytes', ENCODE(datum.bytes, 'hex'),
-                        'value', datum.value
-                      )
-                    END
-                  ) AS inline_datum_object
-                FROM
-                  datum
-                WHERE
-                  datum.id = tx_out.inline_datum_id
+              JSONB_BUILD_OBJECT(
+                'bytes', ENCODE(datum.bytes, 'hex'),
+                'value', datum.value
               )
             END
           ) AS inline_datum,
-          (CASE WHEN _scripts IS NOT TRUE THEN NULL
+          (CASE WHEN tx_out.reference_script_id IS NULL THEN NULL
             ELSE
-              (
-                SELECT
-                  (CASE WHEN tx_out.reference_script_id IS NULL THEN NULL
-                    ELSE
-                      JSONB_BUILD_OBJECT(
-                        'hash', ENCODE(script.hash, 'hex'),
-                        'bytes', ENCODE(script.bytes, 'hex'),
-                        'value', script.json,
-                        'type', script.type::text,
-                        'size', script.serialised_size
-                      )
-                    END
-                  ) AS reference_script_object
-                FROM
-                  script
-                WHERE
-                  script.id = tx_out.reference_script_id
+              JSONB_BUILD_OBJECT(
+                'hash', ENCODE(script.hash, 'hex'),
+                'bytes', ENCODE(script.bytes, 'hex'),
+                'value', script.json,
+                'type', script.type::text,
+                'size', script.serialised_size
               )
             END
           ) AS reference_script
@@ -256,6 +191,11 @@ BEGIN
             AND tx_out.index = reference_tx_in.tx_out_index
           INNER JOIN tx ON tx_out.tx_id = tx.id
           LEFT JOIN stake_address AS sa ON tx_out.stake_address_id = sa.id
+          LEFT JOIN ma_tx_out AS mto ON _assets IS TRUE AND mto.tx_out_id = tx_out.id
+          LEFT JOIN multi_asset AS ma ON _assets IS TRUE AND ma.id = mto.ident
+          LEFT JOIN grest.asset_info_cache AS aic ON _assets IS TRUE AND aic.asset_id = ma.id
+          LEFT JOIN datum ON _scripts IS TRUE AND datum.id = tx_out.inline_datum_id
+          LEFT JOIN script ON _scripts IS TRUE AND script.id = tx_out.reference_script_id
         WHERE
           (_inputs IS TRUE AND _scripts IS TRUE)
           AND
@@ -272,68 +212,33 @@ BEGIN
           tx_out.index                        AS tx_index,
           tx_out.value::text                  AS value,
           ENCODE(tx_out.data_hash, 'hex')     AS datum_hash,
-          (CASE WHEN _assets IS NOT TRUE THEN NULL
+          (CASE WHEN ma.policy IS NULL THEN NULL
             ELSE
-              (
-                SELECT
-                  (CASE WHEN ma.policy IS NULL THEN NULL
-                    ELSE
-                      JSONB_BUILD_OBJECT(
-                        'policy_id', ENCODE(ma.policy, 'hex'),
-                        'asset_name', ENCODE(ma.name, 'hex'),
-                        'fingerprint', ma.fingerprint,
-                        'decimals', aic.decimals,
-                        'quantity', mto.quantity::text
-                      )
-                    END
-                  ) AS asset_list_object
-                FROM
-                  ma_tx_out AS mto
-                  INNER JOIN multi_asset AS ma ON ma.id = mto.ident
-                  INNER JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
-                WHERE
-                  mto.tx_out_id = tx_out.id
+              JSONB_BUILD_OBJECT(
+                'policy_id', ENCODE(ma.policy, 'hex'),
+                'asset_name', ENCODE(ma.name, 'hex'),
+                'fingerprint', ma.fingerprint,
+                'decimals', aic.decimals,
+                'quantity', mto.quantity::text
               )
             END
           ) AS asset_list,
-          (CASE WHEN _scripts IS NOT TRUE THEN NULL
+          (CASE WHEN tx_out.inline_datum_id IS NULL THEN NULL
             ELSE
-              (
-                SELECT
-                  (CASE WHEN tx_out.inline_datum_id IS NULL THEN NULL
-                    ELSE
-                      JSONB_BUILD_OBJECT(
-                        'bytes', ENCODE(datum.bytes, 'hex'),
-                        'value', datum.value
-                      )
-                    END
-                  ) AS inline_datum_object
-                FROM
-                  datum
-                WHERE
-                  datum.id = tx_out.inline_datum_id
+              JSONB_BUILD_OBJECT(
+                'bytes', ENCODE(datum.bytes, 'hex'),
+                'value', datum.value
               )
             END
           ) AS inline_datum,
-          (CASE WHEN _scripts IS NOT TRUE THEN NULL
+          (CASE WHEN tx_out.reference_script_id IS NULL THEN NULL
             ELSE
-              (
-                SELECT
-                  (CASE WHEN tx_out.reference_script_id IS NULL THEN NULL
-                    ELSE
-                      JSONB_BUILD_OBJECT(
-                        'hash', ENCODE(script.hash, 'hex'),
-                        'bytes', ENCODE(script.bytes, 'hex'),
-                        'value', script.json,
-                        'type', script.type::text,
-                        'size', script.serialised_size
-                      )
-                    END
-                  ) AS reference_script_object
-                FROM
-                  script
-                WHERE
-                  script.id = tx_out.reference_script_id
+              JSONB_BUILD_OBJECT(
+                'hash', ENCODE(script.hash, 'hex'),
+                'bytes', ENCODE(script.bytes, 'hex'),
+                'value', script.json,
+                'type', script.type::text,
+                'size', script.serialised_size
               )
             END
           ) AS reference_script
@@ -343,6 +248,11 @@ BEGIN
             AND tx_out.index = tx_in.tx_out_index
           INNER JOIN tx ON tx_out.tx_id = tx.id
           LEFT JOIN stake_address AS sa ON tx_out.stake_address_id = sa.id
+          LEFT JOIN ma_tx_out AS mto ON _assets IS TRUE AND mto.tx_out_id = tx_out.id
+          LEFT JOIN multi_asset AS ma ON _assets IS TRUE AND ma.id = mto.ident
+          LEFT JOIN grest.asset_info_cache AS aic ON _assets IS TRUE AND aic.asset_id = ma.id
+          LEFT JOIN datum ON _scripts IS TRUE AND datum.id = tx_out.inline_datum_id
+          LEFT JOIN script ON _scripts IS TRUE AND script.id = tx_out.reference_script_id
         WHERE
           _inputs IS TRUE
           AND
@@ -359,68 +269,33 @@ BEGIN
           tx_out.index                        AS tx_index,
           tx_out.value::text                  AS value,
           ENCODE(tx_out.data_hash, 'hex')     AS datum_hash,
-          (CASE WHEN _assets IS NOT TRUE THEN NULL
+          (CASE WHEN ma.policy IS NULL THEN NULL
             ELSE
-              (
-                SELECT
-                  (CASE WHEN ma.policy IS NULL THEN NULL
-                    ELSE
-                      JSONB_BUILD_OBJECT(
-                        'policy_id', ENCODE(ma.policy, 'hex'),
-                        'asset_name', ENCODE(ma.name, 'hex'),
-                        'fingerprint', ma.fingerprint,
-                        'decimals', aic.decimals,
-                        'quantity', mto.quantity::text
-                      )
-                    END
-                  ) AS asset_list_object
-                FROM
-                  ma_tx_out AS mto
-                  INNER JOIN multi_asset AS ma ON ma.id = mto.ident
-                  INNER JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
-                WHERE
-                  mto.tx_out_id = tx_out.id
+              JSONB_BUILD_OBJECT(
+                'policy_id', ENCODE(ma.policy, 'hex'),
+                'asset_name', ENCODE(ma.name, 'hex'),
+                'fingerprint', ma.fingerprint,
+                'decimals', aic.decimals,
+                'quantity', mto.quantity::text
               )
             END
           ) AS asset_list,
-          (CASE WHEN _scripts IS NOT TRUE THEN NULL
+          (CASE WHEN tx_out.inline_datum_id IS NULL THEN NULL
             ELSE
-              (
-                SELECT
-                  (CASE WHEN tx_out.inline_datum_id IS NULL THEN NULL
-                    ELSE
-                      JSONB_BUILD_OBJECT(
-                        'bytes', ENCODE(datum.bytes, 'hex'),
-                        'value', datum.value
-                      )
-                    END
-                  ) AS inline_datum_object
-                FROM
-                  datum
-                WHERE
-                  datum.id = tx_out.inline_datum_id
+              JSONB_BUILD_OBJECT(
+                'bytes', ENCODE(datum.bytes, 'hex'),
+                'value', datum.value
               )
             END
           ) AS inline_datum,
-          (CASE WHEN _scripts IS NOT TRUE THEN NULL
+          (CASE WHEN tx_out.reference_script_id IS NULL THEN NULL
             ELSE
-              (
-                SELECT
-                  (CASE WHEN tx_out.reference_script_id IS NULL THEN NULL
-                    ELSE
-                      JSONB_BUILD_OBJECT(
-                        'hash', ENCODE(script.hash, 'hex'),
-                        'bytes', ENCODE(script.bytes, 'hex'),
-                        'value', script.json,
-                        'type', script.type::text,
-                        'size', script.serialised_size
-                      )
-                    END
-                  ) AS reference_script_object
-                FROM
-                  script
-                WHERE
-                  script.id = tx_out.reference_script_id
+              JSONB_BUILD_OBJECT(
+                'hash', ENCODE(script.hash, 'hex'),
+                'bytes', ENCODE(script.bytes, 'hex'),
+                'value', script.json,
+                'type', script.type::text,
+                'size', script.serialised_size
               )
             END
           ) AS reference_script
@@ -428,6 +303,11 @@ BEGIN
           collateral_tx_out AS tx_out
           INNER JOIN tx ON tx_out.tx_id = tx.id
           LEFT JOIN stake_address AS sa ON tx_out.stake_address_id = sa.id
+          LEFT JOIN ma_tx_out AS mto ON _assets IS TRUE AND mto.tx_out_id = tx_out.id
+          LEFT JOIN multi_asset AS ma ON _assets IS TRUE AND ma.id = mto.ident
+          LEFT JOIN grest.asset_info_cache AS aic ON _assets IS TRUE AND aic.asset_id = ma.id
+          LEFT JOIN datum ON _scripts IS TRUE AND datum.id = tx_out.inline_datum_id
+          LEFT JOIN script ON _scripts IS TRUE AND script.id = tx_out.reference_script_id
         WHERE
           _scripts IS TRUE
           AND
@@ -444,68 +324,33 @@ BEGIN
           tx_out.index                        AS tx_index,
           tx_out.value::text                  AS value,
           ENCODE(tx_out.data_hash, 'hex')     AS datum_hash,
-          (CASE WHEN _assets IS NOT TRUE THEN NULL
+          (CASE WHEN ma.policy IS NULL THEN NULL
             ELSE
-              (
-                SELECT
-                  (CASE WHEN ma.policy IS NULL THEN NULL
-                    ELSE
-                      JSONB_BUILD_OBJECT(
-                        'policy_id', ENCODE(ma.policy, 'hex'),
-                        'asset_name', ENCODE(ma.name, 'hex'),
-                        'fingerprint', ma.fingerprint,
-                        'decimals', aic.decimals,
-                        'quantity', mto.quantity::text
-                      )
-                    END
-                  ) AS asset_list_object
-                FROM
-                  ma_tx_out AS mto
-                  INNER JOIN multi_asset AS ma ON ma.id = mto.ident
-                  INNER JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
-                WHERE
-                  mto.tx_out_id = tx_out.id
+              JSONB_BUILD_OBJECT(
+                'policy_id', ENCODE(ma.policy, 'hex'),
+                'asset_name', ENCODE(ma.name, 'hex'),
+                'fingerprint', ma.fingerprint,
+                'decimals', aic.decimals,
+                'quantity', mto.quantity::text
               )
             END
           ) AS asset_list,
-          (CASE WHEN _scripts IS NOT TRUE THEN NULL
+          (CASE WHEN tx_out.inline_datum_id IS NULL THEN NULL
             ELSE
-              (
-                SELECT
-                  (CASE WHEN tx_out.inline_datum_id IS NULL THEN NULL
-                    ELSE
-                      JSONB_BUILD_OBJECT(
-                        'bytes', ENCODE(datum.bytes, 'hex'),
-                        'value', datum.value
-                      )
-                    END
-                  ) AS inline_datum_object
-                FROM
-                  datum
-                WHERE
-                  datum.id = tx_out.inline_datum_id
+              JSONB_BUILD_OBJECT(
+                'bytes', ENCODE(datum.bytes, 'hex'),
+                'value', datum.value
               )
             END
           ) AS inline_datum,
-          (CASE WHEN _scripts IS NOT TRUE THEN NULL
+          (CASE WHEN tx_out.reference_script_id IS NULL THEN NULL
             ELSE
-              (
-                SELECT
-                  (CASE WHEN tx_out.reference_script_id IS NULL THEN NULL
-                    ELSE
-                      JSONB_BUILD_OBJECT(
-                        'hash', ENCODE(script.hash, 'hex'),
-                        'bytes', ENCODE(script.bytes, 'hex'),
-                        'value', script.json,
-                        'type', script.type::text,
-                        'size', script.serialised_size
-                      )
-                    END
-                  ) AS reference_script_object
-                FROM
-                  script
-                WHERE
-                  script.id = tx_out.reference_script_id
+              JSONB_BUILD_OBJECT(
+                'hash', ENCODE(script.hash, 'hex'),
+                'bytes', ENCODE(script.bytes, 'hex'),
+                'value', script.json,
+                'type', script.type::text,
+                'size', script.serialised_size
               )
             END
           ) AS reference_script
@@ -513,6 +358,11 @@ BEGIN
           tx_out
           INNER JOIN tx ON tx_out.tx_id = tx.id
           LEFT JOIN stake_address AS sa ON tx_out.stake_address_id = sa.id
+          LEFT JOIN ma_tx_out AS mto ON _assets IS TRUE AND mto.tx_out_id = tx_out.id
+          LEFT JOIN multi_asset AS ma ON _assets IS TRUE AND ma.id = mto.ident
+          LEFT JOIN grest.asset_info_cache AS aic ON _assets IS TRUE AND aic.asset_id = ma.id
+          LEFT JOIN datum ON _scripts IS TRUE AND datum.id = tx_out.inline_datum_id
+          LEFT JOIN script ON _scripts IS TRUE AND script.id = tx_out.reference_script_id
         WHERE
           tx_out.tx_id = ANY(_tx_id_list)
       ),
