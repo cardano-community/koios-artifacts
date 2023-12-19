@@ -995,6 +995,65 @@ schemas:
             $ref: "#/components/schemas/blocks/items/properties/block_height"
           block_time:
             $ref: "#/components/schemas/blocks/items/properties/block_time"
+    block_tx_info:
+      description: Array of detailed information about transaction(s)
+      type: array
+      items:
+        type: object
+        properties:
+          tx_hash:
+            $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+          block_hash:
+            $ref: "#/components/schemas/blocks/items/properties/hash"
+          block_height:
+            $ref: "#/components/schemas/blocks/items/properties/block_height"
+          epoch_no:
+            $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+          epoch_slot:
+            $ref: "#/components/schemas/blocks/items/properties/epoch_slot"
+          absolute_slot:
+            $ref: "#/components/schemas/blocks/items/properties/abs_slot"
+          tx_timestamp:
+            $ref: "#/components/schemas/tx_info/items/properties/tx_timestamp"
+          tx_block_index:
+            $ref: "#/components/schemas/tx_info/items/properties/tx_block_index"
+          tx_size:
+            $ref: "#/components/schemas/tx_info/items/properties/tx_size"
+          total_output:
+            $ref: "#/components/schemas/tx_info/items/properties/total_output"
+          fee:
+            $ref: "#/components/schemas/tx_info/items/properties/fee"
+          deposit:
+            $ref: "#/components/schemas/tx_info/items/properties/deposit"
+          invalid_before:
+            $ref: "#/components/schemas/tx_info/items/properties/invalid_before"
+          invalid_after:
+            $ref: "#/components/schemas/tx_info/items/properties/invalid_after"
+          collateral_inputs:
+            $ref: "#/components/schemas/tx_info/items/properties/collateral_inputs"
+          collateral_output:
+            $ref: "#/components/schemas/tx_info/items/properties/collateral_output"
+          reference_inputs:
+            $ref: "#/components/schemas/tx_info/items/properties/reference_inputs"
+          inputs:
+            description: An array of UTxO inputs spent in the transaction
+            anyOf:
+            - type: 'null'
+            - $ref: "#/components/schemas/tx_info/items/properties/outputs"
+          outputs:
+            $ref: "#/components/schemas/tx_info/items/properties/outputs"
+          withdrawals:
+            $ref: "#/components/schemas/tx_info/items/properties/withdrawals"
+          assets_minted:
+            $ref: "#/components/schemas/tx_info/items/properties/assets_minted"
+          metadata:
+            $ref: "#/components/schemas/tx_metadata/items/properties/metadata"
+          certificates:
+            $ref: "#/components/schemas/tx_info/items/properties/certificates"
+          native_scripts:
+            $ref: "#/components/schemas/tx_info/items/properties/native_scripts"
+          plutus_contracts:
+            $ref: "#/components/schemas/tx_info/items/properties/plutus_contracts"
     address_info:
       description: Array of information for address(es)
       type: array

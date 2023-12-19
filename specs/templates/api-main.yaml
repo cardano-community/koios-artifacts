@@ -267,6 +267,28 @@ paths:
       summary: Block Transactions
       description: Get a list of all transactions included in provided blocks
       operationId: block_txs
+  /block_tx_info: #RPC
+    post:
+      tags:
+        - Block
+      requestBody:
+        $ref: "#/components/requestBodies/block_tx_info"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/block_tx_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Block Transactions (Detailed Info)
+      description: Get detailed information about transaction(s) for requested blocks
+      operationId: block_tx_info
 
   /utxo_info: #RPC
     post:
