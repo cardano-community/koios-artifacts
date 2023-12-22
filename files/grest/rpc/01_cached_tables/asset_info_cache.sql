@@ -68,6 +68,7 @@ BEGIN
           ELSE TRUE
         END
         AND tm.json IS NOT NULL
+        AND mtm.quantity > 0
       GROUP BY mtm.ident
     ),
 

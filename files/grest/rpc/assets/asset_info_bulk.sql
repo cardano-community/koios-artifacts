@@ -26,10 +26,9 @@ BEGIN
       SELECT
         DECODE(asset_list->>0, 'hex') AS policy,
         DECODE(asset_list->>1, 'hex') AS name
-      FROM
-      JSONB_ARRAY_ELEMENTS(TO_JSONB(_asset_list)) AS asset_list
+      FROM JSONB_ARRAY_ELEMENTS(TO_JSONB(_asset_list)) AS asset_list
     ) AS ald
-    INNER JOIN multi_asset AS mu ON mu.policy = ald.policy AND mu.name = ald.name
+      INNER JOIN multi_asset AS mu ON mu.policy = ald.policy AND mu.name = ald.name
   ) AS tmp;
   RETURN QUERY
     SELECT
@@ -43,16 +42,17 @@ BEGIN
       aic.burn_cnt,
       EXTRACT(EPOCH FROM aic.creation_time)::integer,
       metadata.minting_tx_metadata,
-      CASE WHEN arc.name IS NULL THEN NULL
-      ELSE
-        JSONB_BUILD_OBJECT(
-          'name', arc.name,
-          'description', arc.description,
-          'ticker', arc.ticker,
-          'url', arc.url,
-          'logo', arc.logo,
-          'decimals', arc.decimals
-        )
+      CASE
+        WHEN arc.name IS NULL THEN NULL
+        ELSE
+          JSONB_BUILD_OBJECT(
+            'name', arc.name,
+            'description', arc.description,
+            'ticker', arc.ticker,
+            'url', arc.url,
+            'logo', arc.logo,
+            'decimals', arc.decimals
+          )
       END,
       cip68.metadata
     FROM
@@ -61,15 +61,12 @@ BEGIN
       INNER JOIN tx ON tx.id = aic.last_mint_tx_id
       LEFT JOIN grest.asset_registry_cache AS arc ON arc.asset_policy = ENCODE(ma.policy,'hex') AND arc.asset_name = ENCODE(ma.name,'hex')
       LEFT JOIN LATERAL (
-        SELECT
-          JSONB_OBJECT_AGG(
+        SELECT JSONB_OBJECT_AGG(
             key::text,
             json
           ) AS minting_tx_metadata
-        FROM
-          tx_metadata AS tm
-        WHERE
-          tm.tx_id = tx.id
+        FROM tx_metadata AS tm
+        WHERE tm.tx_id = tx.id
       ) metadata ON TRUE
       LEFT JOIN LATERAL (
         -- CIP-68 supported labels
@@ -91,27 +88,20 @@ BEGIN
               datum.value
             )
           END AS metadata
-        FROM
-          tx_out
+        FROM tx_out
           INNER JOIN datum ON datum.hash = tx_out.data_hash
-        WHERE
-          tx_out.id = (
+        WHERE tx_out.id = (
             SELECT
               (SELECT MAX(tx_out_id) FROM ma_tx_out WHERE ident = _ma.id) as tx_id
-            FROM
-              multi_asset _ma
-            WHERE
-              _ma.policy = MA.policy
-              AND
-              _ma.name = (
+            FROM multi_asset _ma
+            WHERE _ma.policy = MA.policy
+              AND _ma.name = (
                 SELECT
-                  CASE WHEN
-                    STARTS_WITH(ENCODE(ma.name, 'hex'), '000de140')
-                    OR
-                    STARTS_WITH(ENCODE(ma.name, 'hex'), '0014df10')
-                    OR
-                    STARTS_WITH(ENCODE(ma.name, 'hex'), '001bc280')
-                  THEN CONCAT('\x000643b0', SUBSTRING(ENCODE(ma.name, 'hex'), 9))::bytea
+                  CASE
+                    WHEN STARTS_WITH(ENCODE(ma.name, 'hex'), '000de140')
+                      OR STARTS_WITH(ENCODE(ma.name, 'hex'), '0014df10')
+                      OR STARTS_WITH(ENCODE(ma.name, 'hex'), '001bc280')
+                    THEN CONCAT('\x000643b0', SUBSTRING(ENCODE(ma.name, 'hex'), 9))::bytea
                   ELSE null
                   END
               )
