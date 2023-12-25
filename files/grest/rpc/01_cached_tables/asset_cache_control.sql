@@ -15,6 +15,7 @@ CREATE INDEX IF NOT EXISTS idx_atoc_txoid ON grest.asset_tx_out_cache USING btre
 
 CREATE INDEX IF NOT EXISTS idx_atoc_maid ON grest.asset_tx_out_cache USING btree (ma_id) INCLUDE (txo_id, quantity);
 
+DELETE FROM grest.asset_cache_control;
 INSERT INTO grest.asset_cache_control VALUES (DECODE('a0028f350aaabe0545fdcb56b039bfb08e4bb4d8c4d7c3c7d481c235', 'hex')); -- HOSKY
 INSERT INTO grest.asset_cache_control VALUES (DECODE('af2e27f580f7f08e93190a81f72462f153026d06450924726645891b', 'hex')); -- DRIP
 INSERT INTO grest.asset_cache_control VALUES (DECODE('29d222ce763455e3d7a09a665ce554f00ac89d2e99a1a83d267170c6', 'hex')); -- MIN
@@ -34,6 +35,5 @@ INSERT INTO grest.asset_cache_control VALUES (DECODE('750900e4999ebe0d58f19b6347
 INSERT INTO grest.asset_cache_control VALUES (DECODE('e38748c08c510a4a5d712922a0f91269b8446ac565068f653c517475', 'hex')); -- preprod KUt1
 INSERT INTO grest.asset_cache_control VALUES (DECODE('602866d30452bf3ea0af2d6b4007389eed5542d2572808cba3eb991f', 'hex')); -- preprod tokenA
 INSERT INTO grest.asset_cache_control VALUES (DECODE('af6c50cb85c8df17f539437c01b405ab9b62b03140d872e787d7a279', 'hex')); -- preprod tokenB
-INSERT INTO grest.asset_cache_control VALUES (DECODE('c462512684cf5a5ee0b176326c724d5879a37a4977d3bf1e4edc39f6', 'hex')); -- preview mTOSI
-INSERT INTO grest.asset_cache_control VALUES (DECODE('c462512684cf5a5ee0b176326c724d5879a37a4977d3bf1e4edc39f6', 'hex')); -- preview BLUE/GREEN/PURPLE/RAINBOW/RED/YELLOW
+INSERT INTO grest.asset_cache_control VALUES (DECODE('c462512684cf5a5ee0b176326c724d5879a37a4977d3bf1e4edc39f6', 'hex')); -- preview mTOSI BLUE/GREEN/PURPLE/RAINBOW/RED/YELLOW
 -- INSERT INTO grest.asset_cache_control VALUES (DECODE('', 'hex')); -- 
