@@ -13,14 +13,6 @@ BEGIN
     RAISE EXCEPTION 'Previous asset_txo_cache_update query still running but should have completed! Exiting...';
   END IF;
 
-  CREATE TEMP TABLE tmp_ma AS (
-    SELECT ma1.id
-    FROM grest.asset_cache_control AS acc1
-      INNER JOIN multi_asset AS ma1 ON ma1.policy = acc1.policy
-      LEFT JOIN grest.asset_tx_out_cache AS atoc1 ON ma1.id = atoc1.ma_id
-    WHERE atoc1.ma_id IS NULL
-  );
-
   WITH
     ma_filtered AS
       (
@@ -49,7 +41,6 @@ BEGIN
         LEFT JOIN tx_out AS txo ON atoc.txo_id = txo.id
         WHERE txo.consumed_by_tx_in_id IS NOT NULL
           OR txo.id IS NULL);
-  DROP TABLE tmp_ma;
 
 END;
 $$;
