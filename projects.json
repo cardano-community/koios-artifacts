@@ -160,6 +160,14 @@
         "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/raywallet.png"
       }
     },
+    {
+      "text": "Skulliance",
+      "link": "https://skulliance.io",
+      "logo": {
+        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/skulliance_dark.png",
+        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/skulliance_light.png"
+      }
+    },
     {"text": "Stakepool Operator Scripts",
       "link": "https://github.com/gitmachtl/scripts",
       "logo": {
