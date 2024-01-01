@@ -34,7 +34,7 @@ BEGIN
     SELECT
       ENCODE(ma.policy, 'hex'),
       ENCODE(ma.name, 'hex'),
-      ENCODE(ma.name, 'escape'),
+      ENCODE(grest.cip68_strip_label(ENCODE(ma.name, 'hex')), 'escape'),
       ma.fingerprint,
       ENCODE(tx.hash, 'hex'),
       aic.total_supply::text,
@@ -69,22 +69,12 @@ BEGIN
         WHERE tm.tx_id = tx.id
       ) metadata ON TRUE
       LEFT JOIN LATERAL (
-        -- CIP-68 supported labels
-        -- 100 = 000643b0 (ref, metadata)
-        -- 222 = 000de140 (NFT)
-        -- 333 = 0014df10 (FT)
-        -- 444 = 001bc280 (RFT)
         SELECT
           CASE
             WHEN datum.value IS NULL THEN NULL
           ELSE
             JSONB_BUILD_OBJECT(
-              CASE
-                WHEN STARTS_WITH(ENCODE(ma.name, 'hex'), '000de140') THEN '222'
-                WHEN STARTS_WITH(ENCODE(ma.name, 'hex'), '0014df10') THEN '333'
-                WHEN STARTS_WITH(ENCODE(ma.name, 'hex'), '001bc280') THEN '444'
-                ELSE '0'
-              END,
+              grest.cip68_label(ENCODE(ma.name, 'hex')),
               datum.value
             )
           END AS metadata
@@ -98,9 +88,7 @@ BEGIN
               AND _ma.name = (
                 SELECT
                   CASE
-                    WHEN STARTS_WITH(ENCODE(ma.name, 'hex'), '000de140')
-                      OR STARTS_WITH(ENCODE(ma.name, 'hex'), '0014df10')
-                      OR STARTS_WITH(ENCODE(ma.name, 'hex'), '001bc280')
+                    WHEN grest.cip68_label(ENCODE(ma.name, 'hex')) != 0
                     THEN CONCAT('\x000643b0', SUBSTRING(ENCODE(ma.name, 'hex'), 9))::bytea
                   ELSE null
                   END
