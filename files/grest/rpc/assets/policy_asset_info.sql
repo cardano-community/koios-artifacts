@@ -37,8 +37,8 @@ AS $$
 BEGIN
   RETURN QUERY
     SELECT
-      ENCODE(ma.name, 'hex') AS asset_name,
-      ENCODE(ma.name, 'escape') AS asset_name_ascii,
+      ENCODE(ma.name, 'hex'),
+      ENCODE(grest.cip67_strip_label(ENCODE(ma.name, 'hex')), 'escape'),
       ma.fingerprint,
       ENCODE(tx.hash, 'hex'),
       aic.total_supply::text,
