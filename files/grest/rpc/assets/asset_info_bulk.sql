@@ -34,7 +34,7 @@ BEGIN
     SELECT
       ENCODE(ma.policy, 'hex'),
       ENCODE(ma.name, 'hex'),
-      ENCODE(grest.cip68_strip_label(ENCODE(ma.name, 'hex')), 'escape'),
+      ENCODE(grest.cip67_strip_label(ENCODE(ma.name, 'hex')), 'escape'),
       ma.fingerprint,
       ENCODE(tx.hash, 'hex'),
       aic.total_supply::text,
@@ -74,7 +74,7 @@ BEGIN
             WHEN datum.value IS NULL THEN NULL
           ELSE
             JSONB_BUILD_OBJECT(
-              grest.cip68_label(ENCODE(ma.name, 'hex')),
+              grest.cip67_label(ENCODE(ma.name, 'hex')),
               datum.value
             )
           END AS metadata
@@ -88,7 +88,7 @@ BEGIN
               AND _ma.name = (
                 SELECT
                   CASE
-                    WHEN grest.cip68_label(ENCODE(ma.name, 'hex')) != 0
+                    WHEN grest.cip67_label(ENCODE(ma.name, 'hex')) != 0
                     THEN CONCAT('\x000643b0', SUBSTRING(ENCODE(ma.name, 'hex'), 9))::bytea
                   ELSE null
                   END

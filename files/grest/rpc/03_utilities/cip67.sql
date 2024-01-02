@@ -1,9 +1,9 @@
-CREATE OR REPLACE FUNCTION grest.cip68_label(_asset_name text)
+CREATE OR REPLACE FUNCTION grest.cip67_label(_asset_name text)
 RETURNS smallint
 LANGUAGE plpgsql STABLE
 AS $$
 BEGIN
-  -- CIP-68 supported labels
+  -- CIP-67 supported labels
   -- 100 = 000643b0 (ref, metadata)
   -- 222 = 000de140 (NFT)
   -- 333 = 0014df10 (FT)
@@ -26,12 +26,12 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE FUNCTION grest.cip68_strip_label(_asset_name text)
+CREATE OR REPLACE FUNCTION grest.cip67_strip_label(_asset_name text)
 RETURNS text
 LANGUAGE plpgsql STABLE
 AS $$
 BEGIN
-  IF (grest.cip68_label(_asset_name) != 0) THEN
+  IF (grest.cip67_label(_asset_name) != 0) THEN
     RETURN SUBSTRING(_asset_name FROM 9);
   ELSE
     RETURN _asset_name;
@@ -39,6 +39,6 @@ BEGIN
 END;
 $$;
 
-COMMENT ON FUNCTION grest.cip68_label IS 'Returns CIP-67 label for asset name or 0 if not a valid CIP-68 token'; -- noqa: LT01
-COMMENT ON FUNCTION grest.cip68_strip_label IS 'Strips prefix from asset name matching CIP-68 standard'; -- noqa: LT01
+COMMENT ON FUNCTION grest.cip67_label IS 'Returns CIP-67 label for asset name or 0 if not a valid CIP-68 token'; -- noqa: LT01
+COMMENT ON FUNCTION grest.cip67_strip_label IS 'Strips prefix from asset name matching CIP-67 standard'; -- noqa: LT01
 
