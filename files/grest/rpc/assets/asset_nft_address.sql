@@ -1,6 +1,7 @@
 CREATE OR REPLACE FUNCTION grest.asset_nft_address(_asset_policy text, _asset_name text DEFAULT '')
 RETURNS TABLE (
-  payment_address varchar
+  payment_address varchar,
+  stake_address varchar
 ) LANGUAGE plpgsql
 AS $$
 DECLARE
@@ -25,8 +26,11 @@ BEGIN
 
   IF EXISTS (SELECT * FROM ma_tx_mint WHERE ident = _asset_id and quantity < 0 LIMIT 1) THEN
     RETURN QUERY
-      SELECT address
-      FROM tx_out
+      SELECT
+        txo.address,
+        sa.view AS stake_address
+      FROM tx_out AS txo
+      LEFT JOIN stake_address ON txo.stake_address_id = sa.view
       WHERE id = (
         SELECT MAX(tx_out_id)
         FROM ma_tx_out
@@ -34,9 +38,12 @@ BEGIN
       );
   ELSE
     RETURN QUERY
-      SELECT address
-      FROM tx_out
+      SELECT
+        txo.address,
+        sa.view AS stake_address
+      FROM tx_out AS txo
       INNER JOIN ma_tx_out mto ON mto.tx_out_id = tx_out.id
+      LEFT JOIN stake_address ON txo.stake_address_id = sa.view
       WHERE mto.ident = _asset_id
         AND tx_out.consumed_by_tx_in_id IS NULL
       ORDER BY tx_out.id DESC
