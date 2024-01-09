@@ -870,55 +870,59 @@ schemas:
           hash:
             type: string
             description: Hash of the block
-            example: e8c6992d52cd74b577b79251e0351be25070797a0dbc486b2c284d0bf7aeea9c
+            example: 2fa5178c5be950c7f40d6c74efe9b3dd12c4836dc3f3dd052cd1c2a12edd477f
           epoch_no:
             type: number
             description: Epoch number of the block
-            example: 321
+            example: 117
           abs_slot:
             type: number
             description: Absolute slot number of the block
-            example: 53384242
+            example: 49073930
           epoch_slot:
             type: number
             description: Slot number of the block in epoch
-            example: 75442
+            example: 171530
           block_height:
             type:
               - number
               - 'null'
             description: Block height
-            example: 42325043
+            example: 1794506
           block_size:
             type: number
             description: Block size in bytes
-            example: 79109
+            example: 2433
           block_time:
             type: number
             description: UNIX timestamp of the block
-            example: 1506635091
+            example: 1704757130
           tx_count:
             type: number
             description: Number of transactions in the block
-            example: 44
+            example: 2
           vrf_key:
             type: string
             description: VRF key of the block producer
-            example: "vrf_vk1pmxyz8efuyj6eq6zkk373f28u47v06nwp5t59jr5fcmcusaazlmqhxu8k2"
+            example: "vrf_vk1400ju08429se790upcvurdyqrhl8rhm7spm2jxg0lfnedqeaexfq7jsf2x"
           pool:
             type:
               - string
               - 'null'
             description: Pool ID in bech32 format (null for pre-Shelley blocks)
-            example: pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc
+            example: pool13m26ky08vz205232k20u8ft5nrg8u68klhn0xfsk9m4gsqsc44v
           op_cert_counter:
             type: number
             description: Counter value of the operational certificate used to create this block
-            example: 8
+            example: 5
           proto_major:
             $ref: "#/components/schemas/epoch_params/items/properties/protocol_major"
           proto_minor:
             $ref: "#/components/schemas/epoch_params/items/properties/protocol_minor"
+          parent_hash:
+            type: string
+            description: Previous Hash of the current block
+            example: 7eb8d62f9d6a5e7cf2d9635f0b531d2693fef55a717894e3a97baf6183b8d189
     block_info:
       description: Array of detailed block information
       type: array
@@ -1136,8 +1140,17 @@ schemas:
       items:
         type: object
         properties:
-          id:
+          stake_address:
             $ref: "#/components/schemas/account_history/items/properties/stake_address"
+          stake_address_hex:
+            type: string
+            description: Cardano staking address (reward account) in hex format
+            example: e1c865f10d66a2e375242b5ef9f05abc8840d413421982f62c35ce4fbf
+          script_hash:
+            type: string
+            description: Script hash in case the stake address is locked by a script
+            example: bf357f5de69e4aad71954bebd64357a4813ea5233df12fce4a9de582
+
     account_info:
       description: Array of stake account information
       type: array
@@ -1747,6 +1760,8 @@ schemas:
             $ref: "#/components/schemas/asset_info/items/properties/policy_id"
           asset_name:
             $ref: "#/components/schemas/asset_info/items/properties/asset_name"
+          asset_name_ascii:
+            $ref: "#/components/schemas/asset_info/items/properties/asset_name_ascii"
           fingerprint:
             $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
     asset_token_registry:
@@ -1816,6 +1831,10 @@ schemas:
             type: number
             description: Total number of payment addresses (not belonging to registered wallets) holding the given asset
             example: 245
+          addresses:
+            type: number
+            description: Total number of unique addresses holding the given asset
+            example: 812
     asset_info:
       description: Array of detailed asset information
       type: array
