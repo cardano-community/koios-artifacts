@@ -5,7 +5,8 @@ RETURNS TABLE (
   fingerprint character varying,
   total_transactions bigint,
   staked_wallets bigint,
-  unstaked_addresses bigint
+  unstaked_addresses bigint,
+  addresses bigint
 )
 LANGUAGE plpgsql
 AS $$
@@ -35,9 +36,8 @@ BEGIN
         txo.stake_address_id AS sa_id
       FROM ma_tx_out AS mto
       INNER JOIN tx_out AS txo ON txo.id = mto.tx_out_id
-      LEFT JOIN tx_in AS txi ON txi.tx_out_id = txo.tx_id
       WHERE mto.ident = _asset_id
-        AND txi.tx_out_id IS NULL)
+        AND txo.consumed_by_tx_in_id IS NULL)
 
     SELECT
       _asset_policy,
@@ -58,7 +58,11 @@ BEGIN
         SELECT COUNT(DISTINCT(_asset_utxos.address))
         FROM _asset_utxos
         WHERE _asset_utxos.sa_id IS NULL
-      ) AS unstaked_addresses
+      ) AS unstaked_addresses,
+      (
+        SELECT COUNT(DISTINCT(_asset_utxos.address))
+        FROM _asset_utxos
+      ) AS addresses
     FROM multi_asset AS ma
     WHERE ma.id = _asset_id;
   END;

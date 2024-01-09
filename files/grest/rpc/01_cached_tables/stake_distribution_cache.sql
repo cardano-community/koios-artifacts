@@ -86,9 +86,8 @@ BEGIN
         tx_in.tx_out_id AS txoid,
         tx_in.tx_out_index AS txoidx
       FROM tx_in
-      LEFT JOIN tx_out
-        ON tx_in.tx_out_id = tx_out.tx_id
-          AND tx_in.tx_out_index::smallint = tx_out.index::smallint
+      LEFT JOIN tx_out ON tx_in.tx_out_id = tx_out.tx_id
+        AND tx_in.tx_out_index::smallint = tx_out.index::smallint
       INNER JOIN accounts_with_delegated_pools AS awdp ON awdp.stake_address_id = tx_out.stake_address_id
       WHERE tx_in.tx_in_id > _last_account_tx_id
     ),
