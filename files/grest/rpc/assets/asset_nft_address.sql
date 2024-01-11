@@ -30,7 +30,7 @@ BEGIN
         txo.address,
         sa.view AS stake_address
       FROM tx_out AS txo
-      LEFT JOIN stake_address ON txo.stake_address_id = sa.view
+      LEFT JOIN stake_address sa ON txo.stake_address_id = sa.id
       WHERE id = (
         SELECT MAX(tx_out_id)
         FROM ma_tx_out
@@ -42,11 +42,11 @@ BEGIN
         txo.address,
         sa.view AS stake_address
       FROM tx_out AS txo
-      INNER JOIN ma_tx_out mto ON mto.tx_out_id = tx_out.id
-      LEFT JOIN stake_address ON txo.stake_address_id = sa.view
+      INNER JOIN ma_tx_out mto ON mto.tx_out_id = txo.id
+      LEFT JOIN stake_address sa ON txo.stake_address_id = sa.id
       WHERE mto.ident = _asset_id
         AND tx_out.consumed_by_tx_in_id IS NULL
-      ORDER BY tx_out.id DESC
+      ORDER BY txo.id DESC
       LIMIT 1;
   END IF;
 END;
