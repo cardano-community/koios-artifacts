@@ -51,19 +51,13 @@ BEGIN
   END IF;
 
   -- Set-up interval limits for previous epoch
-  SELECT MAX(tx.id) INTO _lower_bound_account_tx_id
-  FROM public.tx
-  INNER JOIN BLOCK AS b ON b.id = tx.block_id
-    WHERE b.epoch_no <= _previous_epoch_no - 2
-    AND b.block_no IS NOT NULL
-    AND b.tx_count != 0;
+  SELECT MAX(eic.i_last_tx_id) INTO _lower_bound_account_tx_id
+    FROM grest.epoch_info_cache AS eic
+    WHERE eic.epoch_no <= _previous_epoch_no - 2;
 
-  SELECT MAX(tx.id) INTO _upper_bound_account_tx_id
-  FROM public.tx
-  INNER JOIN BLOCK AS b ON b.id = tx.block_id
-    WHERE b.epoch_no <= _previous_epoch_no
-    AND b.block_no IS NOT NULL
-    AND b.tx_count != 0;
+  SELECT MAX(eic.i_last_tx_id) INTO _upper_bound_account_tx_id
+    FROM grest.epoch_info_cache AS eic
+    WHERE eic.epoch_no <= _previous_epoch_no;
 
   /* Temporary table to figure out valid delegations ending up in active stake in case of pool retires */
   DROP TABLE IF EXISTS minimum_pool_delegation_tx_ids;

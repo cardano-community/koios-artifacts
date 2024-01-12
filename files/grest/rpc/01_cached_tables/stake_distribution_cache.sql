@@ -15,19 +15,15 @@ DECLARE -- Last block height to control future re-runs of the query
   _last_accounted_block_height bigint;
   _last_account_tx_id bigint;
   _active_stake_epoch bigint;
-  _last_active_stake_blockid bigint;
   _latest_epoch bigint;
 BEGIN
   SELECT MAX(block_no) FROM public.block
     WHERE block_no IS NOT NULL INTO _last_accounted_block_height;
   SELECT (last_value::integer - 2)::integer INTO _active_stake_epoch FROM grest.control_table
     WHERE key = 'last_active_stake_validated_epoch';
-  SELECT MAX(tx.id) INTO _last_account_tx_id
-  FROM public.tx
-  INNER JOIN block AS b ON b.id = tx.block_id
-  WHERE b.epoch_no <= _active_stake_epoch
-    AND b.block_no IS NOT NULL
-    AND b.tx_count != 0;
+  SELECT MAX(eic.i_last_tx_id) INTO _last_account_tx_id
+    FROM grest.epoch_info_cache AS eic
+    WHERE eic.epoch_no <= _active_stake_epoch;
   SELECT MAX(no) INTO _latest_epoch FROM public.epoch WHERE no IS NOT NULL;
 
   WITH
@@ -247,6 +243,11 @@ BEGIN
       WHERE key = 'last_active_stake_validated_epoch'
     ) THEN
     RAISE EXCEPTION 'Active Stake cache too far, skipping...';
+  ELSIF (
+    SELECT
+      ((SELECT MAX(no) FROM epoch) - (SELECT MAX(epoch_no)::integer FROM grest.epoch_info_cache))::integer > 1
+    ) THEN
+    RAISE EXCEPTION 'Epoch Info cache wasnt run yet, skipping...';
   END IF;
 
   -- QUERY START --

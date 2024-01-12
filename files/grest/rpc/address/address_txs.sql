@@ -28,8 +28,6 @@ BEGIN
     --
     SELECT consumed_by_tx_in_id AS tx_id
     FROM tx_out
-    LEFT JOIN tx_in ON tx_out.tx_id = tx_in.tx_out_id
-      AND tx_out.index = tx_in.tx_out_index
     WHERE tx_out.consumed_by_tx_in_id IS NOT NULL
       AND tx_out.address = ANY(_addresses)
       AND tx_out.consumed_by_tx_in_id >= _tx_id_min
