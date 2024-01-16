@@ -10,7 +10,7 @@ AS $$
   SELECT
     ENCODE(ma.policy, 'hex')::text AS policy_id,
     ENCODE(ma.name, 'hex')::text AS asset_name,
-    ENCODE(ma.name, 'escape')::text as asset_name_ascii,
+    ENCODE(DECODE(grest.cip67_strip_label(ENCODE(ma.name, 'hex')), 'hex'), 'escape')::text as asset_name_ascii,
     ma.fingerprint::text
   FROM public.multi_asset AS ma
   ORDER BY ma.policy, ma.name;

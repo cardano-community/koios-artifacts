@@ -34,7 +34,7 @@ BEGIN
     SELECT
       ENCODE(ma.policy, 'hex'),
       ENCODE(ma.name, 'hex'),
-      ENCODE(grest.cip67_strip_label(ENCODE(ma.name, 'hex')), 'escape'),
+      ENCODE(DECODE(grest.cip67_strip_label(ENCODE(ma.name, 'hex')), 'hex'), 'escape'),
       ma.fingerprint,
       ENCODE(tx.hash, 'hex'),
       aic.total_supply::text,
