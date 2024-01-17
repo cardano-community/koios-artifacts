@@ -8,5 +8,5 @@ if [[ $(( $(date +%s) - tip )) -gt 300 ]]; then
 fi
 
 echo "$(date +%F_%H:%M:%S) Running stake distribution update for new accounts..."
-psql ${DB_NAME} -qbt -c "CALL GREST.UPDATE_NEWLY_REGISTERED_ACCOUNTS_STAKE_DISTRIBUTION_CACHE();" 1>/dev/null 2>&1
+psql ${DB_NAME} -qbt -c "CALL GREST.UPDATE_NEWLY_REGISTERED_ACCOUNTS_STAKE_DISTRIBUTION_CACHE();" 1>/dev/null
 echo "$(date +%F_%H:%M:%S) Job done!"

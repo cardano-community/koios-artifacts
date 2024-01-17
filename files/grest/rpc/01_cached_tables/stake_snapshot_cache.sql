@@ -309,10 +309,9 @@ BEGIN
   WITH
     account_delta_tx_ins AS (
       SELECT
-        awdp.stake_address_id,
+        tx_out.stake_address_id,
         tx_out.id AS txoid
       FROM tx_out
-      INNER JOIN accounts_with_delegated_pools AS awdp ON awdp.stake_address_id = tx_out.stake_address_id
       WHERE tx_out.consumed_by_tx_id <= _upper_bound_account_tx_id
         AND tx_out.stake_address_id = ANY(_newly_registered_account_ids)
     ),

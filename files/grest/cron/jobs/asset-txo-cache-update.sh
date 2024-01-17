@@ -8,5 +8,5 @@ if [[ $(( $(date +%s) - tip )) -gt 300 ]]; then
 fi
 
 echo "$(date +%F_%H:%M:%S) Running asset txo cache update..."
-psql ${DB_NAME} -qbt -c "SELECT grest.asset_txo_cache_update();" 1>/dev/null 2>&1
+psql ${DB_NAME} -qbt -c "SELECT grest.asset_txo_cache_update();" 1>/dev/null
 echo "$(date +%F_%H:%M:%S) Job done!"

@@ -70,9 +70,9 @@ BEGIN
     account_active_stake AS (
       SELECT
         awdp.stake_address_id,
-        acsc.amount
-      FROM grest.account_active_stake_cache AS acsc
-      INNER JOIN accounts_with_delegated_pools AS awdp ON awdp.stake_address = acsc.stake_address
+        es.amount
+      FROM epoch_stake AS es
+      INNER JOIN accounts_with_delegated_pools AS awdp ON awdp.stake_address_id = es.addr_id
       WHERE epoch_no = (_active_stake_epoch + 2)
     ),
 
