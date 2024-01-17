@@ -111,7 +111,7 @@ BEGIN
           COALESCE(SUM(VALUE), 0) AS utxo
         FROM tx_out
         WHERE tx_out.stake_address_id = ANY(sa_id_list)
-          AND tx_out.consumed_by_tx_in_id IS NULL
+          AND tx_out.consumed_by_tx_id IS NULL
         GROUP BY tx_out.stake_address_id
       ) AS utxo_t ON utxo_t.stake_address_id = status_t.id
     LEFT JOIN (

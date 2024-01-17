@@ -29,7 +29,7 @@ BEGIN
               txo.id
             FROM tx_out AS txo
             WHERE txo.stake_address_id = ANY(sa_id_list)
-              AND txo.consumed_by_tx_in_id IS NULL
+              AND txo.consumed_by_tx_id IS NULL
           ) AS x
       )
 

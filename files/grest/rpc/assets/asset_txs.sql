@@ -48,7 +48,7 @@ BEGIN
       WHERE
         mto.ident = _asset_id
         AND block.block_no >= _after_block_height
-        AND (_history = TRUE OR txo.consumed_by_tx_in_id IS NULL)
+        AND (_history = TRUE OR txo.consumed_by_tx_id IS NULL)
       GROUP BY
         ident,
         tx.hash,

@@ -35,7 +35,7 @@ BEGIN
           LEFT JOIN tx_out AS txo ON txo.id = atoc.txo_id
           LEFT JOIN stake_address AS sa ON txo.stake_address_id = sa.id
           WHERE ma.policy = DECODE(_asset_policy, 'hex')
-            AND txo.consumed_by_tx_in_id IS NULL
+            AND txo.consumed_by_tx_id IS NULL
         ) x
         LEFT JOIN multi_asset AS ma ON ma.id = x.ma_id
       GROUP BY
@@ -53,7 +53,7 @@ BEGIN
       LEFT JOIN tx_out AS txo ON txo.id = mto.tx_out_id
       LEFT JOIN stake_address AS sa ON txo.stake_address_id = sa.id
       WHERE ma.policy = DECODE(_asset_policy, 'hex')
-        AND txo.consumed_by_tx_in_id IS NULL
+        AND txo.consumed_by_tx_id IS NULL
       GROUP BY
         ma.name,
         txo.address;

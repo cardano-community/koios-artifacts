@@ -79,13 +79,10 @@ BEGIN
     account_delta_tx_ins AS (
       SELECT
         awdp.stake_address_id,
-        tx_in.tx_out_id AS txoid,
-        tx_in.tx_out_index AS txoidx
-      FROM tx_in
-      LEFT JOIN tx_out ON tx_in.tx_out_id = tx_out.tx_id
-        AND tx_in.tx_out_index::smallint = tx_out.index::smallint
+        tx_out.id AS txoid
+      FROM tx_out
       INNER JOIN accounts_with_delegated_pools AS awdp ON awdp.stake_address_id = tx_out.stake_address_id
-      WHERE tx_in.tx_in_id > _last_account_tx_id
+      WHERE tx_out.consumed_by_tx_id > _last_account_tx_id
     ),
 
     account_delta_input AS (
@@ -93,9 +90,7 @@ BEGIN
         tx_out.stake_address_id,
         COALESCE(SUM(tx_out.value), 0) AS amount
       FROM account_delta_tx_ins
-      LEFT JOIN tx_out
-        ON account_delta_tx_ins.txoid=tx_out.tx_id
-          AND account_delta_tx_ins.txoidx = tx_out.index
+      LEFT JOIN tx_out ON account_delta_tx_ins.txoid=tx_out.id
       INNER JOIN accounts_with_delegated_pools AS awdp ON awdp.stake_address_id = tx_out.stake_address_id
       GROUP BY tx_out.stake_address_id
     ),

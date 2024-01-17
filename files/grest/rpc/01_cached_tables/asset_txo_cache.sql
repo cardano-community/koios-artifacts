@@ -32,14 +32,14 @@ BEGIN
       mf.quantity
     FROM ma_filtered AS mf
       LEFT JOIN tx_out AS txo ON mf.tx_out_id = txo.id
-    WHERE txo.consumed_by_tx_in_id IS NULL AND txo.id < (SELECT MAX(id) from tx_out)
+    WHERE txo.consumed_by_tx_id IS NULL AND txo.id < (SELECT MAX(id) from tx_out)
   ;
 
   DELETE FROM grest.asset_tx_out_cache WHERE txo_id IN
     (SELECT atoc.txo_id
       FROM grest.asset_tx_out_cache AS atoc
         LEFT JOIN tx_out AS txo ON atoc.txo_id = txo.id
-        WHERE txo.consumed_by_tx_in_id IS NOT NULL
+        WHERE txo.consumed_by_tx_id IS NOT NULL
           OR txo.id IS NULL);
 
 END;

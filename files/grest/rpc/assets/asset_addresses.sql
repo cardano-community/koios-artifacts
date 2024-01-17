@@ -53,7 +53,7 @@ BEGIN
           LEFT JOIN tx_out AS txo ON atoc.txo_id = txo.id
           LEFT JOIN stake_address AS sa ON txo.stake_address_id = sa.id
           WHERE atoc.ma_id = _asset_id
-            AND txo.consumed_by_tx_in_id IS NULL
+            AND txo.consumed_by_tx_id IS NULL
         ) AS x
       GROUP BY x.address, x.stake_address;
   ELSE
@@ -72,7 +72,7 @@ BEGIN
           LEFT JOIN tx_out AS txo ON txo.id = mto.tx_out_id
           LEFT JOIN stake_address AS sa ON txo.stake_address_id = sa.id
           WHERE mto.ident = _asset_id
-            AND txo.consumed_by_tx_in_id IS NULL
+            AND txo.consumed_by_tx_id IS NULL
         ) AS x
       GROUP BY x.address;
   END IF;

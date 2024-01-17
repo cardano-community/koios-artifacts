@@ -26,11 +26,11 @@ BEGIN
     --
     UNION
     --
-    SELECT consumed_by_tx_in_id AS tx_id
+    SELECT consumed_by_tx_id AS tx_id
     FROM tx_out
-    WHERE tx_out.consumed_by_tx_in_id IS NOT NULL
+    WHERE tx_out.consumed_by_tx_id IS NOT NULL
       AND tx_out.address = ANY(_addresses)
-      AND tx_out.consumed_by_tx_in_id >= _tx_id_min
+      AND tx_out.consumed_by_tx_id >= _tx_id_min
   ) AS tmp;
 
   RETURN QUERY
