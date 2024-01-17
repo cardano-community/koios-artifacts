@@ -42,12 +42,12 @@ BEGIN
         pic.relays,
         pic.meta_url,
         pic.meta_hash,
-        pod.json,
+        ocpd.json,
         'registration' AS update_type,
         NULL::word31type AS retiring_epoch
       FROM
         grest.pool_info_cache AS pic
-        LEFT JOIN public.pool_offline_data AS pod ON pod.pmr_id = pic.meta_id
+        LEFT JOIN public.off_chain_pool_data AS ocpd ON ocpd.pmr_id = pic.meta_id
         LEFT JOIN public.pool_retire AS pr ON pic.pool_hash_id = pr.hash_id
       WHERE _pool_bech32 IS NULL
         OR pic.pool_id_bech32 = _pool_bech32),

@@ -39,13 +39,13 @@ BEGIN
           pic.reward_addr,
           pic.owners,
           pic.relays,
-          pod.ticker_name,
+          ocpd.ticker_name,
           pic.meta_url,
           pic.meta_hash,
           pic.pool_status,
           pic.retiring_epoch
         FROM grest.pool_info_cache AS pic
-        LEFT JOIN public.pool_offline_data AS pod ON pod.pmr_id = pic.meta_id
+        LEFT JOIN public.off_chain_pool_data AS ocpd ON ocpd.pmr_id = pic.meta_id
         ORDER BY
           pic.pool_id_bech32,
           pic.tx_id DESC

@@ -77,11 +77,11 @@ BEGIN
       ROUND((live.stake / _saturation_limit) * 100, 2)
     FROM _all_pool_info AS api
     LEFT JOIN LATERAL (
-      SELECT pod.json
-      FROM public.pool_offline_data AS pod
-      WHERE pod.pool_id = api.pool_hash_id
-        AND pod.pmr_id = api.meta_id
-      ORDER BY pod.pmr_id DESC
+      SELECT ocpd.json
+      FROM public.off_chain_pool_data AS ocpd
+      WHERE ocpd.pool_id = api.pool_hash_id
+        AND ocpd.pmr_id = api.meta_id
+      ORDER BY ocpd.pmr_id DESC
       LIMIT 1
     ) AS offline_data ON TRUE
     LEFT JOIN LATERAL (

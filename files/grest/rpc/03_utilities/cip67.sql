@@ -27,7 +27,7 @@ END;
 $$;
 
 CREATE OR REPLACE FUNCTION grest.cip67_strip_label(_asset_name text)
-RETURNS text
+RETURNS asset32type
 LANGUAGE plpgsql STABLE
 AS $$
 BEGIN
@@ -41,4 +41,3 @@ $$;
 
 COMMENT ON FUNCTION grest.cip67_label IS 'Returns CIP-67 label for asset name or 0 if not a valid CIP-68 token'; -- noqa: LT01
 COMMENT ON FUNCTION grest.cip67_strip_label IS 'Strips prefix from asset name matching CIP-67 standard'; -- noqa: LT01
-
