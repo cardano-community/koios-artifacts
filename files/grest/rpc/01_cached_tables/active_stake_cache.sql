@@ -31,7 +31,7 @@ BEGIN
   IF _current_epoch_no > COALESCE(_last_active_stake_validated_epoch::integer, 0) THEN
     RETURN TRUE;
   ELSE
-    -- 
+    -- If last active stake cache is same as current epoch_no, check if we're beyond 35% within epoch to populate next epoch stake, only valid as of dbsync 13.2.0.0
     IF _current_epoch_no = _last_active_stake_validated_epoch::integer
       AND (
         SELECT (
@@ -43,7 +43,7 @@ BEGIN
         RETURN TRUE;
     END IF;
   END IF;
-  RAISE NOTICE 'Active Stake cache is up to date with DB!'
+  RAISE NOTICE 'Active Stake cache is up to date with DB!';
   RETURN FALSE;
 END;
 $$;
