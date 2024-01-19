@@ -27,14 +27,14 @@ END;
 $$;
 
 CREATE OR REPLACE FUNCTION grest.cip67_strip_label(_asset_name text)
-RETURNS asset32type
+RETURNS bytea
 LANGUAGE plpgsql STABLE
 AS $$
 BEGIN
   IF (grest.cip67_label(_asset_name) != 0) THEN
-    RETURN SUBSTRING(_asset_name FROM 9);
+    RETURN DECODE(SUBSTRING(_asset_name FROM 9),'hex');
   ELSE
-    RETURN _asset_name;
+    RETURN DECODE(_asset_name,'hex');
   END IF;
 END;
 $$;
