@@ -51,10 +51,12 @@ BEGIN
         AND NOT EXISTS (
           SELECT TRUE
           FROM epoch_stake
-          WHERE epoch_stake.epoch_no = (
-            SELECT last_value::integer FROM grest.control_table
-              WHERE key = 'last_active_stake_validated_epoch'
-            )
+          WHERE epoch_stake.epoch_no <= COALESCE(
+            (
+              SELECT last_value::integer
+                FROM grest.control_table
+                WHERE key = 'stake_distribution_new_epoch'
+            ),0)
             AND epoch_stake.addr_id = stake_address.id
         )
     )
@@ -79,6 +81,16 @@ BEGIN
           rewards = EXCLUDED.rewards,
           withdrawals = EXCLUDED.withdrawals,
           rewards_available = EXCLUDED.rewards_available;
+
+  INSERT INTO grest.control_table (key, last_value)
+    VALUES (
+        'stake_distribution_new_epoch',
+        (SELECT last_value::integer FROM grest.control_table
+              WHERE key = 'last_active_stake_validated_epoch')
+      ) ON CONFLICT (key) DO
+    UPDATE
+    SET last_value = (SELECT last_value::integer FROM grest.control_table
+              WHERE key = 'last_active_stake_validated_epoch');
 
     -- Clean up de-registered accounts
     DELETE FROM grest.stake_distribution_cache
