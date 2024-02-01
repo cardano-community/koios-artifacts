@@ -37,7 +37,8 @@ BEGIN
   SELECT MAX(id) INTO _lastest_tx_id
   FROM public.tx;
 
-  SELECT COALESCE(last_value::bigint,1000) - 1000 INTO _asset_info_cache_last_tx_id
+  -- assumption rollback to cater for - 15 blocks (16 tx each) , accordingly - rounding off to 250
+  SELECT COALESCE(last_value::bigint,250) - 250 INTO _asset_info_cache_last_tx_id
   FROM grest.control_table
   WHERE key = 'asset_info_cache_last_tx_id';
 
