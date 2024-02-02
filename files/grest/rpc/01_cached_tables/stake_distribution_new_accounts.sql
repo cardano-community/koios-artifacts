@@ -56,7 +56,11 @@ BEGIN
               SELECT last_value::integer
                 FROM grest.control_table
                 WHERE key = 'stake_distribution_new_epoch'
-            ),0)
+            ), (
+              SELECT last_value::integer
+                FROM grest.control_table
+                WHERE key = 'last_active_stake_validated_epoch'
+            ))
             AND epoch_stake.addr_id = stake_address.id
         )
     )
@@ -106,5 +110,19 @@ BEGIN
               AND sr.tx_id >= sd.tx_id
           )
       );
+
+    -- Clean up accounts registered to retire pools
+    DELETE FROM grest.stake_distribution_cache
+    WHERE stake_address IN (
+      SELECT DISTINCT ON (sa.id)
+        sa.view
+      FROM grest.stake_distribution_cache AS sdc
+      LEFT JOIN stake_address AS sa ON sa.view = sdc.stake_address
+      LEFT JOIN pool_hash AS ph ON ph.view = sdc.pool_id
+      INNER JOIN delegation AS d ON d.addr_id = sa.id
+      LEFT JOIN pool_retire AS pr ON ph.id = pr.hash_id
+      WHERE pr.retiring_epoch < d.active_epoch_no
+    );
+
 END;
 $$;

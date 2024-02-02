@@ -66,12 +66,12 @@ BEGIN
     FROM
       (
         SELECT
-          sas.id,
-          sas.view,
+          sa.id,
+          sa.view,
           EXISTS (
             SELECT TRUE FROM stake_registration
             WHERE
-              stake_registration.addr_id = sas.id
+              stake_registration.addr_id = sa.id
               AND NOT EXISTS (
                 SELECT TRUE
                 FROM stake_deregistration
@@ -80,30 +80,33 @@ BEGIN
                   AND stake_deregistration.tx_id > stake_registration.tx_id
               )
           ) AS registered
-        FROM public.stake_address sas
-        WHERE sas.id = ANY(sa_id_list)
+        FROM public.stake_address sa
+        WHERE sa.id = ANY(sa_id_list)
       ) AS status_t
     LEFT JOIN (
         SELECT
           delegation.addr_id,
           pool_hash.view AS delegated_pool
-        FROM
-          delegation
+        FROM delegation
           INNER JOIN pool_hash ON pool_hash.id = delegation.pool_hash_id
         WHERE
-          delegation.addr_id = ANY(sa_id_list)
+          delegation.addr_id = ANY(_sa_id_list)
           AND NOT EXISTS (
             SELECT TRUE
             FROM delegation AS d
-            WHERE
-              d.addr_id = delegation.addr_id
+            WHERE d.addr_id = delegation.addr_id
               AND d.id > delegation.id)
             AND NOT EXISTS (
               SELECT TRUE
               FROM stake_deregistration
-              WHERE
-                stake_deregistration.addr_id = delegation.addr_id
+              WHERE stake_deregistration.addr_id = delegation.addr_id
                 AND stake_deregistration.tx_id > delegation.tx_id)
+            AND NOT EXISTS (
+              SELECT TRUE
+              FROM pool_retire AS pr
+              WHERE pr.hash_id = delegation.pool_hash_id
+                AND pr.retiring_epoch > delegation.active_epoch_no
+              )
       ) AS pool_t ON pool_t.addr_id = status_t.id
     LEFT JOIN (
         SELECT
