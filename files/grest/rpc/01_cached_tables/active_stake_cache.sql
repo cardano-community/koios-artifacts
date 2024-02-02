@@ -31,7 +31,7 @@ BEGIN
   IF _current_epoch_no > COALESCE(_last_active_stake_validated_epoch::integer, 0) THEN
     RETURN TRUE;
   ELSE
-    -- If last active stake cache is same as current epoch_no, check if we're beyond 35% within epoch to populate next epoch stake, only valid as of dbsync 13.2.0.0
+    -- If last active stake cache is same as current epoch_no, check if we're beyond 50% within epoch to populate next epoch stake, only valid as of dbsync 13.2.0.0
     IF _current_epoch_no = _last_active_stake_validated_epoch::integer
       AND (
         SELECT (
@@ -39,7 +39,7 @@ BEGIN
             FROM block ORDER BY id DESC LIMIT 1) - start_time
           ) * 100 / ((end_time - start_time)::integer)
         FROM grest.epoch_info((SELECT MAX(no) FROM epoch))
-      ) > 35 THEN
+      ) > 50 THEN
         RETURN TRUE;
     END IF;
   END IF;
