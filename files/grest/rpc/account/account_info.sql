@@ -90,7 +90,7 @@ BEGIN
         FROM delegation
           INNER JOIN pool_hash ON pool_hash.id = delegation.pool_hash_id
         WHERE
-          delegation.addr_id = ANY(_sa_id_list)
+          delegation.addr_id = ANY(sa_id_list)
           AND NOT EXISTS (
             SELECT TRUE
             FROM delegation AS d
