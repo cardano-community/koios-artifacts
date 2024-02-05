@@ -74,7 +74,7 @@ BEGIN
           WHERE mto.ident = _asset_id
             AND txo.consumed_by_tx_id IS NULL
         ) AS x
-      GROUP BY x.address;
+      GROUP BY x.address, x.stake_address;
   END IF;
 END;
 $$;
