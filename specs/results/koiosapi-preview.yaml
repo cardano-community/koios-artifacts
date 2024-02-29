@@ -84,16 +84,8 @@ info:
 
     ```
 
-    For GET endpoints, there is also another method to achieve the above, instead of adding parameters to the URL itself, you can specify a `Range` header as below to achieve something similar:<br><br>
-
-    ``` bash
-    curl -s "https://api.koios.rest/api/v1/blocks?select=block_height" -H "Range: 1000-1499" -I | grep -i content-range
-
-    # content-range: 1000-1499/*
-
-    ```
-
-    The above methods for pagination are very useful to keep your queries light as well as process the output in smaller pages, making better use of your resources and respecting server timeouts for response times.
+    The above methods for pagination are very useful to keep some of the queries light as well as process the output in smaller pages, making better use of your resources and respecting server timeouts for response times.
+    However, note that due to the complex nature of some queries that require pre-processing before being subjected to paginations, these may not always be helpful to avoid server timeouts.
 
     ## Ordering
 
