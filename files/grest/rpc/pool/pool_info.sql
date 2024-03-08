@@ -115,8 +115,8 @@ BEGIN
           THEN NULL
         ELSE
           SUM(
-            CASE WHEN total_balance >= 0
-              THEN total_balance
+            CASE WHEN amount::numeric >= 0
+              THEN amount::numeric
               ELSE 0
             END
           )::lovelace
@@ -125,10 +125,9 @@ BEGIN
         CASE WHEN api.pool_status = 'retired'
           THEN NULL
         ELSE
-          SUM(CASE WHEN sdc.stake_address = ANY(api.owners) THEN total_balance ELSE 0 END)::lovelace
+          SUM(CASE WHEN pool_delegs.stake_address = ANY(api.owners) THEN amount::numeric ELSE 0 END)::lovelace
         END AS pledge
-      FROM grest.stake_distribution_cache AS sdc
-      WHERE sdc.pool_id = api.pool_id_bech32
+      FROM grest.pool_delegators(api.pool_id_bech32) AS pool_delegs
     ) AS live ON TRUE;
 END;
 $$;

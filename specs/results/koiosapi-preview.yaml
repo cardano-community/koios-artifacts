@@ -23,24 +23,24 @@ info:
     ``` bash
     curl "https://api.koios.rest/api/v1/tip"
 
-    # [{"hash":"4d44c8a453e677f933c3df42ebcf2fe45987c41268b9cfc9b42ae305e8c3d99a","epoch":317,"abs_slot":51700871,"epoch_slot":120071,"block_height":6806994,"block_time":1643267162}]
+    # [{"hash":"4d44c8a453e677f933c3df42ebcf2fe45987c41268b9cfc9b42ae305e8c3d99a","epoch_no":317,"abs_slot":51700871,"epoch_slot":120071,"block_height":6806994,"block_time":1643267162}]
 
-    curl "https://api.koios.rest/api/v1/blocks?select=epoch,epoch_slot,block_height"
+    curl "https://api.koios.rest/api/v1/blocks?select=epoch_no,epoch_slot,block_height"
 
-    # [{"epoch":317,"epoch_slot":120071,"block_height":6806994}]
+    # [{"epoch_no":317,"epoch_slot":120071,"block_height":6806994}]
     ```
 
     ## Horizontal Filtering
 
     You can filter the returned output based on specific conditions using operators against a column within returned result. Consider an example where you would want to query blocks minted in first 3 minutes of epoch 250 (i.e. epoch_slot was less than 180). To do so your query would look like below:<br><br>
     ``` bash
-    curl "https://api.koios.rest/api/v1/blocks?epoch=eq.250&epoch_slot=lt.180"
+    curl "https://api.koios.rest/api/v1/blocks?epoch_no=eq.250&epoch_slot=lt.180"
 
-    # [{"hash":"8fad2808ac6b37064a0fa69f6fe065807703d5235a57442647bbcdba1c02faf8","epoch":250,"abs_slot":22636942,"epoch_slot":142,"block_height":5385757,"block_time":1614203233,"tx_count":65,"vrf_key":"vrf_vk14y9pjprzlsjvjt66mv5u7w7292sxp3kn4ewhss45ayjga5vurgaqhqknuu","pool":null,"op_cert_counter":2},
-    #  {"hash":"9d33b02badaedc0dedd0d59f3e0411e5fb4ac94217fb5ee86719e8463c570e16","epoch":250,"abs_slot":22636800,"epoch_slot":0,"block_height":5385756,"block_time":1614203091,"tx_count":10,"vrf_key":"vrf_vk1dkfsejw3h2k7tnguwrauqfwnxa7wj3nkp3yw2yw3400c4nlkluwqzwvka6","pool":null,"op_cert_counter":2}]
+    # [{"hash":"8fad2808ac6b37064a0fa69f6fe065807703d5235a57442647bbcdba1c02faf8","epoch_no":250,"abs_slot":22636942,"epoch_slot":142,"block_height":5385757,"block_time":1614203233,"tx_count":65,"vrf_key":"vrf_vk14y9pjprzlsjvjt66mv5u7w7292sxp3kn4ewhss45ayjga5vurgaqhqknuu","pool":null,"op_cert_counter":2},
+    #  {"hash":"9d33b02badaedc0dedd0d59f3e0411e5fb4ac94217fb5ee86719e8463c570e16","epoch_no":250,"abs_slot":22636800,"epoch_slot":0,"block_height":5385756,"block_time":1614203091,"tx_count":10,"vrf_key":"vrf_vk1dkfsejw3h2k7tnguwrauqfwnxa7wj3nkp3yw2yw3400c4nlkluwqzwvka6","pool":null,"op_cert_counter":2}]
     ```
 
-    Here, we made use of `eq.` operator to denote a filter of "value equal to" against `epoch` column. Similarly, we added a filter using `lt.` operator to denote a filter of "values lower than" against `epoch_slot` column. You can find a complete list of operators supported in PostgREST documentation (commonly used ones extracted below):
+    Here, we made use of `eq.` operator to denote a filter of "value equal to" against `epoch_no` column. Similarly, we added a filter using `lt.` operator to denote a filter of "values lower than" against `epoch_slot` column. You can find a complete list of operators supported in PostgREST documentation (commonly used ones extracted below):
 
     |Abbreviation|In PostgreSQL|Meaning                                    |
     |------------|-------------|-------------------------------------------|
@@ -90,16 +90,16 @@ info:
     ## Ordering
 
     You can set a sorting order for returned queries against specific column(s).
-    Consider example where you want to check `epoch` and `epoch_slot` for the first 5 blocks created by a particular pool, i.e. you can set order to ascending based on block_height column and add horizontal filter for that pool ID as below:<br><br>
+    Consider example where you want to check `epoch_no` and `epoch_slot` for the first 5 blocks created by a particular pool, i.e. you can set order to ascending based on block_height column and add horizontal filter for that pool ID as below:<br><br>
 
     ``` bash
     curl -s "https://api.koios.rest/api/v1/blocks?pool=eq.pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc&order=block_height.asc&limit=5"
 
-    # [{"hash":"610b4c7bbebeeb212bd002885048cc33154ba29f39919d62a3d96de05d315706","epoch":236,"abs_slot":16594295,"epoch_slot":5495,"block_height":5086774,"block_time":1608160586,"tx_count":1,"vrf_key":"vrf_vk18x0e7dx8j37gdxftnn8ru6jcxs7n6acdazc4ykeda2ygjwg9a7ls7ns699","pool":"pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc","op_cert_counter":1},
-    # {"hash":"d93d1db5275329ab695d30c06a35124038d8d9af64fc2b0aa082b8aa43da4164","epoch":236,"abs_slot":16597729,"epoch_slot":8929,"block_height":5086944,"block_time":1608164020,"tx_count":7,"vrf_key":"vrf_vk18x0e7dx8j37gdxftnn8ru6jcxs7n6acdazc4ykeda2ygjwg9a7ls7ns699","pool":"pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc","op_cert_counter":1},
-    # {"hash":"dc9496eae64294b46f07eb20499ae6dae4d81fdc67c63c354397db91bda1ee55","epoch":236,"abs_slot":16598058,"epoch_slot":9258,"block_height":5086962,"block_time":1608164349,"tx_count":1,"vrf_key":"vrf_vk18x0e7dx8j37gdxftnn8ru6jcxs7n6acdazc4ykeda2ygjwg9a7ls7ns699","pool":"pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc","op_cert_counter":1},
-    # {"hash":"6ebc7b734c513bc19290d96ca573a09cac9503c5a349dd9892b9ab43f917f9bd","epoch":236,"abs_slot":16601491,"epoch_slot":12691,"block_height":5087097,"block_time":1608167782,"tx_count":0,"vrf_key":"vrf_vk18x0e7dx8j37gdxftnn8ru6jcxs7n6acdazc4ykeda2ygjwg9a7ls7ns699","pool":"pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc","op_cert_counter":1},
-    # {"hash":"2eac97548829fc312858bc56a40f7ce3bf9b0ca27ee8530283ccebb3963de1c0","epoch":236,"abs_slot":16602308,"epoch_slot":13508,"block_height":5087136,"block_time":1608168599,"tx_count":1,"vrf_key":"vrf_vk18x0e7dx8j37gdxftnn8ru6jcxs7n6acdazc4ykeda2ygjwg9a7ls7ns699","pool":"pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc","op_cert_counter":1}]
+    # [{"hash":"610b4c7bbebeeb212bd002885048cc33154ba29f39919d62a3d96de05d315706","epoch_no":236,"abs_slot":16594295,"epoch_slot":5495,"block_height":5086774,"block_time":1608160586,"tx_count":1,"vrf_key":"vrf_vk18x0e7dx8j37gdxftnn8ru6jcxs7n6acdazc4ykeda2ygjwg9a7ls7ns699","pool":"pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc","op_cert_counter":1},
+    # {"hash":"d93d1db5275329ab695d30c06a35124038d8d9af64fc2b0aa082b8aa43da4164","epoch_no":236,"abs_slot":16597729,"epoch_slot":8929,"block_height":5086944,"block_time":1608164020,"tx_count":7,"vrf_key":"vrf_vk18x0e7dx8j37gdxftnn8ru6jcxs7n6acdazc4ykeda2ygjwg9a7ls7ns699","pool":"pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc","op_cert_counter":1},
+    # {"hash":"dc9496eae64294b46f07eb20499ae6dae4d81fdc67c63c354397db91bda1ee55","epoch_no":236,"abs_slot":16598058,"epoch_slot":9258,"block_height":5086962,"block_time":1608164349,"tx_count":1,"vrf_key":"vrf_vk18x0e7dx8j37gdxftnn8ru6jcxs7n6acdazc4ykeda2ygjwg9a7ls7ns699","pool":"pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc","op_cert_counter":1},
+    # {"hash":"6ebc7b734c513bc19290d96ca573a09cac9503c5a349dd9892b9ab43f917f9bd","epoch_no":236,"abs_slot":16601491,"epoch_slot":12691,"block_height":5087097,"block_time":1608167782,"tx_count":0,"vrf_key":"vrf_vk18x0e7dx8j37gdxftnn8ru6jcxs7n6acdazc4ykeda2ygjwg9a7ls7ns699","pool":"pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc","op_cert_counter":1},
+    # {"hash":"2eac97548829fc312858bc56a40f7ce3bf9b0ca27ee8530283ccebb3963de1c0","epoch_no":236,"abs_slot":16602308,"epoch_slot":13508,"block_height":5087136,"block_time":1608168599,"tx_count":1,"vrf_key":"vrf_vk18x0e7dx8j37gdxftnn8ru6jcxs7n6acdazc4ykeda2ygjwg9a7ls7ns699","pool":"pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc","op_cert_counter":1}]
     ```
 
     ## Response Formats
@@ -108,15 +108,15 @@ info:
     Below is an example of JSON/CSV output making use of above to print first in JSON (default), and then override response format to CSV.<br><br>
 
     ``` bash
-    curl -s "https://api.koios.rest/api/v1/blocks?select=epoch,epoch_slot,block_time&limit=3"
+    curl -s "https://api.koios.rest/api/v1/blocks?select=epoch_no,epoch_slot,block_time&limit=3"
 
-    # [{"epoch":318,"epoch_slot":27867,"block_time":1643606958},
-    # {"epoch":318,"epoch_slot":27841,"block_time":1643606932},
-    # {"epoch":318,"epoch_slot":27839,"block_time":1643606930}]
+    # [{"epoch_no":318,"epoch_slot":27867,"block_time":1643606958},
+    # {"epoch_no":318,"epoch_slot":27841,"block_time":1643606932},
+    # {"epoch_no":318,"epoch_slot":27839,"block_time":1643606930}]
 
-    curl -s "https://api.koios.rest/api/v1/blocks?select=epoch,epoch_slot,block_time&limit=3" -H "Accept: text/csv"
+    curl -s "https://api.koios.rest/api/v1/blocks?select=epoch_no,epoch_slot,block_time&limit=3" -H "Accept: text/csv"
 
-    # epoch,epoch_slot,block_time
+    # epoch_no,epoch_slot,block_time
     # 318,28491,1643607582
     # 318,28479,1643607570
     # 318,28406,1643607497
