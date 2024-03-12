@@ -134,6 +134,14 @@ schemas:
             $ref: "#/components/schemas/pool_delegators/items/properties/amount"
           stake_address:
             $ref: "#/components/schemas/account_history/items/properties/stake_address"
+          earned_epoch:
+            description: Epoch where amount is earned
+            allOf:
+              - $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+          spendable_epoch:
+            description: Epoch where the earned amount can be spent
+            allOf:
+              - $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
     pool_list:
       description: Array of pool IDs and tickers
       type: array
@@ -1273,9 +1281,9 @@ schemas:
               type: object
               properties:
                 earned_epoch:
-                  $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+                  $ref: "#/components/schemas/reserve_withdrawals/items/properties/earned_epoch"
                 spendable_epoch:
-                  $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+                  $ref: "#/components/schemas/reserve_withdrawals/items/properties/spendable_epoch"
                 amount:
                   type: string
                   description: Amount of rewards earned (in lovelace)

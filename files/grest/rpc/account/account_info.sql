@@ -123,7 +123,7 @@ BEGIN
           COALESCE(SUM(reward.amount), 0) AS rewards
         FROM reward
         WHERE reward.addr_id = ANY(sa_id_list)
-          AND reward.SPENDABLE_EPOCH <= (
+          AND reward.spendable_epoch <= (
             SELECT MAX(no)
             FROM epoch
           )

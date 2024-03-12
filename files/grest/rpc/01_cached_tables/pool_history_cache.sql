@@ -123,8 +123,7 @@ BEGIN
           WHERE
             id = (
               SELECT MAX(pup2.id)
-              FROM
-                pool_hash AS ph,
+              FROM pool_hash AS ph,
                 pool_update AS pup2
               WHERE pup2.hash_id = ph.id
                 AND ph.view = act.pool_id
@@ -133,12 +132,10 @@ BEGIN
         ) AS pool_fee_variable,
         (
           SELECT fixed_cost
-          FROM
-            pool_update
+          FROM pool_update
           WHERE id = (
               SELECT MAX(pup2.id)
-              FROM
-                pool_update AS pup2,
+              FROM pool_update AS pup2,
                 pool_hash AS ph
               WHERE ph.view = act.pool_id
                 AND pup2.hash_id = ph.id
@@ -163,12 +160,7 @@ BEGIN
         ) AS saturation_pct
       FROM grest.pool_active_stake_cache AS act
       WHERE act.epoch_no >= _epoch_no_to_insert_from
-        -- TODO: revisit later: currently ignore latest epoch AS active stake might not be populated for it yet
-        AND act.epoch_no < (
-          SELECT MAX(e."no")
-          FROM
-            epoch AS e
-        )
+        AND act.epoch_no <= _curr_epoch
     ),
 
     delegators AS (
@@ -201,12 +193,11 @@ BEGIN
       ELSE
         -- special CASE for WHEN reward information is not available yet
         CASE COALESCE(l.leadertotal, 0) + COALESCE(m.memtotal, 0)
-        WHEN 0 THEN
-          NULL
-        ELSE
+          WHEN 0 THEN NULL
+          ELSE
             CASE
-                WHEN COALESCE(l.leadertotal, 0) < actf.pool_fee_fixed THEN COALESCE(l.leadertotal, 0)
-                ELSE ROUND(actf.pool_fee_fixed + (((COALESCE(m.memtotal, 0) + COALESCE(l.leadertotal, 0)) - actf.pool_fee_fixed) * actf.pool_fee_variable))
+              WHEN COALESCE(l.leadertotal, 0) < actf.pool_fee_fixed THEN COALESCE(l.leadertotal, 0)
+              ELSE ROUND(actf.pool_fee_fixed + (((COALESCE(m.memtotal, 0) + COALESCE(l.leadertotal, 0)) - actf.pool_fee_fixed) * actf.pool_fee_variable))
             END
         END
       END AS pool_fees,
@@ -216,42 +207,35 @@ BEGIN
       ELSE
         -- special CASE for WHEN reward information is not available yet
         CASE COALESCE(l.leadertotal, 0) + COALESCE(m.memtotal, 0)
-        WHEN 0 THEN
-          NULL
+          WHEN 0 THEN NULL
         ELSE
           CASE
-          WHEN COALESCE(l.leadertotal, 0) < actf.pool_fee_fixed THEN COALESCE(m.memtotal, 0)
-          ELSE ROUND(COALESCE(m.memtotal, 0) + (COALESCE(l.leadertotal, 0) - (actf.pool_fee_fixed + (((COALESCE(m.memtotal, 0) + COALESCE(l.leadertotal, 0)) - actf.pool_fee_fixed) * actf.pool_fee_variable))))
+            WHEN COALESCE(l.leadertotal, 0) < actf.pool_fee_fixed THEN COALESCE(m.memtotal, 0)
+            ELSE ROUND(COALESCE(m.memtotal, 0) + (COALESCE(l.leadertotal, 0) - (actf.pool_fee_fixed + (((COALESCE(m.memtotal, 0) + COALESCE(l.leadertotal, 0)) - actf.pool_fee_fixed) * actf.pool_fee_variable))))
           END
         END
       END AS deleg_rewards,
       CASE COALESCE(b.block_cnt, 0)
-      WHEN 0 THEN
-        0
+        WHEN 0 THEN 0
       ELSE
         CASE COALESCE(m.memtotal, 0)
-        WHEN 0 THEN
-          NULL
-        ELSE
-          COALESCE(m.memtotal, 0)
+          WHEN 0 THEN NULL
+          ELSE COALESCE(m.memtotal, 0)
         END
       END AS member_rewards,
       CASE COALESCE(b.block_cnt, 0)
-      WHEN 0 THEN
-        0
+        WHEN 0 THEN 0
       ELSE
         -- special CASE for WHEN reward information is not available yet
         CASE COALESCE(l.leadertotal, 0) + COALESCE(m.memtotal, 0)
-        WHEN 0 THEN
-          NULL
-        ELSE
-          CASE
-          WHEN COALESCE(l.leadertotal, 0) < actf.pool_fee_fixed THEN
-            ROUND((((POW((LEAST(((COALESCE(m.memtotal, 0)) / (NULLIF(actf.active_stake, 0))), 1000) + 1), 73) - 1)) * 100)::numeric, 9)
-          -- using LEAST AS a way to prevent overflow, in CASE of dodgy database data (e.g. giant rewards / tiny active stake)
-          ELSE ROUND((((POW((LEAST((((COALESCE(m.memtotal, 0) + (COALESCE(l.leadertotal, 0) - (actf.pool_fee_fixed + (((COALESCE(m.memtotal, 0)
-	          + COALESCE(l.leadertotal, 0)) - actf.pool_fee_fixed) * actf.pool_fee_variable))))) / (NULLIF(actf.active_stake, 0))), 1000) + 1), 73) - 1)) * 100)::numeric, 9)
-          END
+          WHEN 0 THEN NULL
+          ELSE
+            CASE
+              WHEN COALESCE(l.leadertotal, 0) < actf.pool_fee_fixed THEN ROUND((((POW((LEAST(((COALESCE(m.memtotal, 0)) / (NULLIF(actf.active_stake, 0))), 1000) + 1), 73) - 1)) * 100)::numeric, 9)
+              -- using LEAST AS a way to prevent overflow, in CASE of dodgy database data (e.g. giant rewards / tiny active stake)
+              ELSE ROUND((((POW((LEAST((((COALESCE(m.memtotal, 0) + (COALESCE(l.leadertotal, 0) - (actf.pool_fee_fixed + (((COALESCE(m.memtotal, 0)
+  	            + COALESCE(l.leadertotal, 0)) - actf.pool_fee_fixed) * actf.pool_fee_variable))))) / (NULLIF(actf.active_stake, 0))), 1000) + 1), 73) - 1)) * 100)::numeric, 9)
+            END
         END
       END AS epoch_ros
     FROM pool_hash AS ph
