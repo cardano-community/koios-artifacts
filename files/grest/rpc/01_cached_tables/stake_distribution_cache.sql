@@ -190,6 +190,36 @@ BEGIN
       ) ON CONFLICT (key) DO
     UPDATE
     SET last_value = _last_accounted_block_height;
+
+  
+  -- Clean up de-registered accounts
+  DELETE FROM grest.stake_distribution_cache
+  WHERE stake_address IN (
+    SELECT DISTINCT ON (sa.id)
+      sa.view
+    FROM stake_address AS sa
+    INNER JOIN stake_deregistration AS sd ON sa.id = sd.addr_id
+      WHERE NOT EXISTS (
+        SELECT TRUE
+        FROM stake_registration AS sr
+        WHERE sr.addr_id = sd.addr_id
+          AND sr.tx_id >= sd.tx_id
+      )
+  );
+
+  -- Clean up accounts registered to retire pools
+  DELETE FROM grest.stake_distribution_cache
+  WHERE stake_address IN (
+    SELECT DISTINCT ON (sa.id)
+      sa.view
+    FROM grest.stake_distribution_cache AS sdc
+    LEFT JOIN stake_address AS sa ON sa.view = sdc.stake_address
+    LEFT JOIN pool_hash AS ph ON ph.view = sdc.pool_id
+    INNER JOIN delegation AS d ON d.addr_id = sa.id
+    LEFT JOIN pool_retire AS pr ON ph.id = pr.hash_id
+    WHERE pr.retiring_epoch < d.active_epoch_no
+  );
+
 END;
 $$;
 

@@ -121,10 +121,8 @@ BEGIN
         SELECT
           reward.addr_id,
           COALESCE(SUM(reward.amount), 0) AS rewards
-        FROM
-          reward
-        WHERE
-          reward.addr_id = ANY(sa_id_list)
+        FROM reward
+        WHERE reward.addr_id = ANY(sa_id_list)
           AND reward.SPENDABLE_EPOCH <= (
             SELECT MAX(no)
             FROM epoch
@@ -136,10 +134,8 @@ BEGIN
         SELECT
           withdrawal.addr_id,
           COALESCE(SUM(withdrawal.amount), 0) AS withdrawals
-        FROM
-          withdrawal
-        WHERE
-          withdrawal.addr_id = ANY(sa_id_list)
+        FROM withdrawal
+        WHERE withdrawal.addr_id = ANY(sa_id_list)
         GROUP BY
           withdrawal.addr_id
       ) AS withdrawals_t ON withdrawals_t.addr_id = status_t.id
@@ -147,13 +143,11 @@ BEGIN
         SELECT
           reserve.addr_id,
           COALESCE(SUM(reserve.amount), 0) AS reserves
-        FROM
-          reserve
+        FROM reserve
           INNER JOIN tx ON tx.id = reserve.tx_id
           INNER JOIN block ON block.id = tx.block_id
           INNER JOIN latest_withdrawal_epochs AS lwe ON lwe.addr_id = reserve.addr_id
-        WHERE
-          reserve.addr_id = ANY(sa_id_list)
+        WHERE reserve.addr_id = ANY(sa_id_list)
           AND block.epoch_no >= lwe.epoch_no
         GROUP BY
           reserve.addr_id
@@ -162,13 +156,11 @@ BEGIN
         SELECT
           treasury.addr_id,
           COALESCE(SUM(treasury.amount), 0) AS treasury
-        FROM
-          treasury
+        FROM treasury
           INNER JOIN tx ON tx.id = treasury.tx_id
           INNER JOIN block ON block.id = tx.block_id
           INNER JOIN latest_withdrawal_epochs AS lwe ON lwe.addr_id = treasury.addr_id
-        WHERE
-          treasury.addr_id = ANY(sa_id_list)
+        WHERE treasury.addr_id = ANY(sa_id_list)
           AND block.epoch_no >= lwe.epoch_no
         GROUP BY
           treasury.addr_id
