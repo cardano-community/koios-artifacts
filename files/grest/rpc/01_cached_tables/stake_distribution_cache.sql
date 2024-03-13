@@ -120,7 +120,7 @@ BEGIN
     account_delta_instant_rewards AS (
       SELECT
         awdp.stake_address_id,
-        COALESCE(SUM(ir.amount), 0) AS rewards
+        COALESCE(SUM(ir.amount), 0) AS amount
       FROM instant_reward AS ir
       INNER JOIN accounts_with_delegated_pools AS awdp ON awdp.stake_address_id = ir.addr_id
       WHERE ir.spendable_epoch >= (_active_stake_epoch + 2)
