@@ -1993,6 +1993,31 @@ schemas:
             $ref: "#/components/schemas/asset_info/items/properties/minting_tx_metadata"
           token_registry_metadata:
             $ref: "#/components/schemas/asset_info/items/properties/token_registry_metadata"
+    policy_asset_mints:
+      description: Array of mint information for assets under requested policies
+      type: array
+      items:
+        properties:
+          asset_name:
+            $ref: "#/components/schemas/asset_info/items/properties/asset_name"
+          asset_name_ascii:
+            $ref: "#/components/schemas/asset_info/items/properties/asset_name_ascii"
+          fingerprint:
+            $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
+          minting_tx_hash:
+            $ref: "#/components/schemas/asset_info/items/properties/minting_tx_hash"
+          total_supply:
+            $ref: "#/components/schemas/asset_info/items/properties/total_supply"
+          mint_cnt:
+            $ref: "#/components/schemas/asset_info/items/properties/mint_cnt"
+          burn_cnt:
+            $ref: "#/components/schemas/asset_info/items/properties/burn_cnt"
+          creation_time:
+            $ref: "#/components/schemas/asset_info/items/properties/creation_time"
+          minting_tx_metadata:
+            $ref: "#/components/schemas/asset_info/items/properties/minting_tx_metadata"
+          decimals:
+            $ref: "#/components/schemas/asset_info/items/properties/token_registry_metadata/properties/decimals"
     policy_asset_list:
       description: Array of brief information of assets under the same policy
       type: array

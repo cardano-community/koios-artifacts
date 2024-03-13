@@ -1034,6 +1034,28 @@ paths:
       summary: Policy Asset Information
       description: Get the information for all assets under the same policy
       operationId: policy_asset_info
+  /policy_asset_mints: #RPC
+    get:
+      tags:
+        - Asset
+      parameters:
+        - $ref: "#/components/parameters/_asset_policy"
+      responses:
+        "200":
+          description: Get a list of mint or burn count details for all assets minted under a policy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/policy_asset_mints"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Policy Asset Mints
+      description: Get a list of mint or burn count details for all assets minted under a policy
+      operationId: policy_asset_mints
   /asset_summary: #RPC
     get:
       tags:

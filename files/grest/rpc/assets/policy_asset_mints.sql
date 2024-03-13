@@ -24,9 +24,9 @@ AS $$
     aic.decimals
   FROM public.multi_asset AS ma
   INNER JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
-  LEFT JOIN tx ON tx.id = aic.last_mint_tx_id
+  LEFT JOIN tx ON tx.id = aic.first_mint_tx_id
   WHERE ma.policy = DECODE(_asset_policy, 'hex')
-  ORDER BY ma.policy, ma.name;
+  ORDER BY tx.id;
 $$;
 
-COMMENT ON FUNCTION grest.policy_asset_mints IS 'Get a list of all assets minted under a policy, alongwith mint count details';
+COMMENT ON FUNCTION grest.policy_asset_mints IS 'Get a list of mint/burn count details for all assets minted under a policy';
