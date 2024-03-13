@@ -117,6 +117,17 @@ BEGIN
       GROUP BY awdp.stake_address_id
     ),
 
+    account_delta_instant_rewards AS (
+      SELECT
+        awdp.stake_address_id,
+        COALESCE(SUM(ir.amount), 0) AS rewards
+      FROM instant_reward AS ir
+      INNER JOIN accounts_with_delegated_pools AS awdp ON awdp.stake_address_id = ir.addr_id
+      WHERE ir.spendable_epoch >= (_active_stake_epoch + 2)
+        AND ir.spendable_epoch <= _latest_epoch
+      GROUP BY awdp.stake_address_id
+    ),
+
     account_delta_withdrawals AS (
       SELECT
         accounts_with_delegated_pools.stake_address_id,
@@ -151,18 +162,13 @@ BEGIN
     SELECT
       awdp.stake_address,
       pi.pool_id,
-      COALESCE(aas.amount, 0) + COALESCE(ado.amount, 0) - COALESCE(adi.amount, 0) + COALESCE(adr.rewards, 0) - COALESCE(adw.withdrawals, 0) AS total_balance,
-      CASE
-        WHEN ( COALESCE(atrew.rewards, 0) - COALESCE(atw.withdrawals, 0) ) <= 0 THEN
-          COALESCE(aas.amount, 0) + COALESCE(ado.amount, 0) - COALESCE(adi.amount, 0) + COALESCE(adr.rewards, 0) - COALESCE(adw.withdrawals, 0)
-        ELSE
-          COALESCE(aas.amount, 0) + COALESCE(ado.amount, 0) - COALESCE(adi.amount, 0) + COALESCE(adr.rewards, 0) - COALESCE(adw.withdrawals, 0) - (COALESCE(atrew.rewards, 0) - COALESCE(atw.withdrawals, 0))
-      END AS utxo,
+      COALESCE(aas.amount, 0) + COALESCE(ado.amount, 0) - COALESCE(adi.amount, 0) + COALESCE(adr.rewards, 0) + COALESCE(adir.amount, 0) - COALESCE(adw.withdrawals, 0) AS total_balance,
+      COALESCE(aas.amount, 0) + COALESCE(ado.amount, 0) - COALESCE(adi.amount, 0) + COALESCE(adr.rewards, 0) + COALESCE(adir.amount, 0) - COALESCE(adw.withdrawals, 0) AS utxo,
       COALESCE(atrew.rewards, 0) AS rewards,
       COALESCE(atw.withdrawals, 0) AS withdrawals,
       CASE
-        WHEN ( COALESCE(atrew.rewards, 0) - COALESCE(atw.withdrawals, 0) ) <= 0 THEN 0
-        ELSE COALESCE(atrew.rewards, 0) - COALESCE(atw.withdrawals, 0)
+        WHEN ( COALESCE(atrew.rewards, 0) + COALESCE(adir.amount, 0) - COALESCE(atw.withdrawals, 0) ) <= 0 THEN 0
+        ELSE COALESCE(atrew.rewards, 0) + COALESCE(adir.amount, 0) - COALESCE(atw.withdrawals, 0)
       END AS rewards_available
     FROM accounts_with_delegated_pools AS awdp
     INNER JOIN pool_ids AS pi ON pi.stake_address_id = awdp.stake_address_id
@@ -172,6 +178,7 @@ BEGIN
     LEFT JOIN account_delta_input AS adi ON adi.stake_address_id = awdp.stake_address_id
     LEFT JOIN account_delta_output AS ado ON ado.stake_address_id = awdp.stake_address_id
     LEFT JOIN account_delta_rewards AS adr ON adr.stake_address_id = awdp.stake_address_id
+    LEFT JOIN account_delta_instant_rewards AS adir ON adir.stake_address_id = awdp.stake_address_id
     LEFT JOIN account_delta_withdrawals AS adw ON adw.stake_address_id = awdp.stake_address_id
     ON CONFLICT (stake_address) DO
       UPDATE
