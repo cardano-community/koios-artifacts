@@ -1,16 +1,3 @@
-CREATE OR REPLACE FUNCTION grest.asset_address_list(_asset_policy text, _asset_name text DEFAULT '')
-RETURNS TABLE (
-  payment_address varchar,
-  quantity text
-)
-LANGUAGE plpgsql
-AS $$
-BEGIN
-  RETURN QUERY
-    SELECT x.payment_address, x.quantity FROM grest.asset_addresses(_asset_policy, _asset_name) x;
-END;
-$$;
-
 CREATE OR REPLACE FUNCTION grest.asset_addresses(_asset_policy text, _asset_name text DEFAULT '')
 RETURNS TABLE (
   payment_address varchar,
@@ -79,5 +66,4 @@ BEGIN
 END;
 $$;
 
-COMMENT ON FUNCTION grest.asset_address_list IS 'DEPRECATED!! Use asset_addresses instead.'; -- noqa: LT01
 COMMENT ON FUNCTION grest.asset_addresses IS 'Returns a list of addresses with quantity holding the specified asset'; -- noqa: LT01
