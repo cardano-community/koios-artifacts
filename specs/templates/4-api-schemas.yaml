@@ -1802,7 +1802,7 @@ schemas:
           payment_address:
             $ref: "#/components/schemas/utxo_infos/items/properties/address"
           stake_address:
-            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+            $ref: "#/components/schemas/address_info/items/properties/stake_address"
           quantity:
             type: string
             description: Asset balance on the payment address
@@ -1815,7 +1815,7 @@ schemas:
           payment_address:
             $ref: "#/components/schemas/utxo_infos/items/properties/address"
           stake_address:
-            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+            $ref: "#/components/schemas/address_info/items/properties/stake_address"
     asset_summary:
       description: Array of asset summary information
       type: array
@@ -1965,7 +1965,7 @@ schemas:
           payment_address:
             $ref: "#/components/schemas/utxo_infos/items/properties/address"
           stake_address:
-            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+            $ref: "#/components/schemas/address_info/items/properties/stake_address"
           quantity:
             $ref: "#/components/schemas/asset_addresses/items/properties/quantity"
     policy_asset_info:

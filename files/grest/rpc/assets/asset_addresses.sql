@@ -7,7 +7,7 @@ LANGUAGE plpgsql
 AS $$
 BEGIN
   RETURN QUERY
-    SELECT payment_address, quantity FROM grest.asset_addresses(_asset_policy, _asset_name);
+    SELECT x.payment_address, x.quantity FROM grest.asset_addresses(_asset_policy, _asset_name) x;
 END;
 $$;
 

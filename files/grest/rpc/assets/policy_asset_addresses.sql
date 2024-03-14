@@ -40,7 +40,8 @@ BEGIN
         LEFT JOIN multi_asset AS ma ON ma.id = x.ma_id
       GROUP BY
         ma.name,
-        x.address;
+        x.address,
+        x.stake_address;
   ELSE
     RETURN QUERY
       SELECT
@@ -56,7 +57,8 @@ BEGIN
         AND txo.consumed_by_tx_id IS NULL
       GROUP BY
         ma.name,
-        txo.address;
+        txo.address,
+        sa.view;
   END IF;
 END;
 $$;

@@ -1338,7 +1338,7 @@ paths:
       tags:
         - Pool
       parameters:
-        - $ref: "#/components/parameters/_epoch_no"
+        - $ref: "#/components/parameters/_pool_epoch_no"
       responses:
         "200":
           description: Success!!

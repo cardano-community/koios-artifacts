@@ -1482,7 +1482,7 @@ paths:
       tags:
         - Pool
       parameters:
-        - $ref: "#/components/parameters/_epoch_no"
+        - $ref: "#/components/parameters/_pool_epoch_no"
       responses:
         "200":
           description: Success!!
@@ -1837,6 +1837,16 @@ components:
       schema:
         type: string
       example: "pool1leml52hm4fcp3hhe4zye08qz27llhj7d339p3gs0tl85cstx59q"
+      in: query
+      required: false
+      allowEmptyValue: true
+    _pool_epoch_no:
+      deprecated: false
+      name: _epoch_no
+      description: Epoch Number to fetch details for
+      schema:
+        type: string
+      example: "12"
       in: query
       required: false
       allowEmptyValue: true
@@ -4175,7 +4185,7 @@ components:
           payment_address:
             $ref: "#/components/schemas/utxo_infos/items/properties/address"
           stake_address:
-            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+            $ref: "#/components/schemas/address_info/items/properties/stake_address"
           quantity:
             type: string
             description: Asset balance on the payment address
@@ -4188,7 +4198,7 @@ components:
           payment_address:
             $ref: "#/components/schemas/utxo_infos/items/properties/address"
           stake_address:
-            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+            $ref: "#/components/schemas/address_info/items/properties/stake_address"
     asset_summary:
       description: Array of asset summary information
       type: array
@@ -4338,7 +4348,7 @@ components:
           payment_address:
             $ref: "#/components/schemas/utxo_infos/items/properties/address"
           stake_address:
-            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+            $ref: "#/components/schemas/address_info/items/properties/stake_address"
           quantity:
             $ref: "#/components/schemas/asset_addresses/items/properties/quantity"
     policy_asset_info:

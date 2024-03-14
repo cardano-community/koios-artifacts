@@ -23,7 +23,7 @@ BEGIN
     SELECT consumed_by_tx_id
     FROM tx_out
     WHERE tx_out.address = ANY(_addresses)
-      AND tx_out.consumed_by_tx_in_id IS NOT NULL
+      AND tx_out.consumed_by_tx_id IS NOT NULL
   ) AS tmp;
 
   RETURN QUERY
