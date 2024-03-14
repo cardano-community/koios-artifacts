@@ -14,4 +14,4 @@ AS $$
   ORDER BY sa.id;
 $$;
 
-COMMENT ON FUNCTION grest.account_list IS 'Get a list of all accounts';
+COMMENT ON FUNCTION grest.account_list IS 'Get a list of all accounts'; -- noqa: LT01

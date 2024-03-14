@@ -29,4 +29,4 @@ AS $$
   ORDER BY tx.id;
 $$;
 
-COMMENT ON FUNCTION grest.policy_asset_mints IS 'Get a list of mint/burn count details for all assets minted under a policy';
+COMMENT ON FUNCTION grest.policy_asset_mints IS 'Get a list of mint/burn count details for all assets minted under a policy'; -- noqa: LT01

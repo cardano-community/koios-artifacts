@@ -1,11 +1,11 @@
 CREATE OR REPLACE FUNCTION grest.block_tx_info(
-  _block_hashes text[],
-  _inputs       boolean DEFAULT false,
-  _metadata     boolean DEFAULT false,
-  _assets       boolean DEFAULT false,
-  _withdrawals  boolean DEFAULT false,
-  _certs        boolean DEFAULT false,
-  _scripts      boolean DEFAULT false
+  _block_hashes text [],
+  _inputs boolean DEFAULT false,
+  _metadata boolean DEFAULT false,
+  _assets boolean DEFAULT false,
+  _withdrawals boolean DEFAULT false,
+  _certs boolean DEFAULT false,
+  _scripts boolean DEFAULT false
 )
 RETURNS TABLE (
   tx_hash text,

@@ -42,4 +42,4 @@ AS $$
   ORDER BY b.id DESC;
 $$;
 
-COMMENT ON FUNCTION grest.blocks IS 'Get detailed information about all blocks (paginated - latest first)';
+COMMENT ON FUNCTION grest.blocks IS 'Get detailed information about all blocks (paginated - latest first)'; -- noqa: LT01
