@@ -32,15 +32,8 @@ BEGIN
     RETURN TRUE;
   ELSE
     -- If last active stake cache is same as current epoch_no, check if we're beyond 60% within epoch to populate next epoch stake, only valid as of dbsync 13.2.0.0
-    -- Todo: Add status check for epoch_stake_progress instead of checking for checking epoch progress being > 60% as part of https://github.com/IntersectMBO/cardano-db-sync/issues/1620
     IF _current_epoch_no = _last_active_stake_validated_epoch::integer
-      AND (
-        SELECT (
-          (SELECT EXTRACT(EPOCH FROM time)::integer
-            FROM block ORDER BY id DESC LIMIT 1) - start_time
-          ) * 100 / ((end_time - start_time)::integer)
-        FROM grest.epoch_info((SELECT MAX(no) FROM epoch))
-      ) > 60 THEN
+      AND (SELECT MAX(epoch_no) FROM epoch_stake_progress WHERE completed='t')::integer > _last_active_stake_validated_epoch::integer THEN
         RETURN TRUE;
     END IF;
   END IF;
