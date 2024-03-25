@@ -30,6 +30,6 @@ elif [[ -z "${prot_params}" ]] || ! jq -er . <<< "${prot_params}" &>/dev/null; t
   exit 1
 fi
 
-psql ${DB_NAME} -qb -c "INSERT INTO grest.control_table (key, last_value, artifacts) VALUES ('cli_protocol_params','${last_epoch}','${prot_params}') ON CONFLICT(key) DO UPDATE SET last_value='${last_epoch}', artifacts='${prot_params}'"
+psql ${DB_NAME} -qb -c "INSERT INTO grest.control_table (key, last_value, artifacts) VALUES ('cli_protocol_params','${current_epoch}','${prot_params}') ON CONFLICT(key) DO UPDATE SET last_value='${current_epoch}', artifacts='${prot_params}'"
 
-echo "$(date +%F_%H:%M:%S) - END - CLI Protocol Parameters Update, updated for epoch ${last_epoch}."
+echo "$(date +%F_%H:%M:%S) - END - CLI Protocol Parameters Update, updated for epoch ${current_epoch}."
