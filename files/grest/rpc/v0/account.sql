@@ -45,7 +45,7 @@ BEGIN
         INNER JOIN stake_address AS sa ON sa.id = txo.stake_address_id
         LEFT JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
       WHERE sa.id = ANY(sa_id_list)
-        AND txo.consumed_by_tx_in_id IS NULL
+        AND txo.consumed_by_tx_id IS NULL
       GROUP BY
         sa.view, ma.policy, ma.name, ma.fingerprint, aic.decimals
     )
@@ -178,7 +178,7 @@ BEGIN
     tx_out
     INNER JOIN tx ON tx.id = tx_out.tx_id
     LEFT JOIN block AS b ON b.id = tx.block_id
-  WHERE tx_out.consumed_by_tx_in_id IS NULL
+  WHERE tx_out.consumed_by_tx_id IS NULL
     AND tx_out.stake_address_id = (SELECT id FROM stake_address WHERE view = _stake_address);
 END;
 $$;

@@ -26,7 +26,7 @@ BEGIN
       INNER JOIN tx_out AS txo ON txo.id = mtx.tx_out_id
       INNER JOIN stake_address AS sa ON sa.id = txo.stake_address_id
       WHERE sa.view = ANY(_stake_addresses)
-        AND txo.consumed_by_tx_in_id IS NULL
+        AND txo.consumed_by_tx_id IS NULL
       GROUP BY
         sa.view, ma.policy, ma.name, ma.fingerprint, aic.decimals
     )

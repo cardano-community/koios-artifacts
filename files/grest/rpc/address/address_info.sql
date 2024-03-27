@@ -35,7 +35,7 @@ BEGIN
         tx_out.reference_script_id
       FROM tx_out
       INNER JOIN tx ON tx.id = tx_out.tx_id
-      WHERE tx_out.consumed_by_tx_in_id IS NULL
+      WHERE tx_out.consumed_by_tx_id IS NULL
         AND tx_out.address = ANY(_addresses)
     )
 

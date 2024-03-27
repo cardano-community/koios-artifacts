@@ -78,6 +78,12 @@
       "pv": "pool1leml52hm4fcp3hhe4zye08qz27llhj7d339p3gs0tl85cstx59q",
       "pp": "pool1x4p3cwemsm356vpxnjwuud7w76jz64hyss729zp7xa6wuey6yr9"
     },
+    "_pool_epoch_no": {
+        "m": "320",
+        "g": "18852",
+        "pv": "12",
+        "pp": "31"
+    },
     "_script_hash": {
       "m": "d8480dc869b94b80e81ec91b0abe307279311fe0e7001a9488f61ff8",
       "g": "1392eec7d575292ae1523da65ff1b4b021886e917c8c43de54aa7cbd",

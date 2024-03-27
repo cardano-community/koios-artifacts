@@ -8,5 +8,5 @@ if [[ $(( $(date +%s) - tip )) -gt 300 ]]; then
 fi
 
 echo "$(date +%F_%H:%M:%S) Running epoch summary corrections update..."
-psql ${DB_NAME} -qbt -c "SELECT GREST.EPOCH_SUMMARY_CORRECTIONS_UPDATE();" 1>/dev/null 2>&1
+psql ${DB_NAME} -qbt -c "SELECT GREST.EPOCH_SUMMARY_CORRECTIONS_UPDATE();" 1>/dev/null
 echo "$(date +%F_%H:%M:%S) Job done!"

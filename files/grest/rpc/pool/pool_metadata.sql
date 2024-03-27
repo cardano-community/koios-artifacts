@@ -15,11 +15,11 @@ BEGIN
     ph.view AS pool_id_bech32,
     pic.meta_url,
     pic.meta_hash,
-    pod.json,
+    ocpd.json,
     pic.pool_status
   FROM public.pool_hash AS ph
   LEFT JOIN grest.pool_info_cache AS pic ON ph.view = pic.pool_id_bech32
-  LEFT JOIN public.pool_offline_data AS pod ON pod.pmr_id = pic.meta_id
+  LEFT JOIN public.off_chain_pool_data AS ocpd ON ocpd.pmr_id = pic.meta_id
   WHERE
     CASE
       WHEN _pool_bech32_ids IS NULL THEN TRUE

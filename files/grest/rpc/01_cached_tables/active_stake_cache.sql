@@ -11,14 +11,6 @@ CREATE TABLE IF NOT EXISTS grest.epoch_active_stake_cache (
   PRIMARY KEY (epoch_no)
 );
 
-CREATE TABLE IF NOT EXISTS grest.account_active_stake_cache (
-  stake_address varchar NOT NULL,
-  pool_id varchar NOT NULL,
-  epoch_no bigint NOT NULL,
-  amount lovelace NOT NULL,
-  PRIMARY KEY (stake_address, pool_id, epoch_no)
-);
-
 CREATE OR REPLACE FUNCTION grest.active_stake_cache_update_check()
 RETURNS boolean
 LANGUAGE plpgsql
@@ -34,11 +26,18 @@ BEGIN
   -- Get Current Epoch
   SELECT MAX(no) INTO _current_epoch_no
   FROM epoch;
-  RAISE NOTICE 'Current epoch: %', _current_epoch_no;
-  RAISE NOTICE 'Last active stake validated epoch: %', _last_active_stake_validated_epoch;
+  RAISE NOTICE 'Next epoch: %', _current_epoch_no+1;
+  RAISE NOTICE 'Latest epoch in active stake cache: %', _last_active_stake_validated_epoch;
   IF _current_epoch_no > COALESCE(_last_active_stake_validated_epoch::integer, 0) THEN
     RETURN TRUE;
+  ELSE
+    -- If last active stake cache is same as current epoch_no, check if we're beyond 60% within epoch to populate next epoch stake, only valid as of dbsync 13.2.0.0
+    IF _current_epoch_no = _last_active_stake_validated_epoch::integer
+      AND (SELECT MAX(epoch_no) FROM epoch_stake_progress WHERE completed='t')::integer > _last_active_stake_validated_epoch::integer THEN
+        RETURN TRUE;
+    END IF;
   END IF;
+  RAISE NOTICE 'Active Stake cache is up to date with DB!';
   RETURN FALSE;
 END;
 $$;
@@ -51,7 +50,6 @@ LANGUAGE plpgsql
 AS $$
 DECLARE
   _last_active_stake_validated_epoch integer;
-  _last_account_active_stake_cache_epoch_no integer;
 BEGIN
     -- CHECK PREVIOUS QUERY FINISHED RUNNING
     IF (
@@ -100,33 +98,7 @@ BEGIN
       ON CONFLICT (epoch_no) DO UPDATE
         SET amount = excluded.amount
         WHERE epoch_active_stake_cache.amount IS DISTINCT FROM excluded.amount;
-    -- ACCOUNT ACTIVE STAKE CACHE
-    SELECT COALESCE(MAX(epoch_no), (_epoch_no - 4)) INTO _last_account_active_stake_cache_epoch_no
-    FROM grest.account_active_stake_cache;
 
-    INSERT INTO grest.account_active_stake_cache
-      SELECT
-        stake_address.view AS stake_address,
-        pool_hash.view AS pool_id,
-        epoch_stake.epoch_no AS epoch_no,
-        SUM(epoch_stake.amount) AS amount
-      FROM public.epoch_stake
-      INNER JOIN public.pool_hash ON pool_hash.id = epoch_stake.pool_id
-      INNER JOIN public.stake_address ON stake_address.id = epoch_stake.addr_id
-      WHERE epoch_stake.epoch_no > _last_account_active_stake_cache_epoch_no
-        AND epoch_stake.epoch_no <= _epoch_no
-      GROUP BY
-        stake_address.id,
-        pool_hash.id,
-        epoch_stake.epoch_no
-    ON CONFLICT (
-      stake_address,
-      pool_id,
-      epoch_no
-    ) DO UPDATE
-      SET amount = excluded.amount;
-    DELETE FROM grest.account_active_stake_cache
-    WHERE epoch_no <= (_epoch_no - 4);
     -- CONTROL TABLE ENTRY
     PERFORM grest.update_control_table(
       'last_active_stake_validated_epoch',

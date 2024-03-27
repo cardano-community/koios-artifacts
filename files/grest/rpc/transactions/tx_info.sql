@@ -184,7 +184,7 @@ BEGIN
 
       _all_inputs AS (
         SELECT
-          tx_in.tx_in_id AS tx_id,
+          tx_out.consumed_by_tx_id AS tx_id,
           tx_out.address AS payment_addr_bech32,
           ENCODE(tx_out.payment_cred, 'hex') AS payment_addr_cred,
           sa.view AS stake_addr,
@@ -222,10 +222,7 @@ BEGIN
               )
             END
           ) AS reference_script
-        FROM
-          tx_in
-          INNER JOIN tx_out ON tx_out.tx_id = tx_in.tx_out_id
-            AND tx_out.index = tx_in.tx_out_index
+        FROM tx_out
           INNER JOIN tx ON tx_out.tx_id = tx.id
           LEFT JOIN stake_address AS sa ON tx_out.stake_address_id = sa.id
           LEFT JOIN ma_tx_out AS mto ON mto.tx_out_id = tx_out.id
@@ -233,8 +230,7 @@ BEGIN
           LEFT JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
           LEFT JOIN datum ON datum.id = tx_out.inline_datum_id
           LEFT JOIN script ON script.id = tx_out.reference_script_id
-        WHERE
-          tx_in.tx_in_id = ANY(_tx_id_list)
+        WHERE tx_out.consumed_by_tx_id = ANY(_tx_id_list)
       ),
 
       _all_collateral_outputs AS (
@@ -663,8 +659,7 @@ BEGIN
                 ind.hash AS ind_hash,
                 ind.value AS ind_value
               FROM redeemer
-              INNER JOIN tx_in ON tx_in.redeemer_id = redeemer.id
-              INNER JOIN tx_out AS inutxo ON inutxo.tx_id = tx_in.tx_out_id AND inutxo.index = tx_in.tx_out_index
+              INNER JOIN tx_out AS inutxo ON inutxo.consumed_by_tx_id = redeemer.tx_id AND inutxo.index = redeemer.index
               INNER JOIN datum AS ind ON ind.hash = inutxo.data_hash
               WHERE redeemer.tx_id = ANY(_tx_id_list)
             )
@@ -703,8 +698,7 @@ BEGIN
                   ) END
               )
             ) AS data
-          FROM
-            all_redeemers AS ar
+          FROM all_redeemers AS ar
         ) AS tmp
 
         GROUP BY tx_id

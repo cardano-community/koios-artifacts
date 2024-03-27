@@ -11,28 +11,19 @@ DECLARE
   _tx_id_min bigint;
   _tx_id_list bigint[];
 BEGIN
-  SELECT INTO _tx_id_min id
-    FROM tx
-    WHERE block_id >= (SELECT id FROM block WHERE block_no >= _after_block_height ORDER BY id limit 1)
-    ORDER BY id limit 1;
-
   -- all tx_out & tx_in tx ids
   SELECT INTO _tx_id_list ARRAY_AGG(tx_id)
   FROM (
     SELECT tx_id
     FROM tx_out
-    WHERE address = ANY(_addresses)
-      AND tx_id >= _tx_id_min
+    WHERE address = ANY (_addresses)
     --
     UNION
     --
-    SELECT consumed_by_tx_in_id AS tx_id
+    SELECT consumed_by_tx_id
     FROM tx_out
-    LEFT JOIN tx_in ON tx_out.tx_id = tx_in.tx_out_id
-      AND tx_out.index = tx_in.tx_out_index
-    WHERE tx_out.consumed_by_tx_in_id IS NOT NULL
-      AND tx_out.address = ANY(_addresses)
-      AND tx_out.consumed_by_tx_in_id >= _tx_id_min
+    WHERE tx_out.address = ANY(_addresses)
+      AND tx_out.consumed_by_tx_id IS NOT NULL
   ) AS tmp;
 
   RETURN QUERY
@@ -44,7 +35,7 @@ BEGIN
     FROM public.tx
     INNER JOIN public.block AS b ON b.id = tx.block_id
     WHERE tx.id = ANY(_tx_id_list)
-      AND tx.block_id >= _tx_id_min
+      AND b.block_no >= _after_block_height
     ORDER BY b.block_no DESC;
 END;
 $$;

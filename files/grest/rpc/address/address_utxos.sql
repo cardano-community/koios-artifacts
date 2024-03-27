@@ -39,7 +39,7 @@ BEGIN
         LEFT JOIN multi_asset AS ma ON ma.id = mto.ident
         LEFT JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
         WHERE txo.address = ANY(_addresses)
-          AND txo.consumed_by_tx_in_id IS NULL
+          AND txo.consumed_by_tx_id IS NULL
         GROUP BY txo.id
       )
     SELECT
@@ -75,7 +75,7 @@ BEGIN
         ELSE COALESCE(assets, JSONB_BUILD_ARRAY())
       END AS asset_list,
       (CASE
-        WHEN tx_out.consumed_by_tx_in_id IS NULL THEN false
+        WHEN tx_out.consumed_by_tx_id IS NULL THEN false
         ELSE true
       END) AS is_spent
     FROM tx_out
@@ -86,7 +86,7 @@ BEGIN
     LEFT JOIN script ON script.id = tx_out.reference_script_id
     LEFT JOIN _assets ON tx_out.id = _assets.id
     WHERE tx_out.address = ANY(_addresses)
-      AND tx_out.consumed_by_tx_in_id IS NULL
+      AND tx_out.consumed_by_tx_id IS NULL
   ;
 END;
 $$;

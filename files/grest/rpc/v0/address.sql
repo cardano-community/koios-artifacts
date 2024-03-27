@@ -25,7 +25,7 @@ BEGIN
       INNER JOIN tx_out AS txo ON txo.id = mtx.tx_out_id
     WHERE
       txo.address = ANY(_addresses)
-      AND txo.consumed_by_tx_in_id IS NULL
+      AND txo.consumed_by_tx_id IS NULL
     GROUP BY
       txo.address, ma.policy, ma.name, ma.fingerprint, aic.decimals
   )
@@ -127,6 +127,6 @@ BEGIN
     FROM tx_out
       INNER JOIN tx ON tx_out.tx_id = tx.id
     WHERE payment_cred = ANY(_payment_cred_bytea)
-      AND tx_out.consumed_by_tx_in_id IS NULL;
+      AND tx_out.consumed_by_tx_id IS NULL;
 END;
 $$;

@@ -38,7 +38,7 @@ DROP VIEW IF EXISTS grestv0.blocks;
 CREATE VIEW grestv0.blocks AS
 SELECT
   ENCODE(b.hash::bytea, 'hex') AS hash,
-  b.epoch_no AS epoch_no,
+  b.epoch_no,
   b.slot_no AS abs_slot,
   b.epoch_slot_no AS epoch_slot,
   b.block_no AS block_height,

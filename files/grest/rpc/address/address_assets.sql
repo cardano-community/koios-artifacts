@@ -25,7 +25,7 @@ BEGIN
       LEFT JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
       INNER JOIN tx_out AS txo ON txo.id = mtx.tx_out_id
       WHERE txo.address = ANY(_addresses)
-        AND txo.consumed_by_tx_in_id IS NULL
+        AND txo.consumed_by_tx_id IS NULL
       GROUP BY
         txo.address, ma.policy, ma.name, ma.fingerprint, aic.decimals
     )

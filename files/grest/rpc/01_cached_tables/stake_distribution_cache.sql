@@ -15,19 +15,15 @@ DECLARE -- Last block height to control future re-runs of the query
   _last_accounted_block_height bigint;
   _last_account_tx_id bigint;
   _active_stake_epoch bigint;
-  _last_active_stake_blockid bigint;
   _latest_epoch bigint;
 BEGIN
   SELECT MAX(block_no) FROM public.block
     WHERE block_no IS NOT NULL INTO _last_accounted_block_height;
   SELECT (last_value::integer - 2)::integer INTO _active_stake_epoch FROM grest.control_table
     WHERE key = 'last_active_stake_validated_epoch';
-  SELECT MAX(tx.id) INTO _last_account_tx_id
-  FROM public.tx
-  INNER JOIN block AS b ON b.id = tx.block_id
-  WHERE b.epoch_no <= _active_stake_epoch
-    AND b.block_no IS NOT NULL
-    AND b.tx_count != 0;
+  SELECT MAX(eic.i_last_tx_id) INTO _last_account_tx_id
+    FROM grest.epoch_info_cache AS eic
+    WHERE eic.epoch_no <= _active_stake_epoch;
   SELECT MAX(no) INTO _latest_epoch FROM public.epoch WHERE no IS NOT NULL;
 
   WITH
@@ -74,22 +70,19 @@ BEGIN
     account_active_stake AS (
       SELECT
         awdp.stake_address_id,
-        acsc.amount
-      FROM grest.account_active_stake_cache AS acsc
-      INNER JOIN accounts_with_delegated_pools AS awdp ON awdp.stake_address = acsc.stake_address
+        es.amount
+      FROM epoch_stake AS es
+      INNER JOIN accounts_with_delegated_pools AS awdp ON awdp.stake_address_id = es.addr_id
       WHERE epoch_no = (_active_stake_epoch + 2)
     ),
 
     account_delta_tx_ins AS (
       SELECT
         awdp.stake_address_id,
-        tx_in.tx_out_id AS txoid,
-        tx_in.tx_out_index AS txoidx
-      FROM tx_in
-      LEFT JOIN tx_out ON tx_in.tx_out_id = tx_out.tx_id
-        AND tx_in.tx_out_index::smallint = tx_out.index::smallint
+        tx_out.id AS txoid
+      FROM tx_out
       INNER JOIN accounts_with_delegated_pools AS awdp ON awdp.stake_address_id = tx_out.stake_address_id
-      WHERE tx_in.tx_in_id > _last_account_tx_id
+      WHERE tx_out.consumed_by_tx_id > _last_account_tx_id
     ),
 
     account_delta_input AS (
@@ -97,9 +90,7 @@ BEGIN
         tx_out.stake_address_id,
         COALESCE(SUM(tx_out.value), 0) AS amount
       FROM account_delta_tx_ins
-      LEFT JOIN tx_out
-        ON account_delta_tx_ins.txoid=tx_out.tx_id
-          AND account_delta_tx_ins.txoidx = tx_out.index
+      LEFT JOIN tx_out ON account_delta_tx_ins.txoid=tx_out.id
       INNER JOIN accounts_with_delegated_pools AS awdp ON awdp.stake_address_id = tx_out.stake_address_id
       GROUP BY tx_out.stake_address_id
     ),
@@ -123,6 +114,17 @@ BEGIN
       WHERE
         (reward.spendable_epoch >= (_active_stake_epoch + 2) AND reward.spendable_epoch <= _latest_epoch )
         OR (reward.TYPE = 'refund' AND reward.spendable_epoch >= (_active_stake_epoch + 1) AND reward.spendable_epoch <= _latest_epoch )
+      GROUP BY awdp.stake_address_id
+    ),
+
+    account_delta_instant_rewards AS (
+      SELECT
+        awdp.stake_address_id,
+        COALESCE(SUM(ir.amount), 0) AS amount
+      FROM instant_reward AS ir
+      INNER JOIN accounts_with_delegated_pools AS awdp ON awdp.stake_address_id = ir.addr_id
+      WHERE ir.spendable_epoch >= (_active_stake_epoch + 2)
+        AND ir.spendable_epoch <= _latest_epoch
       GROUP BY awdp.stake_address_id
     ),
 
@@ -160,18 +162,13 @@ BEGIN
     SELECT
       awdp.stake_address,
       pi.pool_id,
-      COALESCE(aas.amount, 0) + COALESCE(ado.amount, 0) - COALESCE(adi.amount, 0) + COALESCE(adr.rewards, 0) - COALESCE(adw.withdrawals, 0) AS total_balance,
-      CASE
-        WHEN ( COALESCE(atrew.rewards, 0) - COALESCE(atw.withdrawals, 0) ) <= 0 THEN
-          COALESCE(aas.amount, 0) + COALESCE(ado.amount, 0) - COALESCE(adi.amount, 0) + COALESCE(adr.rewards, 0) - COALESCE(adw.withdrawals, 0)
-        ELSE
-          COALESCE(aas.amount, 0) + COALESCE(ado.amount, 0) - COALESCE(adi.amount, 0) + COALESCE(adr.rewards, 0) - COALESCE(adw.withdrawals, 0) - (COALESCE(atrew.rewards, 0) - COALESCE(atw.withdrawals, 0))
-      END AS utxo,
+      COALESCE(aas.amount, 0) + COALESCE(ado.amount, 0) - COALESCE(adi.amount, 0) + COALESCE(adr.rewards, 0) + COALESCE(adir.amount, 0) - COALESCE(adw.withdrawals, 0) AS total_balance,
+      COALESCE(aas.amount, 0) + COALESCE(ado.amount, 0) - COALESCE(adi.amount, 0) + COALESCE(adr.rewards, 0) + COALESCE(adir.amount, 0) - COALESCE(adw.withdrawals, 0) AS utxo,
       COALESCE(atrew.rewards, 0) AS rewards,
       COALESCE(atw.withdrawals, 0) AS withdrawals,
       CASE
-        WHEN ( COALESCE(atrew.rewards, 0) - COALESCE(atw.withdrawals, 0) ) <= 0 THEN 0
-        ELSE COALESCE(atrew.rewards, 0) - COALESCE(atw.withdrawals, 0)
+        WHEN ( COALESCE(atrew.rewards, 0) + COALESCE(adir.amount, 0) - COALESCE(atw.withdrawals, 0) ) <= 0 THEN 0
+        ELSE COALESCE(atrew.rewards, 0) + COALESCE(adir.amount, 0) - COALESCE(atw.withdrawals, 0)
       END AS rewards_available
     FROM accounts_with_delegated_pools AS awdp
     INNER JOIN pool_ids AS pi ON pi.stake_address_id = awdp.stake_address_id
@@ -181,6 +178,7 @@ BEGIN
     LEFT JOIN account_delta_input AS adi ON adi.stake_address_id = awdp.stake_address_id
     LEFT JOIN account_delta_output AS ado ON ado.stake_address_id = awdp.stake_address_id
     LEFT JOIN account_delta_rewards AS adr ON adr.stake_address_id = awdp.stake_address_id
+    LEFT JOIN account_delta_instant_rewards AS adir ON adir.stake_address_id = awdp.stake_address_id
     LEFT JOIN account_delta_withdrawals AS adw ON adw.stake_address_id = awdp.stake_address_id
     ON CONFLICT (stake_address) DO
       UPDATE
@@ -199,6 +197,36 @@ BEGIN
       ) ON CONFLICT (key) DO
     UPDATE
     SET last_value = _last_accounted_block_height;
+
+  
+  -- Clean up de-registered accounts
+  DELETE FROM grest.stake_distribution_cache
+  WHERE stake_address IN (
+    SELECT DISTINCT ON (sa.id)
+      sa.view
+    FROM stake_address AS sa
+    INNER JOIN stake_deregistration AS sd ON sa.id = sd.addr_id
+      WHERE NOT EXISTS (
+        SELECT TRUE
+        FROM stake_registration AS sr
+        WHERE sr.addr_id = sd.addr_id
+          AND sr.tx_id >= sd.tx_id
+      )
+  );
+
+  -- Clean up accounts registered to retire pools
+  DELETE FROM grest.stake_distribution_cache
+  WHERE stake_address IN (
+    SELECT DISTINCT ON (sa.id)
+      sa.view
+    FROM grest.stake_distribution_cache AS sdc
+    LEFT JOIN stake_address AS sa ON sa.view = sdc.stake_address
+    LEFT JOIN pool_hash AS ph ON ph.view = sdc.pool_id
+    INNER JOIN delegation AS d ON d.addr_id = sa.id
+    LEFT JOIN pool_retire AS pr ON ph.id = pr.hash_id
+    WHERE pr.retiring_epoch < d.active_epoch_no
+  );
+
 END;
 $$;
 
@@ -247,6 +275,11 @@ BEGIN
       WHERE key = 'last_active_stake_validated_epoch'
     ) THEN
     RAISE EXCEPTION 'Active Stake cache too far, skipping...';
+  ELSIF (
+    SELECT
+      ((SELECT MAX(no) FROM epoch) - (SELECT MAX(epoch_no)::integer FROM grest.epoch_info_cache))::integer > 1
+    ) THEN
+    RAISE EXCEPTION 'Epoch Info cache wasnt run yet, skipping...';
   END IF;
 
   -- QUERY START --

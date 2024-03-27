@@ -94,7 +94,7 @@ BEGIN
         ELSE COALESCE(assets, JSONB_BUILD_ARRAY())
       END AS asset_list,
       (CASE
-        WHEN tx_out.consumed_by_tx_in_id IS NULL THEN false
+        WHEN tx_out.consumed_by_tx_id IS NULL THEN false
         ELSE true
       END) AS is_spent
     FROM tx_out

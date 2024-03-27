@@ -41,7 +41,7 @@ BEGIN
         FROM tx_out AS txo
         INNER JOIN ma_tx_out AS mto ON mto.tx_out_id = txo.id
         WHERE mto.ident = ANY(_asset_id_list)
-          AND txo.consumed_by_tx_in_id IS NULL
+          AND txo.consumed_by_tx_id IS NULL
       ),
       _assets AS (
         SELECT
@@ -94,7 +94,7 @@ BEGIN
         ELSE COALESCE(assets, JSONB_BUILD_ARRAY())
       END AS asset_list,
       (CASE
-        WHEN tx_out.consumed_by_tx_in_id IS NULL THEN false
+        WHEN tx_out.consumed_by_tx_id IS NULL THEN false
         ELSE true
       END) AS is_spent
     FROM tx_out
@@ -104,7 +104,7 @@ BEGIN
     LEFT JOIN block AS b ON b.id = tx.block_id
     LEFT JOIN datum ON datum.id = tx_out.inline_datum_id
     LEFT JOIN script ON script.id = tx_out.reference_script_id
-    WHERE tx_out.consumed_by_tx_in_id IS NULL
+    WHERE tx_out.consumed_by_tx_id IS NULL
   ;
 END;
 $$;

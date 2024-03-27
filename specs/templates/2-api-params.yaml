@@ -119,6 +119,16 @@ parameters:
       in: query
       required: false
       allowEmptyValue: true
+    _pool_epoch_no:
+      deprecated: false
+      name: _epoch_no
+      description: Epoch Number to fetch details for
+      schema:
+        type: string
+      example: "##_pool_epoch_no_param##"
+      in: query
+      required: false
+      allowEmptyValue: true
     _script_hash:
       deprecated: false
       name: _script_hash

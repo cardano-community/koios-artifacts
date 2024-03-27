@@ -32,14 +32,13 @@ BEGIN
         SELECT
           tx.id AS tx_id,
           tx.hash AS tx_hash
-        FROM
-          tx
+        FROM tx
         WHERE tx.id = ANY(_tx_id_list)
       ),
 
       _all_inputs AS (
         SELECT
-          tx_in.tx_in_id                      AS tx_id,
+          tx_out.consumed_by_tx_id            AS tx_id,
           tx_out.address                      AS payment_addr_bech32,
           ENCODE(tx_out.payment_cred, 'hex')  AS payment_addr_cred,
           sa.view                             AS stake_addr,
@@ -57,17 +56,13 @@ BEGIN
               )
             END
           )                                   AS asset_list
-        FROM
-          tx_in
-          INNER JOIN tx_out ON tx_out.tx_id = tx_in.tx_out_id
-            AND tx_out.index = tx_in.tx_out_index
+        FROM tx_out
           INNER JOIN tx ON tx_out.tx_id = tx.id
           LEFT JOIN stake_address AS sa ON tx_out.stake_address_id = sa.id
           LEFT JOIN ma_tx_out AS mto ON mto.tx_out_id = tx_out.id
           LEFT JOIN multi_asset AS ma ON ma.id = mto.ident
           LEFT JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
-        WHERE
-          tx_in.tx_in_id = ANY(_tx_id_list)
+        WHERE tx_out.consumed_by_tx_id = ANY(_tx_id_list)
       ),
 
       _all_outputs AS (
@@ -90,15 +85,13 @@ BEGIN
               )
             END
           )                                   AS asset_list
-        FROM
-          tx_out
+        FROM tx_out
           INNER JOIN tx ON tx_out.tx_id = tx.id
           LEFT JOIN stake_address AS sa ON tx_out.stake_address_id = sa.id
           LEFT JOIN ma_tx_out AS mto ON mto.tx_out_id = tx_out.id
           LEFT JOIN multi_asset AS ma ON ma.id = mto.ident
           LEFT JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
-        WHERE
-          tx_out.tx_id = ANY(_tx_id_list)
+        WHERE tx_out.tx_id = ANY(_tx_id_list)
       )
 
     SELECT

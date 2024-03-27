@@ -6,7 +6,9 @@ RETURNS TABLE (
   block_hash text,
   block_height word31type,
   amount text,
-  stake_address text
+  stake_address text,
+  earned_epoch bigint,
+  spendable_epoch bigint
 )
 LANGUAGE sql STABLE
 AS $$
@@ -17,11 +19,16 @@ AS $$
     ENCODE(b.hash,'hex'),
     b.block_no,
     r.amount::text,
-    sa.view
+    sa.view,
+    earned_epoch,
+    spendable_epoch
   FROM reserve AS r
     LEFT JOIN tx ON r.tx_id = tx.id
     INNER JOIN block AS b ON tx.block_id = b.id
-    LEFT JOIN stake_address AS sa ON sa.id = r.addr_id;
+    LEFT JOIN stake_address AS sa ON sa.id = r.addr_id
+    LEFT JOIN instant_reward AS ir ON ir.addr_id = r.addr_id AND ir.earned_epoch = b.epoch_no AND ir.type = 'reserves'
+  ORDER BY b.block_no DESC
+  ;
 $$;
 
 COMMENT ON FUNCTION grest.reserve_withdrawals IS 'A list of withdrawals made from reserves (MIRs)'; --noqa: LT01

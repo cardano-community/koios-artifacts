@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS grest.asset_info_cache (
 
 CREATE INDEX IF NOT EXISTS idx_first_mint_tx_id ON grest.asset_info_cache (first_mint_tx_id);
 CREATE INDEX IF NOT EXISTS idx_last_mint_tx_id ON grest.asset_info_cache (last_mint_tx_id);
+CREATE INDEX IF NOT EXISTS idx_creation_time ON grest.asset_info_cache (creation_time DESC);
 
 CREATE OR REPLACE FUNCTION grest.asset_info_cache_update()
 RETURNS void
@@ -37,7 +38,8 @@ BEGIN
   SELECT MAX(id) INTO _lastest_tx_id
   FROM public.tx;
 
-  SELECT COALESCE(last_value::bigint,1000) - 1000 INTO _asset_info_cache_last_tx_id
+  -- assumption rollback to cater for - 15 blocks (16 tx each) , accordingly - rounding off to 250
+  SELECT COALESCE(last_value::bigint,250) - 250 INTO _asset_info_cache_last_tx_id
   FROM grest.control_table
   WHERE key = 'asset_info_cache_last_tx_id';
 

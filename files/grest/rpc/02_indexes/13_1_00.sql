@@ -19,7 +19,6 @@ CREATE UNIQUE INDEX IF NOT EXISTS unique_stake_deregistration ON public.stake_de
 CREATE UNIQUE INDEX IF NOT EXISTS unique_stake_registration ON public.stake_registration USING btree (tx_id, cert_index);
 CREATE UNIQUE INDEX IF NOT EXISTS unique_treasury ON public.treasury USING btree (addr_id, tx_id, cert_index);
 CREATE UNIQUE INDEX IF NOT EXISTS unique_tx_metadata ON public.tx_metadata USING btree (key, tx_id);
-CREATE UNIQUE INDEX IF NOT EXISTS unique_txin ON tx_in USING btree (tx_out_id, tx_out_index);
 CREATE UNIQUE INDEX IF NOT EXISTS unique_withdrawal ON public.withdrawal USING btree (addr_id, tx_id);
 CREATE INDEX IF NOT EXISTS idx_ma_tx_out_ident ON ma_tx_out (ident) INCLUDE (tx_out_id, quantity);
 CREATE INDEX IF NOT EXISTS idx_collateral_tx_in_tx_in_id ON collateral_tx_in (tx_in_id);
