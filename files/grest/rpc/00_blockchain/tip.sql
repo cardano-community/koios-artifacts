@@ -16,7 +16,7 @@ AS $$
     b.epoch_slot_no AS epoch_slot,
     b.block_no,
     EXTRACT(EPOCH FROM b.time)::integer
-  FROM block b
+  FROM block AS b
   ORDER BY b.id DESC
   LIMIT 1;
 $$;

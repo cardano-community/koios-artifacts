@@ -1,24 +1,22 @@
 #!/bin/bash
 DB_NAME=cexplorer
-NWMAGIC=
-PROM_URL=
-CCLI=
-export CARDANO_NODE_SOCKET_PATH=
+CCLI="${HOME}"/.local/bin/cardano-cli
+CARDANO_NODE_SOCKET_PATH="$(dirname "$0")"/../../sockets/node.socket
 
 echo "$(date +%F_%H:%M:%S) - START - CLI Protocol Parameters Update"
-
-last_epoch="$(psql ${DB_NAME} -c "select last_value from grest.control_table where key='cli_protocol_params'" -t | xargs)"
-current_epoch=$(curl -s "${PROM_URL}" | grep epoch | awk '{print $2}')
+nwmagic=$(psql ${DB_NAME} -qbt -c "SELECT networkmagic FROM grest.genesis()" | xargs)
+last_epoch=$(psql ${DB_NAME} -qbt -c "SELECT last_value FROM grest.control_table WHERE key='cli_protocol_params'" | xargs)
+current_epoch=$(psql ${DB_NAME} -qbt -c "SELECT epoch_no FROM grest.tip()" | xargs)
 
 if [[ -z ${current_epoch} ]] || ! [[ ${current_epoch} =~ ^[0-9]+$ ]]; then
-  echo "$(date +%F_%H:%M:%S) - Unable to fetch epoch metric from node"
+  echo "$(date +%F_%H:%M:%S) - Unable to fetch epoch_no from grest.tip"
   echo "$(date +%F_%H:%M:%S) - Error message: ${current_epoch}"
   exit 1
 fi
 
 [[ -n ${last_epoch} && ${last_epoch} -eq ${current_epoch} ]] && echo "$(date +%F_%H:%M:%S) - END - CLI Protocol Parameters Update, no update necessary." && exit 0
 
-prot_params="$(${CCLI} query protocol-parameters --testnet-magic "${NWMAGIC}" 2>&1)"
+prot_params="$(${CCLI} query protocol-parameters --testnet-magic "${nwmagic}" --socket-path "${SOCKET}" 2>&1)"
 
 if grep -q "Network.Socket.connect" <<< "${prot_params}"; then
   echo "$(date +%F_%H:%M:%S) - Node socket path wrongly configured or node not running, please verify that socket set in env file match what is used to run the node"
