@@ -4,7 +4,8 @@
     {"name":"eden","addr":"eden-preprod.koios.rest","port":8053},
     {"name":"ola-ssl","addr":"koios-preprod.ahlnet.nu","port":2155,"ssl":"true"},
     {"name":"homer","addr":"154.12.248.114","port":8053},
-    {"name":"huths0lo-ssl","addr":"koios-preprod.themorphiumio","port":8453,"ssl":"true"}
+    {"name":"huths0lo-ssl","addr":"koios-preprod.themorphiumio","port":8453,"ssl":"true"},
+    {"name":"bbhmm","addr":"74.122.122.121","port":6253}
   ],
   "Consumers": []
 }
