@@ -1,4 +1,3 @@
-DROP FUNCTION grest.cli_protocol_params(); -- temp line
 CREATE OR REPLACE FUNCTION grest.cli_protocol_params()
 RETURNS JSON
 LANGUAGE sql STABLE
