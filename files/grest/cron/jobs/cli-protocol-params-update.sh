@@ -1,7 +1,7 @@
 #!/bin/bash
 DB_NAME=cexplorer
 CCLI="${HOME}"/.local/bin/cardano-cli
-CARDANO_NODE_SOCKET_PATH="$(dirname "$0")"/../../sockets/node.socket
+SOCKET="$(dirname "$0")"/../../sockets/node.socket
 
 echo "$(date +%F_%H:%M:%S) - START - CLI Protocol Parameters Update"
 nwmagic=$(psql ${DB_NAME} -qbt -c "SELECT networkmagic FROM grest.genesis()" | xargs)
