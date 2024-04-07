@@ -1,3 +1,48 @@
+
+CREATE OR REPLACE FUNCTION grest.is_dangling_delegation(delegation_id bigint)
+RETURNS boolean
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  curr_epoch bigint;
+  num_retirements bigint;
+
+BEGIN
+
+SELECT INTO curr_epoch max(no) FROM epoch;
+
+-- revised logic: 
+-- check for any pool retirement record exists for the pool corresponding to given delegation
+-- pool retiring epoch is current or in the past (future scheduled retirements don't count)
+-- pool retiring epoch is after delegation cert submission epoch 
+-- and there does not exist a pool_update transaction for this pool that came after currently analyzed pool retirement tx 
+-- and before last transaction of the epoch preceeding the pool retirement epoch.. pool update submitted after that point in 
+-- time is too late and pool should have been fully retired
+
+SELECT INTO num_retirements count(*) 
+FROM delegation d
+  INNER JOIN pool_retire pr ON 
+    d.id = delegation_id
+    AND pr.hash_id = d.pool_hash_id
+    AND pr.retiring_epoch <= curr_epoch 
+    AND pr.retiring_epoch > (SELECT b.epoch_no FROM block b INNER JOIN tx t on t.id = d.tx_id and t.block_id = b.id)
+    AND not exists 
+      ( SELECT 1
+        FROM pool_update pu
+        WHERE pu.hash_id = d.pool_hash_id
+          and pu.registered_tx_id >= pr.announced_tx_id
+          and pu.registered_tx_id <= (SELECT i_last_tx_id 
+                                      FROM grest.epoch_info_cache eic 
+                                      WHERE eic.epoch_no = pr.retiring_epoch - 1)
+      );
+
+  return num_retirements > 0;
+END;
+$$;
+
+COMMENT ON FUNCTION grest.is_dangling_delegation IS 'Returns a boolean to indicate whether a given delegation id corresponds to a delegation that has been made dangling by retirement of a stake pool associated with it'
+
+
 CREATE OR REPLACE FUNCTION grest.pool_delegators(_pool_bech32 text)
 RETURNS TABLE (
   stake_address character varying,
@@ -42,6 +87,7 @@ BEGIN
               INNER JOIN stake_address AS sa ON d.addr_id = sa.id
               AND NOT EXISTS (SELECT null FROM delegation AS d2 WHERE d2.addr_id = d.addr_id AND d2.id > d.id)
               AND NOT EXISTS (SELECT null FROM stake_deregistration AS sd WHERE sd.addr_id = d.addr_id AND sd.tx_id > d.tx_id)
+              AND NOT grest.is_dangling_delegation(d.id)
               AND NOT EXISTS (SELECT null FROM grest.stake_distribution_cache AS sdc WHERE sdc.stake_address = sa.view)
           ) z,
           LATERAL grest.account_utxos(array[z.stake_address], false) AS acc_info

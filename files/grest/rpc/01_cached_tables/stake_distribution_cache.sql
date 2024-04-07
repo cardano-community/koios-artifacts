@@ -16,6 +16,7 @@ DECLARE -- Last block height to control future re-runs of the query
   _last_account_tx_id bigint;
   _active_stake_epoch bigint;
   _latest_epoch bigint;
+  _row_count bigint;
 BEGIN
   SELECT MAX(block_no) FROM public.block
     WHERE block_no IS NOT NULL INTO _last_accounted_block_height;
@@ -46,6 +47,8 @@ BEGIN
             WHERE stake_deregistration.addr_id = delegation.addr_id
               AND stake_deregistration.tx_id > delegation.tx_id
           )
+          -- skip delegations that were followed by at least one stake pool retirement
+          AND NOT grest.is_dangling_delegation(delegation.id)
           -- Account must be present in epoch_stake table for the last validated epoch
           AND EXISTS (
             SELECT TRUE
@@ -214,18 +217,19 @@ BEGIN
       )
   );
 
-  -- Clean up accounts registered to retire pools
-  DELETE FROM grest.stake_distribution_cache
-  WHERE stake_address IN (
-    SELECT DISTINCT ON (sa.id)
-      sa.view
-    FROM grest.stake_distribution_cache AS sdc
-    LEFT JOIN stake_address AS sa ON sa.view = sdc.stake_address
-    LEFT JOIN pool_hash AS ph ON ph.view = sdc.pool_id
-    INNER JOIN delegation AS d ON d.addr_id = sa.id
-    LEFT JOIN pool_retire AS pr ON ph.id = pr.hash_id
-    WHERE pr.retiring_epoch < d.active_epoch_no
+  -- Clean up accounts registered to retired-at-least-once-since pools
+  RAISE NOTICE 'DANGLING delegation cleanup from SDC commencing';
+  DELETE FROM grest.stake_distribution_cache WHERE stake_address in (
+     SELECT z.stake_address FROM (
+      SELECT 
+        (SELECT max(d.id) FROM delegation d INNER JOIN stake_address sd ON sd.view = sdc.stake_address AND sd.id = d.addr_id) last_deleg, 
+        sdc.stake_address 
+        FROM grest.stake_distribution_cache sdc
+    ) z WHERE grest.is_dangling_delegation(z.last_deleg)
   );
+
+  GET DIAGNOSTICS _row_count = ROW_COUNT;
+  RAISE NOTICE 'DANGLING delegations - deleted % rows', _row_count;
 
 END;
 $$;
