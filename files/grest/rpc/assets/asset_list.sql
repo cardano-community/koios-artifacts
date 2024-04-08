@@ -16,4 +16,4 @@ AS $$
   ORDER BY ma.policy, ma.name;
 $$;
 
-COMMENT ON FUNCTION grest.asset_list IS 'Get a raw listing of all native assets on chain, without any CIP overlays';
+COMMENT ON FUNCTION grest.asset_list IS 'Get a raw listing of all native assets on chain, without any CIP overlays'; --noqa: LT01

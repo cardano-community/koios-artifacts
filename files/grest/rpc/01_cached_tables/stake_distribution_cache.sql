@@ -219,13 +219,19 @@ BEGIN
 
   -- Clean up accounts registered to retired-at-least-once-since pools
   RAISE NOTICE 'DANGLING delegation cleanup from SDC commencing';
-  DELETE FROM grest.stake_distribution_cache WHERE stake_address in (
-     SELECT z.stake_address FROM (
+  DELETE FROM grest.stake_distribution_cache
+    WHERE stake_address in (
+     SELECT z.stake_address
+     FROM (
       SELECT 
-        (SELECT max(d.id) FROM delegation d INNER JOIN stake_address sd ON sd.view = sdc.stake_address AND sd.id = d.addr_id) last_deleg, 
-        sdc.stake_address 
-        FROM grest.stake_distribution_cache sdc
-    ) z WHERE grest.is_dangling_delegation(z.last_deleg)
+        (
+          SELECT max(d.id)
+          FROM delegation d
+            INNER JOIN stake_address sd ON sd.view = sdc.stake_address AND sd.id = d.addr_id) AS last_deleg, 
+        sdc.stake_address
+      FROM grest.stake_distribution_cache AS sdc
+    ) AS z
+    WHERE grest.is_dangling_delegation(z.last_deleg)
   );
 
   GET DIAGNOSTICS _row_count = ROW_COUNT;
