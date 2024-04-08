@@ -42,6 +42,7 @@ BEGIN
               INNER JOIN stake_address AS sa ON d.addr_id = sa.id
               AND NOT EXISTS (SELECT null FROM delegation AS d2 WHERE d2.addr_id = d.addr_id AND d2.id > d.id)
               AND NOT EXISTS (SELECT null FROM stake_deregistration AS sd WHERE sd.addr_id = d.addr_id AND sd.tx_id > d.tx_id)
+              AND NOT grest.is_dangling_delegation(d.id)
               AND NOT EXISTS (SELECT null FROM grest.stake_distribution_cache AS sdc WHERE sdc.stake_address = sa.view)
           ) z,
           LATERAL grest.account_utxos(array[z.stake_address], false) AS acc_info

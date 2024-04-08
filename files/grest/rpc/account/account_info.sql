@@ -101,12 +101,8 @@ BEGIN
               FROM stake_deregistration
               WHERE stake_deregistration.addr_id = delegation.addr_id
                 AND stake_deregistration.tx_id > delegation.tx_id)
-            AND NOT EXISTS (
-              SELECT TRUE
-              FROM pool_retire AS pr
-              WHERE pr.hash_id = delegation.pool_hash_id
-                AND pr.retiring_epoch > delegation.active_epoch_no
-              )
+            -- skip delegations that were followed by at least one pool retirement
+            AND NOT grest.is_dangling_delegation(delegation.id)
       ) AS pool_t ON pool_t.addr_id = status_t.id
     LEFT JOIN (
         SELECT
