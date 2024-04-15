@@ -659,7 +659,8 @@ BEGIN
                 ind.hash AS ind_hash,
                 ind.value AS ind_value
               FROM redeemer
-              INNER JOIN tx_out AS inutxo ON inutxo.consumed_by_tx_id = redeemer.tx_id AND inutxo.index = redeemer.index
+              INNER JOIN tx_out AS inutxo ON inutxo.consumed_by_tx_id = redeemer.tx_id
+              INNER JOIN script ON redeemer.script_hash = inutxo.payment_cred
               INNER JOIN datum AS ind ON ind.hash = inutxo.data_hash
               WHERE redeemer.tx_id = ANY(_tx_id_list)
             )

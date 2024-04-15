@@ -1808,7 +1808,7 @@ components:
       description: Script hash in hexadecimal format (hex)
       schema:
         type: string
-      example: "590555d7b5760e98ae2bdd29b356247776251dfab0a207bfce98a485"
+      example: "14abafb323de75b7266fd0eab29b6ef562305e8a0dfbb64b07ef32c7"
       in: query
       required: true
       allowEmptyValue: false
