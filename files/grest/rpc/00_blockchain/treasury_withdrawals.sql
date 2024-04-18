@@ -26,7 +26,7 @@ AS $$
     LEFT JOIN tx ON t.tx_id = tx.id
     INNER JOIN block AS b ON tx.block_id = b.id
     LEFT JOIN stake_address AS sa ON sa.id = t.addr_id
-    LEFT JOIN instant_reward AS ir ON ir.addr_id = t.addr_id AND ir.earned_epoch = b.epoch_no AND ir.type = 'treasury'
+    LEFT JOIN reward_rest AS ir ON ir.addr_id = t.addr_id AND ir.earned_epoch = b.epoch_no AND ir.type = 'treasury'
   ORDER BY b.block_no DESC
   ;
 $$;
