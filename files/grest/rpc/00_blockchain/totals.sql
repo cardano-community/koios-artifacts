@@ -14,7 +14,7 @@ AS $$
     ap.utxo::text,
     ap.treasury::text,
     ap.rewards::text,
-    (ap.treasury + ap.rewards + ap.utxo + ap.deposits + ap.fees)::text AS supply,
+    (ap.treasury + ap.rewards + ap.utxo + ap.deposits_stake + ap.deposits_drep + ap.deposits_proposal + ap.fees)::text AS supply,
     ap.reserves::text
   FROM public.ada_pots AS ap
   WHERE (_epoch_no IS NOT NULL AND ap.epoch_no = _epoch_no)
