@@ -115,6 +115,35 @@ schemas:
             type: string
             description: JSON encoded data with details about the parameter update
             example: {"decentralisation": 0.9}
+    cli_protocol_params:
+      description: Get Current Protocol Parameters from node as published by cardano-cli in JSON format
+      type: object
+      example:
+        {
+          "collateralPercentage": 150,
+          "maxBlockBodySize": 90112,
+          "maxBlockHeaderSize": 1100,
+          "maxCollateralInputs": 3,
+          "maxTxSize": 16384,
+          "maxValueSize": 5000,
+          "minPoolCost": 170000000,
+          "minUTxOValue": null,
+          "monetaryExpansion": 3.0e-3,
+          "poolPledgeInfluence": 0.3,
+          "poolRetireMaxEpoch": 18,
+          "protocolVersion": {
+            "major": 8,
+            "minor": 0
+          },
+          "...": "...",
+          "stakeAddressDeposit": 2000000,
+          "stakePoolDeposit": 500000000,
+          "stakePoolTargetNum": 500,
+          "treasuryCut": 0.2,
+          "txFeeFixed": 155381,
+          "txFeePerByte": 44,
+          "utxoCostPerByte": 4310
+        }
     reserve_withdrawals:
       description: Array of withdrawals from reserves/treasury against stake accounts
       type: array

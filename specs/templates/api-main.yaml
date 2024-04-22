@@ -91,6 +91,31 @@ paths:
       summary: Param Update Proposals
       description: Get all parameter update proposals submitted to the chain starting Shelley era
       operationId: param_updates
+  /cli_protocol_params: #RPC
+    get:
+      tags:
+        - Network
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/cli_protocol_params"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: CLI Protocol Parameters
+      description: >-
+        Get Current Protocol Parameters as published by cardano-cli. Note that
+        the output schema of this command is unfortunately fluid on cardano-node
+        and may vary between CLI versions/era. Accordingly, the returned output for
+        this endpoint is left as raw JSON (single row) and any filtering to output should
+        be done on client-side
+      operationId: cli_protocol_params
   /reserve_withdrawals: #RPC
     get:
       tags:
