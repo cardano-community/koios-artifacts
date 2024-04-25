@@ -191,7 +191,7 @@ BEGIN
           ENCODE(tx.hash, 'hex') AS tx_hash,
           tx_out.index AS tx_index,
           tx_out.value::text AS value,
-          ENCODE(tx_out.data_hash, 'hex') AS datum_hash,
+          tx_out.data_hash AS datum_hash,
           (CASE WHEN ma.policy IS NULL THEN NULL
             ELSE
               JSONB_BUILD_OBJECT(
@@ -652,17 +652,37 @@ BEGIN
               WHERE redeemer.tx_id = ANY(_tx_id_list)
             ),
 
+            _all_inputs_sorted AS (
+              SELECT
+                ROW_NUMBER () OVER (
+                  PARTITION BY ai.tx_id
+                  ORDER BY ai.tx_hash, ai.tx_index
+                ) - 1 AS sorted_index,
+                ai.*
+              FROM (
+                SELECT DISTINCT ON (_ai.tx_hash, _ai.tx_index)
+                  _ai.tx_id,
+                  _ai.tx_hash,
+                  _ai.tx_index,
+                  _ai.payment_addr_bech32 as address,
+                  _ai.datum_hash
+                from _all_inputs as _ai
+              ) as ai
+            ),
+
             spend_redeemers AS (
               SELECT DISTINCT ON (redeemer.id)
                 redeemer.id,
-                inutxo.address,
+                ais.address,
+                ais.tx_hash,
+                ais.tx_index,
                 ind.hash AS ind_hash,
                 ind.value AS ind_value
               FROM redeemer
-              INNER JOIN tx_out AS inutxo ON inutxo.consumed_by_tx_id = redeemer.tx_id
-              INNER JOIN script ON redeemer.script_hash = inutxo.payment_cred
-              INNER JOIN datum AS ind ON ind.hash = inutxo.data_hash
+              INNER JOIN _all_inputs_sorted AS ais ON ais.tx_id = redeemer.tx_id AND ais.sorted_index = redeemer.index
+              INNER JOIN datum AS ind ON ind.hash = ais.datum_hash
               WHERE redeemer.tx_id = ANY(_tx_id_list)
+                AND redeemer.purpose = 'spend'
             )
 
           SELECT
@@ -672,6 +692,18 @@ BEGIN
                 CASE
                   WHEN ar.purpose = 'spend' THEN
                     (SELECT address FROM spend_redeemers AS sr WHERE sr.id = ar.id)
+                END,
+              'spends_input',
+                CASE
+                  WHEN ar.purpose = 'spend' THEN
+                    (
+                      SELECT JSONB_BUILD_OBJECT(
+                        'tx_hash', sr.tx_hash,
+                        'tx_index', sr.tx_index
+                      )
+                      FROM spend_redeemers AS sr
+                      WHERE sr.id = ar.id
+                    )
                 END,
               'script_hash', ENCODE(ar.script_hash, 'hex'),
               'bytecode', ENCODE(ar.script_bytes, 'hex'),
@@ -800,7 +832,7 @@ BEGIN
               'tx_hash', ai.tx_hash,
               'tx_index', tx_index,
               'value', value,
-              'datum_hash', datum_hash,
+              'datum_hash', ENCODE(datum_hash, 'hex'),
               'inline_datum', inline_datum,
               'reference_script', reference_script,
               'asset_list', COALESCE(JSONB_AGG(asset_list) FILTER (WHERE asset_list IS NOT NULL), JSONB_BUILD_ARRAY())

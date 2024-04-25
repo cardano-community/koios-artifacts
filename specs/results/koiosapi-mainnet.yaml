@@ -4021,6 +4021,16 @@ components:
                     - 'null'
                   description: Plutus script address
                   example: addr1w999n67e86jn6xal07pzxtrmqynspgx0fwmcmpua4wc6yzsxpljz3
+                spends_input:
+                  type:
+                    - object
+                    - 'null'
+                  properties:
+                    tx_hash:
+                      $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+                    tx_index:
+                      $ref: "#/components/schemas/utxo_infos/items/properties/tx_index"
+                  description: Input utxo this contract spends
                 script_hash:
                   $ref: "#/components/schemas/script_info/items/properties/script_hash"
                 bytecode:
