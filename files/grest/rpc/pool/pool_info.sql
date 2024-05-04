@@ -77,11 +77,11 @@ BEGIN
       ROUND((live.stake / _saturation_limit) * 100, 2)
     FROM _all_pool_info AS api
     LEFT JOIN LATERAL (
-      SELECT pod.json
-      FROM public.pool_offline_data AS pod
-      WHERE pod.pool_id = api.pool_hash_id
-        AND pod.pmr_id = api.meta_id
-      ORDER BY pod.pmr_id DESC
+      SELECT ocpd.json
+      FROM public.off_chain_pool_data AS ocpd
+      WHERE ocpd.pool_id = api.pool_hash_id
+        AND ocpd.pmr_id = api.meta_id
+      ORDER BY ocpd.pmr_id DESC
       LIMIT 1
     ) AS offline_data ON TRUE
     LEFT JOIN LATERAL (
@@ -115,8 +115,8 @@ BEGIN
           THEN NULL
         ELSE
           SUM(
-            CASE WHEN total_balance >= 0
-              THEN total_balance
+            CASE WHEN amount::numeric >= 0
+              THEN amount::numeric
               ELSE 0
             END
           )::lovelace
@@ -125,10 +125,9 @@ BEGIN
         CASE WHEN api.pool_status = 'retired'
           THEN NULL
         ELSE
-          SUM(CASE WHEN sdc.stake_address = ANY(api.owners) THEN total_balance ELSE 0 END)::lovelace
+          SUM(CASE WHEN pool_delegs.stake_address = ANY(api.owners) THEN amount::numeric ELSE 0 END)::lovelace
         END AS pledge
-      FROM grest.stake_distribution_cache AS sdc
-      WHERE sdc.pool_id = api.pool_id_bech32
+      FROM grest.pool_delegators(api.pool_id_bech32) AS pool_delegs
     ) AS live ON TRUE;
 END;
 $$;

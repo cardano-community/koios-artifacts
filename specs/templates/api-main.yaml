@@ -91,6 +91,31 @@ paths:
       summary: Param Update Proposals
       description: Get all parameter update proposals submitted to the chain starting Shelley era
       operationId: param_updates
+  /cli_protocol_params: #RPC
+    get:
+      tags:
+        - Network
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/cli_protocol_params"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: CLI Protocol Parameters
+      description: >-
+        Get Current Protocol Parameters as published by cardano-cli. Note that
+        the output schema of this command is unfortunately fluid on cardano-node
+        and may vary between CLI versions/era. Accordingly, the returned output for
+        this endpoint is left as raw JSON (single row) and any filtering to output should
+        be done on client-side
+      operationId: cli_protocol_params
   /reserve_withdrawals: #RPC
     get:
       tags:
@@ -1034,6 +1059,28 @@ paths:
       summary: Policy Asset Information
       description: Get the information for all assets under the same policy
       operationId: policy_asset_info
+  /policy_asset_mints: #RPC
+    get:
+      tags:
+        - Asset
+      parameters:
+        - $ref: "#/components/parameters/_asset_policy"
+      responses:
+        "200":
+          description: Get a list of mint or burn count details for all assets minted under a policy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/policy_asset_mints"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Policy Asset Mints
+      description: Get a list of mint or burn count details for all assets minted under a policy
+      operationId: policy_asset_mints
   /asset_summary: #RPC
     get:
       tags:
@@ -1082,54 +1129,6 @@ paths:
       summary: Asset Transactions
       description: Get the list of current or all asset transaction hashes (newest first)
       operationId: asset_txs
-  /asset_address_list: #RPC
-    get:
-      tags:
-        - Asset
-      deprecated: true
-      parameters:
-        - $ref: "#/components/parameters/_asset_policy"
-        - $ref: "#/components/parameters/_asset_name"
-      responses:
-        "200":
-          description: Array of payment addresses holding the given token (including balances) [DEPRECATED - replaced by asset_addresses]
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/asset_addresses"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      summary: Asset Address List
-      description: Get the list of all addresses holding a given asset [DEPRECATED - replaced by asset_addresses]
-      operationId: asset_address_list
-  /asset_policy_info: #RPC
-    get:
-      deprecated: true
-      tags:
-        - Asset
-      parameters:
-        - $ref: "#/components/parameters/_asset_policy"
-      responses:
-        "200":
-          description: Array of detailed information of assets under the same policy [DEPRECATED - replaced by policy_asset_info]
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/policy_asset_info"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      summary: Asset Policy Information
-      description: Get the information for all assets under the same policy (DEPRECATED - replaced by policy_asset_info)
-      operationId: asset_policy_info
-
   /pool_list: #RPC
     get:
       tags:
@@ -1316,7 +1315,7 @@ paths:
       tags:
         - Pool
       parameters:
-        - $ref: "#/components/parameters/_epoch_no"
+        - $ref: "#/components/parameters/_pool_epoch_no"
       responses:
         "200":
           description: Success!!

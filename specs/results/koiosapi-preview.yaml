@@ -8,7 +8,7 @@ info:
   license:
     name: Creative Commons Attribution 4.0 International
     url: https://github.com/cardano-community/koios-artifacts/blob/main/LICENSE
-  version: v1.1.1-dev
+  version: v1.1.1rc
   description: |
     Koios is best described as a Decentralized and Elastic RESTful query layer for exploring data on Cardano blockchain to consume within applications/wallets/explorers/etc. This page not only provides an OpenAPI Spec for live implementation, but also ability to execute live demo from client browser against each endpoint with pre-filled examples.
 
@@ -23,24 +23,24 @@ info:
     ``` bash
     curl "https://api.koios.rest/api/v1/tip"
 
-    # [{"hash":"4d44c8a453e677f933c3df42ebcf2fe45987c41268b9cfc9b42ae305e8c3d99a","epoch":317,"abs_slot":51700871,"epoch_slot":120071,"block_height":6806994,"block_time":1643267162}]
+    # [{"hash":"4d44c8a453e677f933c3df42ebcf2fe45987c41268b9cfc9b42ae305e8c3d99a","epoch_no":317,"abs_slot":51700871,"epoch_slot":120071,"block_height":6806994,"block_time":1643267162}]
 
-    curl "https://api.koios.rest/api/v1/blocks?select=epoch,epoch_slot,block_height"
+    curl "https://api.koios.rest/api/v1/blocks?select=epoch_no,epoch_slot,block_height"
 
-    # [{"epoch":317,"epoch_slot":120071,"block_height":6806994}]
+    # [{"epoch_no":317,"epoch_slot":120071,"block_height":6806994}]
     ```
 
     ## Horizontal Filtering
 
     You can filter the returned output based on specific conditions using operators against a column within returned result. Consider an example where you would want to query blocks minted in first 3 minutes of epoch 250 (i.e. epoch_slot was less than 180). To do so your query would look like below:<br><br>
     ``` bash
-    curl "https://api.koios.rest/api/v1/blocks?epoch=eq.250&epoch_slot=lt.180"
+    curl "https://api.koios.rest/api/v1/blocks?epoch_no=eq.250&epoch_slot=lt.180"
 
-    # [{"hash":"8fad2808ac6b37064a0fa69f6fe065807703d5235a57442647bbcdba1c02faf8","epoch":250,"abs_slot":22636942,"epoch_slot":142,"block_height":5385757,"block_time":1614203233,"tx_count":65,"vrf_key":"vrf_vk14y9pjprzlsjvjt66mv5u7w7292sxp3kn4ewhss45ayjga5vurgaqhqknuu","pool":null,"op_cert_counter":2},
-    #  {"hash":"9d33b02badaedc0dedd0d59f3e0411e5fb4ac94217fb5ee86719e8463c570e16","epoch":250,"abs_slot":22636800,"epoch_slot":0,"block_height":5385756,"block_time":1614203091,"tx_count":10,"vrf_key":"vrf_vk1dkfsejw3h2k7tnguwrauqfwnxa7wj3nkp3yw2yw3400c4nlkluwqzwvka6","pool":null,"op_cert_counter":2}]
+    # [{"hash":"8fad2808ac6b37064a0fa69f6fe065807703d5235a57442647bbcdba1c02faf8","epoch_no":250,"abs_slot":22636942,"epoch_slot":142,"block_height":5385757,"block_time":1614203233,"tx_count":65,"vrf_key":"vrf_vk14y9pjprzlsjvjt66mv5u7w7292sxp3kn4ewhss45ayjga5vurgaqhqknuu","pool":null,"op_cert_counter":2},
+    #  {"hash":"9d33b02badaedc0dedd0d59f3e0411e5fb4ac94217fb5ee86719e8463c570e16","epoch_no":250,"abs_slot":22636800,"epoch_slot":0,"block_height":5385756,"block_time":1614203091,"tx_count":10,"vrf_key":"vrf_vk1dkfsejw3h2k7tnguwrauqfwnxa7wj3nkp3yw2yw3400c4nlkluwqzwvka6","pool":null,"op_cert_counter":2}]
     ```
 
-    Here, we made use of `eq.` operator to denote a filter of "value equal to" against `epoch` column. Similarly, we added a filter using `lt.` operator to denote a filter of "values lower than" against `epoch_slot` column. You can find a complete list of operators supported in PostgREST documentation (commonly used ones extracted below):
+    Here, we made use of `eq.` operator to denote a filter of "value equal to" against `epoch_no` column. Similarly, we added a filter using `lt.` operator to denote a filter of "values lower than" against `epoch_slot` column. You can find a complete list of operators supported in PostgREST documentation (commonly used ones extracted below):
 
     |Abbreviation|In PostgreSQL|Meaning                                    |
     |------------|-------------|-------------------------------------------|
@@ -84,30 +84,22 @@ info:
 
     ```
 
-    For GET endpoints, there is also another method to achieve the above, instead of adding parameters to the URL itself, you can specify a `Range` header as below to achieve something similar:<br><br>
-
-    ``` bash
-    curl -s "https://api.koios.rest/api/v1/blocks?select=block_height" -H "Range: 1000-1499" -I | grep -i content-range
-
-    # content-range: 1000-1499/*
-
-    ```
-
-    The above methods for pagination are very useful to keep your queries light as well as process the output in smaller pages, making better use of your resources and respecting server timeouts for response times.
+    The above methods for pagination are very useful to keep some of the queries light as well as process the output in smaller pages, making better use of your resources and respecting server timeouts for response times.
+    However, note that due to the complex nature of some queries that require pre-processing before being subjected to paginations, these may not always be helpful to avoid server timeouts.
 
     ## Ordering
 
     You can set a sorting order for returned queries against specific column(s).
-    Consider example where you want to check `epoch` and `epoch_slot` for the first 5 blocks created by a particular pool, i.e. you can set order to ascending based on block_height column and add horizontal filter for that pool ID as below:<br><br>
+    Consider example where you want to check `epoch_no` and `epoch_slot` for the first 5 blocks created by a particular pool, i.e. you can set order to ascending based on block_height column and add horizontal filter for that pool ID as below:<br><br>
 
     ``` bash
     curl -s "https://api.koios.rest/api/v1/blocks?pool=eq.pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc&order=block_height.asc&limit=5"
 
-    # [{"hash":"610b4c7bbebeeb212bd002885048cc33154ba29f39919d62a3d96de05d315706","epoch":236,"abs_slot":16594295,"epoch_slot":5495,"block_height":5086774,"block_time":1608160586,"tx_count":1,"vrf_key":"vrf_vk18x0e7dx8j37gdxftnn8ru6jcxs7n6acdazc4ykeda2ygjwg9a7ls7ns699","pool":"pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc","op_cert_counter":1},
-    # {"hash":"d93d1db5275329ab695d30c06a35124038d8d9af64fc2b0aa082b8aa43da4164","epoch":236,"abs_slot":16597729,"epoch_slot":8929,"block_height":5086944,"block_time":1608164020,"tx_count":7,"vrf_key":"vrf_vk18x0e7dx8j37gdxftnn8ru6jcxs7n6acdazc4ykeda2ygjwg9a7ls7ns699","pool":"pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc","op_cert_counter":1},
-    # {"hash":"dc9496eae64294b46f07eb20499ae6dae4d81fdc67c63c354397db91bda1ee55","epoch":236,"abs_slot":16598058,"epoch_slot":9258,"block_height":5086962,"block_time":1608164349,"tx_count":1,"vrf_key":"vrf_vk18x0e7dx8j37gdxftnn8ru6jcxs7n6acdazc4ykeda2ygjwg9a7ls7ns699","pool":"pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc","op_cert_counter":1},
-    # {"hash":"6ebc7b734c513bc19290d96ca573a09cac9503c5a349dd9892b9ab43f917f9bd","epoch":236,"abs_slot":16601491,"epoch_slot":12691,"block_height":5087097,"block_time":1608167782,"tx_count":0,"vrf_key":"vrf_vk18x0e7dx8j37gdxftnn8ru6jcxs7n6acdazc4ykeda2ygjwg9a7ls7ns699","pool":"pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc","op_cert_counter":1},
-    # {"hash":"2eac97548829fc312858bc56a40f7ce3bf9b0ca27ee8530283ccebb3963de1c0","epoch":236,"abs_slot":16602308,"epoch_slot":13508,"block_height":5087136,"block_time":1608168599,"tx_count":1,"vrf_key":"vrf_vk18x0e7dx8j37gdxftnn8ru6jcxs7n6acdazc4ykeda2ygjwg9a7ls7ns699","pool":"pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc","op_cert_counter":1}]
+    # [{"hash":"610b4c7bbebeeb212bd002885048cc33154ba29f39919d62a3d96de05d315706","epoch_no":236,"abs_slot":16594295,"epoch_slot":5495,"block_height":5086774,"block_time":1608160586,"tx_count":1,"vrf_key":"vrf_vk18x0e7dx8j37gdxftnn8ru6jcxs7n6acdazc4ykeda2ygjwg9a7ls7ns699","pool":"pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc","op_cert_counter":1},
+    # {"hash":"d93d1db5275329ab695d30c06a35124038d8d9af64fc2b0aa082b8aa43da4164","epoch_no":236,"abs_slot":16597729,"epoch_slot":8929,"block_height":5086944,"block_time":1608164020,"tx_count":7,"vrf_key":"vrf_vk18x0e7dx8j37gdxftnn8ru6jcxs7n6acdazc4ykeda2ygjwg9a7ls7ns699","pool":"pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc","op_cert_counter":1},
+    # {"hash":"dc9496eae64294b46f07eb20499ae6dae4d81fdc67c63c354397db91bda1ee55","epoch_no":236,"abs_slot":16598058,"epoch_slot":9258,"block_height":5086962,"block_time":1608164349,"tx_count":1,"vrf_key":"vrf_vk18x0e7dx8j37gdxftnn8ru6jcxs7n6acdazc4ykeda2ygjwg9a7ls7ns699","pool":"pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc","op_cert_counter":1},
+    # {"hash":"6ebc7b734c513bc19290d96ca573a09cac9503c5a349dd9892b9ab43f917f9bd","epoch_no":236,"abs_slot":16601491,"epoch_slot":12691,"block_height":5087097,"block_time":1608167782,"tx_count":0,"vrf_key":"vrf_vk18x0e7dx8j37gdxftnn8ru6jcxs7n6acdazc4ykeda2ygjwg9a7ls7ns699","pool":"pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc","op_cert_counter":1},
+    # {"hash":"2eac97548829fc312858bc56a40f7ce3bf9b0ca27ee8530283ccebb3963de1c0","epoch_no":236,"abs_slot":16602308,"epoch_slot":13508,"block_height":5087136,"block_time":1608168599,"tx_count":1,"vrf_key":"vrf_vk18x0e7dx8j37gdxftnn8ru6jcxs7n6acdazc4ykeda2ygjwg9a7ls7ns699","pool":"pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc","op_cert_counter":1}]
     ```
 
     ## Response Formats
@@ -116,15 +108,15 @@ info:
     Below is an example of JSON/CSV output making use of above to print first in JSON (default), and then override response format to CSV.<br><br>
 
     ``` bash
-    curl -s "https://api.koios.rest/api/v1/blocks?select=epoch,epoch_slot,block_time&limit=3"
+    curl -s "https://api.koios.rest/api/v1/blocks?select=epoch_no,epoch_slot,block_time&limit=3"
 
-    # [{"epoch":318,"epoch_slot":27867,"block_time":1643606958},
-    # {"epoch":318,"epoch_slot":27841,"block_time":1643606932},
-    # {"epoch":318,"epoch_slot":27839,"block_time":1643606930}]
+    # [{"epoch_no":318,"epoch_slot":27867,"block_time":1643606958},
+    # {"epoch_no":318,"epoch_slot":27841,"block_time":1643606932},
+    # {"epoch_no":318,"epoch_slot":27839,"block_time":1643606930}]
 
-    curl -s "https://api.koios.rest/api/v1/blocks?select=epoch,epoch_slot,block_time&limit=3" -H "Accept: text/csv"
+    curl -s "https://api.koios.rest/api/v1/blocks?select=epoch_no,epoch_slot,block_time&limit=3" -H "Accept: text/csv"
 
-    # epoch,epoch_slot,block_time
+    # epoch_no,epoch_slot,block_time
     # 318,28491,1643607582
     # 318,28479,1643607570
     # 318,28406,1643607497
@@ -243,6 +235,31 @@ paths:
       summary: Param Update Proposals
       description: Get all parameter update proposals submitted to the chain starting Shelley era
       operationId: param_updates
+  /cli_protocol_params: #RPC
+    get:
+      tags:
+        - Network
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/cli_protocol_params"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: CLI Protocol Parameters
+      description: >-
+        Get Current Protocol Parameters as published by cardano-cli. Note that
+        the output schema of this command is unfortunately fluid on cardano-node
+        and may vary between CLI versions/era. Accordingly, the returned output for
+        this endpoint is left as raw JSON (single row) and any filtering to output should
+        be done on client-side
+      operationId: cli_protocol_params
   /reserve_withdrawals: #RPC
     get:
       tags:
@@ -1186,6 +1203,28 @@ paths:
       summary: Policy Asset Information
       description: Get the information for all assets under the same policy
       operationId: policy_asset_info
+  /policy_asset_mints: #RPC
+    get:
+      tags:
+        - Asset
+      parameters:
+        - $ref: "#/components/parameters/_asset_policy"
+      responses:
+        "200":
+          description: Get a list of mint or burn count details for all assets minted under a policy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/policy_asset_mints"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Policy Asset Mints
+      description: Get a list of mint or burn count details for all assets minted under a policy
+      operationId: policy_asset_mints
   /asset_summary: #RPC
     get:
       tags:
@@ -1234,54 +1273,6 @@ paths:
       summary: Asset Transactions
       description: Get the list of current or all asset transaction hashes (newest first)
       operationId: asset_txs
-  /asset_address_list: #RPC
-    get:
-      tags:
-        - Asset
-      deprecated: true
-      parameters:
-        - $ref: "#/components/parameters/_asset_policy"
-        - $ref: "#/components/parameters/_asset_name"
-      responses:
-        "200":
-          description: Array of payment addresses holding the given token (including balances) [DEPRECATED - replaced by asset_addresses]
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/asset_addresses"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      summary: Asset Address List
-      description: Get the list of all addresses holding a given asset [DEPRECATED - replaced by asset_addresses]
-      operationId: asset_address_list
-  /asset_policy_info: #RPC
-    get:
-      deprecated: true
-      tags:
-        - Asset
-      parameters:
-        - $ref: "#/components/parameters/_asset_policy"
-      responses:
-        "200":
-          description: Array of detailed information of assets under the same policy [DEPRECATED - replaced by policy_asset_info]
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/policy_asset_info"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      summary: Asset Policy Information
-      description: Get the information for all assets under the same policy (DEPRECATED - replaced by policy_asset_info)
-      operationId: asset_policy_info
-
   /pool_list: #RPC
     get:
       tags:
@@ -1468,7 +1459,7 @@ paths:
       tags:
         - Pool
       parameters:
-        - $ref: "#/components/parameters/_epoch_no"
+        - $ref: "#/components/parameters/_pool_epoch_no"
       responses:
         "200":
           description: Success!!
@@ -1823,6 +1814,16 @@ components:
       schema:
         type: string
       example: "pool1leml52hm4fcp3hhe4zye08qz27llhj7d339p3gs0tl85cstx59q"
+      in: query
+      required: false
+      allowEmptyValue: true
+    _pool_epoch_no:
+      deprecated: false
+      name: _epoch_no
+      description: Epoch Number to fetch details for
+      schema:
+        type: string
+      example: "12"
       in: query
       required: false
       allowEmptyValue: true
@@ -2474,6 +2475,35 @@ components:
             type: string
             description: JSON encoded data with details about the parameter update
             example: {"decentralisation": 0.9}
+    cli_protocol_params:
+      description: Get Current Protocol Parameters from node as published by cardano-cli in JSON format
+      type: object
+      example:
+        {
+          "collateralPercentage": 150,
+          "maxBlockBodySize": 90112,
+          "maxBlockHeaderSize": 1100,
+          "maxCollateralInputs": 3,
+          "maxTxSize": 16384,
+          "maxValueSize": 5000,
+          "minPoolCost": 170000000,
+          "minUTxOValue": null,
+          "monetaryExpansion": 3.0e-3,
+          "poolPledgeInfluence": 0.3,
+          "poolRetireMaxEpoch": 18,
+          "protocolVersion": {
+            "major": 8,
+            "minor": 0
+          },
+          "...": "...",
+          "stakeAddressDeposit": 2000000,
+          "stakePoolDeposit": 500000000,
+          "stakePoolTargetNum": 500,
+          "treasuryCut": 0.2,
+          "txFeeFixed": 155381,
+          "txFeePerByte": 44,
+          "utxoCostPerByte": 4310
+        }
     reserve_withdrawals:
       description: Array of withdrawals from reserves/treasury against stake accounts
       type: array
@@ -2493,6 +2523,14 @@ components:
             $ref: "#/components/schemas/pool_delegators/items/properties/amount"
           stake_address:
             $ref: "#/components/schemas/account_history/items/properties/stake_address"
+          earned_epoch:
+            description: Epoch where amount is earned
+            allOf:
+              - $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+          spendable_epoch:
+            description: Epoch where the earned amount can be spent
+            allOf:
+              - $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
     pool_list:
       description: Array of pool IDs and tickers
       type: array
@@ -3632,9 +3670,9 @@ components:
               type: object
               properties:
                 earned_epoch:
-                  $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+                  $ref: "#/components/schemas/reserve_withdrawals/items/properties/earned_epoch"
                 spendable_epoch:
-                  $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+                  $ref: "#/components/schemas/reserve_withdrawals/items/properties/spendable_epoch"
                 amount:
                   type: string
                   description: Amount of rewards earned (in lovelace)
@@ -3983,6 +4021,16 @@ components:
                     - 'null'
                   description: Plutus script address
                   example: addr1w999n67e86jn6xal07pzxtrmqynspgx0fwmcmpua4wc6yzsxpljz3
+                spends_input:
+                  type:
+                    - object
+                    - 'null'
+                  properties:
+                    tx_hash:
+                      $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+                    tx_index:
+                      $ref: "#/components/schemas/utxo_infos/items/properties/tx_index"
+                  description: Input utxo this contract spends
                 script_hash:
                   $ref: "#/components/schemas/script_info/items/properties/script_hash"
                 bytecode:
@@ -4153,7 +4201,7 @@ components:
           payment_address:
             $ref: "#/components/schemas/utxo_infos/items/properties/address"
           stake_address:
-            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+            $ref: "#/components/schemas/address_info/items/properties/stake_address"
           quantity:
             type: string
             description: Asset balance on the payment address
@@ -4166,7 +4214,7 @@ components:
           payment_address:
             $ref: "#/components/schemas/utxo_infos/items/properties/address"
           stake_address:
-            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+            $ref: "#/components/schemas/address_info/items/properties/stake_address"
     asset_summary:
       description: Array of asset summary information
       type: array
@@ -4316,7 +4364,7 @@ components:
           payment_address:
             $ref: "#/components/schemas/utxo_infos/items/properties/address"
           stake_address:
-            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+            $ref: "#/components/schemas/address_info/items/properties/stake_address"
           quantity:
             $ref: "#/components/schemas/asset_addresses/items/properties/quantity"
     policy_asset_info:
@@ -4344,6 +4392,31 @@ components:
             $ref: "#/components/schemas/asset_info/items/properties/minting_tx_metadata"
           token_registry_metadata:
             $ref: "#/components/schemas/asset_info/items/properties/token_registry_metadata"
+    policy_asset_mints:
+      description: Array of mint information for assets under requested policies
+      type: array
+      items:
+        properties:
+          asset_name:
+            $ref: "#/components/schemas/asset_info/items/properties/asset_name"
+          asset_name_ascii:
+            $ref: "#/components/schemas/asset_info/items/properties/asset_name_ascii"
+          fingerprint:
+            $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
+          minting_tx_hash:
+            $ref: "#/components/schemas/asset_info/items/properties/minting_tx_hash"
+          total_supply:
+            $ref: "#/components/schemas/asset_info/items/properties/total_supply"
+          mint_cnt:
+            $ref: "#/components/schemas/asset_info/items/properties/mint_cnt"
+          burn_cnt:
+            $ref: "#/components/schemas/asset_info/items/properties/burn_cnt"
+          creation_time:
+            $ref: "#/components/schemas/asset_info/items/properties/creation_time"
+          minting_tx_metadata:
+            $ref: "#/components/schemas/asset_info/items/properties/minting_tx_metadata"
+          decimals:
+            $ref: "#/components/schemas/asset_info/items/properties/token_registry_metadata/properties/decimals"
     policy_asset_list:
       description: Array of brief information of assets under the same policy
       type: array

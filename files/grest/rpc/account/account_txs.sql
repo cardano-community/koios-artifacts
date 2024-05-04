@@ -26,12 +26,12 @@ BEGIN
     --
     UNION
     --
-    SELECT consumed_by_tx_in_id AS tx_id
+    SELECT consumed_by_tx_id AS tx_id
     FROM tx_out
     WHERE
-      tx_out.consumed_by_tx_in_id IS NULL
+      tx_out.consumed_by_tx_id IS NOT NULL
       AND tx_out.stake_address_id = ANY(SELECT id FROM stake_address WHERE view = _stake_address)
-      AND tx_out.consumed_by_tx_in_id >= _tx_id_min
+      AND tx_out.consumed_by_tx_id >= _tx_id_min
   ) AS tmp;
 
   RETURN QUERY

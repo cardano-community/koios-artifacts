@@ -20,7 +20,8 @@ AS $$
     url,
     decimals,
     logo
-  FROM grest.asset_registry_cache;
+  FROM grest.asset_registry_cache
+  ORDER BY asset_policy,asset_name;
 $$;
 
-COMMENT ON FUNCTION grest.asset_token_registry IS 'An array of token registry information (registered via github) for each asset';
+COMMENT ON FUNCTION grest.asset_token_registry IS 'An array of token registry information (registered via github) for each asset'; -- noqa: LT01

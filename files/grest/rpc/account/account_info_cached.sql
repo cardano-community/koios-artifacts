@@ -56,8 +56,7 @@ BEGIN
       sdc.rewards_available::text,
       COALESCE(reserves_t.reserves, 0)::text AS reserves,
       COALESCE(treasury_t.treasury, 0)::text AS treasury
-    FROM
-      grest.stake_distribution_cache AS sdc
+    FROM grest.stake_distribution_cache AS sdc
       LEFT JOIN (
         SELECT
           sas.id,
@@ -69,8 +68,7 @@ BEGIN
               AND NOT EXISTS (
                 SELECT TRUE
                 FROM stake_deregistration
-                WHERE
-                  stake_deregistration.addr_id = stake_registration.addr_id
+                WHERE stake_deregistration.addr_id = stake_registration.addr_id
                   AND stake_deregistration.tx_id > stake_registration.tx_id
               )
           ) AS registered
@@ -81,33 +79,79 @@ BEGIN
         SELECT
           reserve.addr_id,
           COALESCE(SUM(reserve.amount), 0) AS reserves
-        FROM
-          reserve
+        FROM reserve
           INNER JOIN tx ON tx.id = reserve.tx_id
           INNER JOIN block ON block.id = tx.block_id
           INNER JOIN latest_withdrawal_epochs AS lwe ON lwe.addr_id = reserve.addr_id
-        WHERE
-          reserve.addr_id = ANY(sa_id_list)
+        WHERE reserve.addr_id = ANY(sa_id_list)
           AND block.epoch_no >= lwe.epoch_no
-        GROUP BY
-          reserve.addr_id
-      ) AS reserves_t ON reserves_t.addr_id = status_t.id
+        GROUP BY reserve.addr_id
+        ) AS reserves_t ON reserves_t.addr_id = status_t.id
       LEFT JOIN (
         SELECT
           treasury.addr_id,
           COALESCE(SUM(treasury.amount), 0) AS treasury
-        FROM
-          treasury
+        FROM treasury
           INNER JOIN tx ON tx.id = treasury.tx_id
           INNER JOIN block ON block.id = tx.block_id
           INNER JOIN latest_withdrawal_epochs AS lwe ON lwe.addr_id = treasury.addr_id
-        WHERE
-          treasury.addr_id = ANY(sa_id_list)
+        WHERE treasury.addr_id = ANY(sa_id_list)
           AND block.epoch_no >= lwe.epoch_no
         GROUP BY
           treasury.addr_id
-      ) AS treasury_t ON treasury_t.addr_id = status_t.id
-    WHERE sdc.stake_address = ANY(_stake_addresses);
+        ) AS treasury_t ON treasury_t.addr_id = status_t.id
+    WHERE sdc.stake_address = ANY(_stake_addresses)
+
+    UNION ALL
+
+    SELECT 
+      z.stake_address,
+      ai.status,
+      ai.delegated_pool AS pool_id,
+      ai.total_balance::text,
+      ai.utxo::text,
+      ai.rewards::text,
+      ai.withdrawals::text,
+      ai.rewards_available::text,
+      COALESCE(reserves_t.reserves, 0)::text AS reserves,
+      COALESCE(treasury_t.treasury, 0)::text AS treasury
+      FROM
+        (
+          SELECT
+            sa.view AS stake_address,
+            sa.id AS addr_id
+          FROM stake_address AS sa 
+          WHERE view = ANY(_stake_addresses)
+           AND NOT EXISTS (SELECT null FROM grest.stake_distribution_cache AS sdc WHERE sdc.stake_address = sa.view)
+        ) AS z
+        LEFT JOIN (
+          SELECT
+            reserve.addr_id,
+            COALESCE(SUM(reserve.amount), 0) AS reserves
+          FROM reserve
+            INNER JOIN tx ON tx.id = reserve.tx_id
+            INNER JOIN block ON block.id = tx.block_id
+            INNER JOIN latest_withdrawal_epochs AS lwe ON lwe.addr_id = reserve.addr_id
+          WHERE reserve.addr_id = ANY(sa_id_list)
+            AND block.epoch_no >= lwe.epoch_no
+          GROUP BY reserve.addr_id
+          ) AS reserves_t ON reserves_t.addr_id = z.addr_id
+        LEFT JOIN (
+          SELECT
+            treasury.addr_id,
+            COALESCE(SUM(treasury.amount), 0) AS treasury
+          FROM treasury
+            INNER JOIN tx ON tx.id = treasury.tx_id
+            INNER JOIN block ON block.id = tx.block_id
+            INNER JOIN latest_withdrawal_epochs AS lwe ON lwe.addr_id = treasury.addr_id
+          WHERE treasury.addr_id = ANY(sa_id_list)
+            AND block.epoch_no >= lwe.epoch_no
+          GROUP BY
+            treasury.addr_id
+          ) AS treasury_t ON treasury_t.addr_id = z.addr_id
+        , LATERAL grest.account_info(array[z.stake_address]) AS ai
+    ;
+
 END;
 $$;
 

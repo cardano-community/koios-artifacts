@@ -115,6 +115,35 @@ schemas:
             type: string
             description: JSON encoded data with details about the parameter update
             example: {"decentralisation": 0.9}
+    cli_protocol_params:
+      description: Get Current Protocol Parameters from node as published by cardano-cli in JSON format
+      type: object
+      example:
+        {
+          "collateralPercentage": 150,
+          "maxBlockBodySize": 90112,
+          "maxBlockHeaderSize": 1100,
+          "maxCollateralInputs": 3,
+          "maxTxSize": 16384,
+          "maxValueSize": 5000,
+          "minPoolCost": 170000000,
+          "minUTxOValue": null,
+          "monetaryExpansion": 3.0e-3,
+          "poolPledgeInfluence": 0.3,
+          "poolRetireMaxEpoch": 18,
+          "protocolVersion": {
+            "major": 8,
+            "minor": 0
+          },
+          "...": "...",
+          "stakeAddressDeposit": 2000000,
+          "stakePoolDeposit": 500000000,
+          "stakePoolTargetNum": 500,
+          "treasuryCut": 0.2,
+          "txFeeFixed": 155381,
+          "txFeePerByte": 44,
+          "utxoCostPerByte": 4310
+        }
     reserve_withdrawals:
       description: Array of withdrawals from reserves/treasury against stake accounts
       type: array
@@ -134,6 +163,14 @@ schemas:
             $ref: "#/components/schemas/pool_delegators/items/properties/amount"
           stake_address:
             $ref: "#/components/schemas/account_history/items/properties/stake_address"
+          earned_epoch:
+            description: Epoch where amount is earned
+            allOf:
+              - $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+          spendable_epoch:
+            description: Epoch where the earned amount can be spent
+            allOf:
+              - $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
     pool_list:
       description: Array of pool IDs and tickers
       type: array
@@ -1273,9 +1310,9 @@ schemas:
               type: object
               properties:
                 earned_epoch:
-                  $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+                  $ref: "#/components/schemas/reserve_withdrawals/items/properties/earned_epoch"
                 spendable_epoch:
-                  $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+                  $ref: "#/components/schemas/reserve_withdrawals/items/properties/spendable_epoch"
                 amount:
                   type: string
                   description: Amount of rewards earned (in lovelace)
@@ -1624,6 +1661,16 @@ schemas:
                     - 'null'
                   description: Plutus script address
                   example: addr1w999n67e86jn6xal07pzxtrmqynspgx0fwmcmpua4wc6yzsxpljz3
+                spends_input:
+                  type:
+                    - object
+                    - 'null'
+                  properties:
+                    tx_hash:
+                      $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+                    tx_index:
+                      $ref: "#/components/schemas/utxo_infos/items/properties/tx_index"
+                  description: Input utxo this contract spends
                 script_hash:
                   $ref: "#/components/schemas/script_info/items/properties/script_hash"
                 bytecode:
@@ -1794,7 +1841,7 @@ schemas:
           payment_address:
             $ref: "#/components/schemas/utxo_infos/items/properties/address"
           stake_address:
-            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+            $ref: "#/components/schemas/address_info/items/properties/stake_address"
           quantity:
             type: string
             description: Asset balance on the payment address
@@ -1807,7 +1854,7 @@ schemas:
           payment_address:
             $ref: "#/components/schemas/utxo_infos/items/properties/address"
           stake_address:
-            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+            $ref: "#/components/schemas/address_info/items/properties/stake_address"
     asset_summary:
       description: Array of asset summary information
       type: array
@@ -1957,7 +2004,7 @@ schemas:
           payment_address:
             $ref: "#/components/schemas/utxo_infos/items/properties/address"
           stake_address:
-            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+            $ref: "#/components/schemas/address_info/items/properties/stake_address"
           quantity:
             $ref: "#/components/schemas/asset_addresses/items/properties/quantity"
     policy_asset_info:
@@ -1985,6 +2032,31 @@ schemas:
             $ref: "#/components/schemas/asset_info/items/properties/minting_tx_metadata"
           token_registry_metadata:
             $ref: "#/components/schemas/asset_info/items/properties/token_registry_metadata"
+    policy_asset_mints:
+      description: Array of mint information for assets under requested policies
+      type: array
+      items:
+        properties:
+          asset_name:
+            $ref: "#/components/schemas/asset_info/items/properties/asset_name"
+          asset_name_ascii:
+            $ref: "#/components/schemas/asset_info/items/properties/asset_name_ascii"
+          fingerprint:
+            $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
+          minting_tx_hash:
+            $ref: "#/components/schemas/asset_info/items/properties/minting_tx_hash"
+          total_supply:
+            $ref: "#/components/schemas/asset_info/items/properties/total_supply"
+          mint_cnt:
+            $ref: "#/components/schemas/asset_info/items/properties/mint_cnt"
+          burn_cnt:
+            $ref: "#/components/schemas/asset_info/items/properties/burn_cnt"
+          creation_time:
+            $ref: "#/components/schemas/asset_info/items/properties/creation_time"
+          minting_tx_metadata:
+            $ref: "#/components/schemas/asset_info/items/properties/minting_tx_metadata"
+          decimals:
+            $ref: "#/components/schemas/asset_info/items/properties/token_registry_metadata/properties/decimals"
     policy_asset_list:
       description: Array of brief information of assets under the same policy
       type: array
