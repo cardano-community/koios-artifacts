@@ -46,6 +46,7 @@ BEGIN
 
     IF _latest_epoch_no_in_cache = 0 THEN
       RAISE NOTICE 'Epoch info cache table is empty, starting initial population...';
+      PERFORM grest.epoch_summary_corrections_update();
       PERFORM grest.epoch_info_cache_update(0);
       RETURN;
     END IF;
