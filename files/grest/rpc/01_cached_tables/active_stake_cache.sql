@@ -27,8 +27,8 @@ BEGIN
   SELECT MAX(no) INTO _current_epoch_no
   FROM epoch;
   RAISE NOTICE 'Next epoch: %', _current_epoch_no+1;
-  RAISE NOTICE 'Latest epoch in active stake cache: %', COALESCE(_last_active_stake_validated_epoch::integer, 0);
-  IF (SELECT MAX(epoch_no) FROM epoch_stake_progress WHERE completed='t')::integer > COALESCE(_last_active_stake_validated_epoch,0)::integer THEN
+  RAISE NOTICE 'Latest epoch in active stake cache: %', COALESCE(_last_active_stake_validated_epoch::integer, '0');
+  IF (SELECT MAX(epoch_no) FROM epoch_stake_progress WHERE completed='t')::integer > COALESCE(_last_active_stake_validated_epoch,'0')::integer THEN
     RETURN TRUE;
   END IF;
   RAISE NOTICE 'Active Stake cache is up to date with DB!';
