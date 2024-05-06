@@ -31,7 +31,7 @@ BEGIN
         sa.view AS stake_address
       FROM tx_out AS txo
       LEFT JOIN stake_address AS sa ON txo.stake_address_id = sa.id
-      WHERE id = (
+      WHERE txo.id = (
         SELECT MAX(tx_out_id)
         FROM ma_tx_out
         WHERE ident = _asset_id

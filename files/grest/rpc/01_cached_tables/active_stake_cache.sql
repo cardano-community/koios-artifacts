@@ -27,15 +27,9 @@ BEGIN
   SELECT MAX(no) INTO _current_epoch_no
   FROM epoch;
   RAISE NOTICE 'Next epoch: %', _current_epoch_no+1;
-  RAISE NOTICE 'Latest epoch in active stake cache: %', _last_active_stake_validated_epoch;
-  IF _current_epoch_no > COALESCE(_last_active_stake_validated_epoch::integer, 0) THEN
+  RAISE NOTICE 'Latest epoch in active stake cache: %', COALESCE(_last_active_stake_validated_epoch::integer, 0);
+  IF (SELECT MAX(epoch_no) FROM epoch_stake_progress WHERE completed='t')::integer > COALESCE(_last_active_stake_validated_epoch,0)::integer THEN
     RETURN TRUE;
-  ELSE
-    -- If last active stake cache is same as current epoch_no, check if we're beyond 60% within epoch to populate next epoch stake, only valid as of dbsync 13.2.0.0
-    IF _current_epoch_no = _last_active_stake_validated_epoch::integer
-      AND (SELECT MAX(epoch_no) FROM epoch_stake_progress WHERE completed='t')::integer > _last_active_stake_validated_epoch::integer THEN
-        RETURN TRUE;
-    END IF;
   END IF;
   RAISE NOTICE 'Active Stake cache is up to date with DB!';
   RETURN FALSE;

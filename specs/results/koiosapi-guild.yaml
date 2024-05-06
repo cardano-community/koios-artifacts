@@ -1833,7 +1833,7 @@ components:
       description: Script hash in hexadecimal format (hex)
       schema:
         type: string
-      example: "1392eec7d575292ae1523da65ff1b4b021886e917c8c43de54aa7cbd"
+      example: "f6c13b1bd68219ffb6a1e6d77bd23ec5982f3da2d93007aa5956a142"
       in: query
       required: true
       allowEmptyValue: false
