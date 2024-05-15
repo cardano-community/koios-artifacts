@@ -127,7 +127,7 @@ BEGIN
         ELSE
           SUM(CASE WHEN pool_delegs.stake_address = ANY(api.owners) THEN amount::numeric ELSE 0 END)::lovelace
         END AS pledge
-      FROM grest.pool_delegators(api.pool_id_bech32) AS pool_delegs
+      FROM grest.pool_delegators_list(api.pool_id_bech32) AS pool_delegs
     ) AS live ON TRUE;
 END;
 $$;
