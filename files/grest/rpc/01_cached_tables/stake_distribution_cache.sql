@@ -22,9 +22,9 @@ BEGIN
     WHERE block_no IS NOT NULL INTO _last_accounted_block_height;
   SELECT (last_value::integer - 2)::integer INTO _active_stake_epoch FROM grest.control_table
     WHERE key = 'last_active_stake_validated_epoch';
-  SELECT MAX(eic.i_last_tx_id) INTO _last_account_tx_id
+  SELECT (eic.i_last_tx_id) INTO _last_account_tx_id
     FROM grest.epoch_info_cache AS eic
-    WHERE eic.epoch_no <= _active_stake_epoch;
+    WHERE eic.epoch_no = _active_stake_epoch;
   SELECT MAX(no) INTO _latest_epoch FROM public.epoch WHERE no IS NOT NULL;
 
   WITH
@@ -114,8 +114,7 @@ BEGIN
         COALESCE(SUM(reward.amount), 0) AS rewards
       FROM reward
       INNER JOIN accounts_with_delegated_pools AS awdp ON awdp.stake_address_id = reward.addr_id
-      WHERE
-        (reward.spendable_epoch >= (_active_stake_epoch + 2) AND reward.spendable_epoch <= _latest_epoch )
+      WHERE (reward.spendable_epoch >= (_active_stake_epoch + 2) AND reward.spendable_epoch <= _latest_epoch )
         OR (reward.TYPE = 'refund' AND reward.spendable_epoch >= (_active_stake_epoch + 1) AND reward.spendable_epoch <= _latest_epoch )
       GROUP BY awdp.stake_address_id
     ),
@@ -158,6 +157,16 @@ BEGIN
       FROM withdrawal
       INNER JOIN accounts_with_delegated_pools ON accounts_with_delegated_pools.stake_address_id = withdrawal.addr_id
       GROUP BY accounts_with_delegated_pools.stake_address_id
+    ),
+
+    account_total_instant_rewards AS (
+      SELECT
+        awdp.stake_address_id,
+        COALESCE(SUM(ir.amount), 0) AS amount
+      FROM instant_reward AS ir
+      INNER JOIN accounts_with_delegated_pools AS awdp ON awdp.stake_address_id = ir.addr_id
+      WHERE ir.spendable_epoch <= _latest_epoch
+      GROUP BY awdp.stake_address_id
     )
 
   -- INSERT QUERY START
@@ -166,18 +175,16 @@ BEGIN
       awdp.stake_address,
       pi.pool_id,
       COALESCE(aas.amount, 0) + COALESCE(ado.amount, 0) - COALESCE(adi.amount, 0) + COALESCE(adr.rewards, 0) + COALESCE(adir.amount, 0) - COALESCE(adw.withdrawals, 0) AS total_balance,
-      COALESCE(aas.amount, 0) + COALESCE(ado.amount, 0) - COALESCE(adi.amount, 0) + COALESCE(adr.rewards, 0) + COALESCE(adir.amount, 0) - COALESCE(adw.withdrawals, 0) AS utxo,
+      COALESCE(aas.amount, 0) + COALESCE(ado.amount, 0) - COALESCE(adi.amount, 0) + COALESCE(adr.rewards, 0) + COALESCE(adir.amount, 0) - COALESCE(adw.withdrawals, 0) - COALESCE(atrew.rewards, 0) - COALESCE(atir.amount, 0) + COALESCE(atw.withdrawals, 0) AS utxo,
       COALESCE(atrew.rewards, 0) AS rewards,
       COALESCE(atw.withdrawals, 0) AS withdrawals,
-      CASE
-        WHEN ( COALESCE(atrew.rewards, 0) + COALESCE(adir.amount, 0) - COALESCE(atw.withdrawals, 0) ) <= 0 THEN 0
-        ELSE COALESCE(atrew.rewards, 0) + COALESCE(adir.amount, 0) - COALESCE(atw.withdrawals, 0)
-      END AS rewards_available
+      COALESCE(atrew.rewards, 0) + COALESCE(atir.amount, 0) - COALESCE(atw.withdrawals, 0) AS rewards_available
     FROM accounts_with_delegated_pools AS awdp
     INNER JOIN pool_ids AS pi ON pi.stake_address_id = awdp.stake_address_id
     LEFT JOIN account_active_stake AS aas ON aas.stake_address_id = awdp.stake_address_id
     LEFT JOIN account_total_rewards AS atrew ON atrew.stake_address_id = awdp.stake_address_id
     LEFT JOIN account_total_withdrawals AS atw ON atw.stake_address_id = awdp.stake_address_id
+    LEFT JOIN account_total_instant_rewards AS atir ON atir.stake_address_id = awdp.stake_address_id
     LEFT JOIN account_delta_input AS adi ON adi.stake_address_id = awdp.stake_address_id
     LEFT JOIN account_delta_output AS ado ON ado.stake_address_id = awdp.stake_address_id
     LEFT JOIN account_delta_rewards AS adr ON adr.stake_address_id = awdp.stake_address_id
@@ -280,14 +287,14 @@ BEGIN
     FROM grest.control_table
     WHERE key = 'last_active_stake_validated_epoch'
     ) OR (
-      SELECT ((SELECT MAX(no) FROM epoch) - COALESCE((last_value::integer - 2)::integer, 0 ))  > 3
+      SELECT ((SELECT MAX(no) FROM epoch) - COALESCE((last_value::integer - 2)::integer, 0 ))  > 2
       FROM grest.control_table
       WHERE key = 'last_active_stake_validated_epoch'
     ) THEN
     RAISE EXCEPTION 'Active Stake cache too far, skipping...';
   ELSIF (
     SELECT
-      ((SELECT MAX(no) FROM epoch) - (SELECT MAX(epoch_no)::integer FROM grest.epoch_info_cache))::integer > 1
+      ((SELECT MAX(no) FROM epoch) - (SELECT MAX(epoch_no)::integer FROM grest.epoch_info_cache))::integer > 0
     ) THEN
     RAISE EXCEPTION 'Epoch Info cache wasnt run yet, skipping...';
   END IF;

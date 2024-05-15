@@ -22,24 +22,7 @@ BEGIN
   WHERE stake_address.view = ANY(_stake_addresses);
 
   RETURN QUERY
-    WITH latest_withdrawal_txs AS (
-      SELECT DISTINCT ON (addr_id)
-        addr_id,
-        tx_id
-      FROM withdrawal
-      WHERE addr_id = ANY(sa_id_list)
-      ORDER BY addr_id, tx_id DESC
-    ),
-
-    latest_withdrawal_epochs AS (
-      SELECT
-        lwt.addr_id,
-        b.epoch_no
-      FROM block b
-        INNER JOIN tx ON tx.block_id = b.id
-        INNER JOIN latest_withdrawal_txs AS lwt ON tx.id = lwt.tx_id
-    )
-
+  
     SELECT
       status_t.view AS stake_address,
       CASE WHEN status_t.registered = TRUE THEN
@@ -48,19 +31,11 @@ BEGIN
         'not registered'
       END AS status,
       pool_t.delegated_pool,
-      CASE WHEN (COALESCE(rewards_t.rewards, 0) - COALESCE(withdrawals_t.withdrawals, 0)) < 0 THEN
-        (COALESCE(utxo_t.utxo, 0) + COALESCE(rewards_t.rewards, 0) - COALESCE(withdrawals_t.withdrawals, 0) + COALESCE(reserves_t.reserves, 0) + COALESCE(treasury_t.treasury, 0) - (COALESCE(rewards_t.rewards, 0) - COALESCE(withdrawals_t.withdrawals, 0)))::text
-      ELSE
-        (COALESCE(utxo_t.utxo, 0) + COALESCE(rewards_t.rewards, 0) - COALESCE(withdrawals_t.withdrawals, 0) + COALESCE(reserves_t.reserves, 0) + COALESCE(treasury_t.treasury, 0))::text
-      END AS total_balance,
+      (COALESCE(utxo_t.utxo, 0) + COALESCE(rewards_t.rewards, 0) + COALESCE(reserves_t.reserves, 0) + COALESCE(treasury_t.treasury, 0) - COALESCE(withdrawals_t.withdrawals, 0))::text AS total_balance,
       COALESCE(utxo_t.utxo, 0)::text AS utxo,
       COALESCE(rewards_t.rewards, 0)::text AS rewards,
       COALESCE(withdrawals_t.withdrawals, 0)::text AS withdrawals,
-      CASE WHEN (COALESCE(rewards_t.rewards, 0) - COALESCE(withdrawals_t.withdrawals, 0)) <= 0 THEN
-        '0'
-      ELSE
-        (COALESCE(rewards_t.rewards, 0) - COALESCE(withdrawals_t.withdrawals, 0))::text
-      END AS rewards_available,
+      (COALESCE(rewards_t.rewards, 0) + COALESCE(reserves_t.reserves, 0) + COALESCE(treasury_t.treasury, 0) - COALESCE(withdrawals_t.withdrawals, 0))::text AS rewards_available,
       COALESCE(reserves_t.reserves, 0)::text AS reserves,
       COALESCE(treasury_t.treasury, 0)::text AS treasury
     FROM
@@ -137,29 +112,31 @@ BEGIN
       ) AS withdrawals_t ON withdrawals_t.addr_id = status_t.id
     LEFT JOIN (
         SELECT
-          reserve.addr_id,
-          COALESCE(SUM(reserve.amount), 0) AS reserves
-        FROM reserve
-          INNER JOIN tx ON tx.id = reserve.tx_id
-          INNER JOIN block ON block.id = tx.block_id
-          INNER JOIN latest_withdrawal_epochs AS lwe ON lwe.addr_id = reserve.addr_id
-        WHERE reserve.addr_id = ANY(sa_id_list)
-          AND block.epoch_no >= lwe.epoch_no
+          r.addr_id,
+          COALESCE(SUM(r.amount), 0) AS reserves
+        FROM instant_reward AS r
+        WHERE r.addr_id = ANY(sa_id_list)
+          AND r.type = 'reserves'
+          AND r.spendable_epoch <= (
+            SELECT MAX(no)
+            FROM epoch
+          )
         GROUP BY
-          reserve.addr_id
+          r.addr_id
       ) AS reserves_t ON reserves_t.addr_id = status_t.id
     LEFT JOIN (
         SELECT
-          treasury.addr_id,
-          COALESCE(SUM(treasury.amount), 0) AS treasury
-        FROM treasury
-          INNER JOIN tx ON tx.id = treasury.tx_id
-          INNER JOIN block ON block.id = tx.block_id
-          INNER JOIN latest_withdrawal_epochs AS lwe ON lwe.addr_id = treasury.addr_id
-        WHERE treasury.addr_id = ANY(sa_id_list)
-          AND block.epoch_no >= lwe.epoch_no
+          t.addr_id,
+          COALESCE(SUM(t.amount), 0) AS treasury
+        FROM instant_reward AS t
+        WHERE t.addr_id = ANY(sa_id_list)
+          AND t.type = 'treasury'
+          AND t.spendable_epoch <= (
+            SELECT MAX(no)
+            FROM epoch
+          )
         GROUP BY
-          treasury.addr_id
+          t.addr_id
       ) AS treasury_t ON treasury_t.addr_id = status_t.id;
 END;
 $$;
