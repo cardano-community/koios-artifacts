@@ -265,7 +265,7 @@ BEGIN
   UNION 
  
   SELECT epoch_no, active_stake::text, active_stake_pct, saturation_pct, block_cnt, delegator_cnt, margin, fixed_cost::text, pool_fees::text, deleg_rewards::text, member_rewards::text, epoch_ros 
-  from grest.get_pool_history_data_bulk(_curr_epoch - 2, ARRAY[_pool_bech32], _curr_epoch) -- pass in current epoch explicitly to avoid future epoch row being returned
+  from grest.get_pool_history_data_bulk(_curr_epoch - 2, ARRAY[_pool_bech32], _curr_epoch - 1) -- do not care about current or future epochs for history endpoint
 
  ) x 
   WHERE (_epoch_no is null or x.epoch_no = _epoch_no) 
