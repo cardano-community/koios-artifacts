@@ -1,18 +1,18 @@
-
+drop function if exists grest.get_pool_history_data_bulk;
 CREATE OR REPLACE FUNCTION grest.get_pool_history_data_bulk(_epoch_no_to_insert_from word31type, _pool_bech32 text [] DEFAULT null, _epoch_no_until word31type DEFAULT null)
 RETURNS TABLE (
   pool_id_bech32 text,
   epoch_no bigint,
-  active_stake text,
+  active_stake lovelace,
   active_stake_pct numeric,
   saturation_pct numeric,
   block_cnt bigint,
   delegator_cnt bigint,
   margin double precision,
-  fixed_cost text,
-  pool_fees text,
-  deleg_rewards text,
-  member_rewards text,
+  fixed_cost lovelace,
+  pool_fees double precision,
+  deleg_rewards double precision,
+  member_rewards double precision,
   epoch_ros numeric
 )
 LANGUAGE plpgsql
@@ -142,13 +142,13 @@ BEGIN
     SELECT
       actf.pool_id::text,
       actf.epoch_no,
-      actf.active_stake::text,
+      actf.active_stake,
       actf.active_stake_pct,
       actf.saturation_pct,
       COALESCE(b.block_cnt, 0) AS block_cnt,
       del.delegator_cnt,
-      actf.pool_fee_variable,
-      actf.pool_fee_fixed::text,
+      actf.pool_fee_variable::double precision,
+      actf.pool_fee_fixed,
       -- for debugging: m.memtotal,
       -- for debugging: l.leadertotal,
       CASE COALESCE(b.block_cnt, 0)
@@ -164,7 +164,7 @@ BEGIN
               ELSE ROUND(actf.pool_fee_fixed + (((COALESCE(m.memtotal, 0) + COALESCE(l.leadertotal, 0)) - actf.pool_fee_fixed) * actf.pool_fee_variable))
             END
         END
-      END::text AS pool_fees,
+      END AS pool_fees,
       CASE COALESCE(b.block_cnt, 0)
       WHEN 0 THEN
         0
@@ -178,7 +178,7 @@ BEGIN
             ELSE ROUND(COALESCE(m.memtotal, 0) + (COALESCE(l.leadertotal, 0) - (actf.pool_fee_fixed + (((COALESCE(m.memtotal, 0) + COALESCE(l.leadertotal, 0)) - actf.pool_fee_fixed) * actf.pool_fee_variable))))
           END
         END
-      END::text AS deleg_rewards,
+      END AS deleg_rewards,
       CASE COALESCE(b.block_cnt, 0)
         WHEN 0 THEN 0
       ELSE
@@ -186,7 +186,7 @@ BEGIN
           WHEN 0 THEN NULL
           ELSE COALESCE(m.memtotal, 0)
         END
-      END::text AS member_rewards,
+      END::double precision AS member_rewards,
       CASE COALESCE(b.block_cnt, 0)
         WHEN 0 THEN 0
       ELSE
@@ -253,10 +253,10 @@ BEGIN
     block_cnt,
     delegator_cnt,
     pool_fee_variable AS margin,
-    COALESCE(pool_fee_fixed, 0)::text AS fixed_cost,
-    COALESCE(pool_fees, 0)::text,
-    COALESCE(deleg_rewards, 0)::text,
-    COALESCE(member_rewards, 0)::text,
+    pool_fee_fixed::text AS fixed_cost,
+    pool_fees::text,
+    deleg_rewards::text,
+    member_rewards::text,
     COALESCE(epoch_ros, 0)
   FROM grest.pool_history_cache AS phc
   WHERE phc.pool_id = _pool_bech32 
@@ -264,7 +264,7 @@ BEGIN
 
   UNION 
  
-  SELECT epoch_no, active_stake, active_stake_pct, saturation_pct, block_cnt, delegator_cnt, margin, fixed_cost, pool_fees, deleg_rewards, member_rewards, epoch_ros 
+  SELECT epoch_no, active_stake::text, active_stake_pct, saturation_pct, block_cnt, delegator_cnt, margin, fixed_cost::text, pool_fees::text, deleg_rewards::text, member_rewards::text, epoch_ros 
   from grest.get_pool_history_data_bulk(_curr_epoch - 2, ARRAY[_pool_bech32], _curr_epoch) -- pass in current epoch explicitly to avoid future epoch row being returned
 
  ) x 
