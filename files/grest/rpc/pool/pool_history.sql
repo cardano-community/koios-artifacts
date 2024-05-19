@@ -103,7 +103,7 @@ BEGIN
                 AND pup2.active_epoch_no <= act.epoch_no)
         ) AS pool_fee_fixed,
         (act.amount / (
-          SELECT NULLIF(act.amount, 0)
+          SELECT NULLIF(easc.amount, 0)
           FROM grest.epoch_active_stake_cache AS easc
           WHERE easc.epoch_no = act.epoch_no
           )
