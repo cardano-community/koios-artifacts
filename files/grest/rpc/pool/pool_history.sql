@@ -1,4 +1,3 @@
-drop function if exists grest.get_pool_history_data_bulk;
 CREATE OR REPLACE FUNCTION grest.get_pool_history_data_bulk(_epoch_no_to_insert_from word31type, _pool_bech32 text [] DEFAULT null, _epoch_no_until word31type DEFAULT null)
 RETURNS TABLE (
   pool_id_bech32 text,
@@ -218,7 +217,7 @@ $$;
 
 COMMENT ON FUNCTION grest.get_pool_history_data_bulk IS 'Pool block production and reward history from a given epoch until optional later epoch, for all or particular subset of pools'; -- noqa: LT01
 
-CREATE OR REPLACE FUNCTION grest.pool_history(_pool_bech32 text, _epoch_no word31type DEFAULT NULL)
+CREATE OR REPLACE FUNCTION grest.pool_history(_pool_bech32 text, _epoch_no word31type DEFAULT null)
 RETURNS TABLE (
   epoch_no bigint,
   active_stake text,
@@ -239,37 +238,46 @@ AS $$
 DECLARE
   _curr_epoch word31type;
 BEGIN
-  select max(no) into _curr_epoch from epoch;
+
+  SELECT MAX(no) INTO _curr_epoch FROM epoch;
 
   RETURN QUERY
-
- SELECT x.* from (
-
-  SELECT
-    epoch_no,
-    active_stake::text,
-    active_stake_pct,
-    saturation_pct,
-    block_cnt,
-    delegator_cnt,
-    pool_fee_variable AS margin,
-    pool_fee_fixed::text AS fixed_cost,
-    pool_fees::text,
-    deleg_rewards::text,
-    member_rewards::text,
-    COALESCE(epoch_ros, 0)
-  FROM grest.pool_history_cache AS phc
-  WHERE phc.pool_id = _pool_bech32 
-      AND phc.epoch_no < (_curr_epoch - 2) -- temporary condition for testing, until cache table population fixed, then can be removed
-
-  UNION 
- 
-  SELECT epoch_no, active_stake::text, active_stake_pct, saturation_pct, block_cnt, delegator_cnt, margin, fixed_cost::text, pool_fees::text, deleg_rewards::text, member_rewards::text, epoch_ros 
-  from grest.get_pool_history_data_bulk(_curr_epoch - 2, ARRAY[_pool_bech32], _curr_epoch - 1) -- do not care about current or future epochs for history endpoint
-
- ) x 
-  WHERE (_epoch_no is null or x.epoch_no = _epoch_no) 
-  ORDER by x.epoch_no desc;
+    SELECT x.*
+    FROM (
+      SELECT
+        epoch_no,
+        active_stake::text,
+        active_stake_pct,
+        saturation_pct,
+        block_cnt,
+        delegator_cnt,
+        pool_fee_variable AS margin,
+        pool_fee_fixed::text AS fixed_cost,
+        pool_fees::text,
+        deleg_rewards::text,
+        member_rewards::text,
+        COALESCE(epoch_ros, 0)
+      FROM grest.pool_history_cache AS phc
+      WHERE phc.pool_id = _pool_bech32 
+          AND phc.epoch_no < (_curr_epoch - 2) -- temporary condition for testing, until cache table population fixed, then can be removed
+      UNION 
+      SELECT
+        epoch_no,
+        active_stake::text,
+        active_stake_pct,
+        saturation_pct,
+        block_cnt,
+        delegator_cnt,
+        margin,
+        fixed_cost::text,
+        pool_fees::text,
+        deleg_rewards::text,
+        member_rewards::text,
+        epoch_ros 
+      FROM grest.get_pool_history_data_bulk(_curr_epoch - 2, ARRAY[_pool_bech32], _curr_epoch - 1) -- do not care about current or future epochs for history endpoint
+    ) x 
+    WHERE (_epoch_no is null or x.epoch_no = _epoch_no) 
+    ORDER by x.epoch_no desc;
 
 END;
 $$;
