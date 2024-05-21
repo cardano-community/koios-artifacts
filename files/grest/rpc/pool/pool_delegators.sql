@@ -132,4 +132,3 @@ $$;
 
 
 COMMENT ON FUNCTION grest.pool_delegators_list IS 'Return brief variant of information about live delegators for a given pool, needed by pool_info endpoint.'; --noqa: LT01
-
