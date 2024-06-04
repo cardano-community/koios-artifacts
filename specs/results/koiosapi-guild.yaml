@@ -8,7 +8,7 @@ info:
   license:
     name: Creative Commons Attribution 4.0 International
     url: https://github.com/cardano-community/koios-artifacts/blob/main/LICENSE
-  version: v1.1.2
+  version: v1.1.3
   description: |
     Koios is best described as a Decentralized and Elastic RESTful query layer for exploring data on Cardano blockchain to consume within applications/wallets/explorers/etc. This page not only provides an OpenAPI Spec for live implementation, but also ability to execute live demo from client browser against each endpoint with pre-filled examples.
 
@@ -130,7 +130,7 @@ info:
       - Burst Limit: A single IP can query an endpoint up to 100 times within 10 seconds (that's about 8.64 million requests within a day). The sleep time if a limit is crossed is minimal (60 seconds) for that IP - during which, the monitoring layer will return HTTP Status `429 - Too many requests`.  
       - Pagination/Limits: Any query results fetched will be paginated by 1000 records (you can reduce limit and or control pagination offsets on URL itself, see API > Pagination section for more details).
       - Query timeout: If a query from server takes more than 30 seconds, it will return a HTTP Status of `504 - Gateway timeout`. This is because we would want to ensure you're using the queries optimally, and more often than not - it would indicate that particular endpoint is not optimised (or the network connectivity is not optimal between servers).
-      - Payload size limit: Koios supports sending bulk objects to reduce networking costs as well as number of calls users spent. However, this can also become an easy attack surface. Thus, we've had to add a strict limit for request body size to be limited to 5kb.
+      - Payload size limit: Koios supports sending bulk objects to reduce networking costs as well as number of calls users spent. However, this can also become an easy attack surface. Thus, we've had to add a strict limit for request body size to be limited to 1kb for public and 5kb for registered tiers.
 
     Yet, there may be cases where the above restrictions may need exceptions (for example, an explorer or a wallet might need more connections than above - going beyond the Burst Limit). For such cases, it is best to approach the team and we can work towards a solution.
 
@@ -147,9 +147,13 @@ info:
     url: "https://api.koios.rest/images/koios.png"
 servers:
   - url: https://api.koios.rest/api/v1
+    description: Mainnet
   - url: https://guild.koios.rest/api/v1
+    description: Guildnet
   - url: https://preview.koios.rest/api/v1
+    description: Preview Network
   - url: https://preprod.koios.rest/api/v1
+    description: Preprod Network
 paths:
 
   /tip: #RPC
@@ -3828,9 +3832,28 @@ components:
             - $ref: "#/components/schemas/tx_info/items/properties/outputs"
           collateral_output:
             description: A collateral output for change if the smart contract fails to execute and collateral inputs are spent. (CIP-40)
-            anyOf:
-            - type: 'null'
-            - $ref: "#/components/schemas/tx_info/items/properties/outputs/items"
+            type: array
+            items:
+              properties:
+                payment_addr:
+                  $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/payment_addr"
+                stake_addr:
+                  $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/stake_addr"
+                tx_hash:
+                  $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/tx_hash"
+                tx_index:
+                  $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/tx_index"
+                value:
+                  $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/value"
+                datum_hash:
+                  $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/datum_hash"
+                inline_datum:
+                  $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/inline_datum"
+                reference_script:
+                  $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/reference_script"
+                asset_list:
+                  type: array
+                  description: Brief asset description from ledger
           reference_inputs:
             description: An array of reference inputs. A reference input allows looking at an output without spending it. (CIP-31)
             anyOf:
@@ -4636,4 +4659,5 @@ tags:
         - [evaluateTransaction](https://ogmios.dev/mini-protocols/local-tx-submission/#evaluating-transactions)
     x-tag-expanded: true
 security:
+  - []
   - bearerAuth: []
