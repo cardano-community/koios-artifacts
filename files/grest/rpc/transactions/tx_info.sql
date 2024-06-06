@@ -243,17 +243,6 @@ BEGIN
           tx_out.index AS tx_index,
           tx_out.value::text AS value,
           ENCODE(tx_out.data_hash, 'hex') AS datum_hash,
-          (CASE WHEN ma.policy IS NULL THEN NULL
-            ELSE
-              JSONB_BUILD_OBJECT(
-                'policy_id', ENCODE(ma.policy, 'hex'),
-                'asset_name', ENCODE(ma.name, 'hex'),
-                'fingerprint', ma.fingerprint,
-                'decimals', aic.decimals,
-                'quantity', mto.quantity::text
-              )
-            END
-          ) AS asset_list,
           (CASE WHEN tx_out.inline_datum_id IS NULL THEN NULL
             ELSE
               JSONB_BUILD_OBJECT(
@@ -272,14 +261,12 @@ BEGIN
                 'size', script.serialised_size
               )
             END
-          ) AS reference_script
+          ) AS reference_script,
+          REPLACE(multi_assets_descr,'fromList ','') AS asset_descr
         FROM
           collateral_tx_out AS tx_out
           INNER JOIN tx ON tx_out.tx_id = tx.id
           LEFT JOIN stake_address AS sa ON tx_out.stake_address_id = sa.id
-          LEFT JOIN ma_tx_out AS mto ON mto.tx_out_id = tx_out.id
-          LEFT JOIN multi_asset AS ma ON ma.id = mto.ident
-          LEFT JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
           LEFT JOIN datum ON datum.id = tx_out.inline_datum_id
           LEFT JOIN script ON script.id = tx_out.reference_script_id
         WHERE
@@ -789,11 +776,11 @@ BEGIN
             'datum_hash', datum_hash,
             'inline_datum', inline_datum,
             'reference_script', reference_script,
-            'asset_list', COALESCE(JSONB_AGG(asset_list) FILTER (WHERE asset_list IS NOT NULL), JSONB_BUILD_ARRAY())
+            'asset_list', asset_descr
           ) AS tx_collateral_outputs
         FROM _all_collateral_outputs AS aco
         WHERE aco.tx_id = atx.id
-        GROUP BY payment_addr_bech32, payment_addr_cred, stake_addr, aco.tx_hash, tx_index, value, datum_hash, inline_datum, reference_script
+        GROUP BY payment_addr_bech32, payment_addr_cred, stake_addr, aco.tx_hash, tx_index, value, datum_hash, inline_datum, reference_script, asset_descr
         LIMIT 1 -- there can only be one collateral output
       ),
       COALESCE((

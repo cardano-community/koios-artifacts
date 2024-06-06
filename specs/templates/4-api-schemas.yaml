@@ -1467,9 +1467,28 @@ schemas:
             - $ref: "#/components/schemas/tx_info/items/properties/outputs"
           collateral_output:
             description: A collateral output for change if the smart contract fails to execute and collateral inputs are spent. (CIP-40)
-            anyOf:
-            - type: 'null'
-            - $ref: "#/components/schemas/tx_info/items/properties/outputs/items"
+            type: array
+            items:
+              properties:
+                payment_addr:
+                  $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/payment_addr"
+                stake_addr:
+                  $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/stake_addr"
+                tx_hash:
+                  $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/tx_hash"
+                tx_index:
+                  $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/tx_index"
+                value:
+                  $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/value"
+                datum_hash:
+                  $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/datum_hash"
+                inline_datum:
+                  $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/inline_datum"
+                reference_script:
+                  $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/reference_script"
+                asset_list:
+                  type: array
+                  description: Brief asset description from ledger
           reference_inputs:
             description: An array of reference inputs. A reference input allows looking at an output without spending it. (CIP-31)
             anyOf:
