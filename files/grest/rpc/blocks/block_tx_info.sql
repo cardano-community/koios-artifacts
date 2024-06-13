@@ -279,7 +279,7 @@ BEGIN
               )
             END
           ) AS reference_script,
-          REPLACE(multi_assets_descr,'fromList ','') AS asset_descr
+          REPLACE(multi_assets_descr,'fromList ','')::jsonb AS asset_descr
         FROM
           collateral_tx_out AS tx_out
           INNER JOIN tx ON tx_out.tx_id = tx.id
