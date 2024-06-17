@@ -56,6 +56,14 @@
         "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/adabox-logo.webp"
       }
     },
+        {
+      "text": "Gero Labs",
+      "link": "https://gerowallet.io",
+      "logo": {
+        "dark": "https://raw.githubusercontent.com/adabox-aio/cardano-shield/main/.github/gero-blue.webp",
+        "light": "https://raw.githubusercontent.com/adabox-aio/cardano-shield/main/.github/gero-blue.webp"
+      }
+    },
     {
       "text": "Building On Cardano",
       "link": "https://buildingoncardano.com",
