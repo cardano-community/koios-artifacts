@@ -24,7 +24,7 @@ AS $$
     aic.decimals
   FROM public.multi_asset AS ma
   INNER JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
-  LEFT JOIN tx ON tx.id = aic.first_mint_tx_id
+  LEFT JOIN tx ON tx.id = COALESCE(aic.last_mint_meta_tx_id, aic.last_mint_tx_id)
   WHERE ma.policy = DECODE(_asset_policy, 'hex')
   ORDER BY tx.id;
 $$;
