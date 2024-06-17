@@ -161,6 +161,14 @@
       }
     },
     {
+      "text": "Rosen Bridge",
+      "link": "https://rosen.tech",
+      "logo": {
+        "dark": "https://raw.githubusercontent.com/rosen-bridge/ui/dev/apps/rosen/public/dark.png",
+        "light": "https://raw.githubusercontent.com/rosen-bridge/ui/dev/apps/rosen/public/light.png"
+      }
+    },
+    {
       "text": "Skulliance",
       "link": "https://skulliance.io",
       "logo": {
