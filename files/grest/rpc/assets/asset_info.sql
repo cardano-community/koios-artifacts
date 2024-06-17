@@ -50,7 +50,7 @@ BEGIN
       END
     FROM multi_asset AS ma
       INNER JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
-      INNER JOIN tx ON tx.id = aic.last_mint_tx_id
+      INNER JOIN tx ON tx.id = COALESCE(aic.last_mint_meta_tx_id, aic.last_mint_tx_id)
       LEFT JOIN grest.asset_registry_cache AS arc ON arc.asset_policy = ENCODE(ma.policy,'hex') AND arc.asset_name = ENCODE(ma.name,'hex')
       LEFT JOIN LATERAL (
         SELECT JSONB_OBJECT_AGG(key::text, json ) AS minting_tx_metadata
