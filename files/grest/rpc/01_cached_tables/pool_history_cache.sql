@@ -19,6 +19,208 @@ CREATE TABLE grest.pool_history_cache (
 
 COMMENT ON TABLE grest.pool_history_cache IS 'A history of pool performance including blocks, delegators, active stake, fees AND rewards';
 
+CREATE OR REPLACE FUNCTION grest.get_pool_history_data_bulk(_epoch_no_to_insert_from word31type, _pool_bech32 text [] DEFAULT null, _epoch_no_until word31type DEFAULT null)
+RETURNS TABLE (
+  pool_id_bech32 text,
+  epoch_no bigint,
+  active_stake lovelace,
+  active_stake_pct numeric,
+  saturation_pct numeric,
+  block_cnt bigint,
+  delegator_cnt bigint,
+  margin double precision,
+  fixed_cost lovelace,
+  pool_fees double precision,
+  deleg_rewards double precision,
+  member_rewards double precision,
+  epoch_ros numeric
+)
+LANGUAGE plpgsql
+AS $$
+#variable_conflict use_column
+DECLARE
+  _pool_ids bigint [];
+BEGIN
+  _pool_ids := (SELECT array_agg(id) from pool_hash ph where ph.view = ANY(_pool_bech32));
+
+  RETURN QUERY
+  
+  WITH
+    blockcounts AS (
+      SELECT
+        sl.pool_hash_id,
+        b.epoch_no,
+        COUNT(*) AS block_cnt
+      FROM block AS b,
+        slot_leader AS sl
+      WHERE b.slot_leader_id = sl.id
+        AND (_pool_bech32 is null or sl.pool_hash_id = ANY(_pool_ids))
+        AND b.epoch_no >= _epoch_no_to_insert_from
+        AND (_epoch_no_until is null or b.epoch_no <= _epoch_no_until) 
+      GROUP BY
+        sl.pool_hash_id,
+        b.epoch_no
+    ),
+
+    leadertotals AS (
+      SELECT
+        r.pool_id,
+        r.earned_epoch,
+        COALESCE(SUM(r.amount), 0) AS leadertotal
+      FROM reward AS r
+      WHERE r.type = 'leader'
+        AND (_pool_bech32 is null or r.pool_id = ANY(_pool_ids))
+        AND r.earned_epoch >= _epoch_no_to_insert_from
+        AND (_epoch_no_until is null or r.earned_epoch <= _epoch_no_until)
+      GROUP BY
+        r.pool_id,
+        r.earned_epoch
+    ),
+
+    membertotals AS (
+      SELECT
+        r.pool_id,
+        r.earned_epoch,
+        COALESCE(SUM(r.amount), 0) AS memtotal
+      FROM reward AS r
+      WHERE r.type = 'member'
+        AND (_pool_bech32 is null or r.pool_id = ANY(_pool_ids))
+        AND r.earned_epoch >= _epoch_no_to_insert_from
+        AND (_epoch_no_until is null or r.earned_epoch <= _epoch_no_until)
+      GROUP BY
+        r.pool_id,
+        r.earned_epoch
+    ),
+
+    activeandfees AS (
+      SELECT
+        ph.view AS pool_id,
+        es.epoch_no,
+        SUM(es.amount) AS active_stake,
+        COUNT(1) AS delegator_cnt,
+        (
+          SELECT margin
+          FROM
+            pool_update
+          WHERE
+            id = (
+              SELECT MAX(pup2.id)
+              FROM pool_update AS pup2
+              WHERE pup2.hash_id = es.pool_id
+                AND pup2.active_epoch_no <= es.epoch_no
+           )
+        ) AS pool_fee_variable,
+        (
+          SELECT fixed_cost
+          FROM pool_update
+          WHERE id = (
+              SELECT MAX(pup2.id)
+              FROM pool_update AS pup2
+              WHERE pup2.hash_id = es.pool_id
+                AND pup2.active_epoch_no <= es.epoch_no)
+        ) AS pool_fee_fixed,
+        (SUM(es.amount) / (
+          SELECT NULLIF(easc.amount, 0)
+          FROM grest.epoch_active_stake_cache AS easc
+          WHERE easc.epoch_no = es.epoch_no
+          )
+        ) * 100 AS active_stake_pct,
+        ROUND(
+          (SUM(es.amount) / (
+            SELECT supply::bigint / (
+                SELECT ep.optimal_pool_count
+                FROM epoch_param AS ep
+                WHERE ep.epoch_no = es.epoch_no
+              )
+            FROM grest.totals (es.epoch_no)
+            ) * 100
+          ), 2
+        ) AS saturation_pct
+      FROM epoch_stake AS es
+        INNER JOIN pool_hash AS ph ON es.pool_id = ph.id
+      WHERE es.epoch_no >= _epoch_no_to_insert_from
+        AND (_epoch_no_until is null or es.epoch_no < _epoch_no_until)
+        AND (_pool_bech32 is null or ph.view = ANY(_pool_bech32))
+      GROUP BY es.pool_id, ph.view, es.epoch_no
+    )
+
+    SELECT
+      actf.pool_id::text,
+      actf.epoch_no::bigint,
+      actf.active_stake::lovelace,
+      actf.active_stake_pct,
+      actf.saturation_pct,
+      COALESCE(b.block_cnt, 0) AS block_cnt,
+      actf.delegator_cnt,
+      actf.pool_fee_variable::double precision,
+      actf.pool_fee_fixed,
+      -- for debugging: m.memtotal,
+      -- for debugging: l.leadertotal,
+      CASE COALESCE(b.block_cnt, 0)
+      WHEN 0 THEN
+        0
+      ELSE
+        -- special CASE for WHEN reward information is not available yet
+        CASE COALESCE(l.leadertotal, 0) + COALESCE(m.memtotal, 0)
+          WHEN 0 THEN NULL
+          ELSE
+            CASE
+              WHEN COALESCE(l.leadertotal, 0) < actf.pool_fee_fixed THEN COALESCE(l.leadertotal, 0)
+              ELSE ROUND(actf.pool_fee_fixed + (((COALESCE(m.memtotal, 0) + COALESCE(l.leadertotal, 0)) - actf.pool_fee_fixed) * actf.pool_fee_variable))
+            END
+        END
+      END AS pool_fees,
+      CASE COALESCE(b.block_cnt, 0)
+      WHEN 0 THEN
+        0
+      ELSE
+        -- special CASE for WHEN reward information is not available yet
+        CASE COALESCE(l.leadertotal, 0) + COALESCE(m.memtotal, 0)
+          WHEN 0 THEN NULL
+        ELSE
+          CASE
+            WHEN COALESCE(l.leadertotal, 0) < actf.pool_fee_fixed THEN COALESCE(m.memtotal, 0)
+            ELSE ROUND(COALESCE(m.memtotal, 0) + (COALESCE(l.leadertotal, 0) - (actf.pool_fee_fixed + (((COALESCE(m.memtotal, 0) + COALESCE(l.leadertotal, 0)) - actf.pool_fee_fixed) * actf.pool_fee_variable))))
+          END
+        END
+      END AS deleg_rewards,
+      CASE COALESCE(b.block_cnt, 0)
+        WHEN 0 THEN 0
+      ELSE
+        CASE COALESCE(m.memtotal, 0)
+          WHEN 0 THEN NULL
+          ELSE COALESCE(m.memtotal, 0)
+        END
+      END::double precision AS member_rewards,
+      CASE COALESCE(b.block_cnt, 0)
+        WHEN 0 THEN 0
+      ELSE
+        -- special CASE for WHEN reward information is not available yet
+        CASE COALESCE(l.leadertotal, 0) + COALESCE(m.memtotal, 0)
+          WHEN 0 THEN NULL
+          ELSE
+            CASE
+              WHEN COALESCE(l.leadertotal, 0) < actf.pool_fee_fixed THEN ROUND((((POW((LEAST(((COALESCE(m.memtotal, 0)) / (NULLIF(actf.active_stake, 0))), 1000) + 1), 73) - 1)) * 100)::numeric, 9)
+              -- using LEAST AS a way to prevent overflow, in CASE of dodgy database data (e.g. giant rewards / tiny active stake)
+              ELSE ROUND((((POW((LEAST((((COALESCE(m.memtotal, 0) + (COALESCE(l.leadertotal, 0) - (actf.pool_fee_fixed + (((COALESCE(m.memtotal, 0)
+                  + COALESCE(l.leadertotal, 0)) - actf.pool_fee_fixed) * actf.pool_fee_variable))))) / (NULLIF(actf.active_stake, 0))), 1000) + 1), 73) - 1)) * 100)::numeric, 9)
+            END
+        END
+      END AS epoch_ros
+    FROM pool_hash AS ph
+    INNER JOIN activeandfees AS actf ON actf.pool_id = ph.view
+    LEFT JOIN blockcounts AS b ON ph.id = b.pool_hash_id
+      AND actf.epoch_no = b.epoch_no
+    LEFT JOIN leadertotals AS l ON ph.id = l.pool_id
+      AND actf.epoch_no = l.earned_epoch
+    LEFT JOIN membertotals AS m ON ph.id = m.pool_id
+      AND actf.epoch_no = m.earned_epoch;
+     
+END;
+$$;
+
+COMMENT ON FUNCTION grest.get_pool_history_data_bulk IS 'Pool block production and reward history from a given epoch until optional later epoch, for all or particular subset of pools'; -- noqa: LT01
+
 CREATE OR REPLACE FUNCTION grest.pool_history_cache_update(_epoch_no_to_insert_from bigint DEFAULT NULL)
 RETURNS void
 LANGUAGE plpgsql
