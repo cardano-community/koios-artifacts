@@ -60,7 +60,7 @@ BEGIN
     SELECT COALESCE(
       (SELECT last_value::integer
         FROM grest.control_table
-        WHERE key = 'last_active_stake_validated_epoch'), 0) INTO _last_active_stake_validated_epoch;
+        WHERE key = 'last_active_stake_validated_epoch'), _epoch_no - 3) INTO _last_active_stake_validated_epoch;
     -- POOL ACTIVE STAKE CACHE
     INSERT INTO grest.pool_active_stake_cache
       SELECT
@@ -80,6 +80,11 @@ BEGIN
     ) DO UPDATE
       SET amount = excluded.amount
       WHERE pool_active_stake_cache.amount IS DISTINCT FROM excluded.amount;
+    
+    -- Active stake older than active stake can already be captured from pool history cache
+    DELETE FROM grest.pool_active_stake_cache
+      WHERE epoch_no < _last_active_stake_validated_epoch;
+
     -- EPOCH ACTIVE STAKE CACHE
     INSERT INTO grest.epoch_active_stake_cache
       SELECT
