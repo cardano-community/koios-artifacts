@@ -9,17 +9,17 @@ export CARDANO_NODE_SOCKET_PATH=
 echo "$(date +%F_%H:%M:%S) Running next epoch nonce calculation..."
 
 # TODO possibly initialize EPOCH_LENGTH from database as well
-PROTO_MAJ=`psql ${DB_NAME} -c "select protocol_major from epoch_param where epoch_no = (select max(no) from epoch);" -t`
-SECURITY_PARAM=`psql ${DB_NAME} -c "select securityparam from grest.genesis;" -t`
-ACTIVE_SLOT_COEFF=`psql ${DB_NAME} -c "select activeslotcoeff from grest.genesis;" -t`
+PROTO_MAJ=$(psql ${DB_NAME} -c "select protocol_major from epoch_param where epoch_no = (select max(no) from epoch);" -t)
+SECURITY_PARAM=$(psql ${DB_NAME} -c "select securityparam from grest.genesis;" -t)
+ACTIVE_SLOT_COEFF=$(psql ${DB_NAME} -c "select activeslotcoeff from grest.genesis;" -t)
 WINDOW_SIZE=2
 if [[ $PROTO_MAJ -gt 8 ]]; then
   WINDOW_SIZE=3
 fi
 #echo "from db: security_param ${SECURITY_PARAM}, active slot coeff ${ACTIVE_SLOT_COEFF}, window size $WINDOW_SIZE based on protocol major $PROTO_MAJ"
 
-min_slot=`echo "${EPOCH_LENGTH} - (${WINDOW_SIZE} * (${SECURITY_PARAM} / ${ACTIVE_SLOT_COEFF}))" | bc`
-if [ -z $min_slot ]; then
+min_slot=$(echo "${EPOCH_LENGTH} - (${WINDOW_SIZE} * (${SECURITY_PARAM} / ${ACTIVE_SLOT_COEFF}))" | bc)
+if [[ -z $min_slot ]]; then
   min_slot=$((EPOCH_LENGTH * 7 / 10))
   echo "WARNING: Falling back to percent-based calculation, initialized min_slot to ${min_slot}"
 fi
