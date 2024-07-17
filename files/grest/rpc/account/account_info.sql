@@ -114,7 +114,7 @@ BEGIN
         SELECT
           r.addr_id,
           COALESCE(SUM(r.amount), 0) AS reserves
-        FROM instant_reward AS r
+        FROM reward_rest AS r
         WHERE r.addr_id = ANY(sa_id_list)
           AND r.type = 'reserves'
           AND r.spendable_epoch <= (
@@ -128,7 +128,7 @@ BEGIN
         SELECT
           t.addr_id,
           COALESCE(SUM(t.amount), 0) AS treasury
-        FROM instant_reward AS t
+        FROM reward_rest AS t
         WHERE t.addr_id = ANY(sa_id_list)
           AND t.type = 'treasury'
           AND t.spendable_epoch <= (

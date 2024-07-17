@@ -163,7 +163,7 @@ BEGIN
       SELECT
         awdp.stake_address_id,
         COALESCE(SUM(ir.amount), 0) AS amount
-      FROM instant_reward AS ir
+      FROM reward_rest AS ir
       INNER JOIN accounts_with_delegated_pools AS awdp ON awdp.stake_address_id = ir.addr_id
       WHERE ir.spendable_epoch <= _latest_epoch
       GROUP BY awdp.stake_address_id
