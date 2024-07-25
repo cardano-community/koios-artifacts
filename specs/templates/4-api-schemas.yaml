@@ -1334,6 +1334,11 @@ schemas:
             description: Stake address status
             enum: ["registered", "not registered"]
             example: registered
+          delegated_drep:
+            anyOf:
+            - type: 'null'
+            - type: string
+            description: Account's current delegation status to DRep ID in Bech32 format
           delegated_pool:
             anyOf:
             - type: 'null'

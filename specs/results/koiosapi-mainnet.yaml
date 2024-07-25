@@ -486,12 +486,34 @@ paths:
       summary: UTxO Info
       description: Get UTxO set for requested UTxO references
       operationId: utxo_info
-  /tx_info: #RPC
+  /tx_cbor: #RPC
     post:
       tags:
         - Transactions
       requestBody:
         $ref: "#/components/requestBodies/tx_ids"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tx_cbor"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Raw Transaction (CBOR)
+      description: Get raw transaction(s) in CBOR format
+      operationId: tx_cbor
+  /tx_info: #RPC
+    post:
+      tags:
+        - Transactions
+      requestBody:
+        $ref: "#/components/requestBodies/tx_info"
       responses:
         "200":
           description: Success!!
@@ -1899,6 +1921,10 @@ components:
                 format: boolean
                 type: boolean
                 description: Controls whether to include any details regarding collateral/reference/datum/script objects in the result
+              _bytecode:
+                format: boolean
+                type: boolean
+                description: Controls whether to include bytecode for associated reference/plutus scripts
             example:
               _block_hashes:
                 - fb9087c9f1408a7bbd7b022fd294ab565fec8dd3a8ef091567482722a1fa4e30
@@ -1910,6 +1936,7 @@ components:
               _withdrawals: false
               _certs: false
               _scripts: false
+              _bytecode: false
       description: Array of block hashes
     payment_addresses:
       content:
@@ -2140,6 +2167,60 @@ components:
               _tx_hashes:
                 - f144a8264acf4bdfe2e1241170969c930d64ab6b0996a4a45237b623f1dd670e
                 - 0b8ba3bed976fa4913f19adc9f6dd9063138db5b4dd29cecde369456b5155e94
+      description: Array of Cardano Transaction hashes
+    tx_info:
+      content:
+        application/json:
+          schema:
+            required:
+              - _tx_hashes
+            type: object
+            properties:
+              _tx_hashes:
+                format: text
+                type: array
+                items:
+                  type: string
+                description: Array of Cardano Transaction hashes
+              _inputs:
+                format: boolean
+                type: boolean
+                description: Controls whether to include transaction inputs in the result
+              _metadata:
+                format: boolean
+                type: boolean
+                description: Controls whether to include transaction metadata in the result
+              _assets:
+                format: boolean
+                type: boolean
+                description: Controls whether to include assets involved within transaction the result
+              _withdrawals:
+                format: boolean
+                type: boolean
+                description: Controls whether to include any stake account reward withdrawals in the result
+              _certs:
+                format: boolean
+                type: boolean
+                description: Controls whether to include transaction certificates in the result
+              _scripts:
+                format: boolean
+                type: boolean
+                description: Controls whether to include any details regarding collateral/reference/datum/script objects in the result
+              _bytecode:
+                format: boolean
+                type: boolean
+                description: Controls whether to include bytecode for associated reference/plutus scripts
+            example:
+              _tx_hashes:
+                - f144a8264acf4bdfe2e1241170969c930d64ab6b0996a4a45237b623f1dd670e
+                - 0b8ba3bed976fa4913f19adc9f6dd9063138db5b4dd29cecde369456b5155e94
+              _inputs: false
+              _metadata: false
+              _assets: false
+              _withdrawals: false
+              _certs: false
+              _scripts: false
+              _bytecode: false
       description: Array of Cardano Transaction hashes
     txbin:
       content:
@@ -3561,6 +3642,8 @@ components:
             $ref: "#/components/schemas/tx_info/items/properties/total_output"
           fee:
             $ref: "#/components/schemas/tx_info/items/properties/fee"
+          treasury_donation:
+            $ref: "#/components/schemas/tx_info/items/properties/treasury_donation"
           deposit:
             $ref: "#/components/schemas/tx_info/items/properties/deposit"
           invalid_before:
@@ -3684,7 +3767,6 @@ components:
             type: string
             description: Script hash in case the stake address is locked by a script
             example: bf357f5de69e4aad71954bebd64357a4813ea5233df12fce4a9de582
-
     account_info:
       description: Array of stake account information
       type: array
@@ -3698,6 +3780,11 @@ components:
             description: Stake address status
             enum: ["registered", "not registered"]
             example: registered
+          delegated_drep:
+            anyOf:
+            - type: 'null'
+            - type: string
+            description: Account's current delegation status to DRep ID in Bech32 format
           delegated_pool:
             anyOf:
             - type: 'null'
@@ -3730,6 +3817,16 @@ components:
             type: string
             description: Total treasury MIR value of the account
             example: "0"
+          deposit:
+            type: string
+            description: Total deposit reserved from the account
+            eample: 2000000
+          drep_id:
+            anyOf:
+            - string
+            - type: 'null'
+            description: Delegated DRep ID in bech32 format
+            example: drep1gj49xmfcg6ev89ur2yad9c5p7z0pgfxggyakz9pua06vqh5vnp0
     utxo_infos:
       description: Array of complete UTxO information
       type: array
@@ -3942,6 +4039,10 @@ components:
             type: string
             description: Total Transaction fee (in lovelaces)
             example: 172761
+          treasury_donation:
+            type: string
+            description: Total Donation to on-chain treasury (in lovelaces)
+            example: 0
           deposit:
             type: string
             description: Total Deposits included in transaction (for example, if it is registering a pool/key)
@@ -4228,6 +4329,15 @@ components:
                           $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_hash"
                         value:
                           $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_value"
+    tx_cbor:
+      description: Raw Transaction(s) in CBOR format
+      item:
+        properties:
+          tx_hash:
+            $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+          cbor:
+            type: string
+            description: CBOR encoded raw transaction.
     tx_utxos:
       description: Array of inputs and outputs for given transaction(s)
       type: array
@@ -4611,7 +4721,9 @@ components:
             description: Data in JSON format
             example: 'null'
           bytes:
-            type: string
+            type:
+              - string
+              - 'null'
             description: Script bytes (cborSeq)
             example: 5907f4010000332323232323232323233223232323232332232323232322223232533532533533355300712001323212330012233350052200200200100235001220011233001225335002101710010142325335333573466e3cd400488008d4020880080580544ccd5cd19b873500122001350082200101601510153500122002353500122002222222222200a101413357389201115554784f206e6f7420636f6e73756d6564000133333573466e1cd55cea8012400046644246600200600464646464646464646464646666ae68cdc39aab9d500a480008cccccccccc888888888848cccccccccc00402c02802402001c01801401000c008cd40508c8c8cccd5cd19b8735573aa0049000119910919800801801180f9aba150023019357426ae8940088c98d4cd5ce01581501481409aab9e5001137540026ae854028cd4050054d5d0a804999aa80bbae501635742a010666aa02eeb94058d5d0a80399a80a0109aba15006335014335502402275a6ae854014c8c8c8cccd5cd19b8735573aa00490001199109198008018011919191999ab9a3370e6aae754009200023322123300100300233502575a6ae854008c098d5d09aba2500223263533573805e05c05a05826aae7940044dd50009aba150023232323333573466e1cd55cea8012400046644246600200600466a04aeb4d5d0a80118131aba135744a004464c6a66ae700bc0b80b40b04d55cf280089baa001357426ae8940088c98d4cd5ce01581501481409aab9e5001137540026ae854010cd4051d71aba15003335014335502475c40026ae854008c070d5d09aba2500223263533573804e04c04a04826ae8940044d5d1280089aba25001135744a00226ae8940044d5d1280089aba25001135744a00226aae7940044dd50009aba150023232323333573466e1d400520062321222230040053019357426aae79400c8cccd5cd19b875002480108c848888c008014c06cd5d09aab9e500423333573466e1d400d20022321222230010053015357426aae7940148cccd5cd19b875004480008c848888c00c014dd71aba135573ca00c464c6a66ae7008808408007c0780740704d55cea80089baa001357426ae8940088c98d4cd5ce00d80d00c80c080c89931a99ab9c4910350543500019018135573ca00226ea8004c8004d5405888448894cd40044d400c88004884ccd401488008c010008ccd54c01c4800401401000448c88c008dd6000990009aa80b111999aab9f00125009233500830043574200460066ae880080548c8c8c8cccd5cd19b8735573aa00690001199911091998008020018011919191999ab9a3370e6aae7540092000233221233001003002301735742a00466a01c02c6ae84d5d1280111931a99ab9c01b01a019018135573ca00226ea8004d5d0a801999aa803bae500635742a00466a014eb8d5d09aba2500223263533573802e02c02a02826ae8940044d55cf280089baa0011335500175ceb44488c88c008dd5800990009aa80a11191999aab9f0022500823350073355017300635573aa004600a6aae794008c010d5d100180a09aba100111220021221223300100400312232323333573466e1d4005200023212230020033005357426aae79400c8cccd5cd19b8750024800884880048c98d4cd5ce00980900880800789aab9d500113754002464646666ae68cdc39aab9d5002480008cc8848cc00400c008c014d5d0a8011bad357426ae8940088c98d4cd5ce00800780700689aab9e5001137540024646666ae68cdc39aab9d5001480008dd71aba135573ca004464c6a66ae7003803403002c4dd500089119191999ab9a3370ea00290021091100091999ab9a3370ea00490011190911180180218031aba135573ca00846666ae68cdc3a801a400042444004464c6a66ae7004404003c0380340304d55cea80089baa0012323333573466e1d40052002200523333573466e1d40092000200523263533573801a01801601401226aae74dd5000891001091000919191919191999ab9a3370ea002900610911111100191999ab9a3370ea004900510911111100211999ab9a3370ea00690041199109111111198008048041bae35742a00a6eb4d5d09aba2500523333573466e1d40112006233221222222233002009008375c6ae85401cdd71aba135744a00e46666ae68cdc3a802a400846644244444446600c01201060186ae854024dd71aba135744a01246666ae68cdc3a8032400446424444444600e010601a6ae84d55cf280591999ab9a3370ea00e900011909111111180280418071aba135573ca018464c6a66ae7004c04804404003c03803403002c0284d55cea80209aab9e5003135573ca00426aae7940044dd50009191919191999ab9a3370ea002900111999110911998008028020019bad35742a0086eb4d5d0a8019bad357426ae89400c8cccd5cd19b875002480008c8488c00800cc020d5d09aab9e500623263533573801801601401201026aae75400c4d5d1280089aab9e500113754002464646666ae68cdc3a800a400446424460020066eb8d5d09aab9e500323333573466e1d400920002321223002003375c6ae84d55cf280211931a99ab9c009008007006005135573aa00226ea800444888c8c8cccd5cd19b8735573aa0049000119aa80518031aba150023005357426ae8940088c98d4cd5ce00480400380309aab9e5001137540029309000a490350543100112212330010030021123230010012233003300200200133512233002489209366f09fe40eaaeb17d3cb6b0b61e087d664174c39a48a986f86b2b0ba6e2a7b00480008848cc00400c0088005
           size:
