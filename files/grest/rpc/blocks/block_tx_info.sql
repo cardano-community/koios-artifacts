@@ -5,7 +5,8 @@ CREATE OR REPLACE FUNCTION grest.block_tx_info(
   _assets boolean DEFAULT false,
   _withdrawals boolean DEFAULT false,
   _certs boolean DEFAULT false,
-  _scripts boolean DEFAULT false
+  _scripts boolean DEFAULT false,
+  _bytecode boolean DEFAULT false
 )
 RETURNS TABLE (
   tx_hash text,
@@ -19,6 +20,7 @@ RETURNS TABLE (
   tx_size word31type,
   total_output text,
   fee text,
+  treasury_donation text,
   deposit text,
   invalid_before text,
   invalid_after text,
@@ -38,7 +40,6 @@ LANGUAGE plpgsql
 AS $$
 DECLARE
   _block_hashes_bytea   bytea[];
-  _block_id_list        bigint[];
   _tx_id_list           bigint[];
 BEGIN
   -- convert input _block_hashes array into bytea array
@@ -47,19 +48,16 @@ BEGIN
     SELECT DISTINCT DECODE(hashes_hex, 'hex') AS hashes_bytea
     FROM UNNEST(_block_hashes) AS hashes_hex
   ) AS tmp;
-  -- all block ids
-  SELECT INTO _block_id_list ARRAY_AGG(id)
-  FROM (
-    SELECT id
-    FROM block
-    WHERE hash = ANY(_block_hashes_bytea)
-  ) AS tmp;
   -- all tx ids
   SELECT INTO _tx_id_list ARRAY_AGG(id)
   FROM (
     SELECT id
     FROM  tx
-    WHERE tx.block_id = ANY(_block_id_list)
+    WHERE tx.block_id = ANY(
+      SELECT ARRAY_AGG(id)
+      FROM block
+      WHERE hash = ANY(_block_hashes_bytea)
+    )
   ) AS tmp;
 
   RETURN QUERY (
@@ -79,6 +77,7 @@ BEGIN
           tx.size               AS tx_size,
           tx.out_sum            AS total_output,
           tx.fee,
+          tx.treasury_donation,
           tx.deposit,
           tx.invalid_before,
           tx.invalid_hereafter  AS invalid_after
@@ -182,8 +181,7 @@ BEGIN
               )
             END
           ) AS reference_script
-        FROM
-          reference_tx_in
+        FROM reference_tx_in
           INNER JOIN tx_out ON tx_out.tx_id = reference_tx_in.tx_out_id
             AND tx_out.index = reference_tx_in.tx_out_index
           INNER JOIN tx ON tx_out.tx_id = tx.id
@@ -390,8 +388,7 @@ BEGIN
             tm.key::text,
             tm.json
           ) AS list
-        FROM
-          tx_metadata AS tm
+        FROM tx_metadata AS tm
         WHERE _metadata IS TRUE
           AND tm.tx_id = ANY(_tx_id_list)
         GROUP BY tx_id
@@ -538,7 +535,29 @@ BEGIN
                 'max_val_size', pp.max_val_size,
                 'collateral_percent', pp.collateral_percent,
                 'max_collateral_inputs', pp.max_collateral_inputs,
-                'coins_per_utxo_size', pp.coins_per_utxo_size
+                'coins_per_utxo_size', pp.coins_per_utxo_size,
+                'pvt_motion_no_confidence', pp.pvt_motion_no_confidence,
+                'pvt_committee_normal', pp.pvt_committee_normal,
+                'pvt_committee_no_confidence', pp.pvt_committee_no_confidence,
+                'pvt_hard_fork_initiation', pp.pvt_hard_fork_initiation,
+                'dvt_motion_no_confidence', pp.dvt_motion_no_confidence,
+                'dvt_committee_normal', pp.dvt_committee_normal,
+                'dvt_committee_no_confidence', pp.dvt_committee_no_confidence,
+                'dvt_update_to_constitution', pp.dvt_update_to_constitution,
+                'dvt_hard_fork_initiation', pp.dvt_hard_fork_initiation,
+                'dvt_p_p_network_group', pp.dvt_p_p_network_group,
+                'dvt_p_p_economic_group', pp.dvt_p_p_economic_group,
+                'dvt_p_p_technical_group', pp.dvt_p_p_technical_group,
+                'dvt_p_p_gov_group', pp.dvt_p_p_gov_group,
+                'dvt_treasury_withdrawal', pp.dvt_treasury_withdrawal,
+                'committee_min_size', pp.committee_min_size,
+                'committee_max_term_length', pp.committee_max_term_length,
+                'gov_action_lifetime', pp.gov_action_lifetime,
+                'gov_action_deposit', pp.gov_action_deposit,
+                'drep_deposit', pp.drep_deposit,
+                'drep_activity', pp.drep_activity,
+                'pvtpp_security_group', pp.pvtpp_security_group,
+                'min_fee_ref_script_cost_per_byte', pp.min_fee_ref_script_cost_per_byte
               ))
             ) AS data
           FROM public.param_proposal AS pp
@@ -630,7 +649,9 @@ BEGIN
                 rd.hash AS rd_hash,
                 rd.value AS rd_value,
                 script.hash AS script_hash,
-                script.bytes AS script_bytes,
+                CASE WHEN _bytecode IS TRUE THEN
+                  script.bytes
+                END AS script_bytes,
                 script.serialised_size AS script_serialised_size,
                 tx.valid_contract
               FROM redeemer
@@ -641,18 +662,38 @@ BEGIN
                 AND redeemer.tx_id = ANY(_tx_id_list)
             ),
 
+            _all_inputs_sorted AS (
+              SELECT
+                ROW_NUMBER () OVER (
+                  PARTITION BY ai.tx_id
+                  ORDER BY ai.tx_hash, ai.tx_index
+                ) - 1 AS sorted_index,
+                ai.*
+              FROM (
+                SELECT DISTINCT ON (_ai.tx_hash, _ai.tx_index)
+                  _ai.tx_id,
+                  _ai.tx_hash,
+                  _ai.tx_index,
+                  _ai.payment_addr_bech32 as address,
+                  _ai.datum_hash
+                from _all_inputs as _ai
+              ) as ai
+            ),
+
             spend_redeemers AS (
               SELECT DISTINCT ON (redeemer.id)
                 redeemer.id,
-                inutxo.address,
+                ais.address,
+                ais.tx_hash,
+                ais.tx_index,
                 ind.hash AS ind_hash,
                 ind.value AS ind_value
               FROM redeemer
-              INNER JOIN tx_out AS inutxo ON inutxo.consumed_by_tx_id = redeemer.tx_id
-              INNER JOIN script ON redeemer.script_hash = inutxo.payment_cred
-              INNER JOIN datum AS ind ON ind.hash = inutxo.data_hash
+              INNER JOIN _all_inputs_sorted AS ais ON ais.tx_id = redeemer.tx_id AND ais.sorted_index = redeemer.index
+              INNER JOIN datum AS ind ON ind.hash = ais.datum_hash
               WHERE _scripts IS TRUE
                 AND redeemer.tx_id = ANY(_tx_id_list)
+                AND redeemer.purpose = 'spend'
             )
 
           SELECT
@@ -663,8 +704,24 @@ BEGIN
                   WHEN ar.purpose = 'spend' THEN
                     (SELECT address FROM spend_redeemers AS sr WHERE sr.id = ar.id)
                 END,
+              'spends_input',
+                CASE
+                  WHEN ar.purpose = 'spend' THEN
+                    (
+                      SELECT JSONB_BUILD_OBJECT(
+                        'tx_hash', sr.tx_hash,
+                        'tx_index', sr.tx_index
+                      )
+                      FROM spend_redeemers AS sr
+                      WHERE sr.id = ar.id
+                    )
+                END,
               'script_hash', ENCODE(ar.script_hash, 'hex'),
-              'bytecode', ENCODE(ar.script_bytes, 'hex'),
+              'bytecode',
+                CASE
+                  WHEN _bytecode IS TRUE THEN
+                    ENCODE(ar.script_bytes, 'hex')
+                END,
               'size', ar.script_serialised_size,
               'valid_contract', ar.valid_contract,
               'input', JSONB_BUILD_OBJECT(
@@ -707,6 +764,7 @@ BEGIN
       atx.tx_size,
       atx.total_output::text,
       atx.fee::text,
+      atx.treasury_donation::text,
       atx.deposit::text,
       atx.invalid_before::text,
       atx.invalid_after::text,
@@ -723,7 +781,7 @@ BEGIN
               'tx_hash', aci.tx_hash,
               'tx_index', tx_index,
               'value', value,
-              'datum_hash', datum_hash,
+              'datum_hash', ENCODE(datum_hash, 'hex'),
               'inline_datum', inline_datum,
               'reference_script', reference_script,
               'asset_list', COALESCE(JSONB_AGG(asset_list) FILTER (WHERE asset_list IS NOT NULL), JSONB_BUILD_ARRAY())
@@ -744,7 +802,7 @@ BEGIN
             'tx_hash', aco.tx_hash,
             'tx_index', tx_index,
             'value', value,
-            'datum_hash', datum_hash,
+            'datum_hash', ENCODE(datum_hash, 'hex'),
             'inline_datum', inline_datum,
             'reference_script', reference_script,
             'asset_list', asset_descr
@@ -767,7 +825,7 @@ BEGIN
               'tx_hash', ari.tx_hash,
               'tx_index', tx_index,
               'value', value,
-              'datum_hash', datum_hash,
+              'datum_hash', ENCODE(datum_hash, 'hex'),
               'inline_datum', inline_datum,
               'reference_script', reference_script,
               'asset_list', COALESCE(JSONB_AGG(asset_list) FILTER (WHERE asset_list IS NOT NULL), JSONB_BUILD_ARRAY())
@@ -790,7 +848,7 @@ BEGIN
               'tx_hash', ai.tx_hash,
               'tx_index', tx_index,
               'value', value,
-              'datum_hash', datum_hash,
+              'datum_hash', ENCODE(datum_hash, 'hex'),
               'inline_datum', inline_datum,
               'reference_script', reference_script,
               'asset_list', COALESCE(JSONB_AGG(asset_list) FILTER (WHERE asset_list IS NOT NULL), JSONB_BUILD_ARRAY())

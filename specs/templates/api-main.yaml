@@ -368,7 +368,7 @@ paths:
       tags:
         - Transactions
       requestBody:
-        $ref: "#/components/requestBodies/tx_ids"
+        $ref: "#/components/requestBodies/tx_info"
       responses:
         "200":
           description: Success!!
