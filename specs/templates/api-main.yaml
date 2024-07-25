@@ -341,6 +341,28 @@ paths:
       summary: UTxO Info
       description: Get UTxO set for requested UTxO references
       operationId: utxo_info
+  /tx_cbor: #RPC
+    post:
+      tags:
+        - Transactions
+      requestBody:
+        $ref: "#/components/requestBodies/tx_ids"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tx_cbor"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Raw Transaction (CBOR)
+      description: Get raw transaction(s) in CBOR format
+      operationId: tx_cbor
   /tx_info: #RPC
     post:
       tags:

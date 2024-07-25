@@ -1319,7 +1319,6 @@ schemas:
             type: string
             description: Script hash in case the stake address is locked by a script
             example: bf357f5de69e4aad71954bebd64357a4813ea5233df12fce4a9de582
-
     account_info:
       description: Array of stake account information
       type: array
@@ -1365,6 +1364,16 @@ schemas:
             type: string
             description: Total treasury MIR value of the account
             example: "0"
+          deposit:
+            type: string
+            description: Total deposit reserved from the account
+            eample: 2000000
+          drep_id:
+            anyOf:
+            - string
+            - type: 'null'
+            description: Delegated DRep ID in bech32 format
+            example: drep1gj49xmfcg6ev89ur2yad9c5p7z0pgfxggyakz9pua06vqh5vnp0
     utxo_infos:
       description: Array of complete UTxO information
       type: array
@@ -1863,6 +1872,15 @@ schemas:
                           $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_hash"
                         value:
                           $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_value"
+    tx_cbor:
+      description: Raw Transaction(s) in CBOR format
+      item:
+        properties:
+          tx_hash:
+            $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+          cbor:
+            type: string
+            description: CBOR encoded raw transaction.
     tx_utxos:
       description: Array of inputs and outputs for given transaction(s)
       type: array
