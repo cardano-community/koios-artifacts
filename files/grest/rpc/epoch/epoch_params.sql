@@ -31,7 +31,29 @@ RETURNS TABLE (
   max_val_size word64type,
   collateral_percent word31type,
   max_collateral_inputs word31type,
-  coins_per_utxo_size text
+  coins_per_utxo_size text,
+  pvt_motion_no_confidence double precision,
+  pvt_committee_normal double precision,
+  pvt_committee_no_confidence double precision,
+  pvt_hard_fork_initiation double precision,
+  dvt_motion_no_confidence double precision,
+  dvt_committee_normal double precision,
+  dvt_committee_no_confidence double precision,
+  dvt_update_to_constitution double precision,
+  dvt_hard_fork_initiation double precision,
+  dvt_p_p_network_group double precision,
+  dvt_p_p_economic_group double precision,
+  dvt_p_p_technical_group double precision,
+  dvt_p_p_gov_group double precision,
+  dvt_treasury_withdrawal double precision,
+  committee_min_size word64type,
+  committee_max_term_length word64type,
+  gov_action_lifetime word64type,
+  gov_action_deposit text,
+  drep_deposit text,
+  drep_activity word64type,
+  pvtpp_security_group double precision,
+  min_fee_ref_script_cost_per_byte double precision
 )
 LANGUAGE plpgsql
 AS $$
@@ -69,7 +91,29 @@ BEGIN
       ep.max_val_size AS max_val_size,
       ep.collateral_percent AS collateral_percent,
       ep.max_collateral_inputs AS max_collateral_inputs,
-      ep.coins_per_utxo_size::text AS coins_per_utxo_size
+      ep.coins_per_utxo_size::text AS coins_per_utxo_size,
+      ep.pvt_motion_no_confidence,
+      ep.pvt_committee_normal,
+      ep.pvt_committee_no_confidence,
+      ep.pvt_hard_fork_initiation,
+      ep.dvt_motion_no_confidence,
+      ep.dvt_committee_normal,
+      ep.dvt_committee_no_confidence,
+      ep.dvt_update_to_constitution,
+      ep.dvt_hard_fork_initiation,
+      ep.dvt_p_p_network_group,
+      ep.dvt_p_p_economic_group,
+      ep.dvt_p_p_technical_group,
+      ep.dvt_p_p_gov_group,
+      ep.dvt_treasury_withdrawal::text,
+      ep.committee_min_size,
+      ep.committee_max_term_length,
+      ep.gov_action_lifetime,
+      ep.gov_action_deposit::text,
+      ep.drep_deposit::text,
+      ep.drep_activity,
+      ep.pvtpp_security_group,
+      ep.min_fee_ref_script_cost_per_byte
     FROM epoch_param AS ep
     LEFT JOIN grest.epoch_info_cache AS ei ON ei.epoch_no = ep.epoch_no
     LEFT JOIN cost_model AS cm ON cm.id = ep.cost_model_id
