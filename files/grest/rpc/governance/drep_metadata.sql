@@ -10,7 +10,7 @@ AS $$
   SELECT
     DISTINCT ON (dh.view) dh.view AS drep_id,
     va.url,
-    va.data_hash AS hash,
+    ENCODE(va.data_hash, 'hex') AS hash,
     ocvd.json
   FROM public.drep_hash AS dh
     INNER JOIN public.drep_registration AS dr ON dh.id = dr.drep_hash_id
