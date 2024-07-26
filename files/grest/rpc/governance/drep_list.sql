@@ -2,7 +2,7 @@ CREATE OR REPLACE FUNCTION grest.drep_list()
 RETURNS TABLE (
   drep_id character varying,
   hex text,
-  is_script boolean,
+  has_script boolean,
   registered boolean
 )
 LANGUAGE sql STABLE
@@ -10,8 +10,8 @@ AS $$
   SELECT
     DISTINCT ON (dh.view) dh.view AS drep_id,
     ENCODE(dh.raw, 'hex')::text AS hex,
-    dh.has_script AS is_script,
-    (CASE WHEN dr.deposit > 0 THEN TRUE ELSE FALSE END) AS registered
+    dh.has_script AS has_script,
+    (CASE WHEN dr.deposit >= 0 THEN TRUE ELSE FALSE END) AS registered
   FROM public.drep_hash AS dh
     INNER JOIN public.drep_registration dr ON dh.id = dr.drep_hash_id
   ORDER BY
