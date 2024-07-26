@@ -11,9 +11,9 @@ AS $$
     SUM(amount)::text AS amount,
     COUNT(hash_id)
   FROM public.drep_distr
-  WHERE epoch_no = (CASE WHEN _epoch_no IS NULL THEN (SELECT MAX(epoch_no) FROM public.block) ELSE _epoch_no END)
+  WHERE (CASE WHEN _epoch_no IS NULL THEN TRUE ELSE epoch_no = _epoch_no END)
   GROUP BY epoch_no
   ORDER BY epoch_no DESC;
 $$;
 
-COMMENT ON FUNCTION grest.drep_epoch_summary IS 'Get a summary of vote power and active DReps by specified epoch or current'; --noqa: LT01
+COMMENT ON FUNCTION grest.drep_epoch_summary IS 'Get a summary of vote power and active DReps by specified epoch or all'; --noqa: LT01
