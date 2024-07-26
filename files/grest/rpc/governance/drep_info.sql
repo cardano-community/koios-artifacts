@@ -4,6 +4,7 @@ RETURNS TABLE (
   hex text,
   has_script boolean,
   registered boolean,
+  deposit text,
   active boolean,
   amount text
 )
@@ -15,14 +16,13 @@ BEGIN
 
   SELECT INTO curr_epoch MAX(epoch_no) FROM public.block;
 
-  SELECT INTO total_amount COALESCE(SUM(dd.amount),0)::text FROM public.drep_distr dd WHERE dd.epoch_no = curr_epoch;
-
   RETURN QUERY
   SELECT
     DISTINCT ON (dh.view) dh.view AS drep_id,
     ENCODE(dh.raw, 'hex')::text AS hex,
     dh.has_script AS has_script,
     (CASE WHEN (dr.deposit IS NOT NULL AND dr.deposit >= 0) OR starts_with(dh.view,'drep_') THEN TRUE ELSE FALSE END) AS registered,
+    dr.deposit::text AS deposit,
     (CASE WHEN (dd.active_until IS NOT NULL AND dd.active_until > curr_epoch) OR starts_with(dh.view,'drep_') THEN TRUE ELSE FALSE END) AS active,
     COALESCE(dd.amount, 0)::text AS amount
   FROM public.drep_hash AS dh
