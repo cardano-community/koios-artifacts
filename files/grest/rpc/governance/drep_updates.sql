@@ -33,7 +33,10 @@ AS $$
     LEFT JOIN public.voting_anchor AS va ON dr.voting_anchor_id = va.id
     LEFT JOIN public.off_chain_vote_data AS ocvd ON va.id = ocvd.voting_anchor_id
   WHERE
-    CASE WHEN _drep_id IS NULL THEN TRUE ELSE dh.view = _drep_id END
+    CASE
+      WHEN _drep_id IS NULL THEN TRUE
+      ELSE dh.view = _drep_id
+    END
   ORDER BY
     block_time DESC;
 $$;

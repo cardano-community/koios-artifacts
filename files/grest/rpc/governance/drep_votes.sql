@@ -16,10 +16,9 @@ AS $$
     INNER JOIN public.voting_procedure AS vp ON dh.id = vp.drep_voter
     INNER JOIN public.tx ON vp.tx_id = tx.id
     INNER JOIN public.block b ON tx.block_id = b.id
-  WHERE
-    dh.view = _drep_id
+  WHERE dh.view = _drep_id
   ORDER BY
     block_time DESC;
 $$;
 
-COMMENT ON FUNCTION grest.drep_metadata IS 'Get all DRep votes cast from specified DRep ID'; -- noqa: LT01
+COMMENT ON FUNCTION grest.drep_votes IS 'Get all DRep votes cast from specified DRep ID'; -- noqa: LT01

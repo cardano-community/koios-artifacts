@@ -16,8 +16,7 @@ AS $$
     INNER JOIN public.drep_registration AS dr ON dh.id = dr.drep_hash_id
     LEFT JOIN public.voting_anchor AS va ON dr.voting_anchor_id = va.id
     LEFT JOIN public.off_chain_vote_data AS ocvd ON va.id = ocvd.voting_anchor_id
-  WHERE
-    dh.view = ANY(_drep_ids)
+  WHERE dh.view = ANY(_drep_ids)
   ORDER BY
     dh.view, dr.tx_id DESC;
 $$;

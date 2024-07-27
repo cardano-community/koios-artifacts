@@ -28,8 +28,7 @@ BEGIN
   FROM public.drep_hash AS dh
     LEFT JOIN public.drep_registration AS dr ON dh.id = dr.drep_hash_id
     LEFT JOIN public.drep_distr AS dd ON dh.id = dd.hash_id AND dd.epoch_no = curr_epoch
-  WHERE
-    dh.view = ANY(_drep_ids)
+  WHERE dh.view = ANY(_drep_ids)
   ORDER BY
     dh.view, dr.tx_id DESC;
 
