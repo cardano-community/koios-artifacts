@@ -12,10 +12,10 @@ AS $$
     va.url,
     ENCODE(va.data_hash, 'hex') AS hash,
     ocvd.json
-  FROM public.drep_hash AS dh
-    INNER JOIN public.drep_registration AS dr ON dh.id = dr.drep_hash_id
-    LEFT JOIN public.voting_anchor AS va ON dr.voting_anchor_id = va.id
-    LEFT JOIN public.off_chain_vote_data AS ocvd ON va.id = ocvd.voting_anchor_id
+  FROM public.drep_hash dh
+    INNER JOIN public.drep_registration dr ON dh.id = dr.drep_hash_id
+    LEFT JOIN public.voting_anchor va ON dr.voting_anchor_id = va.id
+    LEFT JOIN public.off_chain_vote_data ocvd ON va.id = ocvd.voting_anchor_id
   WHERE dh.view = ANY(_drep_ids)
   ORDER BY
     dh.view, dr.tx_id DESC;

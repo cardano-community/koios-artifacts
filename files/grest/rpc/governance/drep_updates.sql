@@ -26,12 +26,12 @@ AS $$
     va.url AS meta_url,
     ENCODE(va.data_hash, 'hex') AS meta_hash,
     ocvd.json AS meta_json
-  FROM public.drep_hash AS dh
-    INNER JOIN public.drep_registration AS dr ON dh.id = dr.drep_hash_id
+  FROM public.drep_hash dh
+    INNER JOIN public.drep_registration dr ON dh.id = dr.drep_hash_id
     INNER JOIN public.tx ON dr.tx_id = tx.id
     INNER JOIN public.block b ON tx.block_id = b.id
-    LEFT JOIN public.voting_anchor AS va ON dr.voting_anchor_id = va.id
-    LEFT JOIN public.off_chain_vote_data AS ocvd ON va.id = ocvd.voting_anchor_id
+    LEFT JOIN public.voting_anchor va ON dr.voting_anchor_id = va.id
+    LEFT JOIN public.off_chain_vote_data ocvd ON va.id = ocvd.voting_anchor_id
   WHERE
     CASE
       WHEN _drep_id IS NULL THEN TRUE

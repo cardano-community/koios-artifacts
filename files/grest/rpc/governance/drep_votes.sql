@@ -9,12 +9,13 @@ LANGUAGE sql STABLE
 AS $$
   SELECT
     ENCODE(tx.hash, 'hex')::text AS tx_hash,
-    vp.index AS cert_index,
+    gap.index AS cert_index,
     EXTRACT(EPOCH FROM b.time)::integer AS block_time,
     vp.vote
-  FROM public.drep_hash AS dh
-    INNER JOIN public.voting_procedure AS vp ON dh.id = vp.drep_voter
-    INNER JOIN public.tx ON vp.tx_id = tx.id
+  FROM public.drep_hash dh
+    INNER JOIN public.voting_procedure vp ON dh.id = vp.drep_voter
+    INNER JOIN public.gov_action_proposal gap ON vp.gov_action_proposal_id = gap.id
+    INNER JOIN public.tx ON gap.tx_id = tx.id
     INNER JOIN public.block b ON tx.block_id = b.id
   WHERE dh.view = _drep_id
   ORDER BY
