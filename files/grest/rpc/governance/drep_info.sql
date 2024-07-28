@@ -35,4 +35,4 @@ BEGIN
 END;
 $$;
 
-COMMENT ON FUNCTION grest.drep_info IS 'Get bulk DRep info from bech32 formatted DRep IDs, incl predefined roles \'drep_always_abstain\' and \'drep_always_no_confidence\''; -- noqa: LT01
+COMMENT ON FUNCTION grest.drep_info IS 'Get bulk DRep info from bech32 formatted DRep IDs, incl predefined roles ''drep_always_abstain'' and ''drep_always_no_confidence'''; -- noqa: LT01
