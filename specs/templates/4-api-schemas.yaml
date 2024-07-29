@@ -1339,6 +1339,7 @@ schemas:
             - type: 'null'
             - type: string
             description: Account's current delegation status to DRep ID in Bech32 format
+            example: drep1gj49xmfcg6ev89ur2yad9c5p7z0pgfxggyakz9pua06vqh5vnp0
           delegated_pool:
             anyOf:
             - type: 'null'
@@ -1361,8 +1362,12 @@ schemas:
             example: 12105104750
           rewards_available:
             type: string
-            description: Total rewards available for withdawal
+            description: Total rewards available for withdrawal
             example: 44352623297
+          deposit:
+            type: string
+            description: Total deposit available for withdrawal
+            example: 2000000
           reserves:
             type: string
             description: Total reserves MIR value of the account
@@ -1371,16 +1376,6 @@ schemas:
             type: string
             description: Total treasury MIR value of the account
             example: "0"
-          deposit:
-            type: string
-            description: Total deposit reserved from the account
-            eample: 2000000
-          drep_id:
-            anyOf:
-            - string
-            - type: 'null'
-            description: Delegated DRep ID in bech32 format
-            example: drep1gj49xmfcg6ev89ur2yad9c5p7z0pgfxggyakz9pua06vqh5vnp0
     utxo_infos:
       description: Array of complete UTxO information
       type: array

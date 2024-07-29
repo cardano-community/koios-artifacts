@@ -14,7 +14,10 @@ RETURNS TABLE (
   expiration integer,
   meta_url text,
   meta_hash text,
-  meta_json jsonb
+  meta_json jsonb,
+  comment text,
+  language text,
+  is_valid boolean
 )
 LANGUAGE sql STABLE
 AS $$
@@ -33,7 +36,10 @@ AS $$
     gap.expiration AS expiration,
     va.url AS meta_url,
     ENCODE(va.data_hash, 'hex') AS meta_hash,
-    ocvd.json AS meta_json
+    ocvd.json AS meta_json,
+    ocvd.comment AS comment,
+    ocvd.language AS language,
+    ocvd.is_valid AS is_valid
   FROM public.gov_action_proposal AS gap
     INNER JOIN public.tx ON gap.tx_id = tx.id
     INNER JOIN public.block AS b ON tx.block_id = b.id
