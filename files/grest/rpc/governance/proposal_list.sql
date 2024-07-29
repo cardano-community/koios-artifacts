@@ -34,11 +34,11 @@ AS $$
     va.url AS meta_url,
     ENCODE(va.data_hash, 'hex') AS meta_hash,
     ocvd.json AS meta_json
-  FROM public.gov_action_proposal gap
+  FROM public.gov_action_proposal AS gap
     INNER JOIN public.tx ON gap.tx_id = tx.id
-    INNER JOIN public.block b ON tx.block_id = b.id
-    INNER JOIN public.stake_address sa ON gap.return_address = sa.id
-    LEFT JOIN public.voting_anchor va ON gap.voting_anchor_id = va.id
+    INNER JOIN public.block AS b ON tx.block_id = b.id
+    INNER JOIN public.stake_address AS sa ON gap.return_address = sa.id
+    LEFT JOIN public.voting_anchor AS va ON gap.voting_anchor_id = va.id
     LEFT JOIN public.off_chain_vote_data AS ocvd ON va.id = ocvd.voting_anchor_id
   ORDER BY
     block_time DESC;

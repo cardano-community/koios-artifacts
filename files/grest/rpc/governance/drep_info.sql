@@ -25,9 +25,9 @@ BEGIN
     dr.deposit::text AS deposit,
     (CASE WHEN (dd.active_until IS NOT NULL AND dd.active_until > curr_epoch) OR starts_with(dh.view,'drep_') THEN TRUE ELSE FALSE END) AS active,
     COALESCE(dd.amount, 0)::text AS amount
-  FROM public.drep_hash dh
-    LEFT JOIN public.drep_registration dr ON dh.id = dr.drep_hash_id
-    LEFT JOIN public.drep_distr dd ON dh.id = dd.hash_id AND dd.epoch_no = curr_epoch
+  FROM public.drep_hash AS dh
+    LEFT JOIN public.drep_registration AS dr ON dh.id = dr.drep_hash_id
+    LEFT JOIN public.drep_distr AS dd ON dh.id = dd.hash_id AND dd.epoch_no = curr_epoch
   WHERE dh.view = ANY(_drep_ids)
   ORDER BY
     dh.view, dr.tx_id DESC;

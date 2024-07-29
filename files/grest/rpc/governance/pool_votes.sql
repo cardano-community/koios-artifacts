@@ -13,10 +13,10 @@ AS $$
     EXTRACT(EPOCH FROM b.time)::integer AS block_time,
     vp.vote
   FROM public.pool_hash ph
-    INNER JOIN public.voting_procedure vp ON ph.id = vp.pool_voter
-    INNER JOIN public.gov_action_proposal gap ON vp.gov_action_proposal_id = gap.id
+    INNER JOIN public.voting_procedure AS vp ON ph.id = vp.pool_voter
+    INNER JOIN public.gov_action_proposal AS gap ON vp.gov_action_proposal_id = gap.id
     INNER JOIN public.tx ON gap.tx_id = tx.id
-    INNER JOIN public.block b ON tx.block_id = b.id
+    INNER JOIN public.block AS b ON tx.block_id = b.id
   WHERE ph.view = _pool_bech32
   ORDER BY
     block_time DESC;

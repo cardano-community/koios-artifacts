@@ -15,8 +15,8 @@ AS $$
       WHEN dr.deposit >= 0 THEN TRUE
       ELSE FALSE
     END) AS registered
-  FROM public.drep_hash dh
-    INNER JOIN public.drep_registration dr ON dh.id = dr.drep_hash_id
+  FROM public.drep_hash AS dh
+    INNER JOIN public.drep_registration AS dr ON dh.id = dr.drep_hash_id
   ORDER BY
     dh.view, dr.tx_id DESC;
 $$;

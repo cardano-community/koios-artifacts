@@ -3,7 +3,12 @@ RETURNS TABLE (
   drep_id character varying,
   url text,
   hash text,
-  json jsonb
+  json jsonb,
+  bytes text,
+  warning text,
+  language text,
+  comment text,
+  is_valid boolean
 )
 LANGUAGE sql STABLE
 AS $$
@@ -11,11 +16,16 @@ AS $$
     DISTINCT ON (dh.view) dh.view AS drep_id,
     va.url,
     ENCODE(va.data_hash, 'hex') AS hash,
-    ocvd.json
-  FROM public.drep_hash dh
-    INNER JOIN public.drep_registration dr ON dh.id = dr.drep_hash_id
-    LEFT JOIN public.voting_anchor va ON dr.voting_anchor_id = va.id
-    LEFT JOIN public.off_chain_vote_data ocvd ON va.id = ocvd.voting_anchor_id
+    ocvd.json,
+    ENCODE(ocvd.bytes,'hex')::text AS bytes,
+    ocvd.warning AS warning,
+    ocvd.language AS language,
+    ovcd.comment AS comment,
+    is_valid AS is_valid
+  FROM public.drep_hash AS dh
+    INNER JOIN public.drep_registration AS dr ON dh.id = dr.drep_hash_id
+    LEFT JOIN public.voting_anchor AS va ON dr.voting_anchor_id = va.id
+    LEFT JOIN public.off_chain_vote_data AS ocvd ON va.id = ocvd.voting_anchor_id
   WHERE dh.view = ANY(_drep_ids)
   ORDER BY
     dh.view, dr.tx_id DESC;
