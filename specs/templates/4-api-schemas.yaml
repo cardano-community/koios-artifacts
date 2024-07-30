@@ -2280,6 +2280,10 @@ schemas:
             type: boolean
             description: Flag to show if the DRep is  (i.e. not expired)
             example: true
+          expires_epoch_no:
+            type: number
+            description: After which epoch DRep is considered inactive.
+            example: 410
           amount:
             type: string
             description: The total amount of voting power this DRep is delegated.
