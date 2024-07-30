@@ -42,6 +42,12 @@
       "pv": "stake_test1uzs5rxys8qy5jnr9g0mkj860ms5n92nrykmrgyumpf2ytmsejj4m6",
       "pp": "stake_test1urkzeud48zxwnjc54emzmmc3gkg2r6d6tm2sd799jxjnqxqlfzmvk"
     },
+    "_tx_hash": {
+      "m": "f144a8264acf4bdfe2e1241170969c930d64ab6b0996a4a45237b623f1dd670e",
+      "g": "bf04578d452dd3acb7c70fbac32dc972cb69f932f804171cfb4268f5af0228e7",
+      "pv": "f1592b29b79ae85d753913dd25644c60925a4a0683979faa33832fead4b4bd9c",
+      "pp": "d10133964da9e443b303917fd0b7644ae3d01c133deff85b4f59416c2d00f530"
+    },
     "_asset_policy": {
       "m": "750900e4999ebe0d58f19b634768ba25e525aaf12403bfe8fe130501",
       "g": "313534a537bc476c86ff7c57ec511bd7f24a9d15654091b24e9c606e",
@@ -66,6 +72,18 @@
       "pv": "4d43",
       "pp": "74657374"
     },
+    "_drep_id": {
+      "m": "drep17l6sywnwqu9aedd6aumev42w39ln5zfl9nw7j4ak6u8swyrwvz3",
+      "g": "drep1s9qaseg7qyum807fcv0hdky9gv0c89tn98t4urjn5ewz57dml0r",
+      "pv": "drep1l9y2naagv0vqvft9szdt5wf94fqnxn5hdsgusdl7rf6vq4djqck",
+      "pp": "drep1kxtwaqtayj6vklc57u93xayjvkwgvefh8drscqp5a5y6jz7m6rd"
+    },
+    "_committee_hash": {
+      "m": "49fa008218cd619afe6aa8a1a93303f242440722b314f36bda2c2e23",
+      "g": "65d497b875c56ab213586a4006d4f6658970573ea8e2398893857472",
+      "pv": "7ceede7d6a89e006408e6b7c6acb3dd094b3f6817e43b4a36d01535b",
+      "pp": "f8f56120e1ec00feb088ece39ef14f07339afeb37b4e949ff12b89ff"
+    },    
     "_pool_bech32": {
       "m": "pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc",
       "g": "pool1xc9eywck4e20tydz4yvh5vfe0ep8whawvwz8wqkc9k046a2ypp4",

@@ -1814,6 +1814,9 @@ tags:
   - name: Asset
     description: Query Asset related informations
     x-tag-expanded: false
+  - name: Governance
+    description: Query information about governance for network
+    x-tag-expanded: false
   - name: Pool
     description: Query information about specific pools
     x-tag-expanded: false
