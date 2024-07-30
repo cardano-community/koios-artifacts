@@ -1,6 +1,7 @@
 CREATE OR REPLACE FUNCTION grest.drep_metadata(_drep_ids text [])
 RETURNS TABLE (
   drep_id character varying,
+  hex text,
   url text,
   hash text,
   json jsonb,
@@ -14,6 +15,7 @@ LANGUAGE sql STABLE
 AS $$
   SELECT
     DISTINCT ON (dh.view) dh.view AS drep_id,
+    ENCODE(dh.raw, 'hex')::text AS hex,
     va.url,
     ENCODE(va.data_hash, 'hex') AS hash,
     ocvd.json,
@@ -21,7 +23,7 @@ AS $$
     ocvd.warning AS warning,
     ocvd.language AS language,
     ocvd.comment AS comment,
-    is_valid AS is_valid
+    COALESCE(is_valid, true) AS is_valid
   FROM public.drep_hash AS dh
     INNER JOIN public.drep_registration AS dr ON dh.id = dr.drep_hash_id
     LEFT JOIN public.voting_anchor AS va ON dr.voting_anchor_id = va.id

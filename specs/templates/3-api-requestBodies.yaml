@@ -483,6 +483,24 @@ requestBodies:
                 - ##asset2_rb##
               _extended: true
       description: Array of array of policyID and asset names (hex) alongwith extended flag to return additional columns
+    drep_id_bulk:
+      content:
+        application/json:
+          schema:
+            required:
+              - _drep_ids
+            type: object
+            properties:
+              _drep_ids:
+                format: text
+                type: array
+                descriptions: Array of DRep IDs in bech32 format
+                items:
+                  type: string
+            example:
+              _drep_ids:
+                - ##drep_ids1_rb##
+                - ##drep_ids2_rb##
     utxo_refs_with_extended:
       content:
         application/json:

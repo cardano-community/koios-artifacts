@@ -170,6 +170,18 @@
       "pv": "52e63f22c5107ed776b70f7b92248b02552fd08f3e747bc745099441",
       "pp": "82e016828989cd9d809b50d6976d9efa9bc5b2c1a78d4b3bfa1bb83b"
     },
+    "drep_ids1": {
+      "m": "drep17l6sywnwqu9aedd6aumev42w39ln5zfl9nw7j4ak6u8swyrwvz3",
+      "g": "drep1s9qaseg7qyum807fcv0hdky9gv0c89tn98t4urjn5ewz57dml0r",
+      "pv": "drep1l9y2naagv0vqvft9szdt5wf94fqnxn5hdsgusdl7rf6vq4djqck",
+      "pp": "drep1kxtwaqtayj6vklc57u93xayjvkwgvefh8drscqp5a5y6jz7m6rd"
+    },
+    "drep_ids2": {
+      "m": "drep1s9q5uyddsvza4uk2n9wswy90n8wx9d2jmrq4zgcvlyv055007av",
+      "g": "drep13p45vxysc2s6vp6ez2ng7lynlsheh64zxexpcennn68cuc05yps",
+      "pv": "drep1p6m6eg3ljyuthfx49d9dlq4rewnumuupr5hrtay0gaa0zq7qwze",
+      "pp": "drep14x62vyme8l8dkhvxg6rauc6vpcd2va9fquz8k3jstsqczwlvqqh"
+    },
     "tx_ids_tx_hashes1": {
       "m": "f144a8264acf4bdfe2e1241170969c930d64ab6b0996a4a45237b623f1dd670e",
       "g": "bf04578d452dd3acb7c70fbac32dc972cb69f932f804171cfb4268f5af0228e7",
