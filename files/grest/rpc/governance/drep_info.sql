@@ -98,9 +98,9 @@ BEGIN
       ENCODE(dh.raw, 'hex')::text AS hex,
       dh.has_script AS has_script,
       (CASE WHEN starts_with(dh.view,'drep_') OR (COALESCE(dr.deposit, 0) >= 0 AND dr.drep_hash_id IS NOT NULL) THEN TRUE ELSE FALSE END) AS registered,
-      (CASE WHEN (dr.deposit < 0) OR starts_with(dh.view,'drep_') THEN 0 ELSE COALESCE(ds.deposit, 0) END)::text AS deposit,
+      (CASE WHEN (dr.deposit < 0) OR starts_with(dh.view,'drep_') THEN NULL ELSE ds.deposit END)::text AS deposit,
       (CASE WHEN starts_with(dh.view,'drep_') THEN TRUE ELSE COALESCE(dr.deposit, 0) >= 0 AND ds.active END) AS active,
-      (CASE WHEN COALESCE(dr.deposit, 0) >= 0 THEN COALESCE(ds.expires_epoch_no, 0) ELSE 0 END) AS expires_epoch_no,
+      (CASE WHEN COALESCE(dr.deposit, 0) >= 0 THEN ds.expires_epoch_no ELSE NULL END) AS expires_epoch_no,
       COALESCE(dd.amount, 0)::text AS amount
     FROM public.drep_hash AS dh
       LEFT JOIN public.drep_registration AS dr ON dh.id = dr.drep_hash_id

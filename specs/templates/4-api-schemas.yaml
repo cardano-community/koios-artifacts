@@ -2273,7 +2273,9 @@ schemas:
             description: Flag to show if the DRep is currently registered
             example: false
           deposit:
-            type: string
+            type:
+              - string
+              - null
             description: DRep's registration deposit  in lovelace
             example: 500000000
           active:
@@ -2281,7 +2283,9 @@ schemas:
             description: Flag to show if the DRep is  (i.e. not expired)
             example: true
           expires_epoch_no:
-            type: number
+            type:
+              - number
+              - null
             description: After which epoch DRep is considered inactive.
             example: 410
           amount:
