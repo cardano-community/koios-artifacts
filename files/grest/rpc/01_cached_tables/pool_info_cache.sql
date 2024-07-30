@@ -14,6 +14,7 @@ CREATE TABLE grest.pool_info_cache (
   margin double precision NOT NULL,
   fixed_cost lovelace NOT NULL,
   pledge lovelace NOT NULL,
+  deposit lovelace NOT NULL,
   reward_addr character varying,
   owners character varying [],
   relays jsonb [],
@@ -35,6 +36,7 @@ CREATE OR REPLACE FUNCTION grest.pool_info_insert(
   _margin double precision,
   _fixed_cost lovelace,
   _pledge lovelace,
+  _deposit lovelace,
   _reward_addr_id bigint,
   _meta_id bigint
 )
@@ -76,6 +78,7 @@ BEGIN
     margin,
     fixed_cost,
     pledge,
+    deposit,
     reward_addr,
     owners,
     relays,
@@ -98,6 +101,7 @@ BEGIN
       _margin,
       _fixed_cost,
       _pledge,
+      _deposit,
       sa.view,
       ARRAY(
         SELECT sa.view
@@ -213,6 +217,7 @@ BEGIN
         new.margin,
         new.fixed_cost,
         new.pledge,
+        new.deposit,
         new.reward_addr_id,
         new.meta_id
       );
@@ -313,6 +318,7 @@ BEGIN
       rec.margin,
       rec.fixed_cost,
       rec.pledge,
+      rec.deposit,
       rec.reward_addr_id,
       rec.meta_id
     );

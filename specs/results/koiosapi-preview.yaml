@@ -2947,6 +2947,12 @@ components:
               - 'null'
             description: Pool pledge in lovelace
             example: "64000000000000"
+          deposit:
+            type:
+              - string
+              - 'null'
+            description: Pool's registration deposit in lovelace
+            example: "500000000"
           reward_addr:
             type:
               - string
