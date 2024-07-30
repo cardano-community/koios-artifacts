@@ -20,7 +20,7 @@ AS $$
     ENCODE(ocvd.bytes,'hex')::text AS bytes,
     ocvd.warning AS warning,
     ocvd.language AS language,
-    ovcd.comment AS comment,
+    ocvd.comment AS comment,
     is_valid AS is_valid
   FROM public.drep_hash AS dh
     INNER JOIN public.drep_registration AS dr ON dh.id = dr.drep_hash_id
