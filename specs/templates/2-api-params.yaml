@@ -85,7 +85,7 @@ parameters:
       description: DRep ID in bech32 format
       schema:
         type: string
-      example: "##_drep_id_param"
+      example: "##_drep_id_param##"
       in: query
       required: true
       allowEmptyValue: false
@@ -95,7 +95,7 @@ parameters:
       description: DRep ID in bech32 format
       schema:
         type: string
-      example: "##_drep_id_param"
+      example: "##_drep_id_param##"
       in: query
       required: false
       allowEmptyValue: true
@@ -105,7 +105,7 @@ parameters:
       description: Committee hash in hexadecimal format (hex)
       schema:
         type: string
-      example: "##_committee_hash_param"
+      example: "##_committee_hash_param##"
       in: query
       required: false
       allowEmptyValue: true

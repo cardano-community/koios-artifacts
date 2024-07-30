@@ -2007,7 +2007,7 @@ components:
       description: DRep ID in bech32 format
       schema:
         type: string
-      example: "##_drep_id_param"
+      example: "drep17l6sywnwqu9aedd6aumev42w39ln5zfl9nw7j4ak6u8swyrwvz3"
       in: query
       required: true
       allowEmptyValue: false
@@ -2017,7 +2017,7 @@ components:
       description: DRep ID in bech32 format
       schema:
         type: string
-      example: "##_drep_id_param"
+      example: "drep17l6sywnwqu9aedd6aumev42w39ln5zfl9nw7j4ak6u8swyrwvz3"
       in: query
       required: false
       allowEmptyValue: true
@@ -2027,7 +2027,7 @@ components:
       description: Committee hash in hexadecimal format (hex)
       schema:
         type: string
-      example: "##_committee_hash_param"
+      example: "49fa008218cd619afe6aa8a1a93303f242440722b314f36bda2c2e23"
       in: query
       required: false
       allowEmptyValue: true
@@ -3692,13 +3692,13 @@ components:
             example: 14
           gov_action_deposit:
             type:
-              - number
+              - string
               - 'null'
             description: Governance action deposit.
             example: 100000000000
           drep_deposit:
             type:
-              - number
+              - string
               - 'null'
             description: DRep deposit amount.
             example: 500000000
@@ -4976,7 +4976,7 @@ components:
           deposit:
             type:
               - string
-              - null
+              - 'null'
             description: DRep's registration deposit  in lovelace
             example: 500000000
           active:
@@ -4986,7 +4986,7 @@ components:
           expires_epoch_no:
             type:
               - number
-              - null
+              - 'null'
             description: After which epoch DRep is considered inactive.
             example: 410
           amount:
@@ -5092,6 +5092,11 @@ components:
             enum: ["Yes","No","Abstain"]
             description: Actual Vote casted
             example: "Yes"
+    pool_votes:
+      description: List of all votes casted by requested pool
+      type: array
+      items:
+        $ref: "#/components/schemas/drep_votes/items"
     committee_votes:
       description: List of all votes casted by requested delegated representative (DRep)
       type: array
@@ -5126,31 +5131,31 @@ components:
           ratified_epoch:
             type:
               - number
-              - null
+              - 'null'
             description: If not null, then this proposal has been ratified at the specfied epoch.
             example: 670
           enacted_epoch:
             type:
               - number
-              - null
+              - 'null'
             description: If not null, then this proposal has been enacted at the specfied epoch.
             example: 675
           dropped_epoch:
             type:
               - number
-              - null
+              - 'null'
             description: If not null, then this proposal has been dropped (expired/enacted) at the specfied epoch.
             example: 680
           expired_epoch:
             type:
               - number
-              - null
+              - 'null'
             description: If not null, then this proposal has been expired at the specfied epoch.
             example: 680
           expiration:
             type:
               - number
-              - null
+              - 'null'
             description: Shows the epoch at which this governance action is expected to expire.
           meta_url:
             $ref: "#/components/schemas/drep_metadata/items/properties/url"

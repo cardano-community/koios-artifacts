@@ -105,7 +105,7 @@ BEGIN
       ep.dvt_p_p_economic_group,
       ep.dvt_p_p_technical_group,
       ep.dvt_p_p_gov_group,
-      ep.dvt_treasury_withdrawal::text,
+      ep.dvt_treasury_withdrawal,
       ep.committee_min_size,
       ep.committee_max_term_length,
       ep.gov_action_lifetime,

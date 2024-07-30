@@ -991,13 +991,13 @@ schemas:
             example: 14
           gov_action_deposit:
             type:
-              - number
+              - string
               - 'null'
             description: Governance action deposit.
             example: 100000000000
           drep_deposit:
             type:
-              - number
+              - string
               - 'null'
             description: DRep deposit amount.
             example: 500000000
@@ -2275,7 +2275,7 @@ schemas:
           deposit:
             type:
               - string
-              - null
+              - 'null'
             description: DRep's registration deposit  in lovelace
             example: 500000000
           active:
@@ -2285,7 +2285,7 @@ schemas:
           expires_epoch_no:
             type:
               - number
-              - null
+              - 'null'
             description: After which epoch DRep is considered inactive.
             example: 410
           amount:
@@ -2391,6 +2391,11 @@ schemas:
             enum: ["Yes","No","Abstain"]
             description: Actual Vote casted
             example: "Yes"
+    pool_votes:
+      description: List of all votes casted by requested pool
+      type: array
+      items:
+        $ref: "#/components/schemas/drep_votes/items"
     committee_votes:
       description: List of all votes casted by requested delegated representative (DRep)
       type: array
@@ -2425,31 +2430,31 @@ schemas:
           ratified_epoch:
             type:
               - number
-              - null
+              - 'null'
             description: If not null, then this proposal has been ratified at the specfied epoch.
             example: 670
           enacted_epoch:
             type:
               - number
-              - null
+              - 'null'
             description: If not null, then this proposal has been enacted at the specfied epoch.
             example: 675
           dropped_epoch:
             type:
               - number
-              - null
+              - 'null'
             description: If not null, then this proposal has been dropped (expired/enacted) at the specfied epoch.
             example: 680
           expired_epoch:
             type:
               - number
-              - null
+              - 'null'
             description: If not null, then this proposal has been expired at the specfied epoch.
             example: 680
           expiration:
             type:
               - number
-              - null
+              - 'null'
             description: Shows the epoch at which this governance action is expected to expire.
           meta_url:
             $ref: "#/components/schemas/drep_metadata/items/properties/url"
