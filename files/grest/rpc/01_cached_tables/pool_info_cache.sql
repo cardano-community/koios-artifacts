@@ -14,7 +14,7 @@ CREATE TABLE grest.pool_info_cache (
   margin double precision NOT NULL,
   fixed_cost lovelace NOT NULL,
   pledge lovelace NOT NULL,
-  deposit lovelace NOT NULL,
+  deposit lovelace,
   reward_addr character varying,
   owners character varying [],
   relays jsonb [],
