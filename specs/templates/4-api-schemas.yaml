@@ -2476,13 +2476,19 @@ schemas:
             type:
               - object
               - 'null'
-            description: If not null, The amount withdrawn from treasury into stake address by this this proposal
+            description: If not null, the amount withdrawn from treasury into stake address by this this proposal
             properties:
               stake_address:
                 $ref: "#/components/schemas/account_history/items/properties/stake_address"
               amount:
                 type: string
                 example: "31235800000"
+          param_proposal:
+            description: If not null, the proposed new parameter set
+            type:
+              - object
+              - 'null'
+            example: {"id": 15, "key": null, "entropy": null, "epoch_no": null, "influence": null, "max_epoch": null, "min_fee_a": null, "min_fee_b": null, "price_mem": null, "price_step": null, "key_deposit": 1000000, "max_bh_size": null, "max_tx_size": null, "drep_deposit": null, "max_val_size": null, "pool_deposit": null, "cost_model_id": null, "drep_activity": null, "max_tx_ex_mem": null, "min_pool_cost": null, "max_block_size": null, "min_utxo_value": null, "protocol_major": null, "protocol_minor": null, "max_tx_ex_steps": null, "decentralisation": null, "max_block_ex_mem": null, "registered_tx_id": 12270, "dvt_p_p_gov_group": null, "collateral_percent": null, "committee_min_size": null, "gov_action_deposit": null, "max_block_ex_steps": null, "optimal_pool_count": null, "coins_per_utxo_size": null, "gov_action_lifetime": null, "dvt_committee_normal": null, "monetary_expand_rate": null, "pvt_committee_normal": null, "pvtpp_security_group": null, "treasury_growth_rate": null, "dvt_p_p_network_group": null, "max_collateral_inputs": null, "dvt_p_p_economic_group": null, "dvt_p_p_technical_group": null, "dvt_treasury_withdrawal": null, "dvt_hard_fork_initiation": null, "dvt_motion_no_confidence": null, "pvt_hard_fork_initiation": null, "pvt_motion_no_confidence": null, "committee_max_term_length": null, "dvt_update_to_constitution": null, "dvt_committee_no_confidence": null, "pvt_committee_no_confidence": null, "min_fee_ref_script_cost_per_byte": null}
     proposal_votes:
       type: array
       description: List of all votes cast on specified governance action

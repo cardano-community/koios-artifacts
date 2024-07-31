@@ -19,7 +19,8 @@ RETURNS TABLE (
   meta_comment text,
   meta_language text,
   meta_is_valid boolean,
-  withdrawal jsonb
+  withdrawal jsonb,
+  param_proposal jsonb
 )
 LANGUAGE sql STABLE
 AS $$
@@ -43,22 +44,29 @@ AS $$
     ocvd.comment AS meta_comment,
     ocvd.language AS meta_language,
     ocvd.is_valid AS meta_is_valid,
-    CASE WHEN tw.id IS NULL THEN NULL
-    ELSE
-      JSONB_BUILD_OBJECT(
-        'stake_address', (
-          SELECT sa2.view
-          FROM stake_address AS sa2
-          WHERE sa2.id = tw.stake_address_id
-        ),
-        'amount', tw.amount::text
-      )
-    END AS withdrawal
+    CASE
+      WHEN tw.id IS NULL THEN NULL
+      ELSE
+        JSONB_BUILD_OBJECT(
+          'stake_address', (
+            SELECT sa2.view
+            FROM stake_address AS sa2
+            WHERE sa2.id = tw.stake_address_id
+          ),
+          'amount', tw.amount::text
+        )
+    END AS withdrawal,
+    CASE
+      WHEN pp.id IS NULL THEN NULL
+      ELSE ( SELECT ROW_TO_JSON(pp.*) )
+    END AS param_proposal
   FROM public.gov_action_proposal AS gap
     INNER JOIN public.tx ON gap.tx_id = tx.id
     INNER JOIN public.block AS b ON tx.block_id = b.id
     INNER JOIN public.stake_address AS sa ON gap.return_address = sa.id
     LEFT JOIN public.treasury_withdrawal AS tw ON gap.id = tw.gov_action_proposal_id
+    LEFT JOIN public.param_proposal AS pp ON gap.param_proposal = pp.id
+    LEFT JOIN public.cost_model AS cm ON cm.id = pp.cost_model_id
     LEFT JOIN public.voting_anchor AS va ON gap.voting_anchor_id = va.id
     LEFT JOIN public.off_chain_vote_data AS ocvd ON va.id = ocvd.voting_anchor_id
   ORDER BY
