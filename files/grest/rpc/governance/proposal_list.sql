@@ -16,9 +16,10 @@ RETURNS TABLE (
   meta_url text,
   meta_hash text,
   meta_json jsonb,
-  comment text,
-  language text,
-  is_valid boolean
+  meta_comment text,
+  meta_language text,
+  meta_is_valid boolean,
+  withdrawal jsonb
 )
 LANGUAGE sql STABLE
 AS $$
@@ -39,13 +40,25 @@ AS $$
     va.url AS meta_url,
     ENCODE(va.data_hash, 'hex') AS meta_hash,
     ocvd.json AS meta_json,
-    ocvd.comment AS comment,
-    ocvd.language AS language,
-    ocvd.is_valid AS is_valid
+    ocvd.comment AS meta_comment,
+    ocvd.language AS meta_language,
+    ocvd.is_valid AS meta_is_valid,
+    CASE WHEN tw.id IS NULL THEN NULL
+    ELSE
+      JSONB_BUILD_OBJECT(
+        'stake_address', (
+          SELECT sa2.view
+          FROM stake_address AS sa2
+          WHERE sa2.id = tw.stake_address_id
+        ),
+        'amount', tw.amount::text
+      )
+    END AS withdrawal
   FROM public.gov_action_proposal AS gap
     INNER JOIN public.tx ON gap.tx_id = tx.id
     INNER JOIN public.block AS b ON tx.block_id = b.id
     INNER JOIN public.stake_address AS sa ON gap.return_address = sa.id
+    LEFT JOIN public.treasury_withdrawal AS tw ON gap.id = tw.gov_action_proposal_id
     LEFT JOIN public.voting_anchor AS va ON gap.voting_anchor_id = va.id
     LEFT JOIN public.off_chain_vote_data AS ocvd ON va.id = ocvd.voting_anchor_id
   ORDER BY

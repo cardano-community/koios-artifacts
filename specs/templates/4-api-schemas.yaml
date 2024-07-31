@@ -2466,12 +2466,23 @@ schemas:
             $ref: "#/components/schemas/drep_metadata/items/properties/hash"
           meta_json:
             $ref: "#/components/schemas/drep_metadata/items/properties/json"
-          comment:
+          meta_comment:
             $ref: "#/components/schemas/drep_metadata/items/properties/comment"
-          language:
+          meta_language:
             $ref: "#/components/schemas/drep_metadata/items/properties/language"
-          is_valid:
+          meta_is_valid:
             $ref: "#/components/schemas/drep_metadata/items/properties/is_valid"
+          withdrawal:
+            type:
+              - object
+              - 'null'
+            description: If not null, The amount withdrawn from treasury into stake address by this this proposal
+            properties:
+              stake_address:
+                $ref: "#/components/schemas/account_history/items/properties/stake_address"
+              amount:
+                type: string
+                example: "31235800000"
     proposal_votes:
       type: array
       description: List of all votes cast on specified governance action
