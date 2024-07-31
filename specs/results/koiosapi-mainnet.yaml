@@ -5128,6 +5128,10 @@ components:
             type: string
             description: The StakeAddress index of the reward address to receive the deposit when it is repaid.
             example: stake1uy6yzwsxxc28lfms0qmpxvyz9a7y770rtcqx9y96m42cttqwvp4m5
+          proposed_epoch:
+            type: number
+            description: Shows the epoch at which this governance action was proposed.
+            example: 660
           ratified_epoch:
             type:
               - number
