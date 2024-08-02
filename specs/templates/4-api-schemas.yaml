@@ -2354,7 +2354,7 @@ schemas:
             $ref: "#/components/schemas/drep_info/items/properties/drep_id"
           hex:
             $ref: "#/components/schemas/drep_info/items/properties/hex"
-          tx_hash:
+          update_tx_hash:
             $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
           cert_index:
             type: string
@@ -2380,10 +2380,12 @@ schemas:
       type: array
       items:
         properties:
-          tx_hash:
+          proposal_tx_hash:
             $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
           cert_index:
             $ref: "#/components/schemas/drep_updates/items/properties/cert_index"
+          vote_tx_hash:
+            $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
           block_time:
             $ref: "#/components/schemas/blocks/items/properties/block_time"
           vote:
@@ -2406,7 +2408,7 @@ schemas:
       type: array
       items:
         properties:
-          tx_hash:
+          proposal_tx_hash:
             $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
           cert_index:
             $ref: "#/components/schemas/drep_updates/items/properties/cert_index"

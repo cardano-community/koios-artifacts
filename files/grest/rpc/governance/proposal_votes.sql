@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION grest.proposal_votes(_tx_hash text, _cert_index integer)
+CREATE OR REPLACE FUNCTION grest.proposal_votes(_proposal_tx_hash text, _cert_index integer)
 RETURNS TABLE (
   block_time integer,
   voter_role text,
@@ -25,7 +25,7 @@ AS $$
         LEFT JOIN public.drep_hash AS dh ON vp.drep_voter = dh.id 
         LEFT JOIN public.pool_hash AS ph ON vp.pool_voter = ph.id
         LEFT JOIN public.committee_hash AS ch ON vp.committee_voter = ch.id
-      WHERE tx.hash = DECODE(_tx_hash, 'hex')
+      WHERE tx.hash = DECODE(_proposal_tx_hash, 'hex')
         -- will we need a similar filters to the one below for pool and committee member retirements?
         AND (
           CASE
