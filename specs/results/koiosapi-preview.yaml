@@ -5006,6 +5006,23 @@ components:
             $ref: "#/components/schemas/drep_info/items/properties/has_script"
           registered:
             $ref: "#/components/schemas/drep_info/items/properties/registered"
+    drep_delegators:
+      description: List of all delegators by requested delegated representative (DRep)
+      type: array
+      items:
+        properties:
+          stake_address:
+            $ref: "#/components/schemas/account_list/items/properties/stake_address"
+          stake_address_hex:
+            $ref: "#/components/schemas/account_list/items/properties/stake_address_hex"
+          script_hash:
+            $ref: "#/components/schemas/account_list/items/properties/script_hash"
+          epoch_no:
+            description: Epoch when vote delegation was made
+            allOf:
+              - $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+          amount:
+            $ref: "#/components/schemas/account_info/items/properties/total_balance"
     drep_metadata:
       description: List metadata for requested delegated representatives (DReps)
       type: array
