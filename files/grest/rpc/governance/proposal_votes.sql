@@ -4,7 +4,9 @@ RETURNS TABLE (
   voter_role text,
   voter text,
   voter_hex text,
-  vote text
+  vote text,
+  meta_url text,
+  meta_hash text
 )
 LANGUAGE sql STABLE
 AS $$
@@ -16,7 +18,9 @@ AS $$
         vp.voter_role,
         COALESCE(ENCODE(ch.raw, 'hex'), dh.view, ph.view) as voter,
         COALESCE(ENCODE(ch.raw, 'hex'), ENCODE(dh.raw, 'hex'), ENCODE(ph.hash_raw, 'hex')) as voter_hex,
-        vp.vote
+        vp.vote,
+        va.url,
+        ENCODE(va.data_hash, 'hex')
       FROM public.voting_procedure AS vp
         INNER JOIN public.gov_action_proposal AS gap ON vp.gov_action_proposal_id = gap.id
         INNER JOIN public.tx ON gap.tx_id = tx.id
@@ -25,6 +29,7 @@ AS $$
         LEFT JOIN public.drep_hash AS dh ON vp.drep_voter = dh.id 
         LEFT JOIN public.pool_hash AS ph ON vp.pool_voter = ph.id
         LEFT JOIN public.committee_hash AS ch ON vp.committee_voter = ch.id
+        LEFT JOIN public.voting_anchor AS va ON vp.voting_anchor_id = va.id
       WHERE tx.hash = DECODE(_proposal_tx_hash, 'hex')
         AND gap.index = _proposal_index
         -- will we need a similar filters to the one below for pool and committee member retirements?
