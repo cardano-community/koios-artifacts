@@ -1,8 +1,8 @@
 CREATE OR REPLACE FUNCTION grest.proposal_list()
 RETURNS TABLE (
-  proposal_tx_hash text,
-  cert_index integer,
   block_time integer,
+  proposal_tx_hash text,
+  proposal_index integer,
   proposal_type text,
   proposal_description jsonb,
   deposit text,
@@ -25,25 +25,25 @@ RETURNS TABLE (
 LANGUAGE sql STABLE
 AS $$
   SELECT
-    ENCODE(tx.hash, 'hex')::text AS proposal_tx_hash,
-    gap.index AS cert_index,
-    EXTRACT(EPOCH FROM b.time)::integer AS block_time,
-    gap.type AS proposal_type,
-    gap.description AS proposal_description,
-    gap.deposit::text AS deposit,
-    sa.view AS return_address,
-    b.epoch_no AS proposed_epoch,
-    gap.ratified_epoch AS ratified_epoch,
-    gap.enacted_epoch AS enacted_epoch,
-    gap.dropped_epoch AS dropped_epoch,
-    gap.expired_epoch AS expired_epoch,
-    gap.expiration AS expiration,
-    va.url AS meta_url,
-    ENCODE(va.data_hash, 'hex') AS meta_hash,
-    ocvd.json AS meta_json,
-    ocvd.comment AS meta_comment,
-    ocvd.language AS meta_language,
-    ocvd.is_valid AS meta_is_valid,
+    EXTRACT(EPOCH FROM b.time)::integer,
+    ENCODE(tx.hash, 'hex'),
+    gap.index,
+    gap.type,
+    gap.description,
+    gap.deposit::text,
+    sa.view,
+    b.epoch_no,
+    gap.ratified_epoch,
+    gap.enacted_epoch,
+    gap.dropped_epoch,
+    gap.expired_epoch,
+    gap.expiration,
+    va.url,
+    ENCODE(va.data_hash, 'hex'),
+    ocvd.json,
+    ocvd.comment,
+    ocvd.language,
+    ocvd.is_valid,
     CASE
       WHEN tw.id IS NULL THEN NULL
       ELSE
@@ -58,7 +58,7 @@ AS $$
     END AS withdrawal,
     CASE
       WHEN pp.id IS NULL THEN NULL
-      ELSE ( SELECT ROW_TO_JSON(pp.*) )
+      ELSE ( SELECT JSONB_STRIP_NULLS(TO_JSONB(pp.*)) - array['id','registered_tx_id','epoch_no'] )
     END AS param_proposal
   FROM public.gov_action_proposal AS gap
     INNER JOIN public.tx ON gap.tx_id = tx.id

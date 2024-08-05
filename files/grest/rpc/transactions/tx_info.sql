@@ -6,7 +6,8 @@ CREATE OR REPLACE FUNCTION grest.tx_info(
   _withdrawals boolean DEFAULT false,
   _certs boolean DEFAULT false,
   _scripts boolean DEFAULT false,
-  _bytecode boolean DEFAULT false
+  _bytecode boolean DEFAULT false,
+  _governance boolean DEFAULT false
 )
 RETURNS TABLE (
   tx_hash text,
@@ -34,7 +35,9 @@ RETURNS TABLE (
   metadata jsonb,
   certificates jsonb,
   native_scripts jsonb,
-  plutus_contracts jsonb
+  plutus_contracts jsonb,
+  voting_procedures jsonb,
+  proposal_procedures jsonb
 )
 LANGUAGE plpgsql
 AS $$
@@ -91,7 +94,7 @@ BEGIN
           ENCODE(tx.hash, 'hex')              AS tx_hash,
           tx_out.index                        AS tx_index,
           tx_out.value::text                  AS value,
-          ENCODE(tx_out.data_hash, 'hex')     AS datum_hash,
+          tx_out.data_hash                    AS datum_hash,
           (CASE WHEN ma.policy IS NULL THEN NULL
             ELSE
               JSONB_BUILD_OBJECT(
@@ -146,7 +149,7 @@ BEGIN
           ENCODE(tx.hash, 'hex')              AS tx_hash,
           tx_out.index                        AS tx_index,
           tx_out.value::text                  AS value,
-          ENCODE(tx_out.data_hash, 'hex')     AS datum_hash,
+          tx_out.data_hash                    AS datum_hash,
           (CASE WHEN ma.policy IS NULL THEN NULL
             ELSE
               JSONB_BUILD_OBJECT(
@@ -194,14 +197,14 @@ BEGIN
 
       _all_inputs AS (
         SELECT
-          tx_out.consumed_by_tx_id AS tx_id,
-          tx_out.address AS payment_addr_bech32,
+          tx_out.consumed_by_tx_id           AS tx_id,
+          tx_out.address                     AS payment_addr_bech32,
           ENCODE(tx_out.payment_cred, 'hex') AS payment_addr_cred,
-          sa.view AS stake_addr,
-          ENCODE(tx.hash, 'hex') AS tx_hash,
-          tx_out.index AS tx_index,
-          tx_out.value::text AS value,
-          ENCODE(tx_out.data_hash, 'hex') AS datum_hash,
+          sa.view                            AS stake_addr,
+          ENCODE(tx.hash, 'hex')             AS tx_hash,
+          tx_out.index                       AS tx_index,
+          tx_out.value::text                 AS value,
+          tx_out.data_hash                   AS datum_hash,
           (CASE WHEN ma.policy IS NULL THEN NULL
             ELSE
               JSONB_BUILD_OBJECT(
@@ -253,7 +256,7 @@ BEGIN
           ENCODE(tx.hash, 'hex')              AS tx_hash,
           tx_out.index                        AS tx_index,
           tx_out.value::text                  AS value,
-          ENCODE(tx_out.data_hash, 'hex')     AS datum_hash,
+          tx_out.data_hash                    AS datum_hash,
           (CASE WHEN tx_out.inline_datum_id IS NULL THEN NULL
             ELSE
               JSONB_BUILD_OBJECT(
@@ -293,7 +296,7 @@ BEGIN
           ENCODE(tx.hash, 'hex')              AS tx_hash,
           tx_out.index                        AS tx_index,
           tx_out.value::text                  AS value,
-          ENCODE(tx_out.data_hash, 'hex')     AS datum_hash,
+          tx_out.data_hash                    AS datum_hash,
           (CASE WHEN ma.policy IS NULL THEN NULL
             ELSE
               JSONB_BUILD_OBJECT(
@@ -401,7 +404,8 @@ BEGIN
               'index', sr.cert_index,
               'type', 'stake_registration',
               'info', JSONB_BUILD_OBJECT(
-                'stake_address', sa.view
+                'stake_address', sa.view,
+                'deposit', sr.deposit::text
               )
             ) AS data
           FROM public.stake_registration AS sr
@@ -431,7 +435,7 @@ BEGIN
             d.tx_id,
             JSONB_BUILD_OBJECT(
               'index', d.cert_index,
-              'type', 'delegation',
+              'type', 'pool_delegation',
               'info', JSONB_BUILD_OBJECT(
                 'stake_address', sa.view,
                 'pool_id_bech32', ph.view,
@@ -502,59 +506,7 @@ BEGIN
             JSONB_BUILD_OBJECT(
               'index', NULL, -- cert_index not stored in param_proposal table
               'type', 'param_proposal',
-              'info', JSONB_STRIP_NULLS(JSONB_BUILD_OBJECT(
-                'min_fee_a', pp.min_fee_a,
-                'min_fee_b', pp.min_fee_b,
-                'max_block_size', pp.max_block_size,
-                'max_tx_size', pp.max_tx_size,
-                'max_bh_size', pp.max_bh_size,
-                'key_deposit', pp.key_deposit,
-                'pool_deposit', pp.pool_deposit,
-                'max_epoch', pp.max_epoch,
-                'optimal_pool_count', pp.optimal_pool_count,
-                'influence', pp.influence,
-                'monetary_expand_rate', pp.monetary_expand_rate,
-                'treasury_growth_rate', pp.treasury_growth_rate,
-                'decentralisation', pp.decentralisation,
-                'entropy', pp.entropy,
-                'protocol_major', pp.protocol_major,
-                'protocol_minor', pp.protocol_minor,
-                'min_utxo_value', pp.min_utxo_value,
-                'min_pool_cost', pp.min_pool_cost,
-                'cost_model', cm.costs,
-                'price_mem', pp.price_mem,
-                'price_step', pp.price_step,
-                'max_tx_ex_mem', pp.max_tx_ex_mem,
-                'max_tx_ex_steps', pp.max_tx_ex_steps,
-                'max_block_ex_mem', pp.max_block_ex_mem,
-                'max_block_ex_steps', pp.max_block_ex_steps,
-                'max_val_size', pp.max_val_size,
-                'collateral_percent', pp.collateral_percent,
-                'max_collateral_inputs', pp.max_collateral_inputs,
-                'coins_per_utxo_size', pp.coins_per_utxo_size,
-                'pvt_motion_no_confidence', pp.pvt_motion_no_confidence,
-                'pvt_committee_normal', pp.pvt_committee_normal,
-                'pvt_committee_no_confidence', pp.pvt_committee_no_confidence,
-                'pvt_hard_fork_initiation', pp.pvt_hard_fork_initiation,
-                'dvt_motion_no_confidence', pp.dvt_motion_no_confidence,
-                'dvt_committee_normal', pp.dvt_committee_normal,
-                'dvt_committee_no_confidence', pp.dvt_committee_no_confidence,
-                'dvt_update_to_constitution', pp.dvt_update_to_constitution,
-                'dvt_hard_fork_initiation', pp.dvt_hard_fork_initiation,
-                'dvt_p_p_network_group', pp.dvt_p_p_network_group,
-                'dvt_p_p_economic_group', pp.dvt_p_p_economic_group,
-                'dvt_p_p_technical_group', pp.dvt_p_p_technical_group,
-                'dvt_p_p_gov_group', pp.dvt_p_p_gov_group,
-                'dvt_treasury_withdrawal', pp.dvt_treasury_withdrawal,
-                'committee_min_size', pp.committee_min_size,
-                'committee_max_term_length', pp.committee_max_term_length,
-                'gov_action_lifetime', pp.gov_action_lifetime,
-                'gov_action_deposit', pp.gov_action_deposit,
-                'drep_deposit', pp.drep_deposit,
-                'drep_activity', pp.drep_activity,
-                'pvtpp_security_group', pp.pvtpp_security_group,
-                'min_fee_ref_script_cost_per_byte', pp.min_fee_ref_script_cost_per_byte
-              ))
+              'info', JSONB_STRIP_NULLS(TO_JSONB(pp.*)) - array['id','registered_tx_id','epoch_no']
             ) AS data
           FROM public.param_proposal AS pp
             INNER JOIN cost_model AS cm ON cm.id = pp.cost_model_id
@@ -605,6 +557,128 @@ BEGIN
             INNER JOIN public.pool_update AS pu ON pu.registered_tx_id = pic.tx_id
           WHERE _certs IS TRUE
             AND pic.tx_id = ANY(_tx_id_list)
+          --
+          UNION ALL
+          --
+          SELECT
+            dv.tx_id,
+            JSONB_BUILD_OBJECT(
+              'index', dv.cert_index,
+              'type', 'vote_delegation',
+              'info', JSONB_BUILD_OBJECT(
+                'stake_address', sa.view,
+                'drep_id', dh.view,
+                'drep_hex', ENCODE(dh.raw, 'hex')
+              )
+            ) AS data
+          FROM public.delegation_vote AS dv
+            INNER JOIN public.drep_hash AS dh ON dh.id = dv.drep_hash_id
+            INNER JOIN public.stake_address AS sa ON sa.id = dv.addr_id
+          WHERE _certs IS TRUE
+            AND dv.tx_id = ANY(_tx_id_list)
+          --
+          UNION ALL
+          --
+          SELECT
+            dr.tx_id,
+            JSONB_BUILD_OBJECT(
+              'index', dr.cert_index,
+              'type', 'drep_registration',
+              'info', JSONB_BUILD_OBJECT(
+                'drep_id', dh.view,
+                'drep_hex', ENCODE(dh.raw, 'hex'),
+                'deposit', dr.deposit::text,
+                'meta_url', va.url,
+                'meta_hash', va.data_hash
+              )
+            ) AS data
+          FROM public.drep_registration AS dr
+            INNER JOIN public.drep_hash AS dh ON dh.id = dr.drep_hash_id
+            LEFT JOIN public.voting_anchor AS va ON va.id = dr.voting_anchor_id
+          WHERE _certs IS TRUE
+            AND dr.tx_id = ANY(_tx_id_list)
+            AND dr.deposit IS NOT NULL
+            AND dr.deposit >= 0
+          --
+          UNION ALL
+          --
+          SELECT
+            dr.tx_id,
+            JSONB_BUILD_OBJECT(
+              'index', dr.cert_index,
+              'type', 'drep_update',
+              'info', JSONB_BUILD_OBJECT(
+                'drep_id', dh.view,
+                'drep_hex', ENCODE(dh.raw, 'hex'),
+                'meta_url', va.url,
+                'meta_hash', va.data_hash
+              )
+            ) AS data
+          FROM public.drep_registration AS dr
+            INNER JOIN public.drep_hash AS dh ON dh.id = dr.drep_hash_id
+            LEFT JOIN public.voting_anchor AS va ON va.id = dr.voting_anchor_id
+          WHERE _certs IS TRUE
+            AND dr.tx_id = ANY(_tx_id_list)
+            AND dr.deposit IS NULL
+          --
+          UNION ALL
+          --
+          SELECT
+            dr.tx_id,
+            JSONB_BUILD_OBJECT(
+              'index', dr.cert_index,
+              'type', 'drep_retire',
+              'info', JSONB_BUILD_OBJECT(
+                'drep_id', dh.view,
+                'drep_hex', ENCODE(dh.raw, 'hex')
+              )
+            ) AS data
+          FROM public.drep_registration AS dr
+            INNER JOIN public.drep_hash AS dh ON dh.id = dr.drep_hash_id
+          WHERE _certs IS TRUE
+            AND dr.tx_id = ANY(_tx_id_list)
+            AND dr.deposit IS NOT NULL
+            AND dr.deposit < 0
+          --
+          UNION ALL
+          --
+          SELECT
+            cr.tx_id,
+            JSONB_BUILD_OBJECT(
+              'index', cr.cert_index,
+              'type', 'committee_hot_auth',
+              'info', JSONB_BUILD_OBJECT(
+                'cc_cold_hex', ENCODE(ch_cold.raw, 'hex'),
+                'cc_cold_has_script', ch_cold.has_script,
+                'cc_hot_hex', ENCODE(ch_hot.raw, 'hex'),
+                'cc_hot_has_script', ch_hot.has_script
+              )
+            ) AS data
+          FROM public.committee_registration AS cr
+            INNER JOIN public.committee_hash AS ch_cold ON ch_cold.id = cr.cold_key_id
+            INNER JOIN public.committee_hash AS ch_hot ON ch_hot.id = cr.hot_key_id
+          WHERE _certs IS TRUE
+            AND cr.tx_id = ANY(_tx_id_list)
+          --
+          UNION ALL
+          --
+          SELECT
+            cdr.tx_id,
+            JSONB_BUILD_OBJECT(
+              'index', cdr.cert_index,
+              'type', 'committee_resign',
+              'info', JSONB_BUILD_OBJECT(
+                'cc_cold_hex', ENCODE(ch.raw, 'hex'),
+                'cc_cold_has_script', ch.has_script,
+                'meta_url', va.url,
+                'meta_hash', va.data_hash
+              )
+            ) AS data
+          FROM public.committee_de_registration AS cdr
+            INNER JOIN public.committee_hash AS ch ON ch.id = cdr.cold_key_id
+            LEFT JOIN public.voting_anchor AS va ON va.id = cdr.voting_anchor_id
+          WHERE _certs IS TRUE
+            AND cdr.tx_id = ANY(_tx_id_list)
         ) AS tmp
         GROUP BY tx_id
       ),
@@ -644,10 +718,10 @@ BEGIN
                 redeemer.unit_mem,
                 rd.hash AS rd_hash,
                 rd.value AS rd_value,
+                script.hash AS script_hash,
                 CASE WHEN _bytecode IS TRUE THEN
                   script.bytes
                 END AS script_bytes,
-                script.bytes AS script_bytes,
                 script.serialised_size AS script_serialised_size,
                 tx.valid_contract
               FROM redeemer
@@ -744,6 +818,78 @@ BEGIN
             ) AS data
           FROM all_redeemers AS ar
           WHERE _scripts IS TRUE
+        ) AS tmp
+        GROUP BY tx_id
+      ),
+
+      _all_voting_procedures AS (
+        SELECT
+          tx_id,
+          JSONB_AGG(data) AS list
+        FROM (
+          SELECT
+            vp.tx_id,
+            JSONB_BUILD_OBJECT(
+              'proposal_tx_hash', ENCODE(tx.hash, 'hex'),
+              'proposal_index', gap.index,
+              'voter_role', vp.voter_role,
+              'voter', COALESCE(ENCODE(ch.raw, 'hex'), dh.view, ph.view),
+              'voter_hex', COALESCE(ENCODE(ch.raw, 'hex'), ENCODE(dh.raw, 'hex'), ENCODE(ph.hash_raw, 'hex')),
+              'vote', vp.vote
+            ) AS data
+          FROM voting_procedure AS vp
+            INNER JOIN public.gov_action_proposal AS gap ON vp.gov_action_proposal_id = gap.id
+            INNER JOIN public.tx ON gap.tx_id = tx.id
+            LEFT JOIN public.drep_hash AS dh ON vp.drep_voter = dh.id
+            LEFT JOIN public.pool_hash AS ph ON vp.pool_voter = ph.id
+            LEFT JOIN public.committee_hash AS ch ON vp.committee_voter = ch.id
+          WHERE _governance IS TRUE
+            AND vp.tx_id = ANY(_tx_id_list)
+        ) AS tmp
+        GROUP BY tx_id
+      ),
+
+      _all_proposal_procedures AS (
+        SELECT
+          tx_id,
+          JSONB_AGG(data) AS list
+        FROM (
+          SELECT
+            gap.tx_id,
+            JSONB_BUILD_OBJECT(
+              'index', gap.index,
+              'type', gap.type,
+              'description', gap.description,
+              'deposit', gap.deposit::text,
+              'return_address', sa.view,
+              'expiration', gap.expiration,
+              'meta_url', va.url,
+              'meta_hash', ENCODE(va.data_hash, 'hex'),
+              'withdrawal', CASE
+                WHEN tw.id IS NULL THEN NULL
+                ELSE
+                  JSONB_BUILD_OBJECT(
+                    'stake_address', (
+                      SELECT sa2.view
+                      FROM stake_address AS sa2
+                      WHERE sa2.id = tw.stake_address_id
+                    ),
+                    'amount', tw.amount::text
+                  )
+              END,
+              'param_proposal', CASE
+                WHEN pp.id IS NULL THEN NULL
+                ELSE ( SELECT JSONB_STRIP_NULLS(TO_JSONB(pp.*)) - array['id','registered_tx_id','epoch_no'] )
+              END
+            ) AS data
+          FROM gov_action_proposal AS gap
+          INNER JOIN public.stake_address AS sa ON gap.return_address = sa.id
+          LEFT JOIN public.treasury_withdrawal AS tw ON gap.id = tw.gov_action_proposal_id
+          LEFT JOIN public.param_proposal AS pp ON gap.param_proposal = pp.id
+          LEFT JOIN public.cost_model AS cm ON cm.id = pp.cost_model_id
+          LEFT JOIN public.voting_anchor AS va ON gap.voting_anchor_id = va.id
+          WHERE _governance IS TRUE
+            AND gap.tx_id = ANY(_tx_id_list)
         ) AS tmp
         GROUP BY tx_id
       )
@@ -867,7 +1013,7 @@ BEGIN
               'tx_hash', ao.tx_hash,
               'tx_index', tx_index,
               'value', value,
-              'datum_hash', datum_hash,
+              'datum_hash', ENCODE(datum_hash, 'hex'),
               'inline_datum', inline_datum,
               'reference_script', reference_script,
               'asset_list', COALESCE(JSONB_AGG(asset_list) FILTER (WHERE asset_list IS NOT NULL), JSONB_BUILD_ARRAY())
@@ -882,7 +1028,9 @@ BEGIN
       COALESCE((SELECT ame.list FROM _all_metadata AS ame WHERE _metadata IS TRUE AND ame.tx_id = atx.id), NULL),
       COALESCE((SELECT ac.list FROM _all_certs AS ac WHERE _certs IS TRUE AND ac.tx_id = atx.id), JSONB_BUILD_ARRAY()),
       COALESCE((SELECT ans.list FROM _all_native_scripts AS ans WHERE _scripts IS TRUE AND ans.tx_id = atx.id), JSONB_BUILD_ARRAY()),
-      COALESCE((SELECT apc.list FROM _all_plutus_contracts AS apc WHERE _scripts IS TRUE AND apc.tx_id = atx.id), JSONB_BUILD_ARRAY())
+      COALESCE((SELECT apc.list FROM _all_plutus_contracts AS apc WHERE _scripts IS TRUE AND apc.tx_id = atx.id), JSONB_BUILD_ARRAY()),
+      COALESCE((SELECT avp.list FROM _all_voting_procedures AS avp WHERE _governance IS TRUE AND avp.tx_id = atx.id), JSONB_BUILD_ARRAY()),
+      COALESCE((SELECT app.list FROM _all_proposal_procedures AS app WHERE _governance IS TRUE AND app.tx_id = atx.id), JSONB_BUILD_ARRAY())
     FROM _all_tx AS atx
     WHERE atx.id = ANY(_tx_id_list)
   );

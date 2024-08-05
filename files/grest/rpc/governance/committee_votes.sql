@@ -1,7 +1,7 @@
 CREATE OR REPLACE FUNCTION grest.committee_votes(_committee_hash text)
 RETURNS TABLE (
   proposal_tx_hash text,
-  cert_index integer,
+  proposal_index integer,
   vote_tx_hash text,
   block_time integer,
   vote text
@@ -9,10 +9,10 @@ RETURNS TABLE (
 LANGUAGE sql STABLE
 AS $$
   SELECT
-    ENCODE(prop_tx.hash, 'hex')::text AS proposal_tx_hash,
-    gap.index AS cert_index,
-    ENCODE(vote_tx.hash, 'hex')::text AS vote_tx_hash,
-    EXTRACT(EPOCH FROM b.time)::integer AS block_time,
+    ENCODE(prop_tx.hash, 'hex'),
+    gap.index,
+    ENCODE(vote_tx.hash, 'hex'),
+    EXTRACT(EPOCH FROM b.time)::integer,
     vp.vote
   FROM public.committee_hash AS ch
     INNER JOIN public.voting_procedure AS vp ON ch.id = vp.committee_voter

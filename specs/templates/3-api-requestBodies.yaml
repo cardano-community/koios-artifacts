@@ -344,6 +344,10 @@ requestBodies:
                 format: boolean
                 type: boolean
                 description: Controls whether to include bytecode for associated reference/plutus scripts
+              _governance:
+                format: boolean
+                type: boolean
+                description: Controls whether to include governance certificates, votes and proposals in the result
             example:
               _tx_hashes:
                 - ##tx_ids_tx_hashes1_rb##

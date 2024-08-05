@@ -1156,6 +1156,28 @@ paths:
       description: Get the list of current or all asset transaction hashes (newest first)
       operationId: asset_txs
 
+  /drep_epoch_summary: #RPC
+    get:
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_epoch_no"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/drep_epoch_summary"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: DReps Epoch Summary
+      description: Summary of voting power and DRep count for each epoch
+      operationId: drep_epoch_summary
   /drep_list: #RPC
     get:
       tags:
@@ -1264,6 +1286,48 @@ paths:
       summary: DReps Votes
       description: List of all votes casted by requested delegated representative (DRep)
       operationId: drep_votes
+  /drep_delegators: #RPC
+    get:
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_drep_id"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/drep_delegators"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: DReps Delegators
+      description: List of all delegators to requested delegated representative (DRep).
+      operationId: drep_delegators
+  /committee_info: #RPC
+    get:
+      tags:
+        - Governance
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/committee_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Committee Information
+      description: Information about active committee and its members
+      operationId: committee_info
   /committee_votes: #RPC
     get:
       tags:
@@ -1312,7 +1376,7 @@ paths:
         - Governance
       parameters:
         - $ref: "#/components/parameters/_proposal_tx_hash"
-        - $ref: "#/components/schemas/drep_updates/items/properties/cert_index"
+        - $ref: "#/components/parameters/_proposal_index"
       responses:
         "200":
           description: Success!!

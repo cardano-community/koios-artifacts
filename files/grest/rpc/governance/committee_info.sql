@@ -1,7 +1,7 @@
 CREATE OR REPLACE FUNCTION grest.committee_info()
 RETURNS TABLE (
   proposal_tx_hash text,
-  cert_index bigint,
+  proposal_index bigint,
   quorum_numerator bigint,
   quorum_denominator bigint,
   members jsonb

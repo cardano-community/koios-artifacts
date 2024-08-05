@@ -189,3 +189,13 @@ parameters:
       in: query
       required: true
       allowEmptyValue: false
+    _proposal_index:
+      deprecated: false
+      name: _proposal_index
+      description: Index of governance proposal in transaction
+      schema:
+        type: number
+        example: 0
+      in: query
+      required: true
+      allowEmptyValue: false
