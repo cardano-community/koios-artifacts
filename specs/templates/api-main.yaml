@@ -1311,7 +1311,8 @@ paths:
       tags:
         - Governance
       parameters:
-        - $ref: "#/components/parameters/_tx_hash"
+        - $ref: "#/components/parameters/_proposal_tx_hash"
+        - $ref: "#/components/schemas/drep_updates/items/properties/cert_index"
       responses:
         "200":
           description: Success!!

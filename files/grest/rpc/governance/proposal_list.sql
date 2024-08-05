@@ -1,6 +1,6 @@
 CREATE OR REPLACE FUNCTION grest.proposal_list()
 RETURNS TABLE (
-  tx_hash text,
+  proposal_tx_hash text,
   cert_index integer,
   block_time integer,
   proposal_type text,
@@ -25,7 +25,7 @@ RETURNS TABLE (
 LANGUAGE sql STABLE
 AS $$
   SELECT
-    ENCODE(tx.hash, 'hex')::text AS tx_hash,
+    ENCODE(tx.hash, 'hex')::text AS proposal_tx_hash,
     gap.index AS cert_index,
     EXTRACT(EPOCH FROM b.time)::integer AS block_time,
     gap.type AS proposal_type,

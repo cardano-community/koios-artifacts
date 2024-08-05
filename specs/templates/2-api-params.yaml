@@ -179,3 +179,13 @@ parameters:
       in: query
       required: true
       allowEmptyValue: false
+    _proposal_tx_hash:
+      deprecated: false
+      name: _proposal_tx_hash
+      description: Transaction Hash of government proposal in hexadecimal format (hex)
+      example: "##_proposal_tx_hash_param##"
+      schema:
+        type: string
+      in: query
+      required: true
+      allowEmptyValue: false
