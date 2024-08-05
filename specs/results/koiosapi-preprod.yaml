@@ -5006,6 +5006,23 @@ components:
             $ref: "#/components/schemas/drep_info/items/properties/has_script"
           registered:
             $ref: "#/components/schemas/drep_info/items/properties/registered"
+    drep_delegators:
+      description: List of all delegators by requested delegated representative (DRep)
+      type: array
+      items:
+        properties:
+          stake_address:
+            $ref: "#/components/schemas/account_list/items/properties/stake_address"
+          stake_address_hex:
+            $ref: "#/components/schemas/account_list/items/properties/stake_address_hex"
+          script_hash:
+            $ref: "#/components/schemas/account_list/items/properties/script_hash"
+          epoch_no:
+            description: Epoch when vote delegation was made
+            allOf:
+              - $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+          amount:
+            $ref: "#/components/schemas/account_info/items/properties/total_balance"
     drep_metadata:
       description: List metadata for requested delegated representatives (DReps)
       type: array
@@ -5212,7 +5229,38 @@ components:
             example: drep1l9y2naagv0vqvft9szdt5wf94fqnxn5hdsgusdl7rf6vq4djqck
           vote:
             $ref: "#/components/schemas/drep_votes/items/properties/vote"
-
+    committee_info:
+      description: Current governance committee
+      type: object
+      properties:
+        tx_hash:
+          $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+        cert_index:
+          $ref: "#/components/schemas/drep_updates/items/properties/cert_index"
+        quorum_numerator:
+          type: number
+          example: 67
+        quorum_denominator:
+          type: number
+          example: 100
+        members:
+          description: Array of all members part of active governance committee
+          type: array
+          items:
+            type: object
+            properties:
+              hex:
+                type: string
+                description: Committee member in hex format
+                example: f948a9f7a863d8062565809aba3925aa41334e976c11c837fe1a74c0
+              has_script:
+                type: boolean
+                description: Flag which shows if this committee member credential is a script hash
+                example: false
+              expiration_epoch:
+                type: number
+                description: Epoch number in which the committee member vote rights expire
+                example: 324
     script_info:
       type: array
       items:
