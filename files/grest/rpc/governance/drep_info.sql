@@ -7,7 +7,9 @@ RETURNS TABLE (
   deposit text,
   active boolean,
   expires_epoch_no numeric,
-  amount text
+  amount text,
+  url text,
+  hash text
 )
 LANGUAGE plpgsql
 AS $$
@@ -101,9 +103,12 @@ BEGIN
       (CASE WHEN (dr.deposit < 0) OR starts_with(dh.view,'drep_') THEN NULL ELSE ds.deposit END)::text AS deposit,
       (CASE WHEN starts_with(dh.view,'drep_') THEN TRUE ELSE COALESCE(dr.deposit, 0) >= 0 AND ds.active END) AS active,
       (CASE WHEN COALESCE(dr.deposit, 0) >= 0 THEN ds.expires_epoch_no ELSE NULL END) AS expires_epoch_no,
-      COALESCE(dd.amount, 0)::text AS amount
+      COALESCE(dd.amount, 0)::text AS amount,
+      va.url,
+      ENCODE(va.data_hash, 'hex') AS hash,
     FROM public.drep_hash AS dh
       LEFT JOIN public.drep_registration AS dr ON dh.id = dr.drep_hash_id
+      LEFT JOIN public.voting_anchor AS va ON dr.voting_anchor_id = va.id
       LEFT JOIN public.drep_distr AS dd ON dh.id = dd.hash_id AND dd.epoch_no = curr_epoch
       LEFT JOIN _drep_state AS ds ON dh.id = ds.drep
     WHERE dh.id = ANY(drep_list)

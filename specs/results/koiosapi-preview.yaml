@@ -1456,7 +1456,8 @@ paths:
       tags:
         - Governance
       parameters:
-        - $ref: "#/components/parameters/_tx_hash"
+        - $ref: "#/components/parameters/_proposal_tx_hash"
+        - $ref: "#/components/schemas/drep_updates/items/properties/cert_index"
       responses:
         "200":
           description: Success!!
@@ -2098,6 +2099,16 @@ components:
       schema:
         type: string
       example: "f758cf422ca0cbed7d9d6fad1eb5a3c70537d62e661ad450dd2a3810"
+      in: query
+      required: true
+      allowEmptyValue: false
+    _proposal_tx_hash:
+      deprecated: false
+      name: _proposal_tx_hash
+      description: Transaction Hash of government proposal in hexadecimal format (hex)
+      example: "##_proposal_tx_hash_param##"
+      schema:
+        type: string
       in: query
       required: true
       allowEmptyValue: false
@@ -4993,6 +5004,14 @@ components:
             type: string
             description: The total amount of voting power this DRep is delegated.
             example: 599496769641
+          url:
+            type: string
+            description: A URL to a JSON payload of metadata
+            example: "https://hornan7.github.io/Vote_Context.jsonld"
+          hash:
+            type: string
+            description: A hash of the contents of the metadata URL
+            example: dc208474e195442d07a5b6d42af19bb2db02229427dfb53ab23122e6b0e2487d
     drep_list:
       description: List of all active delegated representatives (DReps)
       type: array
@@ -5033,13 +5052,9 @@ components:
           hex:
             $ref: "#/components/schemas/drep_info/items/properties/hex"
           url:
-            type: string
-            description: A URL to a JSON payload of metadata
-            example: "https://hornan7.github.io/Vote_Context.jsonld"
+            $ref: "#/components/schemas/drep_info/items/properties/url"
           hash:
-            type: string
-            description: A hash of the contents of the metadata URL
-            example: dc208474e195442d07a5b6d42af19bb2db02229427dfb53ab23122e6b0e2487d
+            $ref: "#/components/schemas/drep_info/items/properties/hash"
           json:
             type: object
             description: The payload as JSON
@@ -5072,7 +5087,7 @@ components:
             $ref: "#/components/schemas/drep_info/items/properties/drep_id"
           hex:
             $ref: "#/components/schemas/drep_info/items/properties/hex"
-          tx_hash:
+          update_tx_hash:
             $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
           cert_index:
             type: string
@@ -5098,10 +5113,12 @@ components:
       type: array
       items:
         properties:
-          tx_hash:
+          proposal_tx_hash:
             $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
           cert_index:
             $ref: "#/components/schemas/drep_updates/items/properties/cert_index"
+          vote_tx_hash:
+            $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
           block_time:
             $ref: "#/components/schemas/blocks/items/properties/block_time"
           vote:
@@ -5124,7 +5141,7 @@ components:
       type: array
       items:
         properties:
-          tx_hash:
+          proposal_tx_hash:
             $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
           cert_index:
             $ref: "#/components/schemas/drep_updates/items/properties/cert_index"
