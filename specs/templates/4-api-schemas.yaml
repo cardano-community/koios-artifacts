@@ -610,8 +610,6 @@ schemas:
             $ref: "#/components/schemas/pool_info/items/properties/pool_id_bech32"
           relays:
             $ref: "#/components/schemas/pool_info/items/properties/relays"
-          pool_status:
-            $ref: "#/components/schemas/pool_info/items/properties/pool_status"
     pool_metadata:
       description: Array of pool metadata
       type: array
@@ -626,8 +624,6 @@ schemas:
             $ref: "#/components/schemas/pool_info/items/properties/meta_hash"
           meta_json:
             $ref: "#/components/schemas/pool_info/items/properties/meta_json"
-          pool_status:
-            $ref: "#/components/schemas/pool_info/items/properties/pool_status"
     epoch_info:
       description: Array of detailed summary for each epoch
       type: array
