@@ -2072,7 +2072,7 @@ components:
       description: DRep ID in bech32 format
       schema:
         type: string
-      example: "drep1l9y2naagv0vqvft9szdt5wf94fqnxn5hdsgusdl7rf6vq4djqck"
+      example: "drep13a87lnegq9a90dq4z7n864h0fsxuqsvp5ywn29ud65l5cwxlhts"
       in: query
       required: true
       allowEmptyValue: false
@@ -2082,7 +2082,7 @@ components:
       description: DRep ID in bech32 format
       schema:
         type: string
-      example: "drep1l9y2naagv0vqvft9szdt5wf94fqnxn5hdsgusdl7rf6vq4djqck"
+      example: "drep13a87lnegq9a90dq4z7n864h0fsxuqsvp5ywn29ud65l5cwxlhts"
       in: query
       required: false
       allowEmptyValue: true
