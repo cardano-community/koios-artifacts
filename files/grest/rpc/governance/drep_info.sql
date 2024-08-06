@@ -105,7 +105,7 @@ BEGIN
       (CASE WHEN COALESCE(dr.deposit, 0) >= 0 THEN ds.expires_epoch_no ELSE NULL END) AS expires_epoch_no,
       COALESCE(dd.amount, 0)::text AS amount,
       va.url,
-      ENCODE(va.data_hash, 'hex') AS hash,
+      ENCODE(va.data_hash, 'hex') AS hash
     FROM public.drep_hash AS dh
       LEFT JOIN public.drep_registration AS dr ON dh.id = dr.drep_hash_id
       LEFT JOIN public.voting_anchor AS va ON dr.voting_anchor_id = va.id

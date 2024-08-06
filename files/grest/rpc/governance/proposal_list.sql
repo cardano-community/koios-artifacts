@@ -70,7 +70,7 @@ AS $$
     LEFT JOIN public.voting_anchor AS va ON gap.voting_anchor_id = va.id
     LEFT JOIN public.off_chain_vote_data AS ocvd ON va.id = ocvd.voting_anchor_id
   ORDER BY
-    block_time DESC;
+    b.time DESC;
 $$;
 
 COMMENT ON FUNCTION grest.proposal_list IS 'Get a raw listing of all governance proposals'; --noqa: LT01
