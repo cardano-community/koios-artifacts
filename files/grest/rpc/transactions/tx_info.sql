@@ -534,29 +534,44 @@ BEGIN
           UNION ALL
           --
           SELECT
-            pic.tx_id,
+            pu.registered_tx_id AS tx_id,
             JSONB_BUILD_OBJECT(
               'index', pu.cert_index,
               'type', 'pool_update',
               'info', JSONB_BUILD_OBJECT(
-                'pool_id_bech32', pic.pool_id_bech32,
-                'pool_id_hex', pic.pool_id_hex,
-                'active_epoch_no', pic.active_epoch_no,
-                'vrf_key_hash', pic.vrf_key_hash,
-                'margin', pic.margin,
-                'fixed_cost', pic.fixed_cost::text,
-                'pledge', pic.pledge::text,
-                'reward_addr', pic.reward_addr,
-                'owners', pic.owners,
-                'relays', pic.relays,
-                'meta_url', pic.meta_url,
-                'meta_hash', pic.meta_hash
+                'pool_id_bech32', ph.view,
+                'pool_id_hex', ENCODE(ph.hash_raw, 'hex'),
+                'active_epoch_no', pu.active_epoch_no,
+                'vrf_key_hash', ENCODE(pu.vrf_key_hash, 'hex'),
+                'margin', pu.margin,
+                'fixed_cost', pu.fixed_cost::text,
+                'pledge', pu.pledge::text,
+                'reward_addr', sa.view,
+                'owners', JSONB_AGG(po.view),
+                'relays', JSONB_AGG(JSONB_BUILD_OBJECT (
+                  'ipv4', pr.ipv4,
+                  'ipv6', pr.ipv6,
+                  'dns', pr.dns_name,
+                  'srv', pr.dns_srv_name,
+                  'port', pr.port
+                )),
+                'meta_url', pmr.url,
+                'meta_hash', ENCODE(pmr.hash, 'hex')
               )
             ) AS data
-          FROM grest.pool_info_cache AS pic
-            INNER JOIN public.pool_update AS pu ON pu.registered_tx_id = pic.tx_id
+          FROM public.pool_update AS pu
+            LEFT JOIN public.pool_hash AS ph ON pu.hash_id = ph.id
+            LEFT JOIN public.stake_address AS sa ON pu.reward_addr_id = sa.id
+            LEFT JOIN (
+                SELECT po1.pool_update_id, sa1.view
+                FROM public.pool_owner AS po1
+                  LEFT JOIN public.stake_address AS sa1 ON sa1.id = po1.addr_id
+              ) AS po ON pu.id = po.pool_update_id
+            LEFT JOIN public.pool_relay AS pr ON pu.id = pr.update_id
+            LEFT JOIN public.pool_metadata_ref AS pmr ON pu.meta_id = pmr.id
           WHERE _certs IS TRUE
-            AND pic.tx_id = ANY(_tx_id_list)
+            AND pu.registered_tx_id = ANY(_tx_id_list)
+          GROUP BY pu.registered_tx_id, pu.cert_index, ph.view, ph.hash_raw, pu.active_epoch_no, pu.vrf_key_hash, pu.margin, pu.fixed_cost, pu.pledge, sa.view, pmr.url, pmr.hash
           --
           UNION ALL
           --

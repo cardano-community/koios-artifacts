@@ -8,7 +8,7 @@ RETURNS TABLE (
   active boolean,
   expires_epoch_no numeric,
   amount text,
-  url text,
+  url character varying,
   hash text
 )
 LANGUAGE plpgsql
