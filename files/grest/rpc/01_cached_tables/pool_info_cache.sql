@@ -65,6 +65,8 @@ BEGIN
     _pool_status := 'retired';
   END IF;
 
+  DELETE FROM grest.pool_info_cache WHERE pool_hash_id = _hash_id;
+
   INSERT INTO grest.pool_info_cache (
     tx_id,
     update_id,
@@ -188,8 +190,8 @@ BEGIN
 
   UPDATE grest.pool_info_cache
   SET
-      pool_status = _pool_status,
-      retiring_epoch = _retiring_epoch
+    pool_status = _pool_status,
+    retiring_epoch = _retiring_epoch
   WHERE pool_hash_id = _pool_hash_id
     AND tx_id = _latest_pool_update_tx_id;
 

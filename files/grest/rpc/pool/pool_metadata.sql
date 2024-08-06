@@ -3,31 +3,29 @@ RETURNS TABLE (
   pool_id_bech32 character varying,
   meta_url character varying,
   meta_hash text,
-  meta_json jsonb,
-  pool_status text
+  meta_json jsonb
 )
 LANGUAGE plpgsql
 AS $$
 #variable_conflict use_column
 BEGIN
   RETURN QUERY
-  SELECT DISTINCT ON (pic.pool_id_bech32)
+  SELECT DISTINCT ON (ph.view)
     ph.view AS pool_id_bech32,
-    pic.meta_url,
-    pic.meta_hash,
-    ocpd.json,
-    pic.pool_status
+    pmr.url AS meta_url,
+    ENCODE(pmr.hash, 'hex') AS meta_hash,
+    ocpd.json AS meta_json
   FROM public.pool_hash AS ph
-  LEFT JOIN grest.pool_info_cache AS pic ON ph.view = pic.pool_id_bech32
-  LEFT JOIN public.off_chain_pool_data AS ocpd ON ocpd.pmr_id = pic.meta_id
+  LEFT JOIN public.off_chain_pool_data AS ocpd ON ocpd.pool_id = ph.id
+  LEFT JOIN public.pool_metadata_ref AS pmr ON pmr.id = ocpd.pmr_id
   WHERE
     CASE
       WHEN _pool_bech32_ids IS NULL THEN TRUE
-      WHEN _pool_bech32_ids IS NOT NULL THEN pic.pool_id_bech32 = ANY(SELECT UNNEST(_pool_bech32_ids))
+      WHEN _pool_bech32_ids IS NOT NULL THEN ph.view = ANY(SELECT UNNEST(_pool_bech32_ids))
     END
   ORDER BY
-      pic.pool_id_bech32,
-      pic.tx_id DESC;
+      ph.view,
+      pmr.registered_tx_id DESC;
 END;
 $$;
 
