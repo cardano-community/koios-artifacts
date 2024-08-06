@@ -10,8 +10,8 @@ RETURNS TABLE (
   fixed_cost text,
   pledge text,
   reward_addr character varying,
-  owners character varying [],
-  relays jsonb [],
+  owners jsonb,
+  relays jsonb,
   meta_url character varying,
   meta_hash text,
   meta_json jsonb,
@@ -28,29 +28,45 @@ BEGIN
   WITH
     pool_reg AS (
       SELECT
-        pic.tx_hash,
-        pic.block_time::integer,
-        pic.pool_id_bech32,
-        pic.pool_id_hex,
-        pic.active_epoch_no,
-        pic.vrf_key_hash,
-        pic.margin,
-        pic.fixed_cost::text,
-        pic.pledge::text,
-        pic.reward_addr,
-        pic.owners,
-        pic.relays,
-        pic.meta_url,
-        pic.meta_hash,
+        ENCODE(tx.hash::bytea, 'hex') AS tx_hash,
+        EXTRACT(EPOCH FROM b.time)::integer AS block_time,
+        ph.view AS pool_id_bech32,
+        ENCODE(ph.hash_raw::bytea, 'hex') AS pool_id_hex,
+        pu.active_epoch_no,
+        ENCODE(pu.vrf_key_hash, 'hex') AS vrf_key_hash,
+        pu.margin,
+        pu.fixed_cost::text,
+        pu.pledge::text,
+        sa.view AS reward_addr,
+        JSONB_AGG(po.view) AS owners,
+        JSONB_AGG(JSONB_BUILD_OBJECT (
+            'ipv4', pr.ipv4,
+            'ipv6', pr.ipv6,
+            'dns', pr.dns_name,
+            'srv', pr.dns_srv_name,
+            'port', pr.port
+          )) AS relays,
+        pmr.url AS meta_url,
+        ENCODE(pmr.hash, 'hex') AS meta_hash,
         ocpd.json,
         'registration' AS update_type,
         NULL::word31type AS retiring_epoch
-      FROM
-        grest.pool_info_cache AS pic
-        LEFT JOIN public.off_chain_pool_data AS ocpd ON ocpd.pmr_id = pic.meta_id
-        LEFT JOIN public.pool_retire AS pr ON pic.pool_hash_id = pr.hash_id
+      FROM public.pool_hash AS ph
+        LEFT JOIN public.pool_update AS pu ON pu.hash_id = ph.id
+        INNER JOIN public.tx ON pu.registered_tx_id = tx.id
+        INNER JOIN public.block AS b ON b.id = tx.block_id
+        LEFT JOIN public.stake_address AS sa ON pu.reward_addr_id = sa.id
+        LEFT JOIN (
+            SELECT po1.pool_update_id, sa1.view
+            FROM public.pool_owner AS po1
+              LEFT JOIN public.stake_address AS sa1 ON sa1.id = po1.addr_id
+          ) AS po ON pu.id = po.pool_update_id
+        LEFT JOIN public.pool_relay AS pr ON pu.id = pr.update_id
+        LEFT JOIN public.pool_metadata_ref AS pmr ON pu.meta_id = pmr.id
+        LEFT JOIN public.off_chain_pool_data AS ocpd ON pu.meta_id = ocpd.pmr_id
       WHERE _pool_bech32 IS NULL
-        OR pic.pool_id_bech32 = _pool_bech32),
+        OR ph.view = _pool_bech32
+      GROUP BY tx.hash, b.time, ph.view, ph.hash_raw, pu.active_epoch_no, pu.vrf_key_hash, pu.margin, pu.fixed_cost, pu.pledge, sa.view, pmr.url, pmr.hash, ocpd.json),
     pool_dereg AS (
         SELECT
           ENCODE(tx.hash::bytea, 'hex') AS tx_hash,
@@ -63,15 +79,12 @@ BEGIN
           NULL as fixed_cost,
           NULL AS pledge,
           NULL AS reward_addr,
-          NULL::text[] AS owners,
-          NULL::jsonb[] AS relays,
+          NULL::jsonb AS owners,
+          NULL::jsonb AS relays,
           NULL AS meta_url,
           NULL AS meta_hash,
           NULL::jsonb AS json,
-          CASE
-            WHEN pr.retiring_epoch IS NULL THEN 'registration'
-            ELSE 'deregistration'
-          END AS update_type,
+          'deregistration' AS update_type,
           pr.retiring_epoch::word31type
         FROM public.pool_hash AS ph
           LEFT JOIN pool_retire AS pr ON pr.hash_id = ph.id
