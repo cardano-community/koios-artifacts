@@ -28,8 +28,7 @@ BEGIN
     --
     SELECT consumed_by_tx_id AS tx_id
     FROM tx_out
-    WHERE
-      tx_out.consumed_by_tx_id IS NOT NULL
+    WHERE tx_out.consumed_by_tx_id IS NOT NULL
       AND tx_out.stake_address_id = ANY(SELECT id FROM stake_address WHERE view = _stake_address)
       AND tx_out.consumed_by_tx_id >= _tx_id_min
   ) AS tmp;
@@ -43,7 +42,6 @@ BEGIN
     FROM public.tx
     INNER JOIN public.block AS b ON b.id = tx.block_id
     WHERE tx.id = ANY(_tx_id_list)
-      AND b.block_no >= _after_block_height
     ORDER BY b.block_no DESC;
 END;
 $$;

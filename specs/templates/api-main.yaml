@@ -1918,5 +1918,5 @@ tags:
         - [evaluateTransaction](https://ogmios.dev/mini-protocols/local-tx-submission/#evaluating-transactions)
     x-tag-expanded: true
 security:
-  - []
+  - {}
   - bearerAuth: []

@@ -83,7 +83,13 @@
       "g": "65d497b875c56ab213586a4006d4f6658970573ea8e2398893857472",
       "pv": "7ceede7d6a89e006408e6b7c6acb3dd094b3f6817e43b4a36d01535b",
       "pp": "f8f56120e1ec00feb088ece39ef14f07339afeb37b4e949ff12b89ff"
-    },    
+    },
+    "_proposal_tx_hash": {
+      "m": "e61f151fcef9e99dff5c705f8d5de18891f8d1d92d69fef5ff608d2c29a7c133",
+      "g": "e61f151fcef9e99dff5c705f8d5de18891f8d1d92d69fef5ff608d2c29a7c133",
+      "pv": "e61f151fcef9e99dff5c705f8d5de18891f8d1d92d69fef5ff608d2c29a7c133",
+      "pp": "e61f151fcef9e99dff5c705f8d5de18891f8d1d92d69fef5ff608d2c29a7c133"
+    },
     "_pool_bech32": {
       "m": "pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc",
       "g": "pool1xc9eywck4e20tydz4yvh5vfe0ep8whawvwz8wqkc9k046a2ypp4",
