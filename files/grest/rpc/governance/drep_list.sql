@@ -12,7 +12,7 @@ AS $$
     ENCODE(dh.raw, 'hex')::text AS hex,
     dh.has_script AS has_script,
     (CASE
-      WHEN dr.deposit >= 0 THEN TRUE
+      WHEN coalesce(dr.deposit, 0) >= 0 THEN TRUE
       ELSE FALSE
     END) AS registered
   FROM public.drep_hash AS dh
