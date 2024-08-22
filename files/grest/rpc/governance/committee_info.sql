@@ -9,14 +9,25 @@ RETURNS TABLE (
 LANGUAGE plpgsql
 AS $$
 DECLARE
-  gap_id  bigint;
+  gap_id            bigint;
+  gap_enacted_tx_id bigint;
 BEGIN
 
-  SELECT INTO gap_id id
-  FROM public.gov_action_proposal
-  WHERE type = 'NewCommittee'
-    AND enacted_epoch IS NOT NULL
-  ORDER BY enacted_epoch DESC
+  SELECT
+    gap.id,
+    CASE
+      WHEN gap.id IS NULL THEN NULL
+      ELSE (
+        SELECT eic.i_last_tx_id
+        FROM grest.epoch_info_cache AS eic
+        WHERE eic.epoch_no = (gap.enacted_epoch - 1)
+      )
+    END
+    INTO gap_id, gap_enacted_tx_id
+  FROM public.gov_action_proposal AS gap
+  WHERE gap.type = 'NewCommittee'
+    AND gap.enacted_epoch IS NOT NULL
+  ORDER BY gap.enacted_epoch DESC
   LIMIT 1;
 
   RETURN QUERY (
@@ -67,6 +78,10 @@ BEGIN
           WHERE cdr.cold_key_id = cr.cold_key_id
             AND cdr.tx_id > cr.tx_id
         )
+        AND CASE
+          WHEN gap_enacted_tx_id IS NULL THEN TRUE
+          ELSE cr.tx_id > gap_enacted_tx_id
+        END
       ORDER BY cr.id DESC
       LIMIT 1
     ) AS hot_key ON TRUE

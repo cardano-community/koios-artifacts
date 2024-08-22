@@ -2667,7 +2667,7 @@ schemas:
                 type:
                   - string
                   - 'null'
-                description: Committee member key hash from last hot key authorization certificate in hex format
+                description: Committee member key hash from last valid hot key authorization certificate in hex format
                 example: 65d497b875c56ab213586a4006d4f6658970573ea8e2398893857472
               cc_hot_has_script:
                 type:
