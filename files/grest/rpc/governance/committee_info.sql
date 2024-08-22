@@ -53,6 +53,18 @@ BEGIN
       c.quorum_denominator,
       JSONB_AGG(
         JSONB_BUILD_OBJECT(
+          'status',
+            CASE
+              WHEN EXISTS (
+                SELECT TRUE
+                FROM committee_de_registration AS cdr
+                WHERE cdr.cold_key_id = cr.cold_key_id
+                  AND cdr.tx_id > cr.tx_id
+              ) THEN 'resigned'
+              WHEN hot_key.raw IS NULL THEN 'not_authorized'
+            ELSE
+              'authorized'
+            END,
           'cc_cold_hex', ENCODE(ch_cold.raw, 'hex'),
           'cc_cold_has_script', ch_cold.has_script,
           'cc_hot_hex', CASE WHEN hot_key.raw IS NULL THEN NULL ELSE ENCODE(hot_key.raw, 'hex') END,
@@ -78,10 +90,11 @@ BEGIN
           WHERE cdr.cold_key_id = cr.cold_key_id
             AND cdr.tx_id > cr.tx_id
         )
-        AND CASE
-          WHEN gap_enacted_tx_id IS NULL THEN TRUE
-          ELSE cr.tx_id > gap_enacted_tx_id
-        END
+        -- TODO: fix once we know how to properly check for valid hot key auth cert
+        --AND CASE
+        --  WHEN gap_enacted_tx_id IS NULL THEN TRUE
+        --  ELSE cr.tx_id > gap_enacted_tx_id
+        --END
       ORDER BY cr.id DESC
       LIMIT 1
     ) AS hot_key ON TRUE

@@ -5310,7 +5310,7 @@ components:
       items:
         $ref: "#/components/schemas/drep_votes/items"
     proposal_list:
-      description: List of all votes cast on specified governance action
+      description: List of all governance action proposals
       type: array
       items:
         properties:
@@ -5399,6 +5399,11 @@ components:
               - object
               - 'null'
             example: {"key_deposit": 1000000}
+    voter_proposal_list:
+      description: List of all governance action proposals where specified credential(DRep, SPO or Committee member) has cast a vote
+      type: array
+      items:
+        $ref: "#/components/schemas/proposal_list/items"
     proposal_votes:
       type: array
       description: List of all votes cast on specified governance action
@@ -5445,6 +5450,11 @@ components:
           items:
             type: object
             properties:
+              status:
+                type: string
+                description: Member authentication status
+                enum: [ "authorized", "not_authorized", "resigned" ]
+                example: authorized
               cc_cold_hex:
                 type: string
                 description: Committee member cold key hash in hex format
