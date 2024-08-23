@@ -341,12 +341,34 @@ paths:
       summary: UTxO Info
       description: Get UTxO set for requested UTxO references
       operationId: utxo_info
-  /tx_info: #RPC
+  /tx_cbor: #RPC
     post:
       tags:
         - Transactions
       requestBody:
         $ref: "#/components/requestBodies/tx_ids"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tx_cbor"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Raw Transaction (CBOR)
+      description: Get raw transaction(s) in CBOR format
+      operationId: tx_cbor
+  /tx_info: #RPC
+    post:
+      tags:
+        - Transactions
+      requestBody:
+        $ref: "#/components/requestBodies/tx_info"
       responses:
         "200":
           description: Success!!
@@ -1133,6 +1155,268 @@ paths:
       summary: Asset Transactions
       description: Get the list of current or all asset transaction hashes (newest first)
       operationId: asset_txs
+
+  /drep_epoch_summary: #RPC
+    get:
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_epoch_no"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/drep_epoch_summary"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: DReps Epoch Summary
+      description: Summary of voting power and DRep count for each epoch
+      operationId: drep_epoch_summary
+  /drep_list: #RPC
+    get:
+      tags:
+        - Governance
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/drep_list"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: DReps List
+      description: List of all active delegated representatives (DReps)
+      operationId: drep_list
+  /drep_info: #RPC
+    post:
+      tags:
+        - Governance
+      requestBody:
+        $ref: "#/components/requestBodies/drep_id_bulk"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/drep_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: DReps Info
+      description: Get detailed information about requested delegated representatives (DReps)
+      operationId: drep_info
+  /drep_metadata: #RPC
+    post:
+      tags:
+        - Governance
+      requestBody:
+        $ref: "#/components/requestBodies/drep_id_bulk"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/drep_metadata"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: DReps Metadata
+      description: List metadata for requested delegated representatives (DReps)
+      operationId: drep_metadata
+  /drep_updates: #RPC
+    get:
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_drep_id_optional"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/drep_updates"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: DReps Updates
+      description: List of updates for requested (or all) delegated representatives (DReps)
+      operationId: drep_updates
+  /drep_votes: #RPC
+    get:
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_drep_id"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/drep_votes"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: DReps Votes
+      description: List of all votes casted by requested delegated representative (DRep)
+      operationId: drep_votes
+  /drep_delegators: #RPC
+    get:
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_drep_id"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/drep_delegators"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: DReps Delegators
+      description: List of all delegators to requested delegated representative (DRep).
+      operationId: drep_delegators
+  /committee_info: #RPC
+    get:
+      tags:
+        - Governance
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/committee_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Committee Information
+      description: Information about active committee and its members
+      operationId: committee_info
+  /committee_votes: #RPC
+    get:
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_committee_hash"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/committee_votes"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Committee Votes
+      description: List of all votes casted by given committee member or collective
+      operationId: committee_votes
+  /proposal_list: #RPC
+    get:
+      tags:
+        - Governance
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/proposal_list"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Proposals List
+      description: List of all governance proposals
+      operationId: proposal_list
+  /voter_proposal_list: #RPC
+    get:
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_credential"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/proposal_list"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Voter's Proposal List
+      description: List of all governance proposals for specified DRep, SPO or Committee credential
+      operationId: proposal_votes
+
+  /proposal_votes: #RPC
+    get:
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_proposal_tx_hash"
+        - $ref: "#/components/parameters/_proposal_index"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/committee_votes"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Proposal Votes
+      description: List of all votes cast on specified governance action
+      operationId: proposal_votes
+
   /pool_list: #RPC
     get:
       tags:
@@ -1378,6 +1662,28 @@ paths:
       summary: Pool Relays
       description: A list of registered relays for all pools
       operationId: pool_relays
+  /pool_votes: #RPC
+    get:
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_pool_bech32"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_votes"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Pool Votes
+      description: List of all votes casted by a pool
+      operationId: pool_votes
   /pool_metadata: #RPC
     post:
       tags:
@@ -1530,6 +1836,7 @@ paths:
       summary: Datum Information
       description: List of datum information for given datum hashes
       operationId: datum_info
+
   /ogmios: #ogmios-api
     post:
       tags:
@@ -1595,6 +1902,9 @@ tags:
   - name: Asset
     description: Query Asset related informations
     x-tag-expanded: false
+  - name: Governance
+    description: Query information about governance for network
+    x-tag-expanded: false
   - name: Pool
     description: Query information about specific pools
     x-tag-expanded: false
@@ -1631,5 +1941,5 @@ tags:
         - [evaluateTransaction](https://ogmios.dev/mini-protocols/local-tx-submission/#evaluating-transactions)
     x-tag-expanded: true
 security:
-  - []
+  - {}
   - bearerAuth: []

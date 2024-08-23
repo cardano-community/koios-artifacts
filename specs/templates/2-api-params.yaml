@@ -29,6 +29,16 @@ parameters:
       in: query
       required: true
       allowEmptyValue: false
+    _tx_hash:
+      deprecated: false
+      name: _tx_hash
+      description: Transaction Hash in hexadecimal format (hex)
+      example: "##_tx_hash_param##"
+      schema:
+        type: string
+      in: query
+      required: true
+      allowEmptyValue: false
     _asset_policy:
       deprecated: false
       name: _asset_policy
@@ -66,6 +76,46 @@ parameters:
       schema:
         type: string
       example: "##_asset_name_nft_param##"
+      in: query
+      required: false
+      allowEmptyValue: true
+    _credential:
+      deprecated: false
+      name: _credential
+      description: Voter (Drep, SPO, Committee Member) in Hex format
+      schema:
+        type: string
+      example: "##_drep_id_param##"
+      in: query
+      required: true
+      allowEmptyValue: false
+    _drep_id:
+      deprecated: false
+      name: _drep_id
+      description: DRep ID in bech32 format
+      schema:
+        type: string
+      example: "##_drep_id_param##"
+      in: query
+      required: true
+      allowEmptyValue: false
+    _drep_id_optional:
+      deprecated: false
+      name: _drep_id
+      description: DRep ID in bech32 format
+      schema:
+        type: string
+      example: "##_drep_id_param##"
+      in: query
+      required: false
+      allowEmptyValue: true
+    _committee_hash:
+      deprecated: false
+      name: _committee_hash
+      description: Committee hash in hexadecimal format (hex)
+      schema:
+        type: string
+      example: "##_committee_hash_param##"
       in: query
       required: false
       allowEmptyValue: true
@@ -136,6 +186,26 @@ parameters:
       schema:
         type: string
       example: "##_script_hash_param##"
+      in: query
+      required: true
+      allowEmptyValue: false
+    _proposal_tx_hash:
+      deprecated: false
+      name: _proposal_tx_hash
+      description: Transaction Hash of government proposal in hexadecimal format (hex)
+      example: "##_proposal_tx_hash_param##"
+      schema:
+        type: string
+      in: query
+      required: true
+      allowEmptyValue: false
+    _proposal_index:
+      deprecated: false
+      name: _proposal_index
+      description: Index of governance proposal in transaction
+      schema:
+        type: number
+        example: 0
       in: query
       required: true
       allowEmptyValue: false
