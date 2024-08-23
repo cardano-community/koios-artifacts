@@ -58,8 +58,8 @@ BEGIN
               WHEN EXISTS (
                 SELECT TRUE
                 FROM committee_de_registration AS cdr
-                WHERE cdr.cold_key_id = cr.cold_key_id
-                  AND cdr.tx_id > cr.tx_id
+                WHERE cdr.cold_key_id = ch_cold.id
+                  AND cdr.tx_id > (SELECT MAX(tx_id) FROM public.committee_registration WHERE cold_key_id = ch_cold.id)
               ) THEN 'resigned'
               WHEN hot_key.raw IS NULL THEN 'not_authorized'
             ELSE
