@@ -14,6 +14,7 @@ CREATE TABLE grest.pool_info_cache (
   margin double precision NOT NULL,
   fixed_cost lovelace NOT NULL,
   pledge lovelace NOT NULL,
+  deposit lovelace,
   reward_addr character varying,
   owners character varying [],
   relays jsonb [],
@@ -35,6 +36,7 @@ CREATE OR REPLACE FUNCTION grest.pool_info_insert(
   _margin double precision,
   _fixed_cost lovelace,
   _pledge lovelace,
+  _deposit lovelace,
   _reward_addr_id bigint,
   _meta_id bigint
 )
@@ -63,6 +65,8 @@ BEGIN
     _pool_status := 'retired';
   END IF;
 
+  DELETE FROM grest.pool_info_cache WHERE pool_hash_id = _hash_id;
+
   INSERT INTO grest.pool_info_cache (
     tx_id,
     update_id,
@@ -76,6 +80,7 @@ BEGIN
     margin,
     fixed_cost,
     pledge,
+    deposit,
     reward_addr,
     owners,
     relays,
@@ -98,6 +103,7 @@ BEGIN
       _margin,
       _fixed_cost,
       _pledge,
+      _deposit,
       sa.view,
       ARRAY(
         SELECT sa.view
@@ -184,8 +190,8 @@ BEGIN
 
   UPDATE grest.pool_info_cache
   SET
-      pool_status = _pool_status,
-      retiring_epoch = _retiring_epoch
+    pool_status = _pool_status,
+    retiring_epoch = _retiring_epoch
   WHERE pool_hash_id = _pool_hash_id
     AND tx_id = _latest_pool_update_tx_id;
 
@@ -201,9 +207,20 @@ LANGUAGE plpgsql
 AS $$
 DECLARE
   _latest_pool_update_id integer;
+  _calc_meta_id bigint;
 BEGIN
   IF (tg_table_name = 'pool_update') THEN
     IF (tg_op = 'INSERT') THEN
+
+      -- for url/hash of most recent update, find last off_chain data record
+      SELECT coalesce(max(ocpd.pmr_id), new.meta_id) INTO _calc_meta_id
+      FROM off_chain_pool_data ocpd 
+      INNER JOIN pool_metadata_ref pmr ON ocpd.pmr_id = pmr.id 
+      INNER JOIN pool_metadata_ref pmr2 ON pmr2.id = new.meta_id AND
+        pmr2.pool_id = pmr.pool_id AND
+        pmr2.url = pmr.url AND
+        pmr2.hash = pmr.hash;
+
       PERFORM grest.pool_info_insert(
         new.id,
         new.registered_tx_id,
@@ -213,8 +230,9 @@ BEGIN
         new.margin,
         new.fixed_cost,
         new.pledge,
+        new.deposit,
         new.reward_addr_id,
-        new.meta_id
+        _calc_meta_id
       );
     ELSIF (tg_op = 'DELETE') THEN
       DELETE FROM grest.pool_info_cache
@@ -297,6 +315,7 @@ FOR EACH ROW EXECUTE FUNCTION grest.pool_info_retire_status();
 DO $$
 DECLARE
   _latest_pool_info_tx_id bigint;
+  _calc_meta_id bigint;
   rec RECORD;
 BEGIN
   SELECT COALESCE(MAX(tx_id), 0) INTO _latest_pool_info_tx_id FROM grest.pool_info_cache;
@@ -304,6 +323,16 @@ BEGIN
   FOR rec IN (
     SELECT * FROM public.pool_update AS pu WHERE pu.registered_tx_id > _latest_pool_info_tx_id
   ) LOOP
+
+    -- for url/hash of most recent update, find last off_chain data record
+    SELECT coalesce(max(ocpd.pmr_id), rec.meta_id) INTO _calc_meta_id
+    FROM off_chain_pool_data ocpd 
+    INNER JOIN pool_metadata_ref pmr ON ocpd.pmr_id = pmr.id 
+    INNER JOIN pool_metadata_ref pmr2 ON pmr2.id = rec.meta_id AND
+      pmr2.pool_id = pmr.pool_id AND
+      pmr2.url = pmr.url AND
+      pmr2.hash = pmr.hash;
+
     PERFORM grest.pool_info_insert(
       rec.id,
       rec.registered_tx_id,
@@ -313,8 +342,9 @@ BEGIN
       rec.margin,
       rec.fixed_cost,
       rec.pledge,
+      rec.deposit,
       rec.reward_addr_id,
-      rec.meta_id
+      _calc_meta_id
     );
   END LOOP;
 
