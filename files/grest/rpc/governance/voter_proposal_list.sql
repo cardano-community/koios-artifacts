@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION grest.voter_proposal_list(credential text)
+CREATE OR REPLACE FUNCTION grest.voter_proposal_list(_credential text)
 RETURNS TABLE (
   block_time integer,
   proposal_tx_hash text,
@@ -31,11 +31,11 @@ DECLARE
   _gap_id_list          bigint[];
 BEGIN
 
-  SELECT INTO _drep_id id FROM public.drep_hash WHERE raw = DECODE(credential, 'hex');
+  SELECT INTO _drep_id id FROM public.drep_hash WHERE raw = DECODE(_credential, 'hex');
   IF _drep_id IS NULL THEN
-    SELECT INTO _spo_id id FROM public.pool_hash WHERE hash_raw = DECODE(credential, 'hex');
+    SELECT INTO _spo_id id FROM public.pool_hash WHERE hash_raw = DECODE(_credential, 'hex');
   ELSIF _spo_id IS NULL THEN
-    SELECT INTO _committee_member_id id FROM public.committee_hash WHERE raw = DECODE(credential, 'hex');
+    SELECT INTO _committee_member_id id FROM public.committee_hash WHERE raw = DECODE(_credential, 'hex');
   END IF;
 
   SELECT INTO _gap_id_list ARRAY_AGG(gov_action_proposal_id)

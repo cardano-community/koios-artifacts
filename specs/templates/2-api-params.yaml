@@ -79,6 +79,16 @@ parameters:
       in: query
       required: false
       allowEmptyValue: true
+    _credential:
+      deprecated: false
+      name: _credential
+      description: Voter (Drep, SPO, Committee Member) in Hex format
+      schema:
+        type: string
+      example: "##_drep_id_param##"
+      in: query
+      required: true
+      allowEmptyValue: false
     _drep_id:
       deprecated: false
       name: _drep_id

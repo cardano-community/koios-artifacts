@@ -1515,6 +1515,29 @@ paths:
       summary: Proposals List
       description: List of all governance proposals
       operationId: proposal_list
+  /voter_proposal_list: #RPC
+    get:
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_credential"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/proposal_list"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Voter's Proposal List
+      description: List of all governance proposals for specified DRep, SPO or Committee credential
+      operationId: proposal_votes
+
   /proposal_votes: #RPC
     get:
       tags:
@@ -2066,6 +2089,16 @@ components:
       in: query
       required: false
       allowEmptyValue: true
+    _credential:
+      deprecated: false
+      name: _credential
+      description: Voter (Drep, SPO, Committee Member) in Hex format
+      schema:
+        type: string
+      example: "drep1kxtwaqtayj6vklc57u93xayjvkwgvefh8drscqp5a5y6jz7m6rd"
+      in: query
+      required: true
+      allowEmptyValue: false
     _drep_id:
       deprecated: false
       name: _drep_id
