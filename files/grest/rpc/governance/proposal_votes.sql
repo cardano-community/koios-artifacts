@@ -2,6 +2,7 @@ CREATE OR REPLACE FUNCTION grest.proposal_votes(_proposal_tx_hash text, _proposa
 RETURNS TABLE (
   block_time integer,
   voter_role text,
+  has_script boolean,
   voter text,
   voter_hex text,
   vote text,
@@ -16,6 +17,7 @@ AS $$
         distinct on (COALESCE(ENCODE(ch.raw, 'hex'), dh.view, ph.view))
         EXTRACT(EPOCH FROM vote_block.time)::integer AS block_time,
         vp.voter_role,
+        COALESCE(dh.has_script, COALESCE(ch.has_script), false) AS has_script,
         COALESCE(ENCODE(ch.raw, 'hex'), dh.view, ph.view) as voter,
         COALESCE(ENCODE(ch.raw, 'hex'), ENCODE(dh.raw, 'hex'), ENCODE(ph.hash_raw, 'hex')) as voter_hex,
         vp.vote,

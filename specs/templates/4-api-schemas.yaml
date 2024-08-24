@@ -2328,7 +2328,7 @@ schemas:
             example: f948a9f7a863d8062565809aba3925aa41334e976c11c837fe1a74c0
           has_script:
             type: boolean
-            description: Flag which shows if this DRep credentials are a script hash
+            description: Flag which shows if this credential is a script hash
             example: false
           registered:
             type: boolean
@@ -2626,6 +2626,8 @@ schemas:
             description: The role of the voter
             enum: ["ConstitutionalCommittee", "DRep", "SPO"]
             example: DRep
+          has_script:
+            $ref: "#/components/schemas/drep_info/items/properties/has_script"
           voter:
             type: string
             description: Voter's DRep ID (bech32 format), pool ID (bech32 format) or committee hash (hex format)
@@ -2671,7 +2673,7 @@ schemas:
                 example: 6095e643ea6f1cccb6e463ec34349026b3a48621aac5d512655ab1bf
               cc_cold_has_script:
                 type: boolean
-                description: Flag which shows if this committee member cold credential is a script hash
+                description: Flag which shows if this credential is a script hash
                 example: false
               cc_hot_hex:
                 type:
@@ -2683,7 +2685,7 @@ schemas:
                 type:
                   - boolean
                   - 'null'
-                description: Flag which shows if this committee member hot credential is a script hash
+                description: Flag which shows if this credential is a script hash
                 example: false
               expiration_epoch:
                 type: number
