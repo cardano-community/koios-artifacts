@@ -1,8 +1,6 @@
 CREATE OR REPLACE FUNCTION grest.drep_info(_drep_ids text [])
 RETURNS TABLE (
-  drep_id character varying,
-  hex text,
-  has_script boolean,
+  drep_id text,
   registered boolean,
   deposit text,
   active boolean,
@@ -15,6 +13,7 @@ LANGUAGE plpgsql
 AS $$
 DECLARE
   curr_epoch    word31type;
+  drep_ids_raw  hash28type[];
   drep_list     bigint[];
   drep_activity word64type;
 BEGIN
@@ -23,12 +22,14 @@ BEGIN
 
   SELECT INTO drep_activity ep.drep_activity FROM public.epoch_param AS ep WHERE ep.epoch_no = curr_epoch;
 
+  SELECT INTO drep_ids_raw ARRAY_AGG(grest.cip129_drep_id_to_hex(n)) FROM UNNEST(_drep_ids) AS n;
+
   -- all DRep ids
   SELECT INTO drep_list ARRAY_AGG(id)
   FROM (
     SELECT id
     FROM public.drep_hash
-    WHERE view = ANY(_drep_ids)
+    WHERE raw = ANY(drep_ids_raw)
   ) AS tmp;
 
   RETURN QUERY (
@@ -95,10 +96,8 @@ BEGIN
         INNER JOIN block AS b ON tx.block_id = b.id
       )
 
-    SELECT
-      DISTINCT ON (dh.view) dh.view AS drep_id,
-      ENCODE(dh.raw, 'hex')::text AS hex,
-      dh.has_script AS has_script,
+    SELECT DISTINCT ON (dh.raw)
+      grest.cip129_hex_to_drep_id(dh.raw, dh.has_script) AS drep_id,
       (CASE WHEN starts_with(dh.view,'drep_') OR (COALESCE(dr.deposit, 0) >= 0 AND dr.drep_hash_id IS NOT NULL) THEN TRUE ELSE FALSE END) AS registered,
       (CASE WHEN (dr.deposit < 0) OR starts_with(dh.view,'drep_') THEN NULL ELSE ds.deposit END)::text AS deposit,
       (CASE WHEN starts_with(dh.view,'drep_') THEN TRUE ELSE COALESCE(dr.deposit, 0) >= 0 AND ds.active END) AS active,
@@ -113,7 +112,7 @@ BEGIN
       LEFT JOIN _drep_state AS ds ON dh.id = ds.drep
     WHERE dh.id = ANY(drep_list)
     ORDER BY
-      dh.view, dr.tx_id DESC
+      dh.raw, dr.tx_id DESC
   );
 
 END;

@@ -1,7 +1,6 @@
-CREATE OR REPLACE FUNCTION grest.committee_votes(_committee_hash text DEFAULT NULL)
+CREATE OR REPLACE FUNCTION grest.committee_votes(_cc_hot_id text DEFAULT NULL)
 RETURNS TABLE (
-  proposal_tx_hash text,
-  proposal_index integer,
+  proposal_id text,
   vote_tx_hash text,
   block_time integer,
   vote text,
@@ -11,8 +10,7 @@ RETURNS TABLE (
 LANGUAGE sql STABLE
 AS $$
   SELECT
-    ENCODE(prop_tx.hash, 'hex'),
-    gap.index,
+    grest.cip129_to_gov_action_id(prop_tx.hash, gap.index),
     ENCODE(vote_tx.hash, 'hex'),
     EXTRACT(EPOCH FROM b.time)::integer,
     vp.vote,
@@ -27,11 +25,11 @@ AS $$
     LEFT JOIN public.voting_anchor AS va ON vp.voting_anchor_id = va.id
   WHERE
     CASE
-      WHEN _committee_hash IS NULL THEN TRUE
-      ELSE ch.raw = DECODE(_committee_hash, 'hex')
+      WHEN _cc_hot_id IS NULL THEN TRUE
+      ELSE ch.raw = (SELECT grest.cip129_cc_hot_to_hex(_cc_hot_id))
     END
   ORDER BY
     vote_tx.id DESC;
 $$;
 
-COMMENT ON FUNCTION grest.committee_votes IS 'Get all committee votes cast by given committee member or collective'; -- noqa: LT01
+COMMENT ON FUNCTION grest.committee_votes IS 'Get all committee votes cast by given committee member or collective, or all if omitted'; -- noqa: LT01

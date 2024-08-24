@@ -27,7 +27,7 @@ LANGUAGE plpgsql STABLE
 AS $$
 BEGIN
   IF LENGTH(_cc_hot) = 60 THEN
-    RETURN DECODE(SUBSTRING(b32_decode(_cc_hot) from 2), 'hex');
+    RETURN DECODE(SUBSTRING(b32_decode(_cc_hot) from 3), 'hex');
   ELSE
     RETURN DECODE(b32_decode(_cc_hot), 'hex');
   END IF;
@@ -53,7 +53,7 @@ LANGUAGE plpgsql STABLE
 AS $$
 BEGIN
   IF LENGTH(_cc_cold) = 61 THEN
-    RETURN DECODE(SUBSTRING(b32_decode(_cc_cold) from 2), 'hex');
+    RETURN DECODE(SUBSTRING(b32_decode(_cc_cold) from 3), 'hex');
   ELSE
     RETURN DECODE(b32_decode(_cc_cold), 'hex');
   END IF;
@@ -79,7 +79,7 @@ LANGUAGE plpgsql STABLE
 AS $$
 BEGIN
   IF LENGTH(_drep_id) = 58 THEN
-    RETURN DECODE(SUBSTRING(b32_decode(_drep_id) from 2), 'hex');
+    RETURN DECODE(SUBSTRING(b32_decode(_drep_id) from 3), 'hex');
   ELSE
     RETURN DECODE(b32_decode(_drep_id), 'hex');
   END IF;

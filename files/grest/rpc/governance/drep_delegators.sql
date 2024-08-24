@@ -15,7 +15,7 @@ BEGIN
 
   SELECT INTO drep_idx id
   FROM public.drep_hash
-  WHERE view = _drep_id;
+  WHERE raw = (SELECT grest.cip129_drep_id_to_hex(_drep_id));
 
   IF STARTS_WITH(_drep_id,'drep_') THEN
     -- predefined DRep roles
