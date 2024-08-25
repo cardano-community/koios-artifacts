@@ -3,7 +3,7 @@ RETURNS TABLE (
   stake_address varchar,
   status text,
   delegated_pool varchar,
-  delegated_drep varchar,
+  delegated_drep text,
   total_balance text,
   utxo text,
   rewards text,
