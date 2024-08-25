@@ -13,14 +13,18 @@ DECLARE
   last_reg_tx_id  bigint;
 BEGIN
 
-  SELECT INTO drep_idx id
-  FROM public.drep_hash
-  WHERE raw = (SELECT grest.cip129_drep_id_to_hex(_drep_id));
-
   IF STARTS_WITH(_drep_id,'drep_') THEN
     -- predefined DRep roles
+    SELECT INTO drep_idx id
+    FROM public.drep_hash
+    WHERE view = _drep_id;
+
     last_reg_tx_id := 0;
   ELSE
+    SELECT INTO drep_idx id
+    FROM public.drep_hash
+    WHERE raw = DECODE((SELECT grest.cip129_drep_id_to_hex(_drep_id)), 'hex');
+
     SELECT INTO last_reg_tx_id MAX(tx_id)
     FROM public.drep_registration
     WHERE drep_hash_id = drep_idx

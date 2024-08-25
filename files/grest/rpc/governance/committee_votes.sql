@@ -26,7 +26,7 @@ AS $$
   WHERE
     CASE
       WHEN _cc_hot_id IS NULL THEN TRUE
-      ELSE ch.raw = (SELECT grest.cip129_cc_hot_to_hex(_cc_hot_id))
+      ELSE ch.raw = DECODE((SELECT grest.cip129_cc_hot_to_hex(_cc_hot_id)), 'hex')
     END
   ORDER BY
     vote_tx.id DESC;

@@ -22,7 +22,13 @@ BEGIN
 
   SELECT INTO drep_activity ep.drep_activity FROM public.epoch_param AS ep WHERE ep.epoch_no = curr_epoch;
 
-  SELECT INTO drep_ids_raw ARRAY_AGG(grest.cip129_drep_id_to_hex(n)) FROM UNNEST(_drep_ids) AS n;
+  SELECT INTO drep_ids_raw ARRAY_REMOVE(ARRAY_AGG(
+    CASE
+      WHEN STARTS_WITH(n,'drep_') THEN NULL
+    ELSE
+      DECODE(grest.cip129_drep_id_to_hex(n), 'hex')
+    END
+  ), NULL) FROM UNNEST(_drep_ids) AS n;
 
   -- all DRep ids
   SELECT INTO drep_list ARRAY_AGG(id)
@@ -31,6 +37,18 @@ BEGIN
     FROM public.drep_hash
     WHERE raw = ANY(drep_ids_raw)
   ) AS tmp;
+
+  IF 'drep_always_abstain' = ANY(_drep_ids) THEN
+    SELECT INTO drep_list ARRAY_APPEND(drep_list, id)
+    FROM public.drep_hash
+    WHERE view = 'drep_always_abstain';
+  END IF;
+
+  IF 'drep_always_no_confidence' = ANY(_drep_ids) THEN
+    SELECT INTO drep_list ARRAY_APPEND(drep_list, id)
+    FROM public.drep_hash
+    WHERE view = 'drep_always_no_confidence';
+  END IF;
 
   RETURN QUERY (
     WITH
@@ -96,8 +114,12 @@ BEGIN
         INNER JOIN block AS b ON tx.block_id = b.id
       )
 
-    SELECT DISTINCT ON (dh.raw)
-      grest.cip129_hex_to_drep_id(dh.raw, dh.has_script) AS drep_id,
+    SELECT DISTINCT ON (dh.view)
+      CASE
+        WHEN dh.raw IS NULL THEN dh.view
+      ELSE
+        grest.cip129_hex_to_drep_id(dh.raw, dh.has_script)
+      END AS drep_id,
       (CASE WHEN starts_with(dh.view,'drep_') OR (COALESCE(dr.deposit, 0) >= 0 AND dr.drep_hash_id IS NOT NULL) THEN TRUE ELSE FALSE END) AS registered,
       (CASE WHEN (dr.deposit < 0) OR starts_with(dh.view,'drep_') THEN NULL ELSE ds.deposit END)::text AS deposit,
       (CASE WHEN starts_with(dh.view,'drep_') THEN TRUE ELSE COALESCE(dr.deposit, 0) >= 0 AND ds.active END) AS active,
@@ -112,10 +134,10 @@ BEGIN
       LEFT JOIN _drep_state AS ds ON dh.id = ds.drep
     WHERE dh.id = ANY(drep_list)
     ORDER BY
-      dh.raw, dr.tx_id DESC
+      dh.view, dr.tx_id DESC
   );
 
 END;
 $$;
 
-COMMENT ON FUNCTION grest.drep_info IS 'Get bulk DRep info from bech32 formatted DRep IDs, incl predefined roles ''drep_always_abstain'' and ''drep_always_no_confidence'''; -- noqa: LT01
+COMMENT ON FUNCTION grest.drep_info IS 'Get bulk DRep info from bech32 formatted DRep IDs (CIP-5 | CIP-129), incl predefined roles ''drep_always_abstain'' and ''drep_always_no_confidence'''; -- noqa: LT01
