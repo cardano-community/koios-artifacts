@@ -1,6 +1,8 @@
 CREATE OR REPLACE FUNCTION grest.drep_info(_drep_ids text [])
 RETURNS TABLE (
   drep_id text,
+  hex text,
+  has_script boolean,
   registered boolean,
   deposit text,
   active boolean,
@@ -120,6 +122,8 @@ BEGIN
       ELSE
         grest.cip129_hex_to_drep_id(dh.raw, dh.has_script)
       END AS drep_id,
+      ENCODE(dh.raw, 'hex')::text AS hex,
+      dh.has_script AS has_script,
       (CASE WHEN starts_with(dh.view,'drep_') OR (COALESCE(dr.deposit, 0) >= 0 AND dr.drep_hash_id IS NOT NULL) THEN TRUE ELSE FALSE END) AS registered,
       (CASE WHEN (dr.deposit < 0) OR starts_with(dh.view,'drep_') THEN NULL ELSE ds.deposit END)::text AS deposit,
       (CASE WHEN starts_with(dh.view,'drep_') THEN TRUE ELSE COALESCE(dr.deposit, 0) >= 0 AND ds.active END) AS active,

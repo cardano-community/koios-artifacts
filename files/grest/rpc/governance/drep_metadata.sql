@@ -1,6 +1,8 @@
 CREATE OR REPLACE FUNCTION grest.drep_metadata(_drep_ids text [])
 RETURNS TABLE (
   drep_id text,
+  hex text,
+  has_script boolean,
   url character varying,
   hash text,
   json jsonb,
@@ -21,6 +23,8 @@ BEGIN
   RETURN QUERY (
     SELECT DISTINCT ON (dh.raw)
       grest.cip129_hex_to_drep_id(dh.raw, dh.has_script) AS drep_id,
+      ENCODE(dh.raw, 'hex')::text AS hex,
+      dh.has_script AS has_script,
       va.url,
       ENCODE(va.data_hash, 'hex') AS hash,
       ocvd.json,

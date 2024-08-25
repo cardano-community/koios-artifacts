@@ -1,6 +1,8 @@
 CREATE OR REPLACE FUNCTION grest.drep_votes(_drep_id text)
 RETURNS TABLE (
   proposal_id text,
+  proposal_tx_hash text,
+  proposal_index integer,
   vote_tx_hash text,
   block_time integer,
   vote text,
@@ -11,6 +13,8 @@ LANGUAGE sql STABLE
 AS $$
   SELECT
     grest.cip129_to_gov_action_id(prop_tx.hash, gap.index),
+    ENCODE(prop_tx.hash, 'hex'),
+    gap.index,
     ENCODE(vote_tx.hash, 'hex'),
     EXTRACT(EPOCH FROM b.time)::integer,
     vp.vote,

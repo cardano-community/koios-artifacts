@@ -1,12 +1,16 @@
 CREATE OR REPLACE FUNCTION grest.drep_list()
 RETURNS TABLE (
   drep_id text,
+  hex text,
+  has_script boolean,
   registered boolean
 )
 LANGUAGE sql STABLE
 AS $$
   SELECT DISTINCT ON (dh.raw)
     grest.cip129_hex_to_drep_id(dh.raw, dh.has_script) AS drep_id,
+    ENCODE(dh.raw, 'hex')::text AS hex,
+    dh.has_script AS has_script,
     (CASE
       WHEN coalesce(dr.deposit, 0) >= 0 THEN TRUE
       ELSE FALSE

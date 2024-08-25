@@ -1,6 +1,8 @@
 CREATE OR REPLACE FUNCTION grest.drep_updates(_drep_id text DEFAULT NULL)
 RETURNS TABLE (
   drep_id text,
+  hex text,
+  has_script boolean,
   update_tx_hash text,
   cert_index integer,
   block_time integer,
@@ -14,6 +16,8 @@ LANGUAGE sql STABLE
 AS $$
   SELECT
     grest.cip129_hex_to_drep_id(dh.raw, dh.has_script) AS drep_id,
+    ENCODE(dh.raw, 'hex')::text AS hex,
+    dh.has_script AS has_script,
     ENCODE(tx.hash, 'hex')::text AS update_tx_hash,
     dr.cert_index,
     EXTRACT(EPOCH FROM b.time)::integer AS block_time,
