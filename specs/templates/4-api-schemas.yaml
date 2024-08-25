@@ -1348,8 +1348,8 @@ schemas:
             type:
             - 'null'
             - string
-            description: Account's current delegation status to DRep ID in Bech32 format
-            example: drep1gj49xmfcg6ev89ur2yad9c5p7z0pgfxggyakz9pua06vqh5vnp0
+            description: Account's current delegation status to DRep ID in CIP-129 Bech32 format
+            example: drep1yfhyq6tztjksqqpd5lglc3zr2tn8vylgjh9xzz7n2p4l4lgk3qam3
           delegated_pool:
             anyOf:
             - type: 'null'
@@ -2320,12 +2320,12 @@ schemas:
         properties:
           drep_id:
             type: string
-            description: DRep ID in bech32 format
-            example: drep1l9y2naagv0vqvft9szdt5wf94fqnxn5hdsgusdl7rf6vq4djqck
+            description: DRep ID in CIP-129 bech32 format
+            example: drep1yfhyq6tztjksqqpd5lglc3zr2tn8vylgjh9xzz7n2p4l4lgk3qam3
           hex:
             type: string
             description: DRep ID in hex format
-            example: f948a9f7a863d8062565809aba3925aa41334e976c11c837fe1a74c0
+            example: 6e4069625cad00002da7d1fc444352e67613e895ca610bd3506bfafd
           has_script:
             type: boolean
             description: Flag which shows if this credential is a script hash
@@ -2420,6 +2420,8 @@ schemas:
             $ref: "#/components/schemas/drep_info/items/properties/drep_id"
           hex:
             $ref: "#/components/schemas/drep_info/items/properties/hex"
+          has_script:
+            $ref: "#/components/schemas/drep_info/items/properties/has_script"
           url:
             $ref: "#/components/schemas/drep_info/items/properties/url"
           hash:
@@ -2466,6 +2468,8 @@ schemas:
             $ref: "#/components/schemas/drep_info/items/properties/drep_id"
           hex:
             $ref: "#/components/schemas/drep_info/items/properties/hex"
+          has_script:
+            $ref: "#/components/schemas/drep_info/items/properties/has_script"
           update_tx_hash:
             $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
           cert_index:
@@ -2492,6 +2496,8 @@ schemas:
       type: array
       items:
         properties:
+          proposal_id:
+            $ref: "#/components/schemas/proposal_list/items/properties/proposal_id"
           proposal_tx_hash:
             $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
           proposal_index:
@@ -2526,6 +2532,10 @@ schemas:
         properties:
           block_time:
             $ref: "#/components/schemas/blocks/items/properties/block_time"
+          proposal_id:
+            type: string
+            description: Proposal Action ID in accordance with CIP-129 format
+            example: 'gov_action17m93skslaxyd45gpr6ernkdzs852h564wsterr8l6lheu7hu7kvsqecyqdh'
           proposal_tx_hash:
             $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
           proposal_index:
@@ -2626,16 +2636,16 @@ schemas:
             description: The role of the voter
             enum: ["ConstitutionalCommittee", "DRep", "SPO"]
             example: DRep
-          has_script:
-            $ref: "#/components/schemas/drep_info/items/properties/has_script"
-          voter:
+          voter_id:
             type: string
-            description: Voter's DRep ID (bech32 format), pool ID (bech32 format) or committee hash (hex format)
-            example: drep1l9y2naagv0vqvft9szdt5wf94fqnxn5hdsgusdl7rf6vq4djqck
+            description: Voter's DRep ID (CIP-129 bech32 format), pool ID (bech32 format) or committee hot ID (CIP-129 bech32 format)
+            example: drep1yfhyq6tztjksqqpd5lglc3zr2tn8vylgjh9xzz7n2p4l4lgk3qam3
           voter_hex:
             type: string
             description: Voter's DRep ID , pool ID or committee hash in hex format
-            example: drep1l9y2naagv0vqvft9szdt5wf94fqnxn5hdsgusdl7rf6vq4djqck
+            example: 6e4069625cad00002da7d1fc444352e67613e895ca610bd3506bfafd
+          voter_has_script:
+            $ref: "#/components/schemas/drep_info/items/properties/has_script"
           vote:
             $ref: "#/components/schemas/drep_votes/items/properties/vote"
           meta_url:
@@ -2646,6 +2656,8 @@ schemas:
       description: Current governance committee
       type: object
       properties:
+        proposal_id:
+          $ref: "#/components/schemas/proposal_list/items/properties/proposal_id"
         proposal_tx_hash:
           $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
         proposal_index:

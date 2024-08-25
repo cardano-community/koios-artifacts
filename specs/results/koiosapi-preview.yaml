@@ -1478,7 +1478,7 @@ paths:
       tags:
         - Governance
       parameters:
-        - $ref: "#/components/parameters/_committee_hash"
+        - $ref: "#/components/parameters/_cc_hot_id"
       responses:
         "200":
           description: Success!!
@@ -1520,7 +1520,7 @@ paths:
       tags:
         - Governance
       parameters:
-        - $ref: "#/components/parameters/_credential"
+        - $ref: "#/components/parameters/_voter_id"
       responses:
         "200":
           description: Success!!
@@ -1543,8 +1543,7 @@ paths:
       tags:
         - Governance
       parameters:
-        - $ref: "#/components/parameters/_proposal_tx_hash"
-        - $ref: "#/components/parameters/_proposal_index"
+        - $ref: "#/components/parameters/_proposal_id"
       responses:
         "200":
           description: Success!!
@@ -2089,10 +2088,10 @@ components:
       in: query
       required: false
       allowEmptyValue: true
-    _credential:
+    _voter_id:
       deprecated: false
-      name: _credential
-      description: Voter (Drep, SPO, Committee Member) in Hex format
+      name: _voter_id
+      description: Voter ID (Drep, SPO, Committee Member) in Bech32 format (CIP-5 | CIP-129)
       schema:
         type: string
       example: "drep13a87lnegq9a90dq4z7n864h0fsxuqsvp5ywn29ud65l5cwxlhts"
@@ -2119,13 +2118,13 @@ components:
       in: query
       required: false
       allowEmptyValue: true
-    _committee_hash:
+    _cc_hot_id:
       deprecated: false
-      name: _committee_hash
-      description: Committee hash in hexadecimal format (hex)
+      name: _cc_hot_id
+      description: Committee member hot key ID in Bech32 format (CIP-5 | CIP-129)
       schema:
         type: string
-      example: "7ceede7d6a89e006408e6b7c6acb3dd094b3f6817e43b4a36d01535b"
+      example: "cc_hot1qgqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqvcdjk7"
       in: query
       required: false
       allowEmptyValue: true
@@ -2199,23 +2198,13 @@ components:
       in: query
       required: true
       allowEmptyValue: false
-    _proposal_tx_hash:
+    _proposal_id:
       deprecated: false
-      name: _proposal_tx_hash
-      description: Transaction Hash of government proposal in hexadecimal format (hex)
-      example: "e61f151fcef9e99dff5c705f8d5de18891f8d1d92d69fef5ff608d2c29a7c133"
+      name: _proposal_id
+      description: Government proposal ID in CIP-129 Bech32 format
+      example: "gov_action17m93skslaxyd45gpr6ernkdzs852h564wsterr8l6lheu7hu7kvsqecyqdh"
       schema:
         type: string
-      in: query
-      required: true
-      allowEmptyValue: false
-    _proposal_index:
-      deprecated: false
-      name: _proposal_index
-      description: Index of governance proposal in transaction
-      schema:
-        type: number
-        example: 0
       in: query
       required: true
       allowEmptyValue: false
@@ -4171,8 +4160,8 @@ components:
             type:
             - 'null'
             - string
-            description: Account's current delegation status to DRep ID in Bech32 format
-            example: drep1gj49xmfcg6ev89ur2yad9c5p7z0pgfxggyakz9pua06vqh5vnp0
+            description: Account's current delegation status to DRep ID in CIP-129 Bech32 format
+            example: drep1yfhyq6tztjksqqpd5lglc3zr2tn8vylgjh9xzz7n2p4l4lgk3qam3
           delegated_pool:
             anyOf:
             - type: 'null'
@@ -5143,12 +5132,12 @@ components:
         properties:
           drep_id:
             type: string
-            description: DRep ID in bech32 format
-            example: drep1l9y2naagv0vqvft9szdt5wf94fqnxn5hdsgusdl7rf6vq4djqck
+            description: DRep ID in CIP-129 bech32 format
+            example: drep1yfhyq6tztjksqqpd5lglc3zr2tn8vylgjh9xzz7n2p4l4lgk3qam3
           hex:
             type: string
             description: DRep ID in hex format
-            example: f948a9f7a863d8062565809aba3925aa41334e976c11c837fe1a74c0
+            example: 6e4069625cad00002da7d1fc444352e67613e895ca610bd3506bfafd
           has_script:
             type: boolean
             description: Flag which shows if this credential is a script hash
@@ -5243,6 +5232,8 @@ components:
             $ref: "#/components/schemas/drep_info/items/properties/drep_id"
           hex:
             $ref: "#/components/schemas/drep_info/items/properties/hex"
+          has_script:
+            $ref: "#/components/schemas/drep_info/items/properties/has_script"
           url:
             $ref: "#/components/schemas/drep_info/items/properties/url"
           hash:
@@ -5289,6 +5280,8 @@ components:
             $ref: "#/components/schemas/drep_info/items/properties/drep_id"
           hex:
             $ref: "#/components/schemas/drep_info/items/properties/hex"
+          has_script:
+            $ref: "#/components/schemas/drep_info/items/properties/has_script"
           update_tx_hash:
             $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
           cert_index:
@@ -5315,6 +5308,8 @@ components:
       type: array
       items:
         properties:
+          proposal_id:
+            $ref: "#/components/schemas/proposal_list/items/properties/proposal_id"
           proposal_tx_hash:
             $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
           proposal_index:
@@ -5349,6 +5344,10 @@ components:
         properties:
           block_time:
             $ref: "#/components/schemas/blocks/items/properties/block_time"
+          proposal_id:
+            type: string
+            description: Proposal Action ID in accordance with CIP-129 format
+            example: 'gov_action17m93skslaxyd45gpr6ernkdzs852h564wsterr8l6lheu7hu7kvsqecyqdh'
           proposal_tx_hash:
             $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
           proposal_index:
@@ -5449,16 +5448,16 @@ components:
             description: The role of the voter
             enum: ["ConstitutionalCommittee", "DRep", "SPO"]
             example: DRep
-          has_script:
-            $ref: "#/components/schemas/drep_info/items/properties/has_script"
-          voter:
+          voter_id:
             type: string
-            description: Voter's DRep ID (bech32 format), pool ID (bech32 format) or committee hash (hex format)
-            example: drep1l9y2naagv0vqvft9szdt5wf94fqnxn5hdsgusdl7rf6vq4djqck
+            description: Voter's DRep ID (CIP-129 bech32 format), pool ID (bech32 format) or committee hot ID (CIP-129 bech32 format)
+            example: drep1yfhyq6tztjksqqpd5lglc3zr2tn8vylgjh9xzz7n2p4l4lgk3qam3
           voter_hex:
             type: string
             description: Voter's DRep ID , pool ID or committee hash in hex format
-            example: drep1l9y2naagv0vqvft9szdt5wf94fqnxn5hdsgusdl7rf6vq4djqck
+            example: 6e4069625cad00002da7d1fc444352e67613e895ca610bd3506bfafd
+          voter_has_script:
+            $ref: "#/components/schemas/drep_info/items/properties/has_script"
           vote:
             $ref: "#/components/schemas/drep_votes/items/properties/vote"
           meta_url:
@@ -5469,6 +5468,8 @@ components:
       description: Current governance committee
       type: object
       properties:
+        proposal_id:
+          $ref: "#/components/schemas/proposal_list/items/properties/proposal_id"
         proposal_tx_hash:
           $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
         proposal_index:

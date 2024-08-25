@@ -78,17 +78,17 @@
       "pv": "drep13a87lnegq9a90dq4z7n864h0fsxuqsvp5ywn29ud65l5cwxlhts",
       "pp": "drep1kxtwaqtayj6vklc57u93xayjvkwgvefh8drscqp5a5y6jz7m6rd"
     },
-    "_committee_hash": {
-      "m": "49fa008218cd619afe6aa8a1a93303f242440722b314f36bda2c2e23",
-      "g": "65d497b875c56ab213586a4006d4f6658970573ea8e2398893857472",
-      "pv": "7ceede7d6a89e006408e6b7c6acb3dd094b3f6817e43b4a36d01535b",
-      "pp": "f8f56120e1ec00feb088ece39ef14f07339afeb37b4e949ff12b89ff"
+    "_cc_hot_id": {
+      "m": "cc_hot1qgqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqvcdjk7",
+      "g": "cc_hot1qgqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqvcdjk7",
+      "pv": "cc_hot1qgqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqvcdjk7",
+      "pp": "cc_hot1qgqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqvcdjk7"
     },
-    "_proposal_tx_hash": {
-      "m": "e61f151fcef9e99dff5c705f8d5de18891f8d1d92d69fef5ff608d2c29a7c133",
-      "g": "e61f151fcef9e99dff5c705f8d5de18891f8d1d92d69fef5ff608d2c29a7c133",
-      "pv": "e61f151fcef9e99dff5c705f8d5de18891f8d1d92d69fef5ff608d2c29a7c133",
-      "pp": "e61f151fcef9e99dff5c705f8d5de18891f8d1d92d69fef5ff608d2c29a7c133"
+    "_proposal_id": {
+      "m": "gov_action1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpzklpgpf",
+      "g": "gov_action1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpzklpgpf",
+      "pv": "gov_action17m93skslaxyd45gpr6ernkdzs852h564wsterr8l6lheu7hu7kvsqecyqdh",
+      "pp": "gov_action1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpzklpgpf"
     },
     "_pool_bech32": {
       "m": "pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc",

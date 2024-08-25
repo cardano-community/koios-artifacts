@@ -1333,7 +1333,7 @@ paths:
       tags:
         - Governance
       parameters:
-        - $ref: "#/components/parameters/_committee_hash"
+        - $ref: "#/components/parameters/_cc_hot_id"
       responses:
         "200":
           description: Success!!
@@ -1375,7 +1375,7 @@ paths:
       tags:
         - Governance
       parameters:
-        - $ref: "#/components/parameters/_credential"
+        - $ref: "#/components/parameters/_voter_id"
       responses:
         "200":
           description: Success!!
@@ -1398,8 +1398,7 @@ paths:
       tags:
         - Governance
       parameters:
-        - $ref: "#/components/parameters/_proposal_tx_hash"
-        - $ref: "#/components/parameters/_proposal_index"
+        - $ref: "#/components/parameters/_proposal_id"
       responses:
         "200":
           description: Success!!

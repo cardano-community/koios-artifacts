@@ -75,7 +75,7 @@ BEGIN
     LEFT JOIN (
         SELECT
           dv.addr_id,
-          dh.view AS delegated_drep
+          grest.cip129_hex_to_drep_id(dh.raw, dh.has_script) AS delegated_drep
         FROM delegation_vote AS dv
           INNER JOIN drep_hash AS dh ON dh.id = dv.drep_hash_id
         WHERE dv.addr_id = ANY(sa_id_list)
