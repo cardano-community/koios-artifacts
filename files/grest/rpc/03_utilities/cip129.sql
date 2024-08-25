@@ -22,14 +22,14 @@
 -- `....0011`                            | Script Hash
 
 CREATE OR REPLACE FUNCTION grest.cip129_cc_hot_to_hex(_cc_hot text)
-RETURNS bytea
+RETURNS text
 LANGUAGE plpgsql STABLE
 AS $$
 BEGIN
   IF LENGTH(_cc_hot) = 60 THEN
-    RETURN DECODE(SUBSTRING(b32_decode(_cc_hot) from 3), 'hex');
+    RETURN SUBSTRING(b32_decode(_cc_hot) from 3);
   ELSE
-    RETURN DECODE(b32_decode(_cc_hot), 'hex');
+    RETURN b32_decode(_cc_hot);
   END IF;
 END;
 $$;
@@ -48,14 +48,14 @@ END;
 $$;
 
 CREATE OR REPLACE FUNCTION grest.cip129_cc_cold_to_hex(_cc_cold text)
-RETURNS bytea
+RETURNS text
 LANGUAGE plpgsql STABLE
 AS $$
 BEGIN
   IF LENGTH(_cc_cold) = 61 THEN
-    RETURN DECODE(SUBSTRING(b32_decode(_cc_cold) from 3), 'hex');
+    RETURN SUBSTRING(b32_decode(_cc_cold) from 3);
   ELSE
-    RETURN DECODE(b32_decode(_cc_cold), 'hex');
+    RETURN b32_decode(_cc_cold);
   END IF;
 END;
 $$;
@@ -74,14 +74,14 @@ END;
 $$;
 
 CREATE OR REPLACE FUNCTION grest.cip129_drep_id_to_hex(_drep_id text)
-RETURNS bytea
+RETURNS text
 LANGUAGE plpgsql STABLE
 AS $$
 BEGIN
   IF LENGTH(_drep_id) = 58 THEN
-    RETURN DECODE(SUBSTRING(b32_decode(_drep_id) from 3), 'hex');
+    RETURN SUBSTRING(b32_decode(_drep_id) from 3);
   ELSE
-    RETURN DECODE(b32_decode(_drep_id), 'hex');
+    RETURN b32_decode(_drep_id);
   END IF;
 END;
 $$;
