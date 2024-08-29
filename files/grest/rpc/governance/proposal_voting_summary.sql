@@ -35,7 +35,7 @@ BEGIN
           gap.type AS proposal_type,
           expired_epoch,
           ratified_epoch,
-          (coalesce(expired_epoch, ratified_epoch, ( SELECT MAX(no) FROM epoch))) AS epoch_of_interest
+          (coalesce(ratified_epoch, expired_epoch, dropped_epoch, ( SELECT MAX(no) FROM epoch))) AS epoch_of_interest
         FROM gov_action_proposal gap 
         INNER JOIN tx t ON gap.tx_id = t.id AND t.hash = DECODE(proposal[1], 'hex') AND gap.index = proposal[2]::smallint
       ),
