@@ -1,5 +1,7 @@
-create or replace function grest.proposal_voting_summary(_proposal_id text)
+drop function grest.greg_proposal_voting_summary (text);
+create or replace function grest.greg_proposal_voting_summary(_proposal_id text)
 returns table (
+  -- prop_type text,
   epoch_no integer,
   drep_yes_votes_cast integer,
   drep_yes_vote_power lovelace,
@@ -128,8 +130,10 @@ RETURN QUERY (
         INNER JOIN always_abstain_data ON always_abstain_data.gov_action_proposal_id = ped.gov_action_proposal_id
         INNER JOIN tot_pool_power ON tot_pool_power.gov_action_proposal_id = ped.gov_action_proposal_id
         INNER JOIN tot_committee_size on tot_committee_size.gov_action_proposal_id = ped.gov_action_proposal_id
-    ) 
+    )
+ 
   SELECT
+    -- y.proposal_type::text as prop_type,
     y.epoch_of_interest AS epoch_no,
     y.drep_yes_votes_cast::integer,
     y.drep_yes_vote_power::lovelace,
@@ -137,28 +141,28 @@ RETURN QUERY (
     y.drep_no_votes_cast::integer,
     (y.drep_non_abstain_total - y.drep_yes_vote_power)::lovelace AS drep_no_vote_power,
     ROUND((y.drep_non_abstain_total - y.drep_yes_vote_power) * 100 / y.drep_non_abstain_total, 2) AS drep_no_pct,
-    (case when y.proposal_type = 'NewConstitution' then null else
+    (case when y.proposal_type in ('ParameterChange', 'TreasuryWithdrawals', 'NewConstitution') then null else
     y.pool_yes_votes_cast end)::integer,
-    (case when y.proposal_type = 'NewConstitution' then null else
+    (case when y.proposal_type in ('ParameterChange', 'TreasuryWithdrawals', 'NewConstitution') then null else
     y.pool_yes_vote_power end)::lovelace,
-    (case when y.proposal_type = 'NewConstitution' then null else
+    (case when y.proposal_type in ('ParameterChange', 'TreasuryWithdrawals', 'NewConstitution') then null else
     ROUND(y.pool_yes_vote_power * 100 / y.pool_non_abstain_total, 2) end) AS pool_yes_pct,
-    (case when y.proposal_type = 'NewConstitution' then null else
+    (case when y.proposal_type in ('ParameterChange', 'TreasuryWithdrawals', 'NewConstitution') then null else
     y.pool_no_votes_cast end)::integer,
-    (case when y.proposal_type = 'NewConstitution' then null else
+    (case when y.proposal_type in ('ParameterChange', 'TreasuryWithdrawals', 'NewConstitution') then null else
     (y.pool_non_abstain_total - y.pool_yes_vote_power) end)::lovelace AS pool_no_vote_power,
-    (case when y.proposal_type = 'NewConstitution' then null else
+    (case when y.proposal_type in ('ParameterChange', 'TreasuryWithdrawals', 'NewConstitution') then null else
     ROUND((y.pool_non_abstain_total - y.pool_yes_vote_power) * 100 / y.pool_non_abstain_total, 2) end) AS pool_no_pct,
     y.committee_yes_votes_cast::integer,
-    (case when y.proposal_type = 'NewCommittee' then null else
+    (case when y.proposal_type in ('NoConfidence', 'NewCommittee') then null else
     ROUND((y.committee_yes_votes_cast * 100 / y.committee_non_abstain_total), 2) end) as committee_yes_pct,
-    (case when y.proposal_type = 'NewCommittee' then null else
+    (case when y.proposal_type in ('NoConfidence', 'NewCommittee') then null else
     y.committee_no_votes_cast end)::integer,
-    (case when y.proposal_type = 'NewCommittee' then null else
+    (case when y.proposal_type in ('NoConfidence', 'NewCommittee') then null else
     ROUND((committee_non_abstain_total - y.committee_yes_votes_cast) * 100 / y.committee_non_abstain_total, 2) end) as committee_no_pct 
   FROM 
     (
-      SELECT distinct 
+      SELECT  
         gov_action_proposal_id,
         proposal_type,
         epoch_of_interest,
