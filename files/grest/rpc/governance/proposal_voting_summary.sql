@@ -96,7 +96,10 @@ RETURN QUERY (
         vote,
         COUNT(*) AS committee_votes_cast
       FROM proposal_epoch_data AS ped 
-        INNER JOIN voting_procedure AS vp ON vp.voter_role = 'ConstitutionalCommittee' AND vp.gov_action_proposal_id = ped.gov_action_proposal_id
+        INNER JOIN voting_procedure AS vp ON vp.voter_role = 'ConstitutionalCommittee'
+        AND vp.gov_action_proposal_id = ped.gov_action_proposal_id
+        AND NOT EXISTS (select null from voting_procedure vp2 where vp2.gov_action_proposal_id = vp.gov_action_proposal_id
+                        and vp2.committee_voter = vp.committee_voter and vp2.id > vp.id)
       GROUP BY ped.gov_action_proposal_id, vote
     ),
     tot_committee_size AS (
