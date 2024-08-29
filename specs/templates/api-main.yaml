@@ -1394,7 +1394,28 @@ paths:
       summary: Voter's Proposal List
       description: List of all governance proposals for specified DRep, SPO or Committee credential
       operationId: voter_proposal_list
-
+  /proposal_voting_summary: #RPC
+    get:
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_proposal_id"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/proposal_voting_summary"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Proposal Voting Summary
+      description: Summary of votes for given proposal
+      operationId: proposal_voting_summary
   /proposal_votes: #RPC
     get:
       tags:

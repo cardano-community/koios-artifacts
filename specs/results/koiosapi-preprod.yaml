@@ -1539,7 +1539,28 @@ paths:
       summary: Voter's Proposal List
       description: List of all governance proposals for specified DRep, SPO or Committee credential
       operationId: voter_proposal_list
-
+  /proposal_voting_summary: #RPC
+    get:
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_proposal_id"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/proposal_voting_summary"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Proposal Voting Summary
+      description: Summary of votes for given proposal
+      operationId: proposal_voting_summary
   /proposal_votes: #RPC
     get:
       tags:
@@ -2894,19 +2915,19 @@ components:
             example: 294
           circulation:
             type: string
-            description: Circulating UTxOs for given epoch (in lovelaces)
+            description: Circulating UTxOs for given epoch (in numbers)
             example: 32081169442642320
           treasury:
             type: string
-            description: Funds in treasury for given epoch (in lovelaces)
+            description: Funds in treasury for given epoch (in numbers)
             example: 637024173474141
           reward:
             type: string
-            description: Rewards accumulated as of given epoch (in lovelaces)
+            description: Rewards accumulated as of given epoch (in numbers)
             example: 506871250479840
           supply:
             type: string
-            description: Total Active Supply (sum of treasury funds, rewards, UTxOs, deposits and fees) for given epoch (in lovelaces)
+            description: Total Active Supply (sum of treasury funds, rewards, UTxOs, deposits and fees) for given epoch (in numbers)
             example: 33228495612391330
           reserves:
             type: string
@@ -3036,7 +3057,7 @@ components:
             example: 312
           active_stake:
             type: string
-            description: Amount of delegated stake to this pool at the time of epoch snapshot (in lovelaces)
+            description: Amount of delegated stake to this pool at the time of epoch snapshot (in numbers)
             example: "31235800000"
           active_stake_pct:
             type:
@@ -3064,21 +3085,21 @@ components:
             example: 0.125
           fixed_cost:
             type: string
-            description: Pool fixed cost per epoch (in lovelaces)
+            description: Pool fixed cost per epoch (in numbers)
             example: "340000000"
           pool_fees:
             type: string
-            description: Total amount of fees earned by pool owners in that epoch (in lovelaces)
+            description: Total amount of fees earned by pool owners in that epoch (in numbers)
             example: "123327382"
           deleg_rewards:
             type: string
-            description: Total amount of rewards earned by delegators in that epoch (in lovelaces)
+            description: Total amount of rewards earned by delegators in that epoch (in numbers)
             example: "123456789123"
           member_rewards:
             type:
             - string
             - 'null'
-            description: Total amount of rewards earned by members (delegator - owner) in that epoch (in lovelaces)
+            description: Total amount of rewards earned by members (delegator - owner) in that epoch (in numbers)
             example: "123456780123"
           epoch_ros:
             type: number
@@ -3122,13 +3143,13 @@ components:
             type:
               - string
               - 'null'
-            description: Pool pledge in lovelace
+            description: Pool pledge in number
             example: "64000000000000"
           deposit:
             type:
               - string
               - 'null'
-            description: Pool's registration deposit in lovelace
+            description: Pool's registration deposit in number
             example: "500000000"
           reward_addr:
             type:
@@ -3309,7 +3330,7 @@ components:
             $ref: "#/components/schemas/account_history/items/properties/stake_address"
           amount:
             type: string
-            description: Current delegator live stake (in lovelace)
+            description: Current delegator live stake (in number)
             example: 64328591517480
           active_epoch_no:
             type: number
@@ -3547,13 +3568,13 @@ components:
             type:
               - string
               - 'null'
-            description: The amount (in lovelace) required for a deposit to register a stake address
+            description: The amount (in number) required for a deposit to register a stake address
             example: 2000000
           pool_deposit:
             type:
               - string
               - 'null'
-            description: The amount (in lovelace) required for a deposit to register a stake pool
+            description: The amount (in number) required for a deposit to register a stake pool
             example: 500000000
           max_epoch:
             type:
@@ -3954,13 +3975,13 @@ components:
             type:
               - string
               - 'null'
-            description: Total output of the block (in lovelace)
+            description: Total output of the block (in number)
             example: 92384672389
           total_fees:
             type:
               - string
               - 'null'
-            description: Total fees of the block (in lovelace)
+            description: Total fees of the block (in number)
             example: 2346834
           num_confirmations:
             type: number
@@ -4170,7 +4191,7 @@ components:
             - $ref: "#/components/schemas/pool_list/items/properties/pool_id_bech32"
           total_balance:
             type: string
-            description: Total balance of the account including UTxO, rewards and MIRs (in lovelace)
+            description: Total balance of the account including UTxO, rewards and MIRs (in number)
             example: 207116800428
           utxo:
             type: string
@@ -4282,7 +4303,7 @@ components:
                   $ref: "#/components/schemas/reserve_withdrawals/items/properties/spendable_epoch"
                 amount:
                   type: string
-                  description: Amount of rewards earned (in lovelace)
+                  description: Amount of rewards earned (in number)
                 type:
                   type: string
                   description: The source of the rewards
@@ -4372,7 +4393,7 @@ components:
                   example: 301
                 active_stake:
                   type: string
-                  description: Active stake amount (in lovelaces)
+                  description: Active stake amount (in numbers)
                   example: 682334162
     tx_info:
       description: Array of detailed information about transaction(s)
@@ -4406,15 +4427,15 @@ components:
             example: 391
           total_output:
             type: string
-            description: Total sum of all transaction outputs (in lovelaces)
+            description: Total sum of all transaction outputs (in numbers)
             example: 157832856
           fee:
             type: string
-            description: Total Transaction fee (in lovelaces)
+            description: Total Transaction fee (in numbers)
             example: 172761
           treasury_donation:
             type: string
-            description: Total Donation to on-chain treasury (in lovelaces)
+            description: Total Donation to on-chain treasury (in numbers)
             example: 0
           deposit:
             type: string
@@ -4555,7 +4576,7 @@ components:
               properties:
                 amount:
                   type: string
-                  description: Withdrawal amount (in lovelaces)
+                  description: Withdrawal amount (in numbers)
                   example: 9845162
                 stake_addr:
                   type: string
@@ -5152,7 +5173,7 @@ components:
             type:
               - string
               - 'null'
-            description: DRep's registration deposit  in lovelace
+            description: DRep's registration deposit  in number
             example: 500000000
           active:
             type: boolean
@@ -5438,6 +5459,81 @@ components:
       type: array
       items:
         $ref: "#/components/schemas/proposal_list/items"
+    proposal_voting_summary:
+      description: Summary of votes for given proposal
+      type: array
+      items:
+        properties:
+          proposal_type:
+            $ref: "#/components/schemas/proposal_list/items/properties/proposal_type"
+          epoch_no:
+            type: number
+            description: Epoch for which data was collated
+            example: 441
+          drep_yes_votes_cast:
+            type: number
+            description: Number of 'yes' votes casted by dreps
+            example: 7
+          drep_yes_vote_power:
+            type: number
+            description: Power of 'yes' votes from dreps
+            example: 31146839512742
+          drep_yes_pct:
+            type: number
+            description: Percentage of 'yes' votes from dreps
+            example: 60.72
+          drep_no_votes_cast:
+            type: number
+            description: Number of 'no' votes casted by dreps
+            example: 0
+          drep_no_vote_power:
+            type: number
+            description: Power of 'no' votes from dreps
+            example: 20148194577715
+          drep_no_pct:
+            type: number
+            description: Percentage of 'no' votes from dreps
+            example: 39.28
+          pool_yes_votes_cast:
+            type: number
+            description: Number of 'yes' votes casted by pools
+            example: 1
+          pool_yes_vote_power:
+            type: number
+            description: Power of 'yes' votes from pools
+            example: 5234000000
+          pool_yes_pct:
+            type: number
+            description: Percentage of 'yes' votes from pools
+            example: 13.12
+          pool_no_votes_cast:
+            type: number
+            description: Number of 'no' votes casted by pools
+            example: 0
+          pool_no_vote_power:
+            type: number
+            description: Power of 'no' votes from pools
+            example: 0
+          pool_no_pct:
+            type: number
+            description: Percentage of 'no' votes from pools
+            example: 0
+          committee_yes_votes_cast:
+            type: number
+            description: Number of 'yes' votes casted by committee
+            example: 5
+          committee_yes_pct:
+            type: number
+            description: Percentage of 'yes' votes from committee
+            example: 71.43
+          committee_no_votes_cast:
+            type: number
+            description: Number of 'no' votes casted by committee
+            example: 1
+          committee_no_pct:
+            type: number
+            description: Percentage of 'no' votes from committee
+            example: 28.57
     proposal_votes:
       type: array
       description: List of all votes cast on specified governance action
