@@ -9,7 +9,7 @@
     "_epoch_no": {
       "m": "320",
       "g": "6219",
-      "pv": "12",
+      "pv": "675",
       "pp": "31"
     },
     "_earned_epoch_no": {
@@ -75,7 +75,7 @@
     "_drep_id": {
       "m": "drep17l6sywnwqu9aedd6aumev42w39ln5zfl9nw7j4ak6u8swyrwvz3",
       "g": "drep1s9qaseg7qyum807fcv0hdky9gv0c89tn98t4urjn5ewz57dml0r",
-      "pv": "drep13a87lnegq9a90dq4z7n864h0fsxuqsvp5ywn29ud65l5cwxlhts",
+      "pv": "drep17rksqsgqx8ej3rtc3x4gjm8a44u6w3qcshfm46yc9tq4zeffuzj",
       "pp": "drep1kxtwaqtayj6vklc57u93xayjvkwgvefh8drscqp5a5y6jz7m6rd"
     },
     "_cc_hot_id": {
@@ -89,6 +89,12 @@
       "g": "gov_action1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpzklpgpf",
       "pv": "gov_action17m93skslaxyd45gpr6ernkdzs852h564wsterr8l6lheu7hu7kvsqecyqdh",
       "pp": "gov_action1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpzklpgpf"
+    },
+    "_voter_id": {
+      "m": "['pool1w83ux7vrwafrsuz044knxl9xxtr38q5jj2l3p28fl3g26faqqwg', 'drep1yt76he02dprm2af6x26vg76mhs2vajlg43cr9jh9dq3f2qs68ts3s']",
+      "g": "['pool1w83ux7vrwafrsuz044knxl9xxtr38q5jj2l3p28fl3g26faqqwg', 'drep1yt76he02dprm2af6x26vg76mhs2vajlg43cr9jh9dq3f2qs68ts3s']",
+      "pv": "['pool1w83ux7vrwafrsuz044knxl9xxtr38q5jj2l3p28fl3g26faqqwg', 'drep1yt76he02dprm2af6x26vg76mhs2vajlg43cr9jh9dq3f2qs68ts3s']",
+      "pp": "['pool1w83ux7vrwafrsuz044knxl9xxtr38q5jj2l3p28fl3g26faqqwg', 'drep1yt76he02dprm2af6x26vg76mhs2vajlg43cr9jh9dq3f2qs68ts3s']"
     },
     "_pool_bech32": {
       "m": "pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc",
@@ -197,7 +203,7 @@
     "drep_ids1": {
       "m": "drep17l6sywnwqu9aedd6aumev42w39ln5zfl9nw7j4ak6u8swyrwvz3",
       "g": "drep1s9qaseg7qyum807fcv0hdky9gv0c89tn98t4urjn5ewz57dml0r",
-      "pv": "drep13a87lnegq9a90dq4z7n864h0fsxuqsvp5ywn29ud65l5cwxlhts",
+      "pv": "drep1yt76he02dprm2af6x26vg76mhs2vajlg43cr9jh9dq3f2qs68ts3s",
       "pp": "drep1kxtwaqtayj6vklc57u93xayjvkwgvefh8drscqp5a5y6jz7m6rd"
     },
     "drep_ids2": {

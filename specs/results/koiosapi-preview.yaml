@@ -8,7 +8,7 @@ info:
   license:
     name: Creative Commons Attribution 4.0 International
     url: https://github.com/cardano-community/koios-artifacts/blob/main/LICENSE
-  version: v1.2.0b
+  version: v1.2.0
   description: |
     Koios is best described as a Decentralized and Elastic RESTful query layer for exploring data on Cardano blockchain to consume within applications/wallets/explorers/etc. This page not only provides an OpenAPI Spec for live implementation, but also ability to execute live demo from client browser against each endpoint with pre-filled examples.
 
@@ -2047,7 +2047,7 @@ components:
       description: Epoch Number to fetch details for
       schema:
         type: string
-      example: "12"
+      example: "675"
       in: query
       required: false
       allowEmptyValue: true
@@ -2117,7 +2117,7 @@ components:
       description: Voter ID (Drep, SPO, Committee Member) in Bech32 format (CIP-5 | CIP-129)
       schema:
         type: string
-      example: "drep13a87lnegq9a90dq4z7n864h0fsxuqsvp5ywn29ud65l5cwxlhts"
+      example: "drep17rksqsgqx8ej3rtc3x4gjm8a44u6w3qcshfm46yc9tq4zeffuzj"
       in: query
       required: true
       allowEmptyValue: false
@@ -2127,7 +2127,7 @@ components:
       description: DRep ID in bech32 format
       schema:
         type: string
-      example: "drep13a87lnegq9a90dq4z7n864h0fsxuqsvp5ywn29ud65l5cwxlhts"
+      example: "drep17rksqsgqx8ej3rtc3x4gjm8a44u6w3qcshfm46yc9tq4zeffuzj"
       in: query
       required: true
       allowEmptyValue: false
@@ -2137,7 +2137,7 @@ components:
       description: DRep ID in bech32 format
       schema:
         type: string
-      example: "drep13a87lnegq9a90dq4z7n864h0fsxuqsvp5ywn29ud65l5cwxlhts"
+      example: "drep17rksqsgqx8ej3rtc3x4gjm8a44u6w3qcshfm46yc9tq4zeffuzj"
       in: query
       required: false
       allowEmptyValue: true
@@ -2736,7 +2736,7 @@ components:
                   type: string
             example:
               _drep_ids:
-                - drep13a87lnegq9a90dq4z7n864h0fsxuqsvp5ywn29ud65l5cwxlhts
+                - drep1yt76he02dprm2af6x26vg76mhs2vajlg43cr9jh9dq3f2qs68ts3s
                 - drep1g5vl99xcpv8uce5hhh50xe3fh68tl9f8hcprleekw0c6jhhr45f
     utxo_refs_with_extended:
       content:
@@ -4739,7 +4739,7 @@ components:
                 voter_role:
                   $ref: "#/components/schemas/proposal_votes/items/properties/voter_role"
                 voter:
-                  $ref: "#/components/schemas/proposal_votes/items/properties/voter"
+                  $ref: "#/components/schemas/proposal_votes/items/properties/voter_id"
                 voter_hex:
                   $ref: "#/components/schemas/proposal_votes/items/properties/voter_hex"
                 vote:
@@ -5383,7 +5383,7 @@ components:
             description: Proposal Action Type
             example: ParameterChange
           proposal_description:
-            type: string
+            type: object
             description: Description for Proposal Action
             example: '{"tag": "InfoAction"}'
           deposit:

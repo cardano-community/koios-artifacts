@@ -35,6 +35,7 @@ BEGIN
         'not registered'
       END AS status,
       sdc.pool_id AS pool_id,
+      vote_t.delegated_drep,
       sdc.total_balance::text,
       sdc.utxo::text,
       sdc.rewards::text,
@@ -61,7 +62,7 @@ BEGIN
           ) AS registered,
           (
             SELECT sr.deposit FROM stake_registration AS sr
-            WHERE sr.addr_id = sa.id
+            WHERE sr.addr_id = sas.id
               AND NOT EXISTS (
                 SELECT TRUE
                 FROM stake_deregistration AS sd
@@ -122,11 +123,13 @@ BEGIN
       z.stake_address,
       ai.status,
       ai.delegated_pool AS pool_id,
+      ai.delegated_drep,
       ai.total_balance::text,
       ai.utxo::text,
       ai.rewards::text,
       ai.withdrawals::text,
       ai.rewards_available::text,
+      ai.deposit,
       ai.reserves,
       ai.treasury
       FROM

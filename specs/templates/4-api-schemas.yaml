@@ -1904,7 +1904,7 @@ schemas:
                 voter_role:
                   $ref: "#/components/schemas/proposal_votes/items/properties/voter_role"
                 voter:
-                  $ref: "#/components/schemas/proposal_votes/items/properties/voter"
+                  $ref: "#/components/schemas/proposal_votes/items/properties/voter_id"
                 voter_hex:
                   $ref: "#/components/schemas/proposal_votes/items/properties/voter_hex"
                 vote:
@@ -2548,7 +2548,7 @@ schemas:
             description: Proposal Action Type
             example: ParameterChange
           proposal_description:
-            type: string
+            type: object
             description: Description for Proposal Action
             example: '{"tag": "InfoAction"}'
           deposit:
