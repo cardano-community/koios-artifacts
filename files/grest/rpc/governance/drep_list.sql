@@ -1,14 +1,14 @@
 CREATE OR REPLACE FUNCTION grest.drep_list()
 RETURNS TABLE (
-  drep_id character varying,
+  drep_id text,
   hex text,
   has_script boolean,
   registered boolean
 )
 LANGUAGE sql STABLE
 AS $$
-  SELECT
-    DISTINCT ON (dh.view) dh.view AS drep_id,
+  SELECT DISTINCT ON (dh.raw)
+    grest.cip129_hex_to_drep_id(dh.raw, dh.has_script) AS drep_id,
     ENCODE(dh.raw, 'hex')::text AS hex,
     dh.has_script AS has_script,
     (CASE
@@ -18,7 +18,7 @@ AS $$
   FROM public.drep_hash AS dh
     INNER JOIN public.drep_registration AS dr ON dh.id = dr.drep_hash_id
   ORDER BY
-    dh.view, dr.tx_id DESC;
+    dh.raw, dr.tx_id DESC;
 $$;
 
 COMMENT ON FUNCTION grest.asset_list IS 'Get a raw listing of all active delegated representatives, aka DReps'; --noqa: LT01

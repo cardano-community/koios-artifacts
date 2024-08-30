@@ -1,6 +1,7 @@
-CREATE OR REPLACE FUNCTION grest.voter_proposal_list(_credential text)
+CREATE OR REPLACE FUNCTION grest.voter_proposal_list(_voter_id text)
 RETURNS TABLE (
   block_time integer,
+  proposal_id text,
   proposal_tx_hash text,
   proposal_index bigint,
   proposal_type govactiontype,
@@ -31,11 +32,12 @@ DECLARE
   _gap_id_list          bigint[];
 BEGIN
 
-  SELECT INTO _drep_id id FROM public.drep_hash WHERE raw = DECODE(_credential, 'hex');
-  IF _drep_id IS NULL THEN
-    SELECT INTO _spo_id id FROM public.pool_hash WHERE hash_raw = DECODE(_credential, 'hex');
-  ELSIF _spo_id IS NULL THEN
-    SELECT INTO _committee_member_id id FROM public.committee_hash WHERE raw = DECODE(_credential, 'hex');
+  IF STARTS_WITH(_voter_id, 'drep') THEN
+    SELECT INTO _drep_id id FROM public.drep_hash WHERE raw = DECODE((SELECT grest.cip129_drep_id_to_hex(_voter_id)), 'hex');
+  ELSIF STARTS_WITH(_voter_id, 'pool') THEN
+    SELECT INTO _spo_id id FROM public.pool_hash WHERE view = _voter_id;
+  ELSIF STARTS_WITH(_voter_id, 'cc_hot') THEN
+    SELECT INTO _committee_member_id id FROM public.committee_hash WHERE raw = DECODE((SELECT grest.cip129_cc_hot_to_hex(_voter_id)), 'hex');
   END IF;
 
   SELECT INTO _gap_id_list ARRAY_AGG(gov_action_proposal_id)
@@ -55,6 +57,7 @@ BEGIN
   RETURN QUERY (
     SELECT
       EXTRACT(EPOCH FROM b.time)::integer,
+      grest.cip129_to_gov_action_id(tx.hash, gap.index),
       ENCODE(tx.hash, 'hex'),
       gap.index,
       gap.type,

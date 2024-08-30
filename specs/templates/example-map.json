@@ -9,7 +9,7 @@
     "_epoch_no": {
       "m": "320",
       "g": "6219",
-      "pv": "12",
+      "pv": "675",
       "pp": "31"
     },
     "_earned_epoch_no": {
@@ -75,20 +75,26 @@
     "_drep_id": {
       "m": "drep17l6sywnwqu9aedd6aumev42w39ln5zfl9nw7j4ak6u8swyrwvz3",
       "g": "drep1s9qaseg7qyum807fcv0hdky9gv0c89tn98t4urjn5ewz57dml0r",
-      "pv": "drep13a87lnegq9a90dq4z7n864h0fsxuqsvp5ywn29ud65l5cwxlhts",
+      "pv": "drep17rksqsgqx8ej3rtc3x4gjm8a44u6w3qcshfm46yc9tq4zeffuzj",
       "pp": "drep1kxtwaqtayj6vklc57u93xayjvkwgvefh8drscqp5a5y6jz7m6rd"
     },
-    "_committee_hash": {
-      "m": "49fa008218cd619afe6aa8a1a93303f242440722b314f36bda2c2e23",
-      "g": "65d497b875c56ab213586a4006d4f6658970573ea8e2398893857472",
-      "pv": "7ceede7d6a89e006408e6b7c6acb3dd094b3f6817e43b4a36d01535b",
-      "pp": "f8f56120e1ec00feb088ece39ef14f07339afeb37b4e949ff12b89ff"
+    "_cc_hot_id": {
+      "m": "cc_hot1qgqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqvcdjk7",
+      "g": "cc_hot1qgqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqvcdjk7",
+      "pv": "cc_hot1qgqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqvcdjk7",
+      "pp": "cc_hot1qgqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqvcdjk7"
     },
-    "_proposal_tx_hash": {
-      "m": "e61f151fcef9e99dff5c705f8d5de18891f8d1d92d69fef5ff608d2c29a7c133",
-      "g": "e61f151fcef9e99dff5c705f8d5de18891f8d1d92d69fef5ff608d2c29a7c133",
-      "pv": "e61f151fcef9e99dff5c705f8d5de18891f8d1d92d69fef5ff608d2c29a7c133",
-      "pp": "e61f151fcef9e99dff5c705f8d5de18891f8d1d92d69fef5ff608d2c29a7c133"
+    "_proposal_id": {
+      "m": "gov_action1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpzklpgpf",
+      "g": "gov_action1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpzklpgpf",
+      "pv": "gov_action17m93skslaxyd45gpr6ernkdzs852h564wsterr8l6lheu7hu7kvsqecyqdh",
+      "pp": "gov_action1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpzklpgpf"
+    },
+    "_voter_id": {
+      "m": "['pool1w83ux7vrwafrsuz044knxl9xxtr38q5jj2l3p28fl3g26faqqwg', 'drep1yt76he02dprm2af6x26vg76mhs2vajlg43cr9jh9dq3f2qs68ts3s']",
+      "g": "['pool1w83ux7vrwafrsuz044knxl9xxtr38q5jj2l3p28fl3g26faqqwg', 'drep1yt76he02dprm2af6x26vg76mhs2vajlg43cr9jh9dq3f2qs68ts3s']",
+      "pv": "['pool1w83ux7vrwafrsuz044knxl9xxtr38q5jj2l3p28fl3g26faqqwg', 'drep1yt76he02dprm2af6x26vg76mhs2vajlg43cr9jh9dq3f2qs68ts3s']",
+      "pp": "['pool1w83ux7vrwafrsuz044knxl9xxtr38q5jj2l3p28fl3g26faqqwg', 'drep1yt76he02dprm2af6x26vg76mhs2vajlg43cr9jh9dq3f2qs68ts3s']"
     },
     "_pool_bech32": {
       "m": "pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc",
@@ -197,7 +203,7 @@
     "drep_ids1": {
       "m": "drep17l6sywnwqu9aedd6aumev42w39ln5zfl9nw7j4ak6u8swyrwvz3",
       "g": "drep1s9qaseg7qyum807fcv0hdky9gv0c89tn98t4urjn5ewz57dml0r",
-      "pv": "drep13a87lnegq9a90dq4z7n864h0fsxuqsvp5ywn29ud65l5cwxlhts",
+      "pv": "drep1yt76he02dprm2af6x26vg76mhs2vajlg43cr9jh9dq3f2qs68ts3s",
       "pp": "drep1kxtwaqtayj6vklc57u93xayjvkwgvefh8drscqp5a5y6jz7m6rd"
     },
     "drep_ids2": {

@@ -1,5 +1,6 @@
 CREATE OR REPLACE FUNCTION grest.committee_info()
 RETURNS TABLE (
+  proposal_id text,
   proposal_tx_hash text,
   proposal_index bigint,
   quorum_numerator bigint,
@@ -35,6 +36,15 @@ BEGIN
       CASE
         WHEN c.gov_action_proposal_id IS NULL THEN NULL
         ELSE (
+          SELECT grest.cip129_to_gov_action_id(tx.hash, gap.index)
+          FROM gov_action_proposal AS gap
+          INNER JOIN tx on gap.tx_id = tx.id
+          WHERE gap.id = c.gov_action_proposal_id
+        )
+      END,
+      CASE
+        WHEN c.gov_action_proposal_id IS NULL THEN NULL
+        ELSE (
           SELECT ENCODE(tx.hash, 'hex')
           FROM gov_action_proposal AS gap
           INNER JOIN tx on gap.tx_id = tx.id
@@ -65,8 +75,10 @@ BEGIN
             ELSE
               'authorized'
             END,
+          'cc_cold_id', (SELECT grest.cip129_hex_to_cc_cold(ch_cold.raw, ch_cold.has_script)),
           'cc_cold_hex', ENCODE(ch_cold.raw, 'hex'),
           'cc_cold_has_script', ch_cold.has_script,
+          'cc_hot_id', CASE WHEN hot_key.raw IS NULL THEN NULL ELSE (SELECT grest.cip129_hex_to_cc_hot(hot_key.raw, hot_key.has_script)) END,
           'cc_hot_hex', CASE WHEN hot_key.raw IS NULL THEN NULL ELSE ENCODE(hot_key.raw, 'hex') END,
           'cc_hot_has_script', CASE WHEN hot_key.has_script IS NULL THEN NULL ELSE hot_key.has_script END,
           'expiration_epoch', cm.expiration_epoch

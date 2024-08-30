@@ -3,7 +3,7 @@ RETURNS TABLE (
   stake_address varchar,
   status text,
   delegated_pool varchar,
-  delegated_drep varchar,
+  delegated_drep text,
   total_balance text,
   utxo text,
   rewards text,
@@ -75,7 +75,7 @@ BEGIN
     LEFT JOIN (
         SELECT
           dv.addr_id,
-          dh.view AS delegated_drep
+          COALESCE(grest.cip129_hex_to_drep_id(dh.raw, dh.has_script), dh.view::text) AS delegated_drep
         FROM delegation_vote AS dv
           INNER JOIN drep_hash AS dh ON dh.id = dv.drep_hash_id
         WHERE dv.addr_id = ANY(sa_id_list)

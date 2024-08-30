@@ -1,5 +1,6 @@
 CREATE OR REPLACE FUNCTION grest.drep_votes(_drep_id text)
 RETURNS TABLE (
+  proposal_id text,
   proposal_tx_hash text,
   proposal_index integer,
   vote_tx_hash text,
@@ -11,6 +12,7 @@ RETURNS TABLE (
 LANGUAGE sql STABLE
 AS $$
   SELECT
+    grest.cip129_to_gov_action_id(prop_tx.hash, gap.index),
     ENCODE(prop_tx.hash, 'hex'),
     gap.index,
     ENCODE(vote_tx.hash, 'hex'),
@@ -25,7 +27,7 @@ AS $$
     INNER JOIN public.tx vote_tx on vp.tx_id = vote_tx.id
     INNER JOIN public.block AS b ON vote_tx.block_id = b.id
     LEFT JOIN public.voting_anchor AS va ON vp.voting_anchor_id = va.id
-  WHERE dh.view = _drep_id
+  WHERE dh.raw = DECODE((SELECT grest.cip129_drep_id_to_hex(_drep_id)), 'hex')
   ORDER BY
     vote_tx.id DESC;
 $$;

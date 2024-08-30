@@ -8,7 +8,7 @@ info:
   license:
     name: Creative Commons Attribution 4.0 International
     url: https://github.com/cardano-community/koios-artifacts/blob/main/LICENSE
-  version: v1.2.0a
+  version: v1.2.0
   description: |
     Koios is best described as a Decentralized and Elastic RESTful query layer for exploring data on Cardano blockchain to consume within applications/wallets/explorers/etc. This page not only provides an OpenAPI Spec for live implementation, but also ability to execute live demo from client browser against each endpoint with pre-filled examples.
 
@@ -154,6 +154,8 @@ servers:
     description: Preview Network
   - url: https://preprod.koios.rest/api/v1
     description: Preprod Network
+  - url: https://sancho.koios.rest/api/v1
+    description: Sanchonet Network
 paths:
 
   /tip: #RPC
@@ -1478,7 +1480,7 @@ paths:
       tags:
         - Governance
       parameters:
-        - $ref: "#/components/parameters/_committee_hash"
+        - $ref: "#/components/parameters/_cc_hot_id"
       responses:
         "200":
           description: Success!!
@@ -1520,7 +1522,7 @@ paths:
       tags:
         - Governance
       parameters:
-        - $ref: "#/components/parameters/_credential"
+        - $ref: "#/components/parameters/_voter_id"
       responses:
         "200":
           description: Success!!
@@ -1536,22 +1538,42 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Voter's Proposal List
       description: List of all governance proposals for specified DRep, SPO or Committee credential
-      operationId: proposal_votes
-
-  /proposal_votes: #RPC
+      operationId: voter_proposal_list
+  /proposal_voting_summary: #RPC
     get:
       tags:
         - Governance
       parameters:
-        - $ref: "#/components/parameters/_proposal_tx_hash"
-        - $ref: "#/components/parameters/_proposal_index"
+        - $ref: "#/components/parameters/_proposal_id"
       responses:
         "200":
           description: Success!!
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/committee_votes"
+                $ref: "#/components/schemas/proposal_voting_summary"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Proposal Voting Summary
+      description: Summary of votes for given proposal
+      operationId: proposal_voting_summary
+  /proposal_votes: #RPC
+    get:
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_proposal_id"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/proposal_votes"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -2089,10 +2111,10 @@ components:
       in: query
       required: false
       allowEmptyValue: true
-    _credential:
+    _voter_id:
       deprecated: false
-      name: _credential
-      description: Voter (Drep, SPO, Committee Member) in Hex format
+      name: _voter_id
+      description: Voter ID (Drep, SPO, Committee Member) in Bech32 format (CIP-5 | CIP-129)
       schema:
         type: string
       example: "drep1kxtwaqtayj6vklc57u93xayjvkwgvefh8drscqp5a5y6jz7m6rd"
@@ -2119,13 +2141,13 @@ components:
       in: query
       required: false
       allowEmptyValue: true
-    _committee_hash:
+    _cc_hot_id:
       deprecated: false
-      name: _committee_hash
-      description: Committee hash in hexadecimal format (hex)
+      name: _cc_hot_id
+      description: Committee member hot key ID in Bech32 format (CIP-5 | CIP-129)
       schema:
         type: string
-      example: "f8f56120e1ec00feb088ece39ef14f07339afeb37b4e949ff12b89ff"
+      example: "cc_hot1qgqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqvcdjk7"
       in: query
       required: false
       allowEmptyValue: true
@@ -2199,23 +2221,13 @@ components:
       in: query
       required: true
       allowEmptyValue: false
-    _proposal_tx_hash:
+    _proposal_id:
       deprecated: false
-      name: _proposal_tx_hash
-      description: Transaction Hash of government proposal in hexadecimal format (hex)
-      example: "e61f151fcef9e99dff5c705f8d5de18891f8d1d92d69fef5ff608d2c29a7c133"
+      name: _proposal_id
+      description: Government proposal ID in CIP-129 Bech32 format
+      example: "gov_action1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpzklpgpf"
       schema:
         type: string
-      in: query
-      required: true
-      allowEmptyValue: false
-    _proposal_index:
-      deprecated: false
-      name: _proposal_index
-      description: Index of governance proposal in transaction
-      schema:
-        type: number
-        example: 0
       in: query
       required: true
       allowEmptyValue: false
@@ -2903,19 +2915,19 @@ components:
             example: 294
           circulation:
             type: string
-            description: Circulating UTxOs for given epoch (in lovelaces)
+            description: Circulating UTxOs for given epoch (in numbers)
             example: 32081169442642320
           treasury:
             type: string
-            description: Funds in treasury for given epoch (in lovelaces)
+            description: Funds in treasury for given epoch (in numbers)
             example: 637024173474141
           reward:
             type: string
-            description: Rewards accumulated as of given epoch (in lovelaces)
+            description: Rewards accumulated as of given epoch (in numbers)
             example: 506871250479840
           supply:
             type: string
-            description: Total Active Supply (sum of treasury funds, rewards, UTxOs, deposits and fees) for given epoch (in lovelaces)
+            description: Total Active Supply (sum of treasury funds, rewards, UTxOs, deposits and fees) for given epoch (in numbers)
             example: 33228495612391330
           reserves:
             type: string
@@ -3045,7 +3057,7 @@ components:
             example: 312
           active_stake:
             type: string
-            description: Amount of delegated stake to this pool at the time of epoch snapshot (in lovelaces)
+            description: Amount of delegated stake to this pool at the time of epoch snapshot (in numbers)
             example: "31235800000"
           active_stake_pct:
             type:
@@ -3073,21 +3085,21 @@ components:
             example: 0.125
           fixed_cost:
             type: string
-            description: Pool fixed cost per epoch (in lovelaces)
+            description: Pool fixed cost per epoch (in numbers)
             example: "340000000"
           pool_fees:
             type: string
-            description: Total amount of fees earned by pool owners in that epoch (in lovelaces)
+            description: Total amount of fees earned by pool owners in that epoch (in numbers)
             example: "123327382"
           deleg_rewards:
             type: string
-            description: Total amount of rewards earned by delegators in that epoch (in lovelaces)
+            description: Total amount of rewards earned by delegators in that epoch (in numbers)
             example: "123456789123"
           member_rewards:
             type:
             - string
             - 'null'
-            description: Total amount of rewards earned by members (delegator - owner) in that epoch (in lovelaces)
+            description: Total amount of rewards earned by members (delegator - owner) in that epoch (in numbers)
             example: "123456780123"
           epoch_ros:
             type: number
@@ -3131,13 +3143,13 @@ components:
             type:
               - string
               - 'null'
-            description: Pool pledge in lovelace
+            description: Pool pledge in number
             example: "64000000000000"
           deposit:
             type:
               - string
               - 'null'
-            description: Pool's registration deposit in lovelace
+            description: Pool's registration deposit in number
             example: "500000000"
           reward_addr:
             type:
@@ -3318,7 +3330,7 @@ components:
             $ref: "#/components/schemas/account_history/items/properties/stake_address"
           amount:
             type: string
-            description: Current delegator live stake (in lovelace)
+            description: Current delegator live stake (in number)
             example: 64328591517480
           active_epoch_no:
             type: number
@@ -3556,13 +3568,13 @@ components:
             type:
               - string
               - 'null'
-            description: The amount (in lovelace) required for a deposit to register a stake address
+            description: The amount (in number) required for a deposit to register a stake address
             example: 2000000
           pool_deposit:
             type:
               - string
               - 'null'
-            description: The amount (in lovelace) required for a deposit to register a stake pool
+            description: The amount (in number) required for a deposit to register a stake pool
             example: 500000000
           max_epoch:
             type:
@@ -3963,13 +3975,13 @@ components:
             type:
               - string
               - 'null'
-            description: Total output of the block (in lovelace)
+            description: Total output of the block (in number)
             example: 92384672389
           total_fees:
             type:
               - string
               - 'null'
-            description: Total fees of the block (in lovelace)
+            description: Total fees of the block (in number)
             example: 2346834
           num_confirmations:
             type: number
@@ -4171,15 +4183,15 @@ components:
             type:
             - 'null'
             - string
-            description: Account's current delegation status to DRep ID in Bech32 format
-            example: drep1gj49xmfcg6ev89ur2yad9c5p7z0pgfxggyakz9pua06vqh5vnp0
+            description: Account's current delegation status to DRep ID in CIP-129 Bech32 format
+            example: drep1yfhyq6tztjksqqpd5lglc3zr2tn8vylgjh9xzz7n2p4l4lgk3qam3
           delegated_pool:
             anyOf:
             - type: 'null'
             - $ref: "#/components/schemas/pool_list/items/properties/pool_id_bech32"
           total_balance:
             type: string
-            description: Total balance of the account including UTxO, rewards and MIRs (in lovelace)
+            description: Total balance of the account including UTxO, rewards and MIRs (in number)
             example: 207116800428
           utxo:
             type: string
@@ -4291,7 +4303,7 @@ components:
                   $ref: "#/components/schemas/reserve_withdrawals/items/properties/spendable_epoch"
                 amount:
                   type: string
-                  description: Amount of rewards earned (in lovelace)
+                  description: Amount of rewards earned (in number)
                 type:
                   type: string
                   description: The source of the rewards
@@ -4381,7 +4393,7 @@ components:
                   example: 301
                 active_stake:
                   type: string
-                  description: Active stake amount (in lovelaces)
+                  description: Active stake amount (in numbers)
                   example: 682334162
     tx_info:
       description: Array of detailed information about transaction(s)
@@ -4415,15 +4427,15 @@ components:
             example: 391
           total_output:
             type: string
-            description: Total sum of all transaction outputs (in lovelaces)
+            description: Total sum of all transaction outputs (in numbers)
             example: 157832856
           fee:
             type: string
-            description: Total Transaction fee (in lovelaces)
+            description: Total Transaction fee (in numbers)
             example: 172761
           treasury_donation:
             type: string
-            description: Total Donation to on-chain treasury (in lovelaces)
+            description: Total Donation to on-chain treasury (in numbers)
             example: 0
           deposit:
             type: string
@@ -4564,7 +4576,7 @@ components:
               properties:
                 amount:
                   type: string
-                  description: Withdrawal amount (in lovelaces)
+                  description: Withdrawal amount (in numbers)
                   example: 9845162
                 stake_addr:
                   type: string
@@ -4727,7 +4739,7 @@ components:
                 voter_role:
                   $ref: "#/components/schemas/proposal_votes/items/properties/voter_role"
                 voter:
-                  $ref: "#/components/schemas/proposal_votes/items/properties/voter"
+                  $ref: "#/components/schemas/proposal_votes/items/properties/voter_id"
                 voter_hex:
                   $ref: "#/components/schemas/proposal_votes/items/properties/voter_hex"
                 vote:
@@ -5143,15 +5155,15 @@ components:
         properties:
           drep_id:
             type: string
-            description: DRep ID in bech32 format
-            example: drep1l9y2naagv0vqvft9szdt5wf94fqnxn5hdsgusdl7rf6vq4djqck
+            description: DRep ID in CIP-129 bech32 format
+            example: drep1yfhyq6tztjksqqpd5lglc3zr2tn8vylgjh9xzz7n2p4l4lgk3qam3
           hex:
             type: string
             description: DRep ID in hex format
-            example: f948a9f7a863d8062565809aba3925aa41334e976c11c837fe1a74c0
+            example: 6e4069625cad00002da7d1fc444352e67613e895ca610bd3506bfafd
           has_script:
             type: boolean
-            description: Flag which shows if this DRep credentials are a script hash
+            description: Flag which shows if this credential is a script hash
             example: false
           registered:
             type: boolean
@@ -5161,7 +5173,7 @@ components:
             type:
               - string
               - 'null'
-            description: DRep's registration deposit  in lovelace
+            description: DRep's registration deposit  in number
             example: 500000000
           active:
             type: boolean
@@ -5243,6 +5255,8 @@ components:
             $ref: "#/components/schemas/drep_info/items/properties/drep_id"
           hex:
             $ref: "#/components/schemas/drep_info/items/properties/hex"
+          has_script:
+            $ref: "#/components/schemas/drep_info/items/properties/has_script"
           url:
             $ref: "#/components/schemas/drep_info/items/properties/url"
           hash:
@@ -5289,6 +5303,8 @@ components:
             $ref: "#/components/schemas/drep_info/items/properties/drep_id"
           hex:
             $ref: "#/components/schemas/drep_info/items/properties/hex"
+          has_script:
+            $ref: "#/components/schemas/drep_info/items/properties/has_script"
           update_tx_hash:
             $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
           cert_index:
@@ -5315,6 +5331,8 @@ components:
       type: array
       items:
         properties:
+          proposal_id:
+            $ref: "#/components/schemas/proposal_list/items/properties/proposal_id"
           proposal_tx_hash:
             $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
           proposal_index:
@@ -5349,6 +5367,10 @@ components:
         properties:
           block_time:
             $ref: "#/components/schemas/blocks/items/properties/block_time"
+          proposal_id:
+            type: string
+            description: Proposal Action ID in accordance with CIP-129 format
+            example: 'gov_action17m93skslaxyd45gpr6ernkdzs852h564wsterr8l6lheu7hu7kvsqecyqdh'
           proposal_tx_hash:
             $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
           proposal_index:
@@ -5361,7 +5383,7 @@ components:
             description: Proposal Action Type
             example: ParameterChange
           proposal_description:
-            type: string
+            type: object
             description: Description for Proposal Action
             example: '{"tag": "InfoAction"}'
           deposit:
@@ -5437,6 +5459,81 @@ components:
       type: array
       items:
         $ref: "#/components/schemas/proposal_list/items"
+    proposal_voting_summary:
+      description: Summary of votes for given proposal
+      type: array
+      items:
+        properties:
+          proposal_type:
+            $ref: "#/components/schemas/proposal_list/items/properties/proposal_type"
+          epoch_no:
+            type: number
+            description: Epoch for which data was collated
+            example: 441
+          drep_yes_votes_cast:
+            type: number
+            description: Number of 'yes' votes casted by dreps
+            example: 7
+          drep_yes_vote_power:
+            type: number
+            description: Power of 'yes' votes from dreps
+            example: 31146839512742
+          drep_yes_pct:
+            type: number
+            description: Percentage of 'yes' votes from dreps
+            example: 60.72
+          drep_no_votes_cast:
+            type: number
+            description: Number of 'no' votes casted by dreps
+            example: 0
+          drep_no_vote_power:
+            type: number
+            description: Power of 'no' votes from dreps
+            example: 20148194577715
+          drep_no_pct:
+            type: number
+            description: Percentage of 'no' votes from dreps
+            example: 39.28
+          pool_yes_votes_cast:
+            type: number
+            description: Number of 'yes' votes casted by pools
+            example: 1
+          pool_yes_vote_power:
+            type: number
+            description: Power of 'yes' votes from pools
+            example: 5234000000
+          pool_yes_pct:
+            type: number
+            description: Percentage of 'yes' votes from pools
+            example: 13.12
+          pool_no_votes_cast:
+            type: number
+            description: Number of 'no' votes casted by pools
+            example: 0
+          pool_no_vote_power:
+            type: number
+            description: Power of 'no' votes from pools
+            example: 0
+          pool_no_pct:
+            type: number
+            description: Percentage of 'no' votes from pools
+            example: 0
+          committee_yes_votes_cast:
+            type: number
+            description: Number of 'yes' votes casted by committee
+            example: 5
+          committee_yes_pct:
+            type: number
+            description: Percentage of 'yes' votes from committee
+            example: 71.43
+          committee_no_votes_cast:
+            type: number
+            description: Number of 'no' votes casted by committee
+            example: 1
+          committee_no_pct:
+            type: number
+            description: Percentage of 'no' votes from committee
+            example: 28.57
     proposal_votes:
       type: array
       description: List of all votes cast on specified governance action
@@ -5449,14 +5546,16 @@ components:
             description: The role of the voter
             enum: ["ConstitutionalCommittee", "DRep", "SPO"]
             example: DRep
-          voter:
+          voter_id:
             type: string
-            description: Voter's DRep ID (bech32 format), pool ID (bech32 format) or committee hash (hex format)
-            example: drep1l9y2naagv0vqvft9szdt5wf94fqnxn5hdsgusdl7rf6vq4djqck
+            description: Voter's DRep ID (CIP-129 bech32 format), pool ID (bech32 format) or committee hot ID (CIP-129 bech32 format)
+            example: drep1yfhyq6tztjksqqpd5lglc3zr2tn8vylgjh9xzz7n2p4l4lgk3qam3
           voter_hex:
             type: string
             description: Voter's DRep ID , pool ID or committee hash in hex format
-            example: drep1l9y2naagv0vqvft9szdt5wf94fqnxn5hdsgusdl7rf6vq4djqck
+            example: 6e4069625cad00002da7d1fc444352e67613e895ca610bd3506bfafd
+          voter_has_script:
+            $ref: "#/components/schemas/drep_info/items/properties/has_script"
           vote:
             $ref: "#/components/schemas/drep_votes/items/properties/vote"
           meta_url:
@@ -5467,6 +5566,8 @@ components:
       description: Current governance committee
       type: object
       properties:
+        proposal_id:
+          $ref: "#/components/schemas/proposal_list/items/properties/proposal_id"
         proposal_tx_hash:
           $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
         proposal_index:
@@ -5494,7 +5595,7 @@ components:
                 example: 6095e643ea6f1cccb6e463ec34349026b3a48621aac5d512655ab1bf
               cc_cold_has_script:
                 type: boolean
-                description: Flag which shows if this committee member cold credential is a script hash
+                description: Flag which shows if this credential is a script hash
                 example: false
               cc_hot_hex:
                 type:
@@ -5506,7 +5607,7 @@ components:
                 type:
                   - boolean
                   - 'null'
-                description: Flag which shows if this committee member hot credential is a script hash
+                description: Flag which shows if this credential is a script hash
                 example: false
               expiration_epoch:
                 type: number

@@ -9,6 +9,8 @@ servers:
     description: Preview Network
   - url: https://preprod.koios.rest/api/v1
     description: Preprod Network
+  - url: https://sancho.koios.rest/api/v1
+    description: Sanchonet Network
 paths:
 
   /tip: #RPC
@@ -1333,7 +1335,7 @@ paths:
       tags:
         - Governance
       parameters:
-        - $ref: "#/components/parameters/_committee_hash"
+        - $ref: "#/components/parameters/_cc_hot_id"
       responses:
         "200":
           description: Success!!
@@ -1375,7 +1377,7 @@ paths:
       tags:
         - Governance
       parameters:
-        - $ref: "#/components/parameters/_credential"
+        - $ref: "#/components/parameters/_voter_id"
       responses:
         "200":
           description: Success!!
@@ -1391,22 +1393,42 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Voter's Proposal List
       description: List of all governance proposals for specified DRep, SPO or Committee credential
-      operationId: proposal_votes
-
-  /proposal_votes: #RPC
+      operationId: voter_proposal_list
+  /proposal_voting_summary: #RPC
     get:
       tags:
         - Governance
       parameters:
-        - $ref: "#/components/parameters/_proposal_tx_hash"
-        - $ref: "#/components/parameters/_proposal_index"
+        - $ref: "#/components/parameters/_proposal_id"
       responses:
         "200":
           description: Success!!
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/committee_votes"
+                $ref: "#/components/schemas/proposal_voting_summary"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Proposal Voting Summary
+      description: Summary of votes for given proposal
+      operationId: proposal_voting_summary
+  /proposal_votes: #RPC
+    get:
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_proposal_id"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/proposal_votes"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":

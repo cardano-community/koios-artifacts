@@ -79,10 +79,10 @@ parameters:
       in: query
       required: false
       allowEmptyValue: true
-    _credential:
+    _voter_id:
       deprecated: false
-      name: _credential
-      description: Voter (Drep, SPO, Committee Member) in Hex format
+      name: _voter_id
+      description: Voter ID (Drep, SPO, Committee Member) in Bech32 format (CIP-5 | CIP-129)
       schema:
         type: string
       example: "##_drep_id_param##"
@@ -109,13 +109,13 @@ parameters:
       in: query
       required: false
       allowEmptyValue: true
-    _committee_hash:
+    _cc_hot_id:
       deprecated: false
-      name: _committee_hash
-      description: Committee hash in hexadecimal format (hex)
+      name: _cc_hot_id
+      description: Committee member hot key ID in Bech32 format (CIP-5 | CIP-129)
       schema:
         type: string
-      example: "##_committee_hash_param##"
+      example: "##_cc_hot_id_param##"
       in: query
       required: false
       allowEmptyValue: true
@@ -189,23 +189,13 @@ parameters:
       in: query
       required: true
       allowEmptyValue: false
-    _proposal_tx_hash:
+    _proposal_id:
       deprecated: false
-      name: _proposal_tx_hash
-      description: Transaction Hash of government proposal in hexadecimal format (hex)
-      example: "##_proposal_tx_hash_param##"
+      name: _proposal_id
+      description: Government proposal ID in CIP-129 Bech32 format
+      example: "##_proposal_id_param##"
       schema:
         type: string
-      in: query
-      required: true
-      allowEmptyValue: false
-    _proposal_index:
-      deprecated: false
-      name: _proposal_index
-      description: Index of governance proposal in transaction
-      schema:
-        type: number
-        example: 0
       in: query
       required: true
       allowEmptyValue: false

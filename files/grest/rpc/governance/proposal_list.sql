@@ -1,6 +1,7 @@
 CREATE OR REPLACE FUNCTION grest.proposal_list()
 RETURNS TABLE (
   block_time integer,
+  proposal_id text,
   proposal_tx_hash text,
   proposal_index integer,
   proposal_type text,
@@ -26,6 +27,7 @@ LANGUAGE sql STABLE
 AS $$
   SELECT
     EXTRACT(EPOCH FROM b.time)::integer,
+    grest.cip129_to_gov_action_id(tx.hash, gap.index),
     ENCODE(tx.hash, 'hex'),
     gap.index,
     gap.type,

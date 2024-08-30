@@ -1,7 +1,8 @@
 CREATE OR REPLACE FUNCTION grest.drep_updates(_drep_id text DEFAULT NULL)
 RETURNS TABLE (
-  drep_id character varying,
+  drep_id text,
   hex text,
+  has_script boolean,
   update_tx_hash text,
   cert_index integer,
   block_time integer,
@@ -14,8 +15,9 @@ RETURNS TABLE (
 LANGUAGE sql STABLE
 AS $$
   SELECT
-    dh.view AS drep_id,
+    grest.cip129_hex_to_drep_id(dh.raw, dh.has_script) AS drep_id,
     ENCODE(dh.raw, 'hex')::text AS hex,
+    dh.has_script AS has_script,
     ENCODE(tx.hash, 'hex')::text AS update_tx_hash,
     dr.cert_index,
     EXTRACT(EPOCH FROM b.time)::integer AS block_time,
@@ -37,7 +39,7 @@ AS $$
   WHERE
     CASE
       WHEN _drep_id IS NULL THEN TRUE
-      ELSE dh.view = _drep_id
+      ELSE dh.raw = DECODE((SELECT grest.cip129_drep_id_to_hex(_drep_id)), 'hex')
     END
   ORDER BY
     block_time DESC;
