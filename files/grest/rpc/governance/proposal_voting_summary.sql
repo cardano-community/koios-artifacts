@@ -183,11 +183,7 @@ BEGIN
     FROM 
       (
         SELECT  
-          gov_action_proposal_id,
-          proposal_type,
-          epoch_of_interest,
-          always_abstain, 
-          always_no_conf,
+          c1.*,
           (
             SELECT coalesce(SUM(active_drep_votes_cast), 0)
             FROM active_prop_drep_votes AS c2
@@ -252,9 +248,7 @@ BEGIN
             SELECT coalesce(SUM(committee_votes_cast), 0)
             FROM committee_votes AS c3
             WHERE c3.gov_action_proposal_id = c1.gov_action_proposal_id AND c3.vote = 'Abstain'
-          ) AS committee_non_abstain_total,
-          tot_drep_power,
-          tot_pool_power
+          ) AS committee_non_abstain_total
         FROM combined_data AS c1
       ) AS y
     ORDER BY 1 DESC
