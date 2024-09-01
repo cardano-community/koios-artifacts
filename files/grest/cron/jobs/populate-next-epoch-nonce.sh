@@ -30,7 +30,7 @@ current_slot_in_epoch=$(curl -s "${PROM_URL}" | grep slotInEpoch | awk '{print $
 next_epoch=$((current_epoch + 1))
 
 [[ ${current_slot_in_epoch} -ge ${min_slot} ]] &&
-  next_epoch_nonce=$(echo "$(${CCLI} query protocol-state --testnet-magic "${NWMAGIC}" | jq -r .candidateNonce.contents)$(${CCLI} query protocol-state --testnet-magic "${NWMAGIC}" | jq -r .lastEpochBlockNonce.contents)" | xxd -r -p | b2sum -b -l 256 | awk '{print $1}') &&
+  next_epoch_nonce=$(echo "$(${CCLI} query protocol-state --testnet-magic "${NWMAGIC}" | jq -r .candidateNonce)$(${CCLI} query protocol-state --testnet-magic "${NWMAGIC}" | jq -r .lastEpochBlockNonce)" | xxd -r -p | b2sum -b -l 256 | awk '{print $1}') &&
   psql ${DB_NAME} -c "INSERT INTO grest.epoch_info_cache (epoch_no, p_nonce) VALUES (${next_epoch}, '${next_epoch_nonce}') ON CONFLICT(epoch_no) DO UPDATE SET p_nonce='${next_epoch_nonce}';"
 
 echo "$(date +%F_%H:%M:%S) Job done!"
