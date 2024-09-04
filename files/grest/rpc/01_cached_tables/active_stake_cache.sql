@@ -91,7 +91,10 @@ BEGIN
         epoch_stake.epoch_no,
         SUM(epoch_stake.amount) AS amount
       FROM public.epoch_stake
-      WHERE epoch_stake.epoch_no >= _last_active_stake_validated_epoch
+      WHERE epoch_stake.epoch_no >= COALESCE(
+          (SELECT last_value::integer
+            FROM grest.control_table
+            WHERE key = 'last_active_stake_validated_epoch'), 0)
         AND epoch_stake.epoch_no <= _epoch_no
       GROUP BY epoch_stake.epoch_no
       ON CONFLICT (epoch_no) DO UPDATE
