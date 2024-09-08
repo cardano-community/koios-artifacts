@@ -26,8 +26,8 @@ RETURNS TABLE (
   active_stake lovelace,
   active_stake_pct numeric,
   saturation_pct numeric,
-  block_cnt numeric,
-  delegator_cnt numeric,
+  block_cnt bigint,
+  delegator_cnt bigint,
   margin double precision,
   fixed_cost lovelace,
   pool_fees double precision,
@@ -46,6 +46,21 @@ BEGIN
   RETURN QUERY
   
   WITH
+    blockcounts AS (
+      SELECT
+        sl.pool_hash_id,
+        b.epoch_no,
+        COUNT(*) AS block_cnt
+      FROM block AS b,
+        slot_leader AS sl
+      WHERE b.slot_leader_id = sl.id
+        AND (_pool_bech32 is null or sl.pool_hash_id = ANY(_pool_ids))
+        AND b.epoch_no >= _epoch_no_to_insert_from
+        AND (_epoch_no_until is null or b.epoch_no <= _epoch_no_until) 
+      GROUP BY
+        sl.pool_hash_id,
+        b.epoch_no
+    ),
     leadertotals AS (
       SELECT
         r.pool_id,
@@ -79,18 +94,17 @@ BEGIN
     activeandfees AS (
       SELECT
         ph.view AS pool_id,
-        ps.epoch_no,
-        ps.stake AS active_stake,
-        ps.number_of_blocks AS block_cnt,
-        COALESCE(ps.number_of_delegators, 0) AS delegator_cnt,
+        es.epoch_no,
+        SUM(es.amount) AS active_stake,
+        COUNT(1) AS delegator_cnt,
         (
           SELECT margin
           FROM pool_update
           WHERE id = (
               SELECT MAX(pup2.id)
               FROM pool_update AS pup2
-              WHERE pup2.hash_id = ps.pool_hash_id
-                AND pup2.active_epoch_no <= ps.epoch_no
+              WHERE pup2.hash_id = es.pool_id
+                AND pup2.active_epoch_no <= es.epoch_no
            )
         ) AS pool_fee_variable,
         (
@@ -99,32 +113,32 @@ BEGIN
           WHERE id = (
               SELECT MAX(pup2.id)
               FROM pool_update AS pup2
-              WHERE pup2.hash_id = ps.pool_hash_id
-                AND pup2.active_epoch_no <= ps.epoch_no)
+              WHERE pup2.hash_id = es.pool_id
+                AND pup2.active_epoch_no <= es.epoch_no)
         ) AS pool_fee_fixed,
-        (ps.stake / (
+        (SUM(es.amount) / (
           SELECT NULLIF(easc.amount, 0)
           FROM grest.epoch_active_stake_cache AS easc
-          WHERE easc.epoch_no = ps.epoch_no
+          WHERE easc.epoch_no = es.epoch_no
           )
         ) * 100 AS active_stake_pct,
         ROUND(
-          (ps.stake / (
+          (SUM(es.amount) / (
             SELECT supply::bigint / (
                 SELECT ep.optimal_pool_count
                 FROM epoch_param AS ep
-                WHERE ep.epoch_no = ps.epoch_no
+                WHERE ep.epoch_no = es.epoch_no
               )
-            FROM grest.totals (ps.epoch_no)
+            FROM grest.totals (es.epoch_no)
             ) * 100
           ), 2
         ) AS saturation_pct
-      FROM pool_stat AS ps
-        INNER JOIN pool_hash AS ph ON ps.pool_hash_id = ph.id
-      WHERE ps.epoch_no >= _epoch_no_to_insert_from
-        AND (_epoch_no_until is null or ps.epoch_no < _epoch_no_until)
+      FROM epoch_stake AS es
+        INNER JOIN pool_hash AS ph ON es.pool_id = ph.id
+      WHERE es.epoch_no >= _epoch_no_to_insert_from
+        AND (_epoch_no_until is null or es.epoch_no < _epoch_no_until)
         AND (_pool_bech32 is null or ph.view = ANY(_pool_bech32))
-      GROUP BY ps.pool_hash_id, ph.view, ps.epoch_no, ps.stake, ps.number_of_blocks, ps.number_of_delegators
+      GROUP BY es.pool_id, ph.view, es.epoch_no
     )
 
     SELECT
@@ -133,13 +147,13 @@ BEGIN
       actf.active_stake::lovelace,
       actf.active_stake_pct,
       actf.saturation_pct,
-      COALESCE(actf.block_cnt, 0) AS block_cnt,
+      COALESCE(b.block_cnt, 0) AS block_cnt,
       actf.delegator_cnt,
       actf.pool_fee_variable::double precision,
       actf.pool_fee_fixed,
       -- for debugging: m.memtotal,
       -- for debugging: l.leadertotal,
-      CASE COALESCE(actf.block_cnt, 0)
+      CASE COALESCE(b.block_cnt, 0)
       WHEN 0 THEN
         0
       ELSE
@@ -153,7 +167,7 @@ BEGIN
             END
         END
       END AS pool_fees,
-      CASE COALESCE(actf.block_cnt, 0)
+      CASE COALESCE(b.block_cnt, 0)
       WHEN 0 THEN
         0
       ELSE
@@ -167,7 +181,7 @@ BEGIN
           END
         END
       END AS deleg_rewards,
-      CASE COALESCE(actf.block_cnt, 0)
+      CASE COALESCE(b.block_cnt, 0)
         WHEN 0 THEN 0
       ELSE
         CASE COALESCE(m.memtotal, 0)
@@ -175,7 +189,7 @@ BEGIN
           ELSE COALESCE(m.memtotal, 0)
         END
       END::double precision AS member_rewards,
-      CASE COALESCE(actf.block_cnt, 0)
+      CASE COALESCE(b.block_cnt, 0)
         WHEN 0 THEN 0
       ELSE
         -- special CASE for WHEN reward information is not available yet
@@ -192,6 +206,8 @@ BEGIN
       END AS epoch_ros
     FROM pool_hash AS ph
     INNER JOIN activeandfees AS actf ON actf.pool_id = ph.view
+    LEFT JOIN blockcounts AS b ON ph.id = b.pool_hash_id
+      AND actf.epoch_no = b.epoch_no
     LEFT JOIN leadertotals AS l ON ph.id = l.pool_id
       AND actf.epoch_no = l.earned_epoch
     LEFT JOIN membertotals AS m ON ph.id = m.pool_id
