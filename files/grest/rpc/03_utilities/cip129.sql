@@ -34,6 +34,19 @@ BEGIN
 END;
 $$;
 
+CREATE OR REPLACE FUNCTION grest.cip129_cc_hot_has_script(_cc_hot text)
+RETURNS boolean
+LANGUAGE plpgsql STABLE
+AS $$
+BEGIN
+  IF LENGTH(_cc_hot) = 60 THEN
+    RETURN SUBSTRING(b32_decode(_cc_hot) from 2 for 1) = '3';
+  ELSE
+    RETURN STARTS_WITH(_cc_hot, 'cc_hot_script');
+  END IF;
+END;
+$$;
+
 CREATE OR REPLACE FUNCTION grest.cip129_hex_to_cc_hot(_raw bytea, _is_script boolean)
 RETURNS text
 LANGUAGE plpgsql STABLE
@@ -60,6 +73,19 @@ BEGIN
 END;
 $$;
 
+CREATE OR REPLACE FUNCTION grest.cip129_cc_cold_has_script(_cc_cold text)
+RETURNS boolean
+LANGUAGE plpgsql STABLE
+AS $$
+BEGIN
+  IF LENGTH(_cc_cold) = 61 THEN
+    RETURN SUBSTRING(b32_decode(_cc_cold) from 2 for 1) = '3';
+  ELSE
+    RETURN STARTS_WITH(_cc_cold, 'cc_cold_script');
+  END IF;
+END;
+$$;
+
 CREATE OR REPLACE FUNCTION grest.cip129_hex_to_cc_cold(_raw bytea, _is_script boolean)
 RETURNS text
 LANGUAGE plpgsql STABLE
@@ -82,6 +108,19 @@ BEGIN
     RETURN SUBSTRING(b32_decode(_drep_id) from 3);
   ELSE
     RETURN b32_decode(_drep_id);
+  END IF;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION grest.cip129_drep_id_has_script(_drep_id text)
+RETURNS boolean
+LANGUAGE plpgsql STABLE
+AS $$
+BEGIN
+  IF LENGTH(_drep_id) = 58 THEN
+    RETURN SUBSTRING(b32_decode(_drep_id) from 2 for 1) = '3';
+  ELSE
+    RETURN STARTS_WITH(_drep_id, 'drep_script');
   END IF;
 END;
 $$;
@@ -121,10 +160,13 @@ END;
 $$;
 
 COMMENT ON FUNCTION grest.cip129_cc_hot_to_hex IS 'Returns binary hex from Constitutional Committee Hot Credential ID in old or new (CIP-129) format'; -- noqa: LT01
+COMMENT ON FUNCTION grest.cip129_cc_hot_has_script IS 'Returns true if Constitutional Committee Hot Credential ID is of type script'; -- noqa: LT01
 COMMENT ON FUNCTION grest.cip129_hex_to_cc_hot IS 'Returns Constitutional Committee Hot Credential ID in CIP-129 format from raw binary hex'; -- noqa: LT01
 COMMENT ON FUNCTION grest.cip129_cc_cold_to_hex IS 'Returns binary hex from Constitutional Committee Cold Credential ID in old or new (CIP-129) format'; -- noqa: LT01
+COMMENT ON FUNCTION grest.cip129_cc_cold_has_script IS 'Returns true if Constitutional Committee Cold Credential ID is of type script'; -- noqa: LT01
 COMMENT ON FUNCTION grest.cip129_hex_to_cc_cold IS 'Returns Constitutional Committee Cold Credential ID in CIP-129 format from raw binary hex'; -- noqa: LT01
 COMMENT ON FUNCTION grest.cip129_drep_id_to_hex IS 'Returns binary hex from DRep Credential ID in old or new (CIP-129) format'; -- noqa: LT01
+COMMENT ON FUNCTION grest.cip129_drep_id_has_script IS 'Returns true if DRep Credential ID is of type script'; -- noqa: LT01
 COMMENT ON FUNCTION grest.cip129_hex_to_drep_id IS 'Returns DRep Credential ID in CIP-129 format from raw binary hex'; -- noqa: LT01
 COMMENT ON FUNCTION grest.cip129_from_gov_action_id IS 'Returns string array containing transaction hash and certificate index from Governance Action Proposal ID in CIP-129 format'; -- noqa: LT01
 COMMENT ON FUNCTION grest.cip129_to_gov_action_id IS 'Returns Governance Action Proposal ID in CIP-129 format from transaction hash appended by index of certificate within the transaction'; -- noqa: LT01

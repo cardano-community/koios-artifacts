@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION grest.drep_info(_drep_ids text [])
+CREATE OR REPLACE FUNCTION grest.drep_info2(_drep_ids text [])
 RETURNS TABLE (
   drep_id text,
   hex text,
@@ -15,7 +15,6 @@ LANGUAGE plpgsql
 AS $$
 DECLARE
   curr_epoch    word31type;
-  drep_ids_raw  hash28type[];
   drep_list     bigint[];
   drep_activity word64type;
 BEGIN
@@ -24,20 +23,22 @@ BEGIN
 
   SELECT INTO drep_activity ep.drep_activity FROM public.epoch_param AS ep WHERE ep.epoch_no = curr_epoch;
 
-  SELECT INTO drep_ids_raw ARRAY_REMOVE(ARRAY_AGG(
-    CASE
-      WHEN STARTS_WITH(n,'drep_') THEN NULL
-    ELSE
-      DECODE(grest.cip129_drep_id_to_hex(n), 'hex')
-    END
-  ), NULL) FROM UNNEST(_drep_ids) AS n;
-
   -- all DRep ids
   SELECT INTO drep_list ARRAY_AGG(id)
   FROM (
     SELECT id
-    FROM public.drep_hash
-    WHERE raw = ANY(drep_ids_raw)
+    FROM public.drep_hash AS dh
+    INNER JOIN (
+      SELECT
+        CASE
+          WHEN STARTS_WITH(n,'drep_always') THEN NULL
+        ELSE
+          DECODE(grest.cip129_drep_id_to_hex(n), 'hex')
+        END AS hex,
+        grest.cip129_drep_id_has_script(n) AS has_script
+      FROM UNNEST(_drep_ids) AS n
+    ) AS dip ON dip.hex = dh.raw AND dip.has_script = dh.has_script
+    WHERE dh.raw IS NOT NULL
   ) AS tmp;
 
   IF 'drep_always_abstain' = ANY(_drep_ids) THEN
@@ -124,9 +125,9 @@ BEGIN
       END AS drep_id,
       ENCODE(dh.raw, 'hex')::text AS hex,
       dh.has_script AS has_script,
-      (CASE WHEN starts_with(dh.view,'drep_') OR (COALESCE(dr.deposit, 0) >= 0 AND dr.drep_hash_id IS NOT NULL) THEN TRUE ELSE FALSE END) AS registered,
-      (CASE WHEN (dr.deposit < 0) OR starts_with(dh.view,'drep_') THEN NULL ELSE ds.deposit END)::text AS deposit,
-      (CASE WHEN starts_with(dh.view,'drep_') THEN TRUE ELSE COALESCE(dr.deposit, 0) >= 0 AND ds.active END) AS active,
+      (CASE WHEN starts_with(dh.view,'drep_always') OR (COALESCE(dr.deposit, 0) >= 0 AND dr.drep_hash_id IS NOT NULL) THEN TRUE ELSE FALSE END) AS registered,
+      (CASE WHEN (dr.deposit < 0) OR starts_with(dh.view,'drep_always') THEN NULL ELSE ds.deposit END)::text AS deposit,
+      (CASE WHEN starts_with(dh.view,'drep_always') THEN TRUE ELSE COALESCE(dr.deposit, 0) >= 0 AND ds.active END) AS active,
       (CASE WHEN COALESCE(dr.deposit, 0) >= 0 THEN ds.expires_epoch_no ELSE NULL END) AS expires_epoch_no,
       COALESCE(dd.amount, 0)::text AS amount,
       va.url,

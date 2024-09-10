@@ -28,6 +28,7 @@ AS $$
     INNER JOIN public.block AS b ON vote_tx.block_id = b.id
     LEFT JOIN public.voting_anchor AS va ON vp.voting_anchor_id = va.id
   WHERE dh.raw = DECODE((SELECT grest.cip129_drep_id_to_hex(_drep_id)), 'hex')
+    AND dh.has_script = grest.cip129_drep_id_has_script(_drep_id)
   ORDER BY
     vote_tx.id DESC;
 $$;

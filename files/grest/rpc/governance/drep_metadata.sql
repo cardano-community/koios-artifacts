@@ -14,11 +14,7 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql
 AS $$
-DECLARE
-  drep_ids_raw  hash28type[];
 BEGIN
-
-  SELECT INTO drep_ids_raw ARRAY_AGG(DECODE(grest.cip129_drep_id_to_hex(n), 'hex')) FROM UNNEST(_drep_ids) AS n;
 
   RETURN QUERY (
     SELECT DISTINCT ON (dh.raw)
@@ -34,10 +30,20 @@ BEGIN
       ocvd.comment AS comment,
       COALESCE(ocvd.is_valid, true) AS is_valid
     FROM public.drep_hash AS dh
+      INNER JOIN (
+        SELECT
+          CASE
+            WHEN STARTS_WITH(n,'drep_always') THEN NULL
+          ELSE
+            DECODE(grest.cip129_drep_id_to_hex(n), 'hex')
+          END AS hex,
+          grest.cip129_drep_id_has_script(n) AS has_script
+        FROM UNNEST(_drep_ids) AS n
+      ) AS dip ON dip.hex = dh.raw AND dip.has_script = dh.has_script
       INNER JOIN public.drep_registration AS dr ON dh.id = dr.drep_hash_id
       LEFT JOIN public.voting_anchor AS va ON dr.voting_anchor_id = va.id
       LEFT JOIN public.off_chain_vote_data AS ocvd ON va.id = ocvd.voting_anchor_id
-    WHERE dh.raw = ANY(drep_ids_raw)
+    WHERE dh.raw IS NOT NULL
     ORDER BY
       dh.raw, dr.tx_id DESC
   );

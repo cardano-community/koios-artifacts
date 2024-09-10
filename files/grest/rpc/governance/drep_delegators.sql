@@ -13,7 +13,7 @@ DECLARE
   last_reg_tx_id  bigint;
 BEGIN
 
-  IF STARTS_WITH(_drep_id,'drep_') THEN
+  IF STARTS_WITH(_drep_id,'drep_always') THEN
     -- predefined DRep roles
     SELECT INTO drep_idx id
     FROM public.drep_hash
@@ -23,7 +23,8 @@ BEGIN
   ELSE
     SELECT INTO drep_idx id
     FROM public.drep_hash
-    WHERE raw = DECODE((SELECT grest.cip129_drep_id_to_hex(_drep_id)), 'hex');
+    WHERE raw = DECODE((SELECT grest.cip129_drep_id_to_hex(_drep_id)), 'hex')
+      AND has_script = grest.cip129_drep_id_has_script(_drep_id);
 
     SELECT INTO last_reg_tx_id MAX(tx_id)
     FROM public.drep_registration
