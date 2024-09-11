@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION grest.drep_info2(_drep_ids text [])
+CREATE OR REPLACE FUNCTION grest.drep_info(_drep_ids text [])
 RETURNS TABLE (
   drep_id text,
   hex text,
