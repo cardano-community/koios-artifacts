@@ -23,12 +23,15 @@ BEGIN
   FROM
     stake_address
   WHERE
-    stake_address.view = ANY(_stake_addresses);
+    stake_address.hash_raw = ANY(
+      SELECT ARRAY_AGG(DECODE(b32_decode(n), 'hex'))
+      FROM UNNEST(_stake_addresses) AS n
+    );
 
   RETURN QUERY
 
     SELECT
-      sdc.stake_address,
+      grest.cip5_hex_to_stake_addr(sdc.stake_address_raw),
       CASE  WHEN status_t.registered = TRUE THEN
         'registered'
       ELSE
@@ -48,7 +51,7 @@ BEGIN
       LEFT JOIN (
         SELECT
           sas.id,
-          sas.view,
+          sas.hash_raw,
           EXISTS (
             SELECT TRUE FROM stake_registration
             WHERE
@@ -73,7 +76,7 @@ BEGIN
           ) AS deposit
         FROM public.stake_address AS sas
         WHERE sas.id = ANY(sa_id_list)
-        ) AS status_t ON sdc.stake_address = status_t.view
+        ) AS status_t ON sdc.stake_address_raw = status_t.hash_raw
       LEFT JOIN (
         SELECT
           dv.addr_id,
@@ -115,7 +118,10 @@ BEGIN
         GROUP BY
           t.addr_id
         ) AS treasury_t ON treasury_t.addr_id = status_t.id
-    WHERE sdc.stake_address = ANY(_stake_addresses)
+    WHERE sdc.stake_address_raw = ANY(
+      SELECT ARRAY_AGG(DECODE(b32_decode(n), 'hex'))
+      FROM UNNEST(_stake_addresses) AS n
+    )
 
     UNION ALL
 
@@ -135,13 +141,13 @@ BEGIN
       FROM
         (
           SELECT
-            sa.view AS stake_address,
+            sa.hash_raw AS stake_address_raw,
             sa.id AS addr_id
           FROM stake_address AS sa 
-          WHERE view = ANY(_stake_addresses)
-           AND NOT EXISTS (SELECT null FROM grest.stake_distribution_cache AS sdc WHERE sdc.stake_address = sa.view)
+          WHERE sa.id = ANY(sa_id_list)
+           AND NOT EXISTS (SELECT null FROM grest.stake_distribution_cache AS sdc WHERE sdc.stake_address_raw = sa.hash_raw)
         ) AS z
-        , LATERAL grest.account_info(array[z.stake_address]) AS ai
+        , LATERAL grest.account_info(array[(SELECT grest.cip5_hex_to_stake_addr(z.stake_address_raw))]) AS ai
     ;
 
 END;

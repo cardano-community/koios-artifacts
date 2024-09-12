@@ -10,18 +10,21 @@ AS $$
 DECLARE
   _tx_id_min bigint;
   _tx_id_list bigint[];
+  _stake_address_id integer;
 BEGIN
   SELECT INTO _tx_id_min id
     FROM tx
     WHERE block_id >= (SELECT id FROM block WHERE block_no >= _after_block_height ORDER BY id limit 1)
     ORDER BY id limit 1;
 
+  SELECT INTO _stake_address_id id FROM stake_address WHERE hash_raw = (SELECT DECODE(b32_decode(_stake_address), 'hex'));
+
   -- all tx_out & tx_in tx ids
   SELECT INTO _tx_id_list ARRAY_AGG(tx_id)
   FROM (
     SELECT tx_id
     FROM tx_out
-    WHERE stake_address_id = ANY(SELECT id FROM stake_address WHERE view = _stake_address)
+    WHERE stake_address_id = _stake_address_id
       AND tx_id >= _tx_id_min
     --
     UNION
@@ -29,7 +32,7 @@ BEGIN
     SELECT consumed_by_tx_id AS tx_id
     FROM tx_out
     WHERE tx_out.consumed_by_tx_id IS NOT NULL
-      AND tx_out.stake_address_id = ANY(SELECT id FROM stake_address WHERE view = _stake_address)
+      AND tx_out.stake_address_id = _stake_address_id
       AND tx_out.consumed_by_tx_id >= _tx_id_min
   ) AS tmp;
 

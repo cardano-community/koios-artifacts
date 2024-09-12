@@ -28,13 +28,13 @@ BEGIN
     RETURN QUERY
       SELECT
         x.address,
-        x.stake_address,
+        grest.cip5_hex_to_stake_addr(x.stake_address_raw),
         SUM(x.quantity)::text
       FROM
         (
           SELECT
             txo.address,
-            sa.view AS stake_address,
+            sa.hash_raw AS stake_address_raw,
             atoc.quantity
           FROM grest.asset_tx_out_cache AS atoc
           LEFT JOIN tx_out AS txo ON atoc.txo_id = txo.id
@@ -42,18 +42,18 @@ BEGIN
           WHERE atoc.ma_id = _asset_id
             AND txo.consumed_by_tx_id IS NULL
         ) AS x
-      GROUP BY x.address, x.stake_address;
+      GROUP BY x.address, x.stake_address_raw;
   ELSE
     RETURN QUERY
       SELECT
         x.address,
-        x.stake_address,
+        grest.cip5_hex_to_stake_addr(x.stake_address_raw),
         SUM(x.quantity)::text
       FROM
         (
           SELECT
             txo.address,
-            sa.view AS stake_address,
+            sa.hash_raw AS stake_address_raw,
             mto.quantity
           FROM ma_tx_out AS mto
           LEFT JOIN tx_out AS txo ON txo.id = mto.tx_out_id
@@ -61,7 +61,7 @@ BEGIN
           WHERE mto.ident = _asset_id
             AND txo.consumed_by_tx_id IS NULL
         ) AS x
-      GROUP BY x.address, x.stake_address;
+      GROUP BY x.address, x.stake_address_raw;
   END IF;
 END;
 $$;

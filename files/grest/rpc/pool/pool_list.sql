@@ -26,9 +26,9 @@ AS $$
     pu.fixed_cost::text,
     pu.pledge::text,
     pu.deposit::text,
-    sa.view AS reward_addr,
+    grest.cip5_hex_to_stake_addr(sa.hash_raw) AS reward_addr,
     ARRAY(
-      SELECT sa.view
+      SELECT grest.cip5_hex_to_stake_addr(sa.hash_raw)
       FROM public.pool_owner AS po
       INNER JOIN public.stake_address AS sa ON sa.id = po.addr_id
       WHERE po.pool_update_id = pic.update_id

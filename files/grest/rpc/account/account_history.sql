@@ -13,12 +13,15 @@ BEGIN
   FROM
     stake_address
   WHERE
-    stake_address.view = ANY(_stake_addresses);
+    stake_address.hash_raw = ANY(
+      SELECT ARRAY_AGG(DECODE(b32_decode(n), 'hex'))
+      FROM UNNEST(_stake_addresses) AS n
+    );
 
   IF _epoch_no IS NOT NULL THEN
     RETURN QUERY
       SELECT
-        sa.view AS stake_address,
+        grest.cip5_hex_to_stake_addr(sa.hash_raw) AS stake_address,
         JSONB_AGG(
           JSONB_BUILD_OBJECT(
             'pool_id', ph.view,
@@ -35,11 +38,11 @@ BEGIN
         AND
         sa.id = ANY(sa_id_list)
       GROUP BY
-        sa.view;
+        sa.hash_raw;
   ELSE
     RETURN QUERY
       SELECT
-        sa.view AS stake_address,
+        grest.cip5_hex_to_stake_addr(sa.hash_raw) AS stake_address,
         JSONB_AGG(
           JSONB_BUILD_OBJECT(
             'pool_id', ph.view,
@@ -54,7 +57,7 @@ BEGIN
       WHERE
         sa.id = ANY(sa_id_list)
       GROUP BY
-        sa.view;
+        sa.hash_raw;
   END IF;
 END;
 $$;

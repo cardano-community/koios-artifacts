@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS grest.stake_distribution_cache (
-  stake_address varchar PRIMARY KEY,
+  stake_address_raw addr29type PRIMARY KEY,
   pool_id varchar,
   total_balance numeric,
   utxo numeric,
@@ -31,7 +31,7 @@ BEGIN
     accounts_with_delegated_pools AS (
       SELECT DISTINCT ON (stake_address.id)
         stake_address.id AS stake_address_id,
-        stake_address.view AS stake_address,
+        stake_address.hash_raw AS stake_address_raw,
         pool_hash_id
       FROM stake_address
         INNER JOIN delegation ON delegation.addr_id = stake_address.id
@@ -172,7 +172,7 @@ BEGIN
   -- INSERT QUERY START
   INSERT INTO grest.stake_distribution_cache
     SELECT
-      awdp.stake_address,
+      awdp.stake_address_raw,
       pi.pool_id,
       COALESCE(aas.amount, 0) + COALESCE(ado.amount, 0) - COALESCE(adi.amount, 0) + COALESCE(adr.rewards, 0) + COALESCE(adir.amount, 0) - COALESCE(adw.withdrawals, 0) AS total_balance,
       COALESCE(aas.amount, 0) + COALESCE(ado.amount, 0) - COALESCE(adi.amount, 0) + COALESCE(adr.rewards, 0) + COALESCE(adir.amount, 0) - COALESCE(adw.withdrawals, 0) - COALESCE(atrew.rewards, 0) - COALESCE(atir.amount, 0) + COALESCE(atw.withdrawals, 0) AS utxo,
@@ -190,7 +190,7 @@ BEGIN
     LEFT JOIN account_delta_rewards AS adr ON adr.stake_address_id = awdp.stake_address_id
     LEFT JOIN account_delta_instant_rewards AS adir ON adir.stake_address_id = awdp.stake_address_id
     LEFT JOIN account_delta_withdrawals AS adw ON adw.stake_address_id = awdp.stake_address_id
-    ON CONFLICT (stake_address) DO
+    ON CONFLICT (stake_address_raw) DO
       UPDATE
         SET pool_id = excluded.pool_id,
           total_balance = excluded.total_balance,
@@ -211,9 +211,9 @@ BEGIN
   
   -- Clean up de-registered accounts
   DELETE FROM grest.stake_distribution_cache
-  WHERE stake_address IN (
+  WHERE stake_address_raw IN (
     SELECT DISTINCT ON (sa.id)
-      sa.view
+      sa.hash_raw
     FROM stake_address AS sa
     INNER JOIN stake_deregistration AS sd ON sa.id = sd.addr_id
       WHERE NOT EXISTS (
@@ -227,15 +227,15 @@ BEGIN
   -- Clean up accounts registered to retired-at-least-once-since pools
   RAISE NOTICE 'DANGLING delegation cleanup from SDC commencing';
   DELETE FROM grest.stake_distribution_cache
-    WHERE stake_address in (
-     SELECT z.stake_address
+    WHERE stake_address_raw in (
+     SELECT z.stake_address_raw
      FROM (
       SELECT 
         (
           SELECT max(d.id)
           FROM delegation d
-            INNER JOIN stake_address sd ON sd.view = sdc.stake_address AND sd.id = d.addr_id) AS last_deleg, 
-        sdc.stake_address
+            INNER JOIN stake_address sd ON sd.hash_raw = sdc.stake_address_raw AND sd.id = d.addr_id) AS last_deleg,
+        sdc.stake_address_raw
       FROM grest.stake_distribution_cache AS sdc
     ) AS z
     WHERE grest.is_dangling_delegation(z.last_deleg)

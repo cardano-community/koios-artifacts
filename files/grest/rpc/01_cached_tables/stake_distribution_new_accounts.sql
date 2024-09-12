@@ -32,7 +32,7 @@ BEGIN
     newly_registered_accounts AS (
       SELECT DISTINCT ON (stake_address.id)
         stake_address.id AS stake_address_id,
-        stake_address.view AS stake_address,
+        stake_address.hash_raw AS stake_address_raw,
         pool_hash_id
       FROM stake_address
       INNER JOIN delegation ON delegation.addr_id = stake_address.id
@@ -67,7 +67,7 @@ BEGIN
   -- INSERT QUERY START
   INSERT INTO grest.stake_distribution_cache
     SELECT
-      nra.stake_address,
+      nra.stake_address_raw,
       ai.delegated_pool AS pool_id,
       ai.total_balance::lovelace,
       ai.utxo::lovelace,
@@ -75,8 +75,8 @@ BEGIN
       ai.withdrawals::lovelace,
       ai.rewards_available::lovelace
     FROM newly_registered_accounts AS nra,
-      LATERAL grest.account_info(array[nra.stake_address]) AS ai
-    ON CONFLICT (stake_address) DO
+      LATERAL grest.account_info(array[(SELECT grest.cip5_hex_to_stake_addr(nra.stake_address_raw))]) AS ai
+    ON CONFLICT (stake_address_raw) DO
       UPDATE
         SET
           pool_id = EXCLUDED.pool_id,

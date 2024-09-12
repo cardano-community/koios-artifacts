@@ -28,7 +28,7 @@ BEGIN
     RETURN QUERY
       SELECT
         txo.address,
-        sa.view AS stake_address
+        grest.cip5_hex_to_stake_addr(sa.hash_raw) AS stake_address
       FROM tx_out AS txo
       LEFT JOIN stake_address AS sa ON txo.stake_address_id = sa.id
       WHERE txo.id = (
@@ -40,7 +40,7 @@ BEGIN
     RETURN QUERY
       SELECT
         txo.address,
-        sa.view AS stake_address
+        grest.cip5_hex_to_stake_addr(sa.hash_raw) AS stake_address
       FROM tx_out AS txo
       INNER JOIN ma_tx_out mto ON mto.tx_out_id = txo.id
       LEFT JOIN stake_address AS sa ON txo.stake_address_id = sa.id

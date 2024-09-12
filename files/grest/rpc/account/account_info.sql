@@ -21,12 +21,15 @@ BEGIN
   SELECT INTO sa_id_list
     array_agg(id)
   FROM stake_address
-  WHERE stake_address.view = ANY(_stake_addresses);
+  WHERE stake_address.hash_raw = ANY(
+    SELECT ARRAY_AGG(DECODE(b32_decode(n), 'hex'))
+    FROM UNNEST(_stake_addresses) AS n
+  );
 
   RETURN QUERY
   
     SELECT
-      status_t.view AS stake_address,
+      grest.cip5_hex_to_stake_addr(status_t.hash_raw) AS stake_address,
       CASE WHEN status_t.registered = TRUE THEN
         'registered'
       ELSE
@@ -46,7 +49,7 @@ BEGIN
       (
         SELECT
           sa.id,
-          sa.view,
+          sa.hash_raw,
           EXISTS (
             SELECT TRUE FROM stake_registration AS sr
             WHERE sr.addr_id = sa.id

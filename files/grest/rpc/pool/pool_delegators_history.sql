@@ -14,7 +14,7 @@ BEGIN
   IF _epoch_no IS NULL THEN
     RETURN QUERY
       SELECT
-        sa.view,
+        grest.cip5_hex_to_stake_addr(sa.hash_raw),
         es.amount::text,
         es.epoch_no
       FROM
@@ -27,7 +27,7 @@ BEGIN
   ELSE
     RETURN QUERY
       SELECT
-        sa.view,
+        grest.cip5_hex_to_stake_addr(sa.hash_raw),
         es.amount::text,
         es.epoch_no
       FROM

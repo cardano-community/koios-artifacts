@@ -67,9 +67,9 @@ BEGIN
       pu.fixed_cost::text,
       pu.pledge::text,
       pu.deposit::text,
-      sa.view AS reward_addr,
+      grest.cip5_hex_to_stake_addr(sa.hash_raw) AS reward_addr,
       ARRAY(
-        SELECT sa.view
+        SELECT grest.cip5_hex_to_stake_addr(sa.hash_raw)
         FROM public.pool_owner AS po
         INNER JOIN public.stake_address AS sa ON sa.id = po.addr_id
         WHERE po.pool_update_id = api.update_id
@@ -147,8 +147,8 @@ BEGIN
           THEN NULL
         ELSE
           SUM(CASE
-            WHEN pool_delegs.stake_address IN (
-                SELECT sa.view
+            WHEN DECODE(b32_decode(pool_delegs.stake_address), 'hex') IN (
+                SELECT sa.hash_raw
                 FROM public.pool_owner AS po
                 INNER JOIN public.stake_address AS sa ON sa.id = po.addr_id
                 WHERE po.pool_update_id = api.update_id
