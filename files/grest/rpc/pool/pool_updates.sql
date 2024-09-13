@@ -37,8 +37,8 @@ BEGIN
         pu.margin,
         pu.fixed_cost::text,
         pu.pledge::text,
-        sa.view AS reward_addr,
-        JSONB_AGG(po.view) AS owners,
+        grest.cip5_hex_to_stake_addr(sa.hash_raw) AS reward_addr,
+        JSONB_AGG(po.stake_address) AS owners,
         JSONB_AGG(JSONB_BUILD_OBJECT (
             'ipv4', pr.ipv4,
             'ipv6', pr.ipv6,
@@ -57,7 +57,7 @@ BEGIN
         INNER JOIN public.block AS b ON b.id = tx.block_id
         LEFT JOIN public.stake_address AS sa ON pu.reward_addr_id = sa.id
         LEFT JOIN (
-            SELECT po1.pool_update_id, sa1.view
+            SELECT po1.pool_update_id, grest.cip5_hex_to_stake_addr(sa1.hash_raw) AS stake_address
             FROM public.pool_owner AS po1
               LEFT JOIN public.stake_address AS sa1 ON sa1.id = po1.addr_id
           ) AS po ON pu.id = po.pool_update_id
@@ -66,7 +66,7 @@ BEGIN
         LEFT JOIN public.off_chain_pool_data AS ocpd ON pu.meta_id = ocpd.pmr_id
       WHERE _pool_bech32 IS NULL
         OR ph.hash_raw = DECODE(b32_decode(_pool_bech32),'hex')
-      GROUP BY tx.hash, b.time, ph.hash_raw, ph.hash_raw, pu.active_epoch_no, pu.vrf_key_hash, pu.margin, pu.fixed_cost, pu.pledge, sa.view, pmr.url, pmr.hash, ocpd.json),
+      GROUP BY tx.hash, b.time, ph.hash_raw, ph.hash_raw, pu.active_epoch_no, pu.vrf_key_hash, pu.margin, pu.fixed_cost, pu.pledge, sa.hash_raw, pmr.url, pmr.hash, ocpd.json),
     pool_dereg AS (
         SELECT
           ENCODE(tx.hash::bytea, 'hex') AS tx_hash,

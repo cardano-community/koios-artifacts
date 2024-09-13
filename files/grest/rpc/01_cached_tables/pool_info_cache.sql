@@ -13,8 +13,8 @@ CREATE TABLE grest.pool_info_cache (
   fixed_cost lovelace NOT NULL,
   pledge lovelace NOT NULL,
   deposit lovelace,
-  reward_addr character varying,
-  owners character varying [],
+  reward_addr bigint,
+  owners bigint [],
   relays jsonb [],
   meta_id bigint,
   meta_url character varying,
@@ -71,8 +71,6 @@ BEGIN
     tx_hash,
     block_time,
     pool_hash_id,
-    pool_id_bech32,
-    pool_id_hex,
     active_epoch_no,
     vrf_key_hash,
     margin,
@@ -100,11 +98,10 @@ BEGIN
       _fixed_cost,
       _pledge,
       _deposit,
-      grest.cip5_hex_to_stake_addr(sa.hash_raw),
+      _reward_addr_id,
       ARRAY(
-        SELECT grest.cip5_hex_to_stake_addr(sa.hash_raw)
+        SELECT po.addr_id
         FROM public.pool_owner AS po
-        INNER JOIN public.stake_address AS sa ON sa.id = po.addr_id
         WHERE po.pool_update_id = _update_id
       ),
       ARRAY(
@@ -127,7 +124,6 @@ BEGIN
     INNER JOIN public.tx ON tx.id = _tx_id
     INNER JOIN public.block AS b ON b.id = tx.block_id
     LEFT JOIN public.pool_metadata_ref AS pmr ON pmr.id = _meta_id
-    LEFT JOIN public.stake_address AS sa ON sa.id = _reward_addr_id
     WHERE ph.id = _hash_id;
 END;
 $$;
@@ -260,7 +256,7 @@ BEGIN
   ELSIF (tg_table_name = 'pool_owner') THEN
       UPDATE grest.pool_info_cache
       SET
-        owners = owners || (SELECT sa.view FROM public.stake_address AS sa WHERE sa.id = new.addr_id)
+        owners = owners || (SELECT sa.id FROM public.stake_address AS sa WHERE sa.id = new.addr_id)
       WHERE
         update_id = new.pool_update_id;
   END IF;

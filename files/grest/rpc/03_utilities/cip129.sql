@@ -52,6 +52,7 @@ RETURNS text
 LANGUAGE plpgsql STABLE
 AS $$
 BEGIN
+  IF _raw IS NULL THEN RETURN NULL END IF;
   IF _is_script THEN
     RETURN b32_encode('cc_hot', ('\x03'::bytea || _raw)::text);
   ELSE
@@ -91,6 +92,7 @@ RETURNS text
 LANGUAGE plpgsql STABLE
 AS $$
 BEGIN
+  IF _raw IS NULL THEN RETURN NULL END IF;
   IF _is_script THEN
     RETURN b32_encode('cc_cold', ('\x13'::bytea || _raw)::text);
   ELSE
@@ -130,6 +132,7 @@ RETURNS text
 LANGUAGE plpgsql STABLE
 AS $$
 BEGIN
+  IF _raw IS NULL THEN RETURN NULL END IF;
   IF _is_script THEN
     RETURN b32_encode('drep', ('\x23'::bytea || _raw)::text);
   ELSE

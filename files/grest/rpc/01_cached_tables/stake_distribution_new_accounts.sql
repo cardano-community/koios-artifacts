@@ -67,7 +67,7 @@ BEGIN
   -- INSERT QUERY START
   INSERT INTO grest.stake_distribution_cache
     SELECT
-      nra.stake_address_raw,
+      nra.stake_address_id,
       ai.delegated_pool AS pool_id,
       ai.total_balance::lovelace,
       ai.utxo::lovelace,
@@ -76,7 +76,7 @@ BEGIN
       ai.rewards_available::lovelace
     FROM newly_registered_accounts AS nra,
       LATERAL grest.account_info(array[(SELECT grest.cip5_hex_to_stake_addr(nra.stake_address_raw))]) AS ai
-    ON CONFLICT (stake_address_raw) DO
+    ON CONFLICT (stake_address_id) DO
       UPDATE
         SET
           pool_id = EXCLUDED.pool_id,

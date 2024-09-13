@@ -31,7 +31,7 @@ BEGIN
   RETURN QUERY
 
     SELECT
-      grest.cip5_hex_to_stake_addr(sdc.stake_address_raw),
+      grest.cip5_hex_to_stake_addr(sa.hash_raw),
       CASE  WHEN status_t.registered = TRUE THEN
         'registered'
       ELSE
@@ -48,10 +48,10 @@ BEGIN
       COALESCE(reserves_t.reserves, 0)::text AS reserves,
       COALESCE(treasury_t.treasury, 0)::text AS treasury
     FROM grest.stake_distribution_cache AS sdc
+      INNER JOIN stake_address AS sa ON sa.id = sdc.stake_address_id
       LEFT JOIN (
         SELECT
           sas.id,
-          sas.hash_raw,
           EXISTS (
             SELECT TRUE FROM stake_registration
             WHERE
@@ -76,7 +76,7 @@ BEGIN
           ) AS deposit
         FROM public.stake_address AS sas
         WHERE sas.id = ANY(sa_id_list)
-        ) AS status_t ON sdc.stake_address_raw = status_t.hash_raw
+        ) AS status_t ON sdc.stake_address_id = status_t.id
       LEFT JOIN (
         SELECT
           dv.addr_id,
@@ -118,10 +118,7 @@ BEGIN
         GROUP BY
           t.addr_id
         ) AS treasury_t ON treasury_t.addr_id = status_t.id
-    WHERE sdc.stake_address_raw = ANY(
-      SELECT ARRAY_AGG(DECODE(b32_decode(n), 'hex'))
-      FROM UNNEST(_stake_addresses) AS n
-    )
+    WHERE sdc.stake_address_id = ANY(sa_id_list)
 
     UNION ALL
 
@@ -141,13 +138,13 @@ BEGIN
       FROM
         (
           SELECT
-            sa.hash_raw AS stake_address_raw,
+            grest.cip5_hex_to_stake_addr(sa.hash_raw) AS stake_address,
             sa.id AS addr_id
           FROM stake_address AS sa 
           WHERE sa.id = ANY(sa_id_list)
-           AND NOT EXISTS (SELECT null FROM grest.stake_distribution_cache AS sdc WHERE sdc.stake_address_raw = sa.hash_raw)
+           AND NOT EXISTS (SELECT null FROM grest.stake_distribution_cache AS sdc WHERE sdc.stake_address_id = sa.id)
         ) AS z
-        , LATERAL grest.account_info(array[(SELECT grest.cip5_hex_to_stake_addr(z.stake_address_raw))]) AS ai
+        , LATERAL grest.account_info(array[stake_address]) AS ai
     ;
 
 END;

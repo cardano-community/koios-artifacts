@@ -16,7 +16,7 @@ BEGIN
       _all_delegations AS (
         SELECT
           sa.id AS stake_address_id,
-          sdc.stake_address_raw,
+          sa.hash_raw AS stake_address_raw,
           (
             CASE WHEN sdc.total_balance >= 0
               THEN sdc.total_balance
@@ -24,7 +24,7 @@ BEGIN
             END
           ) AS total_balance
         FROM grest.stake_distribution_cache AS sdc
-        INNER JOIN public.stake_address AS sa ON sa.hash_raw = sdc.stake_address_raw
+        INNER JOIN public.stake_address AS sa ON sa.id = sdc.stake_address_id
         WHERE sdc.pool_id = _pool_bech32
 
         UNION ALL
@@ -43,7 +43,7 @@ BEGIN
               AND NOT EXISTS (SELECT null FROM delegation AS d2 WHERE d2.addr_id = d.addr_id AND d2.id > d.id)
               AND NOT EXISTS (SELECT null FROM stake_deregistration AS sd WHERE sd.addr_id = d.addr_id AND sd.tx_id > d.tx_id)
               -- AND NOT grest.is_dangling_delegation(d.id)
-              AND NOT EXISTS (SELECT null FROM grest.stake_distribution_cache AS sdc WHERE sdc.stake_address_raw = sa.hash_raw)
+              AND NOT EXISTS (SELECT null FROM grest.stake_distribution_cache AS sdc WHERE sdc.stake_address_id = sa.id)
           ) z,
           LATERAL grest.account_utxos(array[(SELECT grest.cip5_hex_to_stake_addr(z.stake_address_raw))], false) AS acc_info
         GROUP BY
@@ -88,7 +88,7 @@ BEGIN
       _all_delegations AS (
         SELECT
           sa.id AS stake_address_id,
-          sdc.stake_address_raw,
+          sa.hash_raw AS stake_address_raw,
           (
             CASE WHEN sdc.total_balance >= 0
               THEN sdc.total_balance
@@ -96,7 +96,7 @@ BEGIN
             END
           ) AS total_balance
         FROM grest.stake_distribution_cache AS sdc
-        INNER JOIN public.stake_address AS sa ON sa.hash_raw = sdc.stake_address_raw
+        INNER JOIN public.stake_address AS sa ON sa.id = sdc.stake_address_id
         WHERE sdc.pool_id = _pool_bech32
 
         UNION ALL
@@ -114,7 +114,7 @@ BEGIN
               AND NOT EXISTS (SELECT null FROM delegation AS d2 WHERE d2.addr_id = d.addr_id AND d2.id > d.id)
               AND NOT EXISTS (SELECT null FROM stake_deregistration AS sd WHERE sd.addr_id = d.addr_id AND sd.tx_id > d.tx_id)
               -- AND NOT grest.is_dangling_delegation(d.id)
-              AND NOT EXISTS (SELECT null FROM grest.stake_distribution_cache AS sdc WHERE sdc.stake_address_raw = sa.hash_raw)
+              AND NOT EXISTS (SELECT null FROM grest.stake_distribution_cache AS sdc WHERE sdc.stake_address_id = sa.id)
           ) z,
           LATERAL grest.account_utxos(array[(SELECT grest.cip5_hex_to_stake_addr(z.stake_address_raw))], false) AS acc_info
         GROUP BY

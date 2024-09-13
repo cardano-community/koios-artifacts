@@ -89,7 +89,7 @@ BEGIN
       INNER JOIN stake_address AS sa ON ad.addr_id = sa.id
       INNER JOIN tx ON ad.tx_id = tx.id
       INNER JOIN block AS b ON tx.block_id = b.id
-      LEFT JOIN grest.stake_distribution_cache AS sdc ON sa.view = sdc.stake_address
+      LEFT JOIN grest.stake_distribution_cache AS sdc ON sa.id = sdc.stake_address_id
     ORDER BY b.epoch_no DESC, grest.cip5_hex_to_stake_addr(sa.hash_raw)
   );
 
