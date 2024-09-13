@@ -10,7 +10,7 @@ AS $$
 DECLARE
   _pool_id bigint;
 BEGIN
-  SELECT id INTO _pool_id FROM pool_hash WHERE pool_hash.view = _pool_bech32;
+  SELECT id INTO _pool_id FROM pool_hash WHERE pool_hash.hash_raw = DECODE(b32_decode(_pool_bech32),'hex');
   IF _epoch_no IS NULL THEN
     RETURN QUERY
       SELECT

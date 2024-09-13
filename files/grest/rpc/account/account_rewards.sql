@@ -28,7 +28,7 @@ BEGIN
           'spendable_epoch', r.spendable_epoch,
           'amount', r.amount::text,
           'type', r.type,
-          'pool_id', ph.view
+          'pool_id', b32_encode('pool', DECODE(ph.hash_raw,'hex')::text)
           )
         ) AS rewards
       FROM
@@ -48,7 +48,7 @@ BEGIN
             'spendable_epoch', r.spendable_epoch,
             'amount', r.amount::text,
             'type', r.type,
-            'pool_id', ph.view
+            'pool_id', b32_encode('pool', DECODE(ph.hash_raw,'hex')::text)
           )
         ) AS rewards
       FROM

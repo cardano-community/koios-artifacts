@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS grest.pool_active_stake_cache (
-  pool_id varchar NOT NULL,
+  pool_id bigint NOT NULL,
   epoch_no bigint NOT NULL,
   amount lovelace NOT NULL,
   PRIMARY KEY (pool_id, epoch_no)
@@ -64,15 +64,14 @@ BEGIN
     -- POOL ACTIVE STAKE CACHE
     INSERT INTO grest.pool_active_stake_cache
       SELECT
-        pool_hash.view AS pool_id,
+        epoch_stake.pool_id AS pool_id,
         epoch_stake.epoch_no,
         SUM(epoch_stake.amount) AS amount
       FROM public.epoch_stake
-      INNER JOIN public.pool_hash ON pool_hash.id = epoch_stake.pool_id
       WHERE epoch_stake.epoch_no >= _last_active_stake_validated_epoch
         AND epoch_stake.epoch_no <= _epoch_no
       GROUP BY
-        pool_hash.view,
+        epoch_stake.pool_id,
         epoch_stake.epoch_no
     ON CONFLICT (
       pool_id,

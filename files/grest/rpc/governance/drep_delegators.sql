@@ -80,7 +80,7 @@ BEGIN
       )
 
     SELECT
-      sa.view::text,
+      grest.cip5_hex_to_stake_addr(sa.hash_raw)::text,
       ENCODE(sa.hash_raw,'hex'),
       ENCODE(sa.script_hash,'hex'),
       b.epoch_no,
@@ -90,7 +90,7 @@ BEGIN
       INNER JOIN tx ON ad.tx_id = tx.id
       INNER JOIN block AS b ON tx.block_id = b.id
       LEFT JOIN grest.stake_distribution_cache AS sdc ON sa.view = sdc.stake_address
-    ORDER BY b.epoch_no DESC, sa.view
+    ORDER BY b.epoch_no DESC, grest.cip5_hex_to_stake_addr(sa.hash_raw)
   );
 
 END;

@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS grest.stake_distribution_cache (
   stake_address_raw addr29type PRIMARY KEY,
-  pool_id varchar,
+  pool_id bigint,
   total_balance numeric,
   utxo numeric,
   rewards numeric,
@@ -65,7 +65,7 @@ BEGIN
     pool_ids AS (
       SELECT
         awdp.stake_address_id,
-        pool_hash.view AS pool_id
+        pool_hash.id AS pool_id
       FROM pool_hash
         INNER JOIN accounts_with_delegated_pools AS awdp ON awdp.pool_hash_id = pool_hash.id
     ),

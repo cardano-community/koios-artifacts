@@ -24,7 +24,7 @@ BEGIN
         grest.cip5_hex_to_stake_addr(sa.hash_raw) AS stake_address,
         JSONB_AGG(
           JSONB_BUILD_OBJECT(
-            'pool_id', ph.view,
+            'pool_id', b32_encode('pool', ph.hash_raw::text),
             'epoch_no', es.epoch_no::bigint,
             'active_stake', es.amount::text
           )
@@ -45,7 +45,7 @@ BEGIN
         grest.cip5_hex_to_stake_addr(sa.hash_raw) AS stake_address,
         JSONB_AGG(
           JSONB_BUILD_OBJECT(
-            'pool_id', ph.view,
+            'pool_id', b32_encode('pool', ph.hash_raw::text),
             'epoch_no', es.epoch_no::bigint,
             'active_stake', es.amount::text
           )

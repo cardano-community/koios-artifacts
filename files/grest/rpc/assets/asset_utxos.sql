@@ -66,7 +66,7 @@ BEGIN
       tx_out.index::smallint,
       tx_out.address::text,
       tx_out.value::text,
-      sa.view::text as stake_address,
+      grest.cip5_hex_to_stake_addr(sa.hash_raw)::text as stake_address,
       ENCODE(tx_out.payment_cred, 'hex') AS payment_cred,
       b.epoch_no,
       b.block_no,

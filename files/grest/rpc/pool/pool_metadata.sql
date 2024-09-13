@@ -10,8 +10,8 @@ AS $$
 #variable_conflict use_column
 BEGIN
   RETURN QUERY
-  SELECT DISTINCT ON (ph.view)
-    ph.view AS pool_id_bech32,
+  SELECT DISTINCT ON (ph.id)
+    b32_encode('pool', ph.hash_raw::text) AS pool_id_bech32,
     pmr.url AS meta_url,
     ENCODE(pmr.hash, 'hex') AS meta_hash,
     ocpd.json AS meta_json
@@ -21,10 +21,12 @@ BEGIN
   WHERE
     CASE
       WHEN _pool_bech32_ids IS NULL THEN TRUE
-      WHEN _pool_bech32_ids IS NOT NULL THEN ph.view = ANY(SELECT UNNEST(_pool_bech32_ids))
+      WHEN _pool_bech32_ids IS NOT NULL THEN ph.hash_raw = ANY(
+        SELECT ARRAY_AGG(DECODE(b32_decode(p),'hex'))
+        FROM UNNEST(_pool_bech32_ids) AS p)
     END
   ORDER BY
-      ph.view,
+      ph.hash_raw,
       pmr.registered_tx_id DESC;
 END;
 $$;

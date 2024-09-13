@@ -49,17 +49,19 @@ BEGIN
           pic.pool_status,
           pic.retiring_epoch,
           pic.meta_id,
-          ph.view,
+          b32_encode('pool', ph.hash_raw::text) AS pool_id_bech32,
           ph.hash_raw
         FROM grest.pool_info_cache AS pic
         INNER JOIN public.pool_hash AS ph ON ph.id = pic.pool_hash_id
-        WHERE ph.view = ANY(SELECT UNNEST(_pool_bech32_ids))
+        WHERE ph.hash_raw = ANY(
+          SELECT ARRAY_AGG(DECODE(b32_decode(p),'hex'))
+          FROM UNNEST(_pool_bech32_ids) AS p)
         ORDER BY
           pic.pool_hash_id,
           pic.tx_id DESC
       )
     SELECT
-      ph.view AS pool_id_bech32,
+      api.pool_id_bech32,
       ENCODE(ph.hash_raw::bytea, 'hex') AS pool_id_hex,
       pu.active_epoch_no,
       ENCODE(pu.vrf_key_hash, 'hex') AS vrf_key_hash,
@@ -122,7 +124,7 @@ BEGIN
     LEFT JOIN LATERAL(
       SELECT amount::lovelace AS as_sum
       FROM grest.pool_active_stake_cache AS pasc
-      WHERE pasc.pool_id = api.view
+      WHERE pasc.pool_id = api.pool_hash_id
         AND pasc.epoch_no = _epoch_no
     ) AS active_stake ON TRUE
     LEFT JOIN LATERAL(
@@ -156,7 +158,7 @@ BEGIN
             ELSE 0
           END)::lovelace
         END AS pledge
-      FROM grest.pool_delegators_list(api.view) AS pool_delegs
+      FROM grest.pool_delegators_list(api.pool_id_bech32) AS pool_delegs
     ) AS live ON TRUE;
 END;
 $$;

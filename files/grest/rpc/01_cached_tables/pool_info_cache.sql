@@ -7,8 +7,6 @@ CREATE TABLE grest.pool_info_cache (
   tx_hash text,
   block_time numeric,
   pool_hash_id bigint NOT NULL,
-  pool_id_bech32 character varying NOT NULL,
-  pool_id_hex text NOT NULL,
   active_epoch_no bigint NOT NULL,
   vrf_key_hash text NOT NULL,
   margin double precision NOT NULL,
@@ -96,17 +94,15 @@ BEGIN
       encode(tx.hash::bytea, 'hex'),
       EXTRACT(EPOCH FROM b.time),
       _hash_id,
-      ph.view,
-      encode(ph.hash_raw::bytea, 'hex'),
       _active_epoch_no,
-      encode(_vrf_key_hash::bytea, 'hex'),
+      ENCODE(_vrf_key_hash::bytea, 'hex'),
       _margin,
       _fixed_cost,
       _pledge,
       _deposit,
-      sa.view,
+      grest.cip5_hex_to_stake_addr(sa.hash_raw),
       ARRAY(
-        SELECT sa.view
+        SELECT grest.cip5_hex_to_stake_addr(sa.hash_raw)
         FROM public.pool_owner AS po
         INNER JOIN public.stake_address AS sa ON sa.id = po.addr_id
         WHERE po.pool_update_id = _update_id

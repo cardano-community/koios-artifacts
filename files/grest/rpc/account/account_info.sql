@@ -91,7 +91,7 @@ BEGIN
     LEFT JOIN (
         SELECT
           delegation.addr_id,
-          pool_hash.view AS delegated_pool
+          b32_encode('pool', DECODE(ph.hash_raw,'hex')::text) AS delegated_pool
         FROM delegation
           INNER JOIN pool_hash ON pool_hash.id = delegation.pool_hash_id
         WHERE delegation.addr_id = ANY(sa_id_list)

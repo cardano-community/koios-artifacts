@@ -438,7 +438,7 @@ BEGIN
               'type', 'pool_delegation',
               'info', JSONB_BUILD_OBJECT(
                 'stake_address', sa.view,
-                'pool_id_bech32', ph.view,
+                'pool_id_bech32', b32_encode('pool', ph.hash_raw::text),
                 'pool_id_hex', ENCODE(ph.hash_raw, 'hex')
               )
             ) AS data
@@ -521,7 +521,7 @@ BEGIN
               'index', pr.cert_index,
               'type', 'pool_retire',
               'info', JSONB_BUILD_OBJECT(
-                'pool_id_bech32', ph.view,
+                'pool_id_bech32', b32_encode('pool', ph.hash_raw::text),
                 'pool_id_hex', ENCODE(ph.hash_raw, 'hex'),
                 'retiring epoch', pr.retiring_epoch
               )
@@ -539,7 +539,7 @@ BEGIN
               'index', pu.cert_index,
               'type', 'pool_update',
               'info', JSONB_BUILD_OBJECT(
-                'pool_id_bech32', ph.view,
+                'pool_id_bech32', b32_encode('pool', ph.hash_raw::text),
                 'pool_id_hex', ENCODE(ph.hash_raw, 'hex'),
                 'active_epoch_no', pu.active_epoch_no,
                 'vrf_key_hash', ENCODE(pu.vrf_key_hash, 'hex'),
@@ -571,7 +571,7 @@ BEGIN
             LEFT JOIN public.pool_metadata_ref AS pmr ON pu.meta_id = pmr.id
           WHERE _certs IS TRUE
             AND pu.registered_tx_id = ANY(_tx_id_list)
-          GROUP BY pu.registered_tx_id, pu.cert_index, ph.view, ph.hash_raw, pu.active_epoch_no, pu.vrf_key_hash, pu.margin, pu.fixed_cost, pu.pledge, sa.view, pmr.url, pmr.hash
+          GROUP BY pu.registered_tx_id, pu.cert_index, ph.hash_raw, pu.active_epoch_no, pu.vrf_key_hash, pu.margin, pu.fixed_cost, pu.pledge, sa.view, pmr.url, pmr.hash
           --
           UNION ALL
           --
@@ -848,7 +848,7 @@ BEGIN
               'proposal_tx_hash', ENCODE(tx.hash, 'hex'),
               'proposal_index', gap.index,
               'voter_role', vp.voter_role,
-              'voter', COALESCE(ENCODE(ch.raw, 'hex'), dh.view, ph.view),
+              'voter', COALESCE(ENCODE(ch.raw, 'hex'), dh.view, b32_encode('pool', ph.hash_raw::text)),
               'voter_hex', COALESCE(ENCODE(ch.raw, 'hex'), ENCODE(dh.raw, 'hex'), ENCODE(ph.hash_raw, 'hex')),
               'vote', vp.vote
             ) AS data

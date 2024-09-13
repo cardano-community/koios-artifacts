@@ -19,7 +19,7 @@ RETURNS TABLE (
 LANGUAGE sql STABLE
 AS $$
   SELECT DISTINCT ON (pic.pool_hash_id)
-    ph.view AS pool_id_bech32,
+    b32_encode('pool', ph.hash_raw::text) AS pool_id_bech32,
     ENCODE(ph.hash_raw,'hex') as pool_id_hex,
     pu.active_epoch_no,
     pu.margin,

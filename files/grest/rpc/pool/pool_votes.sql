@@ -25,7 +25,7 @@ AS $$
     INNER JOIN public.tx vote_tx on vp.tx_id = vote_tx.id
     INNER JOIN public.block AS b ON vote_tx.block_id = b.id
     LEFT JOIN public.voting_anchor AS va ON vp.voting_anchor_id = va.id
-  WHERE ph.view = _pool_bech32
+  WHERE ph.hash_raw = DECODE(b32_decode(_pool_bech32),'hex')
   ORDER BY
     vote_tx.id DESC;
 $$;

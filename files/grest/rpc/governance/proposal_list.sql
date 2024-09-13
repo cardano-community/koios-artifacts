@@ -33,7 +33,7 @@ AS $$
     gap.type,
     gap.description,
     gap.deposit::text,
-    sa.view,
+    grest.cip5_hex_to_stake_addr(sa.hash_raw),
     b.epoch_no,
     gap.ratified_epoch,
     gap.enacted_epoch,
@@ -51,7 +51,7 @@ AS $$
       ELSE
         JSONB_BUILD_OBJECT(
           'stake_address', (
-            SELECT sa2.view
+            SELECT grest.cip5_hex_to_stake_addr(sa2.hash_raw)
             FROM stake_address AS sa2
             WHERE sa2.id = tw.stake_address_id
           ),

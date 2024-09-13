@@ -19,7 +19,7 @@ AS $$
     ENCODE(b.hash,'hex'),
     b.block_no,
     r.amount::text,
-    sa.view,
+    grest.cip5_hex_to_stake_addr(sa.hash_raw) AS stake_address,
     earned_epoch,
     spendable_epoch
   FROM reserve AS r
