@@ -22,7 +22,7 @@ BEGIN
     array_agg(id)
   FROM stake_address
   WHERE stake_address.hash_raw = ANY(
-    SELECT ARRAY_AGG(DECODE(b32_decode(n), 'hex'))
+    SELECT DECODE(b32_decode(n), 'hex')
     FROM UNNEST(_stake_addresses) AS n
   );
 

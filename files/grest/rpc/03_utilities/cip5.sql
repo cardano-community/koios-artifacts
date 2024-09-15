@@ -7,11 +7,13 @@ RETURNS text
 LANGUAGE plpgsql STABLE
 AS $$
 BEGIN
-  IF _raw IS NULL THEN RETURN NULL END IF;
+  IF _raw IS NULL THEN
+   RETURN NULL;
+  END IF;
   IF SUBSTRING(ENCODE(_raw, 'hex') from 2 for 1) = '0' THEN
-    RETURN b32_encode('stake_test', hex::text);
+    RETURN b32_encode('stake_test', _raw::text);
   ELSE
-    RETURN b32_encode('stake', hex::text);
+    RETURN b32_encode('stake', _raw::text);
   END IF;
 END;
 $$;

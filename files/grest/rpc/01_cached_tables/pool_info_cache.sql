@@ -340,8 +340,8 @@ BEGIN
     );
   END LOOP;
 
+  CREATE INDEX IF NOT EXISTS idx_id ON grest.pool_info_cache (tx_id);
   CREATE INDEX IF NOT EXISTS idx_tx_id ON grest.pool_info_cache (tx_id);
-  CREATE INDEX IF NOT EXISTS idx_pool_id_bech32 ON grest.pool_info_cache (pool_id_bech32);
   CREATE INDEX IF NOT EXISTS idx_pool_hash_id ON grest.pool_info_cache (pool_hash_id);
   CREATE INDEX IF NOT EXISTS idx_pool_status ON grest.pool_info_cache (pool_status);
   CREATE INDEX IF NOT EXISTS idx_meta_id ON grest.pool_info_cache (meta_id);

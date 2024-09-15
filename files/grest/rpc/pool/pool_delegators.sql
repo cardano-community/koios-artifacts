@@ -25,7 +25,7 @@ BEGIN
           ) AS total_balance
         FROM grest.stake_distribution_cache AS sdc
         INNER JOIN public.stake_address AS sa ON sa.id = sdc.stake_address_id
-        WHERE sdc.pool_id = _pool_bech32
+        WHERE sdc.pool_id = (SELECT id FROM pool_hash WHERE view = _pool_bech32)
 
         UNION ALL
 
@@ -52,7 +52,7 @@ BEGIN
       )
 
     SELECT DISTINCT ON (ad.stake_address_raw)
-      grest.cip5_hex_to_stake_addr(ad.stake_address_raw),
+      grest.cip5_hex_to_stake_addr(ad.stake_address_raw)::varchar,
       ad.total_balance::text,
       d.active_epoch_no,
       ENCODE(tx.hash, 'hex')
@@ -97,7 +97,7 @@ BEGIN
           ) AS total_balance
         FROM grest.stake_distribution_cache AS sdc
         INNER JOIN public.stake_address AS sa ON sa.id = sdc.stake_address_id
-        WHERE sdc.pool_id = _pool_bech32
+        WHERE sdc.pool_id = _pool_id
 
         UNION ALL
 
@@ -123,7 +123,7 @@ BEGIN
       )
 
     SELECT 
-      grest.cip5_hex_to_stake_addr(ad.stake_address_raw),
+      grest.cip5_hex_to_stake_addr(ad.stake_address_raw)::varchar,
       ad.total_balance::text
     FROM _all_delegations AS ad;
 

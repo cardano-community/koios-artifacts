@@ -275,7 +275,7 @@ BEGIN
         FROM combined_data AS c1
       ) AS y
     ORDER BY 1 DESC
-   );
+  );
 END;
 $$;
 

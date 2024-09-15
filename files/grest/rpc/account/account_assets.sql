@@ -26,7 +26,7 @@ BEGIN
       INNER JOIN tx_out AS txo ON txo.id = mtx.tx_out_id
       INNER JOIN stake_address AS sa ON sa.id = txo.stake_address_id
       WHERE sa.hash_raw = ANY(
-          SELECT ARRAY_AGG(DECODE(b32_decode(n), 'hex'))
+          SELECT DECODE(b32_decode(n), 'hex')
           FROM UNNEST(_stake_addresses) AS n
         )
         AND txo.consumed_by_tx_id IS NULL

@@ -23,11 +23,9 @@ DECLARE
 BEGIN
   SELECT INTO sa_id_list
     ARRAY_AGG(stake_address.id)
-  FROM
-    stake_address
-  WHERE
-    stake_address.hash_raw = ANY(
-      SELECT ARRAY_AGG(DECODE(b32_decode(n), 'hex'))
+  FROM stake_address
+  WHERE stake_address.hash_raw = ANY(
+      SELECT DECODE(b32_decode(n), 'hex')
       FROM UNNEST(_stake_addresses) AS n
     );
 
@@ -49,7 +47,7 @@ BEGIN
         INNER JOIN ma_tx_out AS mto ON mto.tx_out_id = txo.id
         LEFT JOIN multi_asset AS ma ON ma.id = mto.ident
         LEFT JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
-        WHERE txo.stake_address_id ANY(sa_id_list)
+        WHERE txo.stake_address_id = ANY(sa_id_list)
           AND txo.consumed_by_tx_id IS NULL
         GROUP BY txo.id
       )
@@ -96,7 +94,7 @@ BEGIN
     LEFT JOIN datum ON datum.id = tx_out.inline_datum_id
     LEFT JOIN script ON script.id = tx_out.reference_script_id
     LEFT JOIN _assets ON tx_out.id = _assets.id
-    WHERE tx_out.stake_address_id ANY(sa_id_list)
+    WHERE tx_out.stake_address_id = ANY(sa_id_list)
       AND tx_out.consumed_by_tx_id IS NULL
   ;
 END;

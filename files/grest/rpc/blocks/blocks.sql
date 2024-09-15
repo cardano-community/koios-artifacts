@@ -27,7 +27,7 @@ AS $$
     EXTRACT(EPOCH FROM b.time)::integer AS block_time,
     b.tx_count,
     b.vrf_key,
-    b32_encode('pool', DECODE(ph.hash_raw,'hex')::text) AS pool,
+    b32_encode('pool', ph.hash_raw::text) AS pool,
     b.proto_major,
     b.proto_minor,
     b.op_cert_counter,

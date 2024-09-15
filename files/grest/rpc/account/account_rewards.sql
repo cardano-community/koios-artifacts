@@ -14,7 +14,7 @@ BEGIN
     stake_address
   WHERE
     stake_address.hash_raw = ANY(
-      SELECT ARRAY_AGG(DECODE(b32_decode(n), 'hex'))
+      SELECT DECODE(b32_decode(n), 'hex')
       FROM UNNEST(_stake_addresses) AS n
     );
 
@@ -28,7 +28,7 @@ BEGIN
           'spendable_epoch', r.spendable_epoch,
           'amount', r.amount::text,
           'type', r.type,
-          'pool_id', b32_encode('pool', DECODE(ph.hash_raw,'hex')::text)
+          'pool_id', b32_encode('pool', ph.hash_raw::text)
           )
         ) AS rewards
       FROM
@@ -48,7 +48,7 @@ BEGIN
             'spendable_epoch', r.spendable_epoch,
             'amount', r.amount::text,
             'type', r.type,
-            'pool_id', b32_encode('pool', DECODE(ph.hash_raw,'hex')::text)
+            'pool_id', b32_encode('pool', ph.hash_raw::text)
           )
         ) AS rewards
       FROM

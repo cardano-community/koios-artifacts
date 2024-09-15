@@ -30,14 +30,14 @@ BEGIN
       SELECT
         ENCODE(tx.hash::bytea, 'hex') AS tx_hash,
         EXTRACT(EPOCH FROM b.time)::integer AS block_time,
-        b32_encode('pool', ph.hash_raw::text) AS pool_id_bech32,
+        b32_encode('pool', ph.hash_raw::text)::varchar AS pool_id_bech32,
         ENCODE(ph.hash_raw::bytea, 'hex') AS pool_id_hex,
         pu.active_epoch_no,
         ENCODE(pu.vrf_key_hash, 'hex') AS vrf_key_hash,
         pu.margin,
         pu.fixed_cost::text,
         pu.pledge::text,
-        grest.cip5_hex_to_stake_addr(sa.hash_raw) AS reward_addr,
+        grest.cip5_hex_to_stake_addr(sa.hash_raw)::varchar AS reward_addr,
         JSONB_AGG(po.stake_address) AS owners,
         JSONB_AGG(JSONB_BUILD_OBJECT (
             'ipv4', pr.ipv4,

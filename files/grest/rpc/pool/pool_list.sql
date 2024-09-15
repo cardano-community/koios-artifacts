@@ -19,16 +19,16 @@ RETURNS TABLE (
 LANGUAGE sql STABLE
 AS $$
   SELECT DISTINCT ON (pic.pool_hash_id)
-    b32_encode('pool', ph.hash_raw::text) AS pool_id_bech32,
+    b32_encode('pool', ph.hash_raw::text)::varchar AS pool_id_bech32,
     ENCODE(ph.hash_raw,'hex') as pool_id_hex,
     pu.active_epoch_no,
     pu.margin,
     pu.fixed_cost::text,
     pu.pledge::text,
     pu.deposit::text,
-    grest.cip5_hex_to_stake_addr(sa.hash_raw) AS reward_addr,
+    grest.cip5_hex_to_stake_addr(sa.hash_raw)::varchar AS reward_addr,
     ARRAY(
-      SELECT grest.cip5_hex_to_stake_addr(sa.hash_raw)
+      SELECT grest.cip5_hex_to_stake_addr(sa.hash_raw)::varchar
       FROM public.pool_owner AS po
       INNER JOIN public.stake_address AS sa ON sa.id = po.addr_id
       WHERE po.pool_update_id = pic.update_id

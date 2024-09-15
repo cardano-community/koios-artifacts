@@ -54,14 +54,14 @@ BEGIN
         FROM grest.pool_info_cache AS pic
         INNER JOIN public.pool_hash AS ph ON ph.id = pic.pool_hash_id
         WHERE ph.hash_raw = ANY(
-          SELECT ARRAY_AGG(DECODE(b32_decode(p),'hex'))
+          SELECT DECODE(b32_decode(p),'hex')
           FROM UNNEST(_pool_bech32_ids) AS p)
         ORDER BY
           pic.pool_hash_id,
           pic.tx_id DESC
       )
     SELECT
-      api.pool_id_bech32,
+      api.pool_id_bech32::varchar,
       ENCODE(ph.hash_raw::bytea, 'hex') AS pool_id_hex,
       pu.active_epoch_no,
       ENCODE(pu.vrf_key_hash, 'hex') AS vrf_key_hash,
@@ -69,9 +69,9 @@ BEGIN
       pu.fixed_cost::text,
       pu.pledge::text,
       pu.deposit::text,
-      grest.cip5_hex_to_stake_addr(sa.hash_raw) AS reward_addr,
+      grest.cip5_hex_to_stake_addr(sa.hash_raw)::varchar AS reward_addr,
       ARRAY(
-        SELECT grest.cip5_hex_to_stake_addr(sa.hash_raw)
+        SELECT grest.cip5_hex_to_stake_addr(sa.hash_raw)::varchar
         FROM public.pool_owner AS po
         INNER JOIN public.stake_address AS sa ON sa.id = po.addr_id
         WHERE po.pool_update_id = api.update_id
