@@ -2,7 +2,7 @@ CREATE OR REPLACE FUNCTION grest.asset_history(_asset_policy text, _asset_name t
 RETURNS TABLE (
   policy_id text,
   asset_name text,
-  fingerprint character varying,
+  fingerprint varchar,
   minting_txs jsonb []
 )
 LANGUAGE plpgsql

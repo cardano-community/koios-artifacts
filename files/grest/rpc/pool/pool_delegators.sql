@@ -1,6 +1,6 @@
 CREATE OR REPLACE FUNCTION grest.pool_delegators(_pool_bech32 text)
 RETURNS TABLE (
-  stake_address character varying,
+  stake_address varchar,
   amount text,
   active_epoch_no bigint,
   latest_delegation_tx_hash text
@@ -72,7 +72,7 @@ COMMENT ON FUNCTION grest.pool_delegators IS 'Return information about live dele
 
 CREATE OR REPLACE FUNCTION grest.pool_delegators_list(_pool_bech32 text)
 RETURNS TABLE (
-  stake_address character varying,
+  stake_address varchar,
   amount text
 )
 LANGUAGE plpgsql

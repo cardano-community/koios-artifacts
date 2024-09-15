@@ -3,13 +3,13 @@ RETURNS TABLE (
   drep_id text,
   hex text,
   has_script boolean,
-  url character varying,
+  url varchar,
   hash text,
   json jsonb,
   bytes text,
-  warning character varying,
-  language character varying,
-  comment character varying,
+  warning varchar,
+  language varchar,
+  comment varchar,
   is_valid boolean
 )
 LANGUAGE plpgsql

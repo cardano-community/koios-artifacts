@@ -1,17 +1,17 @@
 CREATE OR REPLACE FUNCTION grest.pool_list()
 RETURNS TABLE (
-  pool_id_bech32 character varying,
+  pool_id_bech32 varchar,
   pool_id_hex text,
   active_epoch_no bigint,
   margin double precision,
   fixed_cost text,
   pledge text,
   deposit text,
-  reward_addr character varying,
-  owners character varying [],
+  reward_addr varchar,
+  owners varchar [],
   relays jsonb [],
-  ticker character varying,
-  meta_url character varying,
+  ticker varchar,
+  meta_url varchar,
   meta_hash text,
   pool_status text,
   retiring_epoch word31type

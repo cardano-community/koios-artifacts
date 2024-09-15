@@ -2,7 +2,7 @@ CREATE OR REPLACE FUNCTION grest.address_info(_addresses text [])
 RETURNS TABLE (
   address varchar,
   balance text,
-  stake_address character varying,
+  stake_address varchar,
   script_address boolean,
   utxo_set jsonb
 )

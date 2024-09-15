@@ -1,7 +1,7 @@
 CREATE OR REPLACE FUNCTION grest.pool_metadata(_pool_bech32_ids text [] DEFAULT null)
 RETURNS TABLE (
-  pool_id_bech32 character varying,
-  meta_url character varying,
+  pool_id_bech32 varchar,
+  meta_url varchar,
   meta_hash text,
   meta_json jsonb
 )

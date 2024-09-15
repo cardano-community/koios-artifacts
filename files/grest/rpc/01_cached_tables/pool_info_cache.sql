@@ -17,7 +17,7 @@ CREATE TABLE grest.pool_info_cache (
   owners bigint [],
   relays jsonb [],
   meta_id bigint,
-  meta_url character varying,
+  meta_url varchar,
   meta_hash text,
   pool_status text,
   retiring_epoch word31type

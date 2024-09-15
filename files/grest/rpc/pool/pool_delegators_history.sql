@@ -1,6 +1,6 @@
 CREATE OR REPLACE FUNCTION grest.pool_delegators_history(_pool_bech32 text, _epoch_no word31type DEFAULT NULL)
 RETURNS TABLE (
-  stake_address character varying,
+  stake_address varchar,
   amount text,
   epoch_no word31type
 )

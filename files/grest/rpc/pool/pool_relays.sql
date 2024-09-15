@@ -1,6 +1,6 @@
 CREATE OR REPLACE FUNCTION grest.pool_relays()
 RETURNS TABLE (
-  pool_id_bech32 character varying,
+  pool_id_bech32 varchar,
   relays jsonb
 )
 LANGUAGE sql STABLE

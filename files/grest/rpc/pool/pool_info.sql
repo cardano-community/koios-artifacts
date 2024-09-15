@@ -1,6 +1,6 @@
 CREATE OR REPLACE FUNCTION grest.pool_info(_pool_bech32_ids text [])
 RETURNS TABLE (
-  pool_id_bech32 character varying,
+  pool_id_bech32 varchar,
   pool_id_hex text,
   active_epoch_no bigint,
   vrf_key_hash text,
@@ -8,10 +8,10 @@ RETURNS TABLE (
   fixed_cost text,
   pledge text,
   deposit text,
-  reward_addr character varying,
-  owners character varying [],
+  reward_addr varchar,
+  owners varchar [],
   relays jsonb [],
-  meta_url character varying,
+  meta_url varchar,
   meta_hash text,
   meta_json jsonb,
   pool_status text,

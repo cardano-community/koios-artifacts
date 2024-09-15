@@ -6,7 +6,7 @@ RETURNS TABLE (
   voter_hex text,
   voter_has_script boolean,
   vote vote,
-  meta_url character varying,
+  meta_url varchar,
   meta_hash text
 )
 LANGUAGE plpgsql

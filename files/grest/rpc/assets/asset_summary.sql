@@ -2,7 +2,7 @@ CREATE OR REPLACE FUNCTION grest.asset_summary(_asset_policy text, _asset_name t
 RETURNS TABLE (
   policy_id text,
   asset_name text,
-  fingerprint character varying,
+  fingerprint varchar,
   total_transactions bigint,
   staked_wallets bigint,
   unstaked_addresses bigint,
