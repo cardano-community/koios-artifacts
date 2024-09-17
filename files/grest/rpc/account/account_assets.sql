@@ -35,7 +35,7 @@ BEGIN
     )
 
     SELECT
-      grest.cip5_hex_to_stake_addr(aa.hash_raw) AS stake_address,
+      grest.cip5_hex_to_stake_addr(aa.hash_raw)::varchar AS stake_address,
       ENCODE(aa.policy, 'hex') AS policy_id,
       ENCODE(aa.name, 'hex') AS asset_name,
       aa.fingerprint AS fingerprint,

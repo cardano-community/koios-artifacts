@@ -21,7 +21,7 @@ BEGIN
   IF _epoch_no IS NULL THEN
     RETURN QUERY
       SELECT
-        grest.cip5_hex_to_stake_addr(sa.hash_raw),
+        grest.cip5_hex_to_stake_addr(sa.hash_raw)::varchar,
         JSONB_AGG(
           JSONB_BUILD_OBJECT(
           'earned_epoch', r.earned_epoch,
@@ -31,17 +31,15 @@ BEGIN
           'pool_id', b32_encode('pool', ph.hash_raw::text)
           )
         ) AS rewards
-      FROM
-        reward AS r
+      FROM reward AS r
         LEFT JOIN pool_hash AS ph ON r.pool_id = ph.id
         INNER JOIN stake_address AS sa ON sa.id = r.addr_id
-      WHERE
-        r.addr_id = ANY(sa_id_list)
+      WHERE r.addr_id = ANY(sa_id_list)
       GROUP BY sa.hash_raw;
   ELSE
     RETURN QUERY
       SELECT
-        grest.cip5_hex_to_stake_addr(sa.hash_raw),
+        grest.cip5_hex_to_stake_addr(sa.hash_raw)::varchar,
         JSONB_AGG(
           JSONB_BUILD_OBJECT(
             'earned_epoch', r.earned_epoch,
@@ -51,12 +49,10 @@ BEGIN
             'pool_id', b32_encode('pool', ph.hash_raw::text)
           )
         ) AS rewards
-      FROM
-        reward AS r
+      FROM reward AS r
         LEFT JOIN pool_hash AS ph ON r.pool_id = ph.id
         INNER JOIN stake_address AS sa ON sa.id = r.addr_id
-      WHERE
-        r.addr_id = ANY(sa_id_list)
+      WHERE r.addr_id = ANY(sa_id_list)
         AND r.earned_epoch = _epoch_no
       GROUP BY sa.hash_raw;
   END IF;

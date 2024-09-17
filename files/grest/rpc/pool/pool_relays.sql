@@ -17,9 +17,9 @@ AS $$
   FROM public.pool_hash AS ph
     LEFT JOIN public.pool_update AS pu ON pu.hash_id = ph.id
     LEFT JOIN public.pool_relay AS pr ON pu.id = pr.update_id
-  GROUP BY ph.hash_raw,pu.registered_tx_id
+  GROUP BY ph.id, ph.hash_raw,pu.registered_tx_id
   ORDER BY
-    ph.hash_raw,
+    ph.id,
     pu.registered_tx_id DESC
   ;
 $$;

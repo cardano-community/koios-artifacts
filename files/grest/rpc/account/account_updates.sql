@@ -20,7 +20,7 @@ BEGIN
 
   RETURN QUERY
     SELECT
-      grest.cip5_hex_to_stake_addr(sa.hash_raw) AS stake_address,
+      grest.cip5_hex_to_stake_addr(sa.hash_raw)::varchar AS stake_address,
       JSONB_AGG(
         JSONB_BUILD_OBJECT(
           'action_type', actions.action_type,

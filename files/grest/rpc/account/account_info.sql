@@ -29,7 +29,7 @@ BEGIN
   RETURN QUERY
   
     SELECT
-      grest.cip5_hex_to_stake_addr(status_t.hash_raw) AS stake_address,
+      grest.cip5_hex_to_stake_addr(status_t.hash_raw)::varchar AS stake_address,
       CASE WHEN status_t.registered = TRUE THEN
         'registered'
       ELSE
@@ -91,9 +91,9 @@ BEGIN
     LEFT JOIN (
         SELECT
           delegation.addr_id,
-          b32_encode('pool', DECODE(ph.hash_raw,'hex')::text) AS delegated_pool
+          b32_encode('pool', ph.hash_raw::text)::varchar AS delegated_pool
         FROM delegation
-          INNER JOIN pool_hash ON pool_hash.id = delegation.pool_hash_id
+          INNER JOIN pool_hash AS ph ON ph.id = delegation.pool_hash_id
         WHERE delegation.addr_id = ANY(sa_id_list)
           AND NOT EXISTS (
             SELECT TRUE

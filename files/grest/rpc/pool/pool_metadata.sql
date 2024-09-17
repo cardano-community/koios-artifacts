@@ -25,8 +25,7 @@ BEGIN
         SELECT DECODE(b32_decode(p),'hex')
         FROM UNNEST(_pool_bech32_ids) AS p)
     END
-  ORDER BY
-      ph.hash_raw,
+  ORDER BY ph.id,
       pmr.registered_tx_id DESC;
 END;
 $$;

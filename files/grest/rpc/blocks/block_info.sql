@@ -59,7 +59,7 @@ BEGIN
     b.vrf_key,
     ENCODE(b.op_cert::bytea, 'hex') AS op_cert,
     b.op_cert_counter,
-    b32_encode('pool', ph.hash_raw::text) AS pool,
+    b32_encode('pool', ph.hash_raw::text)::varchar AS pool,
     b.proto_major,
     b.proto_minor,
     block_data.total_output::text,

@@ -37,7 +37,7 @@ BEGIN
       )
 
       SELECT
-        grest.cip5_hex_to_stake_addr(sa.hash_raw) AS stake_address,
+        grest.cip5_hex_to_stake_addr(sa.hash_raw)::varchar AS stake_address,
         JSONB_AGG(txo_addr.address) AS addresses
       FROM
         txo_addr
@@ -63,7 +63,7 @@ BEGIN
       )
 
       SELECT
-        grest.cip5_hex_to_stake_addr(sa.hash_raw) AS stake_address,
+        grest.cip5_hex_to_stake_addr(sa.hash_raw)::varchar AS stake_address,
         JSONB_AGG(txo_addr.address) AS addresses
       FROM
         txo_addr

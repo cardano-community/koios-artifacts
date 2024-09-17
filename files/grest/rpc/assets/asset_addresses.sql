@@ -28,7 +28,7 @@ BEGIN
     RETURN QUERY
       SELECT
         x.address,
-        grest.cip5_hex_to_stake_addr(x.stake_address_raw),
+        grest.cip5_hex_to_stake_addr(x.stake_address_raw)::varchar,
         SUM(x.quantity)::text
       FROM
         (
@@ -47,7 +47,7 @@ BEGIN
     RETURN QUERY
       SELECT
         x.address,
-        grest.cip5_hex_to_stake_addr(x.stake_address_raw),
+        grest.cip5_hex_to_stake_addr(x.stake_address_raw)::varchar,
         SUM(x.quantity)::text
       FROM
         (

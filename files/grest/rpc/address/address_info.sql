@@ -42,7 +42,7 @@ BEGIN
     SELECT
       ka.address,
       COALESCE(SUM(au.value), '0')::text AS balance,
-      grest.cip5_hex_to_stake_addr(ka.stake_address_raw),
+      grest.cip5_hex_to_stake_addr(ka.stake_address_raw)::varchar,
       ka.script_address,
       CASE
         WHEN EXISTS (
