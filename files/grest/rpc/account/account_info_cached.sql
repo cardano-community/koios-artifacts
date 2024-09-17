@@ -31,13 +31,13 @@ BEGIN
   RETURN QUERY
 
     SELECT
-      grest.cip5_hex_to_stake_addr(sa.hash_raw),
+      grest.cip5_hex_to_stake_addr(sa.hash_raw)::varchar,
       CASE  WHEN status_t.registered = TRUE THEN
         'registered'
       ELSE
         'not registered'
       END AS status,
-      sdc.pool_id AS pool_id,
+      b32_encode('pool', ph.hash_raw::text)::varchar AS delegated_pool,
       vote_t.delegated_drep,
       sdc.total_balance::text,
       sdc.utxo::text,
@@ -49,6 +49,7 @@ BEGIN
       COALESCE(treasury_t.treasury, 0)::text AS treasury
     FROM grest.stake_distribution_cache AS sdc
       INNER JOIN stake_address AS sa ON sa.id = sdc.stake_address_id
+      INNER JOIN pool_hash AS ph ON sdc.pool_id = ph.id
       LEFT JOIN (
         SELECT
           sas.id,
@@ -138,16 +139,16 @@ BEGIN
       FROM
         (
           SELECT
-            grest.cip5_hex_to_stake_addr(sa.hash_raw) AS stake_address,
+            grest.cip5_hex_to_stake_addr(sa.hash_raw)::varchar AS stake_address,
             sa.id AS addr_id
           FROM stake_address AS sa 
           WHERE sa.id = ANY(sa_id_list)
            AND NOT EXISTS (SELECT null FROM grest.stake_distribution_cache AS sdc WHERE sdc.stake_address_id = sa.id)
         ) AS z
-        , LATERAL grest.account_info(array[stake_address]) AS ai
+        , LATERAL grest.account_info(array[z.stake_address]) AS ai
     ;
 
 END;
 $$;
 
-COMMENT ON FUNCTION grest.account_info IS 'Get the cached account information for given stake addresses'; -- noqa: LT01
+COMMENT ON FUNCTION grest.account_info_cached IS 'Get the cached account information for given stake addresses'; -- noqa: LT01

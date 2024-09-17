@@ -1,23 +1,23 @@
 #!/usr/bin/env bash
 
-sudo apt-get install python3 python3-pip -y >/dev/null
-python3 -m pip install virtualenv >/dev/null
-export PATH=$PATH:~/.local/bin/
+sudo apt-get install python3 python3-pip python3-virtualenv -y >/dev/null
+export PATH="${HOME}"/.local/bin/:$PATH
 virtualenv koios-tests >/dev/null
 source koios-tests/bin/activate
 python3 -m pip install schemathesis pytest-order >/dev/null
-curl -sfL https://raw.githubusercontent.com/cardano-community/koios-artifacts/master/tests/not_empty_response.py -o not_empty_response.py >/dev/null
+#curl -sfL https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/tests/not_empty_response.py -o not_empty_response.py >/dev/null
+export SCHEMATHESIS_HOOKS=not_empty_response
 
 cat <<-EOF
 	
 	To run the endpoint validation tests, use the below:
 	
-	  schemathesis --pre-run not_empty_response run --request-timeout 5000 https://guild.koios.rest/koiosapi.yaml --hypothesis-phases=explicit \\
-	      --hypothesis-verbosity quiet -b http://127.0.0.1:8053/api/v1 -c all --validate-schema=true -H "Content-Type: application/json"
+	  schemathesis run --request-timeout 25000 ../specs/results/koiosapi-guild.yaml --hypothesis-phases=explicit --hypothesis-verbosity quiet \\
+	      -b http://127.0.0.1:8053/api/v1 -c all --validate-schema=true -H "Content-Type: application/json" --experimental=openapi-3.1 --exclude-checks ignored_auths
 	
 	      where http://127.0.0.1:8053/api/v1 is the URL of instance you want to test, and guild.koios.rest is the target enviornment for testing.
 	
-	To run the data validations tests, use the below:
+	To run the data validations tests, use the below (WIP - skip for now):
 	
 	  pytest --local-url http://127.0.0.1:8053/api/v1 --compare-url https://guild.koios.rest/api/v1 --api-schema-file ../specs/results/koiosapi-guild.yaml -x -v
 	
