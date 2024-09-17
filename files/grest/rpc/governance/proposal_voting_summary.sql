@@ -106,6 +106,9 @@ BEGIN
           SUM(voting_power) AS tot_pool_power 
         FROM proposal_epoch_data AS ped
           INNER JOIN pool_stat ON pool_stat.epoch_no = ped.epoch_of_interest
+          -- if hard fork initiation, then need to use full SPO voting power otherwise just voted SPO power
+          WHERE ((ped.proposal_type = 'HardForkInitiation') or EXISTS (SELECT 1 FROM latest_votes vp where vp.voter_role = 'SPO' 
+          AND vp.gov_action_proposal_id = ped.gov_action_proposal_id AND vp.pool_voter = pool_stat.pool_hash_id)) 
         GROUP BY ped.gov_action_proposal_id, pool_stat.epoch_no
       ),
       active_prop_pool_votes AS (
