@@ -90,7 +90,7 @@ BEGIN
           collateral_tx_in.tx_in_id           AS tx_id,
           tx_out.address                      AS payment_addr_bech32,
           ENCODE(tx_out.payment_cred, 'hex')  AS payment_addr_cred,
-          sa.view                             AS stake_addr,
+          grest.cip5_hex_to_stake_addr(sa.hash_raw) AS stake_addr,
           ENCODE(tx.hash, 'hex')              AS tx_hash,
           tx_out.index                        AS tx_index,
           tx_out.value::text                  AS value,
@@ -145,7 +145,7 @@ BEGIN
           reference_tx_in.tx_in_id            AS tx_id,
           tx_out.address                      AS payment_addr_bech32,
           ENCODE(tx_out.payment_cred, 'hex')  AS payment_addr_cred,
-          sa.view                             AS stake_addr,
+          grest.cip5_hex_to_stake_addr(sa.hash_raw) AS stake_addr,
           ENCODE(tx.hash, 'hex')              AS tx_hash,
           tx_out.index                        AS tx_index,
           tx_out.value::text                  AS value,
@@ -200,7 +200,7 @@ BEGIN
           tx_out.consumed_by_tx_id           AS tx_id,
           tx_out.address                     AS payment_addr_bech32,
           ENCODE(tx_out.payment_cred, 'hex') AS payment_addr_cred,
-          sa.view                            AS stake_addr,
+          grest.cip5_hex_to_stake_addr(sa.hash_raw) AS stake_addr,
           ENCODE(tx.hash, 'hex')             AS tx_hash,
           tx_out.index                       AS tx_index,
           tx_out.value::text                 AS value,
@@ -252,7 +252,7 @@ BEGIN
           tx_out.tx_id,
           tx_out.address                      AS payment_addr_bech32,
           ENCODE(tx_out.payment_cred, 'hex')  AS payment_addr_cred,
-          sa.view                             AS stake_addr,
+          grest.cip5_hex_to_stake_addr(sa.hash_raw) AS stake_addr,
           ENCODE(tx.hash, 'hex')              AS tx_hash,
           tx_out.index                        AS tx_index,
           tx_out.value::text                  AS value,
@@ -292,7 +292,7 @@ BEGIN
           tx_out.tx_id,
           tx_out.address                      AS payment_addr_bech32,
           ENCODE(tx_out.payment_cred, 'hex')  AS payment_addr_cred,
-          sa.view                             AS stake_addr,
+          grest.cip5_hex_to_stake_addr(sa.hash_raw) AS stake_addr,
           ENCODE(tx.hash, 'hex')              AS tx_hash,
           tx_out.index                        AS tx_index,
           tx_out.value::text                  AS value,
@@ -347,7 +347,7 @@ BEGIN
             w.tx_id,
             JSONB_BUILD_OBJECT(
               'amount', w.amount::text,
-              'stake_addr', sa.view
+              'stake_addr', grest.cip5_hex_to_stake_addr(sa.hash_raw)
             ) AS data
           FROM withdrawal AS w
             INNER JOIN stake_address AS sa ON w.addr_id = sa.id
@@ -404,7 +404,7 @@ BEGIN
               'index', sr.cert_index,
               'type', 'stake_registration',
               'info', JSONB_BUILD_OBJECT(
-                'stake_address', sa.view,
+                'stake_address', grest.cip5_hex_to_stake_addr(sa.hash_raw),
                 'deposit', sr.deposit::text
               )
             ) AS data
@@ -421,7 +421,7 @@ BEGIN
               'index', sd.cert_index,
               'type', 'stake_deregistration',
               'info', JSONB_BUILD_OBJECT(
-                'stake_address', sa.view
+                'stake_address', grest.cip5_hex_to_stake_addr(sa.hash_raw)
               )
             ) AS data
           FROM public.stake_deregistration AS sd
@@ -437,8 +437,8 @@ BEGIN
               'index', d.cert_index,
               'type', 'pool_delegation',
               'info', JSONB_BUILD_OBJECT(
-                'stake_address', sa.view,
-                'pool_id_bech32', ph.view,
+                'stake_address', grest.cip5_hex_to_stake_addr(sa.hash_raw),
+                'pool_id_bech32', b32_encode('pool', ph.hash_raw::text),
                 'pool_id_hex', ENCODE(ph.hash_raw, 'hex')
               )
             ) AS data
@@ -456,7 +456,7 @@ BEGIN
               'index', t.cert_index,
               'type', 'treasury_MIR',
               'info', JSONB_BUILD_OBJECT(
-                'stake_address', sa.view,
+                'stake_address', grest.cip5_hex_to_stake_addr(sa.hash_raw),
                 'amount', t.amount::text
               )
             ) AS data
@@ -473,7 +473,7 @@ BEGIN
               'index', r.cert_index,
               'type', 'reserve_MIR',
               'info', JSONB_BUILD_OBJECT(
-                'stake_address', sa.view,
+                'stake_address', grest.cip5_hex_to_stake_addr(sa.hash_raw),
                 'amount', r.amount::text
               )
             ) AS data
@@ -521,7 +521,7 @@ BEGIN
               'index', pr.cert_index,
               'type', 'pool_retire',
               'info', JSONB_BUILD_OBJECT(
-                'pool_id_bech32', ph.view,
+                'pool_id_bech32', b32_encode('pool', ph.hash_raw::text),
                 'pool_id_hex', ENCODE(ph.hash_raw, 'hex'),
                 'retiring epoch', pr.retiring_epoch
               )
@@ -539,15 +539,15 @@ BEGIN
               'index', pu.cert_index,
               'type', 'pool_update',
               'info', JSONB_BUILD_OBJECT(
-                'pool_id_bech32', ph.view,
+                'pool_id_bech32', b32_encode('pool', ph.hash_raw::text),
                 'pool_id_hex', ENCODE(ph.hash_raw, 'hex'),
                 'active_epoch_no', pu.active_epoch_no,
                 'vrf_key_hash', ENCODE(pu.vrf_key_hash, 'hex'),
                 'margin', pu.margin,
                 'fixed_cost', pu.fixed_cost::text,
                 'pledge', pu.pledge::text,
-                'reward_addr', sa.view,
-                'owners', JSONB_AGG(po.view),
+                'reward_addr', grest.cip5_hex_to_stake_addr(sa.hash_raw),
+                'owners', JSONB_AGG(po.stake_address),
                 'relays', JSONB_AGG(JSONB_BUILD_OBJECT (
                   'ipv4', pr.ipv4,
                   'ipv6', pr.ipv6,
@@ -563,7 +563,7 @@ BEGIN
             LEFT JOIN public.pool_hash AS ph ON pu.hash_id = ph.id
             LEFT JOIN public.stake_address AS sa ON pu.reward_addr_id = sa.id
             LEFT JOIN (
-                SELECT po1.pool_update_id, sa1.view
+                SELECT po1.pool_update_id, grest.cip5_hex_to_stake_addr(sa1.hash_raw) AS stake_address
                 FROM public.pool_owner AS po1
                   LEFT JOIN public.stake_address AS sa1 ON sa1.id = po1.addr_id
               ) AS po ON pu.id = po.pool_update_id
@@ -571,7 +571,7 @@ BEGIN
             LEFT JOIN public.pool_metadata_ref AS pmr ON pu.meta_id = pmr.id
           WHERE _certs IS TRUE
             AND pu.registered_tx_id = ANY(_tx_id_list)
-          GROUP BY pu.registered_tx_id, pu.cert_index, ph.view, ph.hash_raw, pu.active_epoch_no, pu.vrf_key_hash, pu.margin, pu.fixed_cost, pu.pledge, sa.view, pmr.url, pmr.hash
+          GROUP BY pu.registered_tx_id, pu.cert_index, ph.hash_raw, pu.active_epoch_no, pu.vrf_key_hash, pu.margin, pu.fixed_cost, pu.pledge, sa.hash_raw, pmr.url, pmr.hash
           --
           UNION ALL
           --
@@ -581,8 +581,8 @@ BEGIN
               'index', dv.cert_index,
               'type', 'vote_delegation',
               'info', JSONB_BUILD_OBJECT(
-                'stake_address', sa.view,
-                'drep_id', dh.view,
+                'stake_address', grest.cip5_hex_to_stake_addr(sa.hash_raw),
+                'drep_id', COALESCE(grest.cip129_hex_to_drep_id(dh.raw, dh.has_script), dh.view::text),
                 'drep_hex', ENCODE(dh.raw, 'hex')
               )
             ) AS data
@@ -600,7 +600,7 @@ BEGIN
               'index', dr.cert_index,
               'type', 'drep_registration',
               'info', JSONB_BUILD_OBJECT(
-                'drep_id', dh.view,
+                'drep_id', grest.cip129_hex_to_drep_id(dh.raw, dh.has_script),
                 'drep_hex', ENCODE(dh.raw, 'hex'),
                 'deposit', dr.deposit::text,
                 'meta_url', va.url,
@@ -623,7 +623,7 @@ BEGIN
               'index', dr.cert_index,
               'type', 'drep_update',
               'info', JSONB_BUILD_OBJECT(
-                'drep_id', dh.view,
+                'drep_id', grest.cip129_hex_to_drep_id(dh.raw, dh.has_script),
                 'drep_hex', ENCODE(dh.raw, 'hex'),
                 'meta_url', va.url,
                 'meta_hash', va.data_hash
@@ -644,7 +644,7 @@ BEGIN
               'index', dr.cert_index,
               'type', 'drep_retire',
               'info', JSONB_BUILD_OBJECT(
-                'drep_id', dh.view,
+                'drep_id', grest.cip129_hex_to_drep_id(dh.raw, dh.has_script),
                 'drep_hex', ENCODE(dh.raw, 'hex')
               )
             ) AS data
@@ -848,7 +848,7 @@ BEGIN
               'proposal_tx_hash', ENCODE(tx.hash, 'hex'),
               'proposal_index', gap.index,
               'voter_role', vp.voter_role,
-              'voter', COALESCE(ENCODE(ch.raw, 'hex'), dh.view, ph.view),
+              'voter', COALESCE(grest.cip129_hex_to_drep_id(dh.raw, dh.has_script), dh.view::text, grest.cip129_hex_to_cc_hot(ch.raw, ch.has_script), b32_encode('pool', ph.hash_raw::text)),
               'voter_hex', COALESCE(ENCODE(ch.raw, 'hex'), ENCODE(dh.raw, 'hex'), ENCODE(ph.hash_raw, 'hex')),
               'vote', vp.vote
             ) AS data
@@ -876,7 +876,7 @@ BEGIN
               'type', gap.type,
               'description', gap.description,
               'deposit', gap.deposit::text,
-              'return_address', sa.view,
+              'return_address', grest.cip5_hex_to_stake_addr(sa.hash_raw),
               'expiration', gap.expiration,
               'meta_url', va.url,
               'meta_hash', ENCODE(va.data_hash, 'hex'),
@@ -885,7 +885,7 @@ BEGIN
                 ELSE
                   JSONB_BUILD_OBJECT(
                     'stake_address', (
-                      SELECT sa2.view
+                      SELECT grest.cip5_hex_to_stake_addr(sa2.hash_raw)
                       FROM stake_address AS sa2
                       WHERE sa2.id = tw.stake_address_id
                     ),

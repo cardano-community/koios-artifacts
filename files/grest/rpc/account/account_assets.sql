@@ -14,7 +14,7 @@ BEGIN
 
     WITH _all_assets AS (
       SELECT
-        sa.view,
+        sa.hash_raw,
         ma.policy,
         ma.name,
         ma.fingerprint,
@@ -25,21 +25,24 @@ BEGIN
       LEFT JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
       INNER JOIN tx_out AS txo ON txo.id = mtx.tx_out_id
       INNER JOIN stake_address AS sa ON sa.id = txo.stake_address_id
-      WHERE sa.view = ANY(_stake_addresses)
+      WHERE sa.hash_raw = ANY(
+          SELECT DECODE(b32_decode(n), 'hex')
+          FROM UNNEST(_stake_addresses) AS n
+        )
         AND txo.consumed_by_tx_id IS NULL
       GROUP BY
-        sa.view, ma.policy, ma.name, ma.fingerprint, aic.decimals
+        sa.hash_raw, ma.policy, ma.name, ma.fingerprint, aic.decimals
     )
 
     SELECT
-      aa.view AS stake_address,
+      grest.cip5_hex_to_stake_addr(aa.hash_raw)::varchar AS stake_address,
       ENCODE(aa.policy, 'hex') AS policy_id,
       ENCODE(aa.name, 'hex') AS asset_name,
       aa.fingerprint AS fingerprint,
       aa.decimals AS decimals,
       aa.quantity::text AS quantity
     FROM _all_assets AS aa
-    ORDER BY aa.view;
+    ORDER BY aa.hash_raw;
 END;
 $$;
 

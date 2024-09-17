@@ -20,7 +20,7 @@ RETURNS TABLE (
   committee_no_pct numeric
 )
 LANGUAGE plpgsql
-as $$
+AS $$
 DECLARE
   proposal text[];
 BEGIN
@@ -29,12 +29,22 @@ BEGIN
 
   RETURN QUERY (
     WITH
+      latest_votes AS (
+        SELECT * FROM voting_procedure vp
+        WHERE NOT EXISTS (SELECT 1 FROM voting_procedure vp2
+                          WHERE vp2.gov_action_proposal_id = vp.gov_action_proposal_id
+                          AND vp2.id > vp.id
+                          AND vp2.voter_role = vp.voter_role
+                          AND coalesce(vp2.drep_voter, vp2.pool_voter, vp2.committee_voter) = 
+                              coalesce(vp.drep_voter, vp.pool_voter, vp.committee_voter))
+      ),
       proposal_epoch_data AS (
         SELECT
           gap.id AS gov_action_proposal_id,
           gap.type AS proposal_type,
           expired_epoch,
           ratified_epoch,
+          dropped_epoch,
           (coalesce(ratified_epoch, expired_epoch, dropped_epoch, ( SELECT MAX(no) FROM epoch))) AS epoch_of_interest
         FROM gov_action_proposal gap 
         INNER JOIN tx t ON gap.tx_id = t.id AND t.hash = DECODE(proposal[1], 'hex') AND gap.index = proposal[2]::smallint
@@ -52,8 +62,26 @@ BEGIN
           vote,
           COUNT(*) AS active_drep_votes_cast
         FROM proposal_epoch_data AS ped 
-          INNER JOIN voting_procedure AS vp ON vp.voter_role = 'DRep' AND vp.gov_action_proposal_id = ped.gov_action_proposal_id
+          INNER JOIN latest_votes AS vp ON vp.voter_role = 'DRep' AND vp.gov_action_proposal_id = ped.gov_action_proposal_id
           LEFT JOIN drep_distr AS dd ON vp.drep_voter = dd.hash_id AND dd.epoch_no = ped.epoch_of_interest
+          WHERE NOT EXISTS 
+          (
+            SELECT 1 
+            FROM drep_registration as dr 
+            WHERE dr.drep_hash_id = vp.drep_voter
+            -- deregistration tx
+            AND deposit < 0 
+            -- submitted after vote tx
+            AND dr.tx_id > vp.tx_id 
+            -- but before last tx of epoch preceding ratification/expiry/drop epoch or last tx of current epoch
+            AND dr.tx_id < 
+              ( 
+                SELECT i_last_tx_id 
+                FROM grest.epoch_info_cache as eic
+                WHERE eic.epoch_no = 
+                  (coalesce(ped.ratified_epoch, ped.expired_epoch, ped.dropped_epoch, (SELECT max(no) + 1 FROM epoch)) - 1)
+              )
+          )
         GROUP BY ped.gov_action_proposal_id, vote
       ),
       always_no_conf_data AS (
@@ -78,6 +106,9 @@ BEGIN
           SUM(voting_power) AS tot_pool_power 
         FROM proposal_epoch_data AS ped
           INNER JOIN pool_stat ON pool_stat.epoch_no = ped.epoch_of_interest
+          -- if hard fork initiation, then need to use full SPO voting power otherwise just voted SPO power
+          WHERE ((ped.proposal_type = 'HardForkInitiation') or EXISTS (SELECT 1 FROM latest_votes vp where vp.voter_role = 'SPO' 
+          AND vp.gov_action_proposal_id = ped.gov_action_proposal_id AND vp.pool_voter = pool_stat.pool_hash_id)) 
         GROUP BY ped.gov_action_proposal_id, pool_stat.epoch_no
       ),
       active_prop_pool_votes AS (
@@ -87,7 +118,7 @@ BEGIN
           vote,
           COUNT(*) AS pool_votes_cast
         FROM proposal_epoch_data AS ped
-          INNER JOIN voting_procedure AS vp ON vp.voter_role = 'SPO' AND vp.gov_action_proposal_id = ped.gov_action_proposal_id
+          INNER JOIN latest_votes AS vp ON vp.voter_role = 'SPO' AND vp.gov_action_proposal_id = ped.gov_action_proposal_id
           INNER JOIN pool_stat ON vp.pool_voter = pool_stat.pool_hash_id AND pool_stat.epoch_no = ped.epoch_of_interest
         GROUP BY ped.gov_action_proposal_id, vote
       ),
@@ -97,13 +128,8 @@ BEGIN
           vote,
           COUNT(*) AS committee_votes_cast
         FROM proposal_epoch_data AS ped 
-          INNER JOIN voting_procedure AS vp ON vp.voter_role = 'ConstitutionalCommittee'
+          INNER JOIN latest_votes AS vp ON vp.voter_role = 'ConstitutionalCommittee'
           AND vp.gov_action_proposal_id = ped.gov_action_proposal_id
-          AND NOT EXISTS (
-            SELECT null
-            FROM voting_procedure AS vp2
-            WHERE vp2.gov_action_proposal_id = vp.gov_action_proposal_id
-              AND vp2.committee_voter = vp.committee_voter AND vp2.id > vp.id)
         GROUP BY ped.gov_action_proposal_id, vote
       ),
       tot_committee_size AS (

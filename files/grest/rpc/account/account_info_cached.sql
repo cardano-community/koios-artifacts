@@ -23,18 +23,21 @@ BEGIN
   FROM
     stake_address
   WHERE
-    stake_address.view = ANY(_stake_addresses);
+    stake_address.hash_raw = ANY(
+      SELECT DECODE(b32_decode(n), 'hex')
+      FROM UNNEST(_stake_addresses) AS n
+    );
 
   RETURN QUERY
 
     SELECT
-      sdc.stake_address,
+      grest.cip5_hex_to_stake_addr(sa.hash_raw)::varchar,
       CASE  WHEN status_t.registered = TRUE THEN
         'registered'
       ELSE
         'not registered'
       END AS status,
-      sdc.pool_id AS pool_id,
+      b32_encode('pool', ph.hash_raw::text)::varchar AS delegated_pool,
       vote_t.delegated_drep,
       sdc.total_balance::text,
       sdc.utxo::text,
@@ -45,10 +48,11 @@ BEGIN
       COALESCE(reserves_t.reserves, 0)::text AS reserves,
       COALESCE(treasury_t.treasury, 0)::text AS treasury
     FROM grest.stake_distribution_cache AS sdc
+      INNER JOIN stake_address AS sa ON sa.id = sdc.stake_address_id
+      INNER JOIN pool_hash AS ph ON sdc.pool_id = ph.id
       LEFT JOIN (
         SELECT
           sas.id,
-          sas.view,
           EXISTS (
             SELECT TRUE FROM stake_registration
             WHERE
@@ -73,7 +77,7 @@ BEGIN
           ) AS deposit
         FROM public.stake_address AS sas
         WHERE sas.id = ANY(sa_id_list)
-        ) AS status_t ON sdc.stake_address = status_t.view
+        ) AS status_t ON sdc.stake_address_id = status_t.id
       LEFT JOIN (
         SELECT
           dv.addr_id,
@@ -115,7 +119,7 @@ BEGIN
         GROUP BY
           t.addr_id
         ) AS treasury_t ON treasury_t.addr_id = status_t.id
-    WHERE sdc.stake_address = ANY(_stake_addresses)
+    WHERE sdc.stake_address_id = ANY(sa_id_list)
 
     UNION ALL
 
@@ -135,11 +139,11 @@ BEGIN
       FROM
         (
           SELECT
-            sa.view AS stake_address,
+            grest.cip5_hex_to_stake_addr(sa.hash_raw)::varchar AS stake_address,
             sa.id AS addr_id
           FROM stake_address AS sa 
-          WHERE view = ANY(_stake_addresses)
-           AND NOT EXISTS (SELECT null FROM grest.stake_distribution_cache AS sdc WHERE sdc.stake_address = sa.view)
+          WHERE sa.id = ANY(sa_id_list)
+           AND NOT EXISTS (SELECT null FROM grest.stake_distribution_cache AS sdc WHERE sdc.stake_address_id = sa.id)
         ) AS z
         , LATERAL grest.account_info(array[z.stake_address]) AS ai
     ;
@@ -147,4 +151,4 @@ BEGIN
 END;
 $$;
 
-COMMENT ON FUNCTION grest.account_info IS 'Get the cached account information for given stake addresses'; -- noqa: LT01
+COMMENT ON FUNCTION grest.account_info_cached IS 'Get the cached account information for given stake addresses'; -- noqa: LT01

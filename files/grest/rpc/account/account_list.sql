@@ -7,7 +7,7 @@ RETURNS TABLE (
 LANGUAGE sql STABLE
 AS $$
   SELECT
-    sa.view::text,
+    grest.cip5_hex_to_stake_addr(sa.hash_raw),
     ENCODE(sa.hash_raw,'hex'),
     ENCODE(sa.script_hash,'hex')
   FROM stake_address AS sa

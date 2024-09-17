@@ -3,7 +3,7 @@ RETURNS TABLE (
   policy_id text,
   asset_name text,
   asset_name_ascii text,
-  fingerprint character varying,
+  fingerprint varchar,
   minting_tx_hash text,
   total_supply text,
   mint_cnt bigint,

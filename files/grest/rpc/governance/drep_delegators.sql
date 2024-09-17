@@ -13,7 +13,7 @@ DECLARE
   last_reg_tx_id  bigint;
 BEGIN
 
-  IF STARTS_WITH(_drep_id,'drep_') THEN
+  IF STARTS_WITH(_drep_id,'drep_always') THEN
     -- predefined DRep roles
     SELECT INTO drep_idx id
     FROM public.drep_hash
@@ -23,7 +23,8 @@ BEGIN
   ELSE
     SELECT INTO drep_idx id
     FROM public.drep_hash
-    WHERE raw = DECODE((SELECT grest.cip129_drep_id_to_hex(_drep_id)), 'hex');
+    WHERE raw = DECODE((SELECT grest.cip129_drep_id_to_hex(_drep_id)), 'hex')
+      AND has_script = grest.cip129_drep_id_has_script(_drep_id);
 
     SELECT INTO last_reg_tx_id MAX(tx_id)
     FROM public.drep_registration
@@ -79,7 +80,7 @@ BEGIN
       )
 
     SELECT
-      sa.view::text,
+      grest.cip5_hex_to_stake_addr(sa.hash_raw)::text,
       ENCODE(sa.hash_raw,'hex'),
       ENCODE(sa.script_hash,'hex'),
       b.epoch_no,
@@ -88,8 +89,8 @@ BEGIN
       INNER JOIN stake_address AS sa ON ad.addr_id = sa.id
       INNER JOIN tx ON ad.tx_id = tx.id
       INNER JOIN block AS b ON tx.block_id = b.id
-      LEFT JOIN grest.stake_distribution_cache AS sdc ON sa.view = sdc.stake_address
-    ORDER BY b.epoch_no DESC, sa.view
+      LEFT JOIN grest.stake_distribution_cache AS sdc ON sa.id = sdc.stake_address_id
+    ORDER BY b.epoch_no DESC, grest.cip5_hex_to_stake_addr(sa.hash_raw)
   );
 
 END;

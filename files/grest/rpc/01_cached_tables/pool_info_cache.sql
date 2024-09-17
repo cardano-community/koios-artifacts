@@ -7,19 +7,17 @@ CREATE TABLE grest.pool_info_cache (
   tx_hash text,
   block_time numeric,
   pool_hash_id bigint NOT NULL,
-  pool_id_bech32 character varying NOT NULL,
-  pool_id_hex text NOT NULL,
   active_epoch_no bigint NOT NULL,
   vrf_key_hash text NOT NULL,
   margin double precision NOT NULL,
   fixed_cost lovelace NOT NULL,
   pledge lovelace NOT NULL,
   deposit lovelace,
-  reward_addr character varying,
-  owners character varying [],
+  reward_addr bigint,
+  owners bigint [],
   relays jsonb [],
   meta_id bigint,
-  meta_url character varying,
+  meta_url varchar,
   meta_hash text,
   pool_status text,
   retiring_epoch word31type
@@ -73,8 +71,6 @@ BEGIN
     tx_hash,
     block_time,
     pool_hash_id,
-    pool_id_bech32,
-    pool_id_hex,
     active_epoch_no,
     vrf_key_hash,
     margin,
@@ -96,19 +92,16 @@ BEGIN
       encode(tx.hash::bytea, 'hex'),
       EXTRACT(EPOCH FROM b.time),
       _hash_id,
-      ph.view,
-      encode(ph.hash_raw::bytea, 'hex'),
       _active_epoch_no,
-      encode(_vrf_key_hash::bytea, 'hex'),
+      ENCODE(_vrf_key_hash::bytea, 'hex'),
       _margin,
       _fixed_cost,
       _pledge,
       _deposit,
-      sa.view,
+      _reward_addr_id,
       ARRAY(
-        SELECT sa.view
+        SELECT po.addr_id
         FROM public.pool_owner AS po
-        INNER JOIN public.stake_address AS sa ON sa.id = po.addr_id
         WHERE po.pool_update_id = _update_id
       ),
       ARRAY(
@@ -131,7 +124,6 @@ BEGIN
     INNER JOIN public.tx ON tx.id = _tx_id
     INNER JOIN public.block AS b ON b.id = tx.block_id
     LEFT JOIN public.pool_metadata_ref AS pmr ON pmr.id = _meta_id
-    LEFT JOIN public.stake_address AS sa ON sa.id = _reward_addr_id
     WHERE ph.id = _hash_id;
 END;
 $$;
@@ -264,7 +256,7 @@ BEGIN
   ELSIF (tg_table_name = 'pool_owner') THEN
       UPDATE grest.pool_info_cache
       SET
-        owners = owners || (SELECT sa.view FROM public.stake_address AS sa WHERE sa.id = new.addr_id)
+        owners = owners || (SELECT sa.id FROM public.stake_address AS sa WHERE sa.id = new.addr_id)
       WHERE
         update_id = new.pool_update_id;
   END IF;
@@ -348,8 +340,8 @@ BEGIN
     );
   END LOOP;
 
+  CREATE INDEX IF NOT EXISTS idx_id ON grest.pool_info_cache (tx_id);
   CREATE INDEX IF NOT EXISTS idx_tx_id ON grest.pool_info_cache (tx_id);
-  CREATE INDEX IF NOT EXISTS idx_pool_id_bech32 ON grest.pool_info_cache (pool_id_bech32);
   CREATE INDEX IF NOT EXISTS idx_pool_hash_id ON grest.pool_info_cache (pool_hash_id);
   CREATE INDEX IF NOT EXISTS idx_pool_status ON grest.pool_info_cache (pool_status);
   CREATE INDEX IF NOT EXISTS idx_meta_id ON grest.pool_info_cache (meta_id);

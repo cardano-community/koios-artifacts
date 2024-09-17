@@ -13,11 +13,14 @@ BEGIN
   FROM
     stake_address
   WHERE
-    stake_address.VIEW = ANY(_stake_addresses);
+    stake_address.hash_raw = ANY(
+      SELECT DECODE(b32_decode(n), 'hex')
+      FROM UNNEST(_stake_addresses) AS n
+    );
 
   RETURN QUERY
     SELECT
-      sa.view AS stake_address,
+      grest.cip5_hex_to_stake_addr(sa.hash_raw)::varchar AS stake_address,
       JSONB_AGG(
         JSONB_BUILD_OBJECT(
           'action_type', actions.action_type,
@@ -73,7 +76,7 @@ BEGIN
       INNER JOIN tx ON tx.id = actions.tx_id
       INNER JOIN stake_address AS sa ON sa.id = actions.addr_id
       INNER JOIN block AS b ON b.id = tx.block_id
-    GROUP BY sa.id;
+    GROUP BY sa.hash_raw;
 END;
 $$;
 

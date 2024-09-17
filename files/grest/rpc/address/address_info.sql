@@ -2,7 +2,7 @@ CREATE OR REPLACE FUNCTION grest.address_info(_addresses text [])
 RETURNS TABLE (
   address varchar,
   balance text,
-  stake_address character varying,
+  stake_address varchar,
   script_address boolean,
   utxo_set jsonb
 )
@@ -14,7 +14,7 @@ BEGIN
   CREATE TEMPORARY TABLE _known_addresses AS
     SELECT
       DISTINCT ON (tx_out.address) tx_out.address,
-      sa.view AS stake_address,
+      sa.hash_raw AS stake_address_raw,
       COALESCE(tx_out.address_has_script, 'false') AS script_address
     FROM tx_out
     LEFT JOIN stake_address AS sa ON sa.id = tx_out.stake_address_id
@@ -42,7 +42,7 @@ BEGIN
     SELECT
       ka.address,
       COALESCE(SUM(au.value), '0')::text AS balance,
-      ka.stake_address,
+      grest.cip5_hex_to_stake_addr(ka.stake_address_raw)::varchar,
       ka.script_address,
       CASE
         WHEN EXISTS (
@@ -110,7 +110,7 @@ BEGIN
       LEFT JOIN script ON script.id = au.reference_script_id
       GROUP BY
         ka.address,
-        ka.stake_address,
+        ka.stake_address_raw,
         ka.script_address;
     DROP TABLE _known_addresses;
 END;

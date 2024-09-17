@@ -21,12 +21,15 @@ BEGIN
   SELECT INTO sa_id_list
     array_agg(id)
   FROM stake_address
-  WHERE stake_address.view = ANY(_stake_addresses);
+  WHERE stake_address.hash_raw = ANY(
+    SELECT DECODE(b32_decode(n), 'hex')
+    FROM UNNEST(_stake_addresses) AS n
+  );
 
   RETURN QUERY
   
     SELECT
-      status_t.view AS stake_address,
+      grest.cip5_hex_to_stake_addr(status_t.hash_raw)::varchar AS stake_address,
       CASE WHEN status_t.registered = TRUE THEN
         'registered'
       ELSE
@@ -46,7 +49,7 @@ BEGIN
       (
         SELECT
           sa.id,
-          sa.view,
+          sa.hash_raw,
           EXISTS (
             SELECT TRUE FROM stake_registration AS sr
             WHERE sr.addr_id = sa.id
@@ -88,9 +91,9 @@ BEGIN
     LEFT JOIN (
         SELECT
           delegation.addr_id,
-          pool_hash.view AS delegated_pool
+          b32_encode('pool', ph.hash_raw::text)::varchar AS delegated_pool
         FROM delegation
-          INNER JOIN pool_hash ON pool_hash.id = delegation.pool_hash_id
+          INNER JOIN pool_hash AS ph ON ph.id = delegation.pool_hash_id
         WHERE delegation.addr_id = ANY(sa_id_list)
           AND NOT EXISTS (
             SELECT TRUE

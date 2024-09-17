@@ -11,7 +11,7 @@ RETURNS TABLE (
 LANGUAGE sql STABLE
 AS $$
   SELECT
-    ph.view,
+    b32_encode('pool', ph.hash_raw::text),
     ENCODE(tx.hash,'hex'),
     ENCODE(b.hash,'hex'),
     b.block_no,

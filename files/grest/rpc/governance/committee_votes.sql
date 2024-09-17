@@ -31,6 +31,7 @@ AS $$
     CASE
       WHEN _cc_hot_id IS NULL THEN TRUE
       ELSE ch.raw = DECODE((SELECT grest.cip129_cc_hot_to_hex(_cc_hot_id)), 'hex')
+       AND ch.has_script = grest.cip129_cc_hot_has_script(_cc_hot_id)
     END
   ORDER BY
     vote_tx.id DESC;

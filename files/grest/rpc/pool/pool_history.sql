@@ -4,8 +4,8 @@ RETURNS TABLE (
   active_stake text,
   active_stake_pct numeric,
   saturation_pct numeric,
-  block_cnt numeric,
-  delegator_cnt numeric,
+  block_cnt bigint,
+  delegator_cnt bigint,
   margin double precision,
   fixed_cost text,
   pool_fees text,
@@ -39,7 +39,7 @@ BEGIN
         member_rewards::text,
         COALESCE(epoch_ros, 0)
       FROM grest.pool_history_cache AS phc
-      WHERE phc.pool_id = _pool_bech32 
+      WHERE phc.pool_id = (SELECT id FROM pool_hash AS ph WHERE ph.hash_raw = DECODE(b32_decode(_pool_bech32),'hex'))
           AND phc.epoch_no < (_curr_epoch - 2) -- temporary condition for testing, until cache table population fixed, then can be removed
       UNION 
       SELECT

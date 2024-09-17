@@ -34,8 +34,7 @@ BEGIN
     grest.pool_active_stake_cache AS pasc
     INNER JOIN grest.epoch_active_stake_cache AS easc ON easc.epoch_no = pasc.epoch_no
     LEFT JOIN grest.epoch_info_cache AS eic ON eic.epoch_no = pasc.epoch_no
-  WHERE
-    pasc.pool_id = _pool_bech32
+  WHERE pasc.pool_id = (SELECT id FROM pool_hash AS ph WHERE ph.hash_raw = DECODE(b32_decode(_pool_bech32),'hex'))
     AND pasc.epoch_no BETWEEN _go AND _mark
   ORDER BY
     pasc.epoch_no;

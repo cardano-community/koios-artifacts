@@ -18,7 +18,7 @@ AS $$
     EXTRACT(EPOCH FROM b.time)::integer
   FROM public.block AS b
   INNER JOIN public.slot_leader AS sl ON b.slot_leader_id = sl.id
-  WHERE sl.pool_hash_id = (SELECT id FROM public.pool_hash WHERE view = _pool_bech32)
+  WHERE sl.pool_hash_id = (SELECT id FROM public.pool_hash WHERE hash_raw = DECODE(b32_decode(_pool_bech32),'hex'))
     AND (_epoch_no IS NULL OR b.epoch_no = _epoch_no);
 $$;
 

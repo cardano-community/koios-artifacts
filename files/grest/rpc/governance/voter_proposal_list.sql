@@ -7,18 +7,18 @@ RETURNS TABLE (
   proposal_type govactiontype,
   proposal_description jsonb,
   deposit text,
-  return_address character varying,
+  return_address varchar,
   proposed_epoch word31type,
   ratified_epoch word31type,
   enacted_epoch word31type,
   dropped_epoch word31type,
   expired_epoch word31type,
   expiration word31type,
-  meta_url character varying,
+  meta_url varchar,
   meta_hash text,
   meta_json jsonb,
-  meta_comment character varying,
-  meta_language character varying,
+  meta_comment varchar,
+  meta_language varchar,
   meta_is_valid boolean,
   withdrawal jsonb,
   param_proposal jsonb
@@ -33,11 +33,11 @@ DECLARE
 BEGIN
 
   IF STARTS_WITH(_voter_id, 'drep') THEN
-    SELECT INTO _drep_id id FROM public.drep_hash WHERE raw = DECODE((SELECT grest.cip129_drep_id_to_hex(_voter_id)), 'hex');
+    SELECT INTO _drep_id id FROM public.drep_hash WHERE raw = DECODE((SELECT grest.cip129_drep_id_to_hex(_voter_id)), 'hex') AND has_script = grest.cip129_drep_id_has_script(_voter_id);
   ELSIF STARTS_WITH(_voter_id, 'pool') THEN
-    SELECT INTO _spo_id id FROM public.pool_hash WHERE view = _voter_id;
+    SELECT INTO _spo_id id FROM public.pool_hash WHERE hash_raw = DECODE(b32_decode(_voter_id),'hex');
   ELSIF STARTS_WITH(_voter_id, 'cc_hot') THEN
-    SELECT INTO _committee_member_id id FROM public.committee_hash WHERE raw = DECODE((SELECT grest.cip129_cc_hot_to_hex(_voter_id)), 'hex');
+    SELECT INTO _committee_member_id id FROM public.committee_hash WHERE raw = DECODE((SELECT grest.cip129_cc_hot_to_hex(_voter_id)), 'hex') AND has_script = grest.cip129_cc_hot_has_script(_voter_id);
   END IF;
 
   SELECT INTO _gap_id_list ARRAY_AGG(gov_action_proposal_id)
@@ -63,7 +63,7 @@ BEGIN
       gap.type,
       gap.description,
       gap.deposit::text,
-      sa.view,
+      grest.cip5_hex_to_stake_addr(sa.hash_raw)::text,
       b.epoch_no,
       gap.ratified_epoch,
       gap.enacted_epoch,
@@ -81,7 +81,7 @@ BEGIN
         ELSE
           JSONB_BUILD_OBJECT(
             'stake_address', (
-              SELECT sa2.view
+              SELECT grest.cip5_hex_to_stake_addr(sa2.hash_raw)::text
               FROM stake_address AS sa2
               WHERE sa2.id = tw.stake_address_id
             ),

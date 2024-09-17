@@ -40,6 +40,7 @@ AS $$
     CASE
       WHEN _drep_id IS NULL THEN TRUE
       ELSE dh.raw = DECODE((SELECT grest.cip129_drep_id_to_hex(_drep_id)), 'hex')
+       AND dh.has_script = grest.cip129_drep_id_has_script(_drep_id)
     END
   ORDER BY
     block_time DESC;

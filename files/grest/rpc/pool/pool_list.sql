@@ -1,17 +1,17 @@
 CREATE OR REPLACE FUNCTION grest.pool_list()
 RETURNS TABLE (
-  pool_id_bech32 character varying,
+  pool_id_bech32 varchar,
   pool_id_hex text,
   active_epoch_no bigint,
   margin double precision,
   fixed_cost text,
   pledge text,
   deposit text,
-  reward_addr character varying,
-  owners character varying [],
+  reward_addr varchar,
+  owners varchar [],
   relays jsonb [],
-  ticker character varying,
-  meta_url character varying,
+  ticker varchar,
+  meta_url varchar,
   meta_hash text,
   pool_status text,
   retiring_epoch word31type
@@ -19,16 +19,16 @@ RETURNS TABLE (
 LANGUAGE sql STABLE
 AS $$
   SELECT DISTINCT ON (pic.pool_hash_id)
-    ph.view AS pool_id_bech32,
+    b32_encode('pool', ph.hash_raw::text)::varchar AS pool_id_bech32,
     ENCODE(ph.hash_raw,'hex') as pool_id_hex,
     pu.active_epoch_no,
     pu.margin,
     pu.fixed_cost::text,
     pu.pledge::text,
     pu.deposit::text,
-    sa.view AS reward_addr,
+    grest.cip5_hex_to_stake_addr(sa.hash_raw)::varchar AS reward_addr,
     ARRAY(
-      SELECT sa.view
+      SELECT grest.cip5_hex_to_stake_addr(sa.hash_raw)::varchar
       FROM public.pool_owner AS po
       INNER JOIN public.stake_address AS sa ON sa.id = po.addr_id
       WHERE po.pool_update_id = pic.update_id

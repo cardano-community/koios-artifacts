@@ -13,7 +13,10 @@ BEGIN
   FROM
     stake_address
   WHERE
-    stake_address.VIEW = ANY(_stake_addresses);
+    stake_address.hash_raw = ANY(
+      SELECT DECODE(b32_decode(n), 'hex')
+      FROM UNNEST(_stake_addresses) AS n
+    );
 
   IF _first_only IS NOT TRUE AND _empty IS NOT TRUE THEN
     RETURN QUERY
@@ -34,7 +37,7 @@ BEGIN
       )
 
       SELECT
-        sa.view AS stake_address,
+        grest.cip5_hex_to_stake_addr(sa.hash_raw)::varchar AS stake_address,
         JSONB_AGG(txo_addr.address) AS addresses
       FROM
         txo_addr
@@ -60,7 +63,7 @@ BEGIN
       )
 
       SELECT
-        sa.view AS stake_address,
+        grest.cip5_hex_to_stake_addr(sa.hash_raw)::varchar AS stake_address,
         JSONB_AGG(txo_addr.address) AS addresses
       FROM
         txo_addr
