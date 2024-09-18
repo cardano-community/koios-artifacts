@@ -1,3 +1,4 @@
+
 CREATE OR REPLACE FUNCTION grest.proposal_voting_summary(_proposal_id text)
 RETURNS TABLE (
   proposal_type text,
@@ -8,16 +9,19 @@ RETURNS TABLE (
   drep_no_votes_cast integer,
   drep_no_vote_power lovelace,
   drep_no_pct numeric,
+  drep_abstain_votes_cast integer,
   pool_yes_votes_cast integer,
   pool_yes_vote_power lovelace,
   pool_yes_pct numeric,
   pool_no_votes_cast integer,
   pool_no_vote_power lovelace,
   pool_no_pct numeric,
+  pool_abstain_votes_cast integer,
   committee_yes_votes_cast integer,
   committee_yes_pct numeric,
   committee_no_votes_cast integer,
-  committee_no_pct numeric
+  committee_no_pct numeric,
+  committee_abstain_votes_cast integer
 )
 LANGUAGE plpgsql
 AS $$
@@ -169,6 +173,7 @@ BEGIN
       y.drep_no_votes_cast::integer,
       (y.drep_non_abstain_total - y.drep_yes_vote_power)::lovelace AS drep_no_vote_power,
       ROUND((y.drep_non_abstain_total - y.drep_yes_vote_power) * 100 / y.drep_non_abstain_total, 2) AS drep_no_pct,
+      (SELECT COALESCE(SUM(active_drep_votes_cast), 0)::integer FROM active_prop_drep_votes WHERE vote = 'Abstain') AS drep_abstain_votes_cast,
       (CASE
         WHEN y.proposal_type IN ('ParameterChange', 'TreasuryWithdrawals', 'NewConstitution') THEN 0
         ELSE y.pool_yes_votes_cast
@@ -193,6 +198,7 @@ BEGIN
         WHEN y.proposal_type IN ('ParameterChange', 'TreasuryWithdrawals', 'NewConstitution') THEN 0
         ELSE ROUND((y.pool_non_abstain_total - y.pool_yes_vote_power) * 100 / y.pool_non_abstain_total, 2)
       END) AS pool_no_pct,
+      (SELECT COALESCE(SUM(pool_votes_cast), 0)::integer FROM active_prop_pool_votes WHERE vote = 'Abstain') AS pool_abstain_votes_cast,
       y.committee_yes_votes_cast::integer,
       (CASE
         WHEN y.proposal_type IN ('NoConfidence', 'NewCommittee') THEN 0
@@ -205,7 +211,8 @@ BEGIN
       (CASE
         WHEN y.proposal_type IN ('NoConfidence', 'NewCommittee') THEN 0
         ELSE ROUND((committee_non_abstain_total - y.committee_yes_votes_cast) * 100 / y.committee_non_abstain_total, 2)
-      END) AS committee_no_pct 
+      END) AS committee_no_pct,
+      (SELECT COALESCE(SUM(committee_votes_cast), 0)::integer FROM committee_votes WHERE vote = 'Abstain') AS committee_abstain_votes_cast
     FROM 
       (
         SELECT  
