@@ -226,7 +226,7 @@ schemas:
             example: "31235800000"
           active_stake_pct:
             type:
-            - string
+            - number
             - 'null'
             description: Active stake for the pool, expressed as a percentage of total active stake on network
             example: 13.512182543475783
@@ -2659,6 +2659,10 @@ schemas:
             type: number
             description: Percentage of 'no' votes from dreps
             example: 39.28
+          drep_abstain_votes_cast:
+            type: number
+            description: Percentage of 'abstain' votes from dreps
+            example: 5
           pool_yes_votes_cast:
             type: number
             description: Number of 'yes' votes casted by pools
@@ -2683,6 +2687,9 @@ schemas:
             type: number
             description: Percentage of 'no' votes from pools
             example: 0
+          pool_abstain_votes_cast:
+            type: number
+            description: Percentage of 'abstain' votes from pools
           committee_yes_votes_cast:
             type: number
             description: Number of 'yes' votes casted by committee
@@ -2699,6 +2706,9 @@ schemas:
             type: number
             description: Percentage of 'no' votes from committee
             example: 28.57
+          committee_abstain_votes_cast:
+            type: number
+            description: Percentage of 'abstain' votes from committee
     proposal_votes:
       type: array
       description: List of all votes cast on specified governance action
