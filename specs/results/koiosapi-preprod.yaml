@@ -2047,7 +2047,7 @@ components:
       description: Epoch Number to fetch details for
       schema:
         type: string
-      example: "31"
+      example: "166"
       in: query
       required: false
       allowEmptyValue: true
@@ -2117,7 +2117,7 @@ components:
       description: Voter ID (Drep, SPO, Committee Member) in Bech32 format (CIP-5 | CIP-129)
       schema:
         type: string
-      example: "drep1kxtwaqtayj6vklc57u93xayjvkwgvefh8drscqp5a5y6jz7m6rd"
+      example: "drep1ydmraa6kv8cvmry059v608tehl50nfmg0z764lmsqkvwurs40sw2z"
       in: query
       required: true
       allowEmptyValue: false
@@ -2127,7 +2127,7 @@ components:
       description: DRep ID in bech32 format
       schema:
         type: string
-      example: "drep1kxtwaqtayj6vklc57u93xayjvkwgvefh8drscqp5a5y6jz7m6rd"
+      example: "drep1ydmraa6kv8cvmry059v608tehl50nfmg0z764lmsqkvwurs40sw2z"
       in: query
       required: true
       allowEmptyValue: false
@@ -2137,7 +2137,7 @@ components:
       description: DRep ID in bech32 format
       schema:
         type: string
-      example: "drep1kxtwaqtayj6vklc57u93xayjvkwgvefh8drscqp5a5y6jz7m6rd"
+      example: "drep1ydmraa6kv8cvmry059v608tehl50nfmg0z764lmsqkvwurs40sw2z"
       in: query
       required: false
       allowEmptyValue: true
@@ -2187,7 +2187,7 @@ components:
       description: Pool ID in bech32 format
       schema:
         type: string
-      example: "pool1x4p3cwemsm356vpxnjwuud7w76jz64hyss729zp7xa6wuey6yr9"
+      example: "pool1vw6fr9agt58djrp3w0t0lsn6t329t6eusqxz5ugd9w7ecyedsdv"
       in: query
       required: true
       allowEmptyValue: false
@@ -2197,7 +2197,7 @@ components:
       description: Pool ID in bech32 format (optional)
       schema:
         type: string
-      example: "pool1x4p3cwemsm356vpxnjwuud7w76jz64hyss729zp7xa6wuey6yr9"
+      example: "pool1vw6fr9agt58djrp3w0t0lsn6t329t6eusqxz5ugd9w7ecyedsdv"
       in: query
       required: false
       allowEmptyValue: true
@@ -2225,7 +2225,7 @@ components:
       deprecated: false
       name: _proposal_id
       description: Government proposal ID in CIP-129 Bech32 format
-      example: "gov_action1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpzklpgpf"
+      example: "gov_action14lefp8upwhhq92xph7t075txshf9huxxh9d2ey05ml2n5hqgvlxqqp92kfl"
       schema:
         type: string
       in: query
@@ -2618,7 +2618,7 @@ components:
             example:
               _pool_bech32_ids:
                 - pool1ext7qrwjzaxcdfhdnkq5mth59ukuu2atcg6tgqpmevpt7ratkta
-                - pool1x4p3cwemsm356vpxnjwuud7w76jz64hyss729zp7xa6wuey6yr9
+                - pool1vw6fr9agt58djrp3w0t0lsn6t329t6eusqxz5ugd9w7ecyedsdv
                 - pool1ws42l6rawqjv58crs5l32v0eem3qnngpnjfd7epwd4lmjccc5cg
       description: Array of Cardano pool IDs (bech32 format)
     pool_ids_optional:
@@ -2636,7 +2636,7 @@ components:
             example:
               _pool_bech32_ids:
                 - pool1ext7qrwjzaxcdfhdnkq5mth59ukuu2atcg6tgqpmevpt7ratkta
-                - pool1x4p3cwemsm356vpxnjwuud7w76jz64hyss729zp7xa6wuey6yr9
+                - pool1vw6fr9agt58djrp3w0t0lsn6t329t6eusqxz5ugd9w7ecyedsdv
                 - pool1ws42l6rawqjv58crs5l32v0eem3qnngpnjfd7epwd4lmjccc5cg
       description: Array of Cardano pool IDs (bech32 format) [Optional]
     script_hashes:
@@ -2736,8 +2736,8 @@ components:
                   type: string
             example:
               _drep_ids:
-                - drep1kxtwaqtayj6vklc57u93xayjvkwgvefh8drscqp5a5y6jz7m6rd
-                - drep14x62vyme8l8dkhvxg6rauc6vpcd2va9fquz8k3jstsqczwlvqqh
+                - drep1ydmraa6kv8cvmry059v608tehl50nfmg0z764lmsqkvwurs40sw2z
+                - drep1y25j98kvqf7t3tj4pvxwrjr2728dsrfekptgg3kxqrr56qqcny8sn
     utxo_refs_with_extended:
       content:
         application/json:
@@ -5291,7 +5291,9 @@ components:
               - string
             description: Comment attached to the metadata
           is_valid:
-            type: boolean
+            type:
+              - 'null'
+              - boolean
             description: Indicate whether data is invalid
             example: true
     drep_updates:

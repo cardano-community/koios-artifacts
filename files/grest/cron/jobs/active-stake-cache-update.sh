@@ -14,7 +14,4 @@ echo "$(date +%F_%H:%M:%S) Running active stake cache update..."
   echo "No update needed, exiting..." &&
   exit 0
 
-next_epoch_no=$(psql ${DB_NAME} -qbt -c "SELECT MAX(epoch_no) FROM epoch_stake_progress WHERE completed='t'" | tr -cd '[:alnum:]')
-
-psql ${DB_NAME} -qbt -c "SELECT GREST.active_stake_cache_update(${next_epoch_no});" 1>/dev/null
 echo "$(date +%F_%H:%M:%S) Job done!"

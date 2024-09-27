@@ -12,11 +12,11 @@ CREATE TABLE IF NOT EXISTS grest.epoch_active_stake_cache (
 );
 
 CREATE OR REPLACE FUNCTION grest.active_stake_cache_update_check()
-RETURNS boolean
+RETURNS void
 LANGUAGE plpgsql
 AS $$
 DECLARE
-  _current_epoch_no integer;
+  _latest_epoch_stake integer;
   _last_active_stake_validated_epoch text;
 BEGIN
   -- Get Last Active Stake Validated Epoch
@@ -24,15 +24,17 @@ BEGIN
   FROM grest.control_table
   WHERE key = 'last_active_stake_validated_epoch';
   -- Get Current Epoch
-  SELECT MAX(no) INTO _current_epoch_no
-  FROM epoch;
-  RAISE NOTICE 'Next epoch: %', _current_epoch_no+1;
+  SELECT MAX(epoch_no) INTO _latest_epoch_stake
+    FROM epoch_stake_progress
+    WHERE completed='t';
+  RAISE NOTICE 'Latest epoch in epoch_stake: %', _latest_epoch_stake;
   RAISE NOTICE 'Latest epoch in active stake cache: %', COALESCE(_last_active_stake_validated_epoch::integer, '0');
-  IF (SELECT MAX(epoch_no) FROM epoch_stake_progress WHERE completed='t')::integer > COALESCE(_last_active_stake_validated_epoch,'0')::integer THEN
-    RETURN TRUE;
+  IF _latest_epoch_stake::integer > COALESCE(_last_active_stake_validated_epoch,'0')::integer THEN
+    RAISE NOTICE 'Running update for epoch: %', _latest_epoch_stake;
+    PERFORM grest.active_stake_cache_update(_latest_epoch_stake);
+  ELSE
+    RAISE NOTICE 'Skipping! Active Stake cache is already up to date with DB!';
   END IF;
-  RAISE NOTICE 'Active Stake cache is up to date with DB!';
-  RETURN FALSE;
 END;
 $$;
 
