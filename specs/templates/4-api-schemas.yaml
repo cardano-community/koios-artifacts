@@ -2354,13 +2354,13 @@ schemas:
             type: string
             description: The total amount of voting power this DRep is delegated.
             example: 599496769641
-          url:
+          meta_url:
             type:
               - 'null'
               - string
             description: A URL to a JSON payload of metadata
             example: "https://hornan7.github.io/Vote_Context.jsonld"
-          hash:
+          meta_hash:
             type:
               - 'null'
               - string
@@ -2422,11 +2422,11 @@ schemas:
             $ref: "#/components/schemas/drep_info/items/properties/hex"
           has_script:
             $ref: "#/components/schemas/drep_info/items/properties/has_script"
-          url:
-            $ref: "#/components/schemas/drep_info/items/properties/url"
-          hash:
-            $ref: "#/components/schemas/drep_info/items/properties/hash"
-          json:
+          meta_url:
+            $ref: "#/components/schemas/drep_info/items/properties/meta_url"
+          meta_hash:
+            $ref: "#/components/schemas/drep_info/items/properties/meta_hash"
+          meta_json:
             type:
               - 'null'
               - object

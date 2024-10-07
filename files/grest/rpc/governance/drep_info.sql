@@ -8,8 +8,8 @@ RETURNS TABLE (
   active boolean,
   expires_epoch_no numeric,
   amount text,
-  url varchar,
-  hash text
+  meta_url varchar,
+  meta_hash text
 )
 LANGUAGE plpgsql
 AS $$
@@ -130,8 +130,8 @@ BEGIN
       (CASE WHEN starts_with(dh.view,'drep_always') THEN TRUE ELSE COALESCE(dr.deposit, 0) >= 0 AND ds.active END) AS active,
       (CASE WHEN COALESCE(dr.deposit, 0) >= 0 THEN ds.expires_epoch_no ELSE NULL END) AS expires_epoch_no,
       COALESCE(dd.amount, 0)::text AS amount,
-      va.url,
-      ENCODE(va.data_hash, 'hex') AS hash
+      va.url AS meta_url,
+      ENCODE(va.data_hash, 'hex') AS meta_hash
     FROM public.drep_hash AS dh
       LEFT JOIN public.drep_registration AS dr ON dh.id = dr.drep_hash_id
       LEFT JOIN public.voting_anchor AS va ON dr.voting_anchor_id = va.id
