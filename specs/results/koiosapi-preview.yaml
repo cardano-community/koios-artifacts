@@ -4777,6 +4777,16 @@ components:
         properties:
           tx_hash:
             $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+          block_hash:
+            $ref: "#/components/schemas/blocks/items/properties/hash"
+          block_height:
+            $ref: "#/components/schemas/blocks/items/properties/block_height"
+          epoch_no:
+            $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+          absolute_slot:
+            $ref: "#/components/schemas/blocks/items/properties/abs_slot"
+          tx_timestamp:
+            $ref: "#/components/schemas/tx_info/items/properties/tx_timestamp"
           cbor:
             type: string
             description: CBOR encoded raw transaction.
