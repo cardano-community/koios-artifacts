@@ -1,3 +1,4 @@
+
 CREATE OR REPLACE FUNCTION grest.pool_info(_pool_bech32_ids text [])
 RETURNS TABLE (
   pool_id_bech32 varchar,
@@ -9,6 +10,7 @@ RETURNS TABLE (
   pledge text,
   deposit text,
   reward_addr varchar,
+  reward_addr_delegated_drep text,
   owners varchar [],
   relays jsonb [],
   meta_url varchar,
@@ -53,6 +55,10 @@ BEGIN
           ph.hash_raw
         FROM grest.pool_info_cache AS pic
         INNER JOIN public.pool_hash AS ph ON ph.id = pic.pool_hash_id
+        -- consider only activated updates or all updates if none were activated so far
+            AND ( (pic.active_epoch_no <= _epoch_no)
+            OR ( NOT EXISTS (SELECT 1 from grest.pool_info_cache AS pic2 where pic2.pool_hash_id = pic.pool_hash_id
+                AND pic2.active_epoch_no <= _epoch_no) ) )
         WHERE ph.hash_raw = ANY(
           SELECT DECODE(b32_decode(p),'hex')
           FROM UNNEST(_pool_bech32_ids) AS p)
@@ -70,6 +76,7 @@ BEGIN
       pu.pledge::text,
       pu.deposit::text,
       grest.cip5_hex_to_stake_addr(sa.hash_raw)::varchar AS reward_addr,
+      COALESCE(grest.cip129_hex_to_drep_id(dh.raw, dh.has_script), dh.view::text) AS reward_addr_delegated_drep,
       ARRAY(
         SELECT grest.cip5_hex_to_stake_addr(sa.hash_raw)::varchar
         FROM public.pool_owner AS po
@@ -105,6 +112,10 @@ BEGIN
     LEFT JOIN public.pool_hash AS ph ON ph.id = api.pool_hash_id
     LEFT JOIN public.pool_update AS pu ON pu.id = api.update_id
     LEFT JOIN public.stake_address AS sa ON pu.reward_addr_id = sa.id
+    LEFT JOIN delegation_vote AS dv on dv.addr_id = sa.id
+	    AND NOT EXISTS (SELECT 1 FROM delegation_vote dv2 WHERE dv2.addr_id = sa.id AND dv2.tx_id > dv.tx_id)
+	  LEFT JOIN drep_hash AS dh ON dh.id = dv.drep_hash_id
+	        -- could add this condition too since delegations elsewhere are meaningless: and dh.view like 'drep_always%'
     LEFT JOIN public.pool_metadata_ref AS pmr ON pmr.id = api.meta_id
     LEFT JOIN public.off_chain_pool_data AS ocpd ON api.meta_id = ocpd.pmr_id
     LEFT JOIN LATERAL (

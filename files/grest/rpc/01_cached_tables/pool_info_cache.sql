@@ -63,7 +63,7 @@ BEGIN
     _pool_status := 'retired';
   END IF;
 
-  DELETE FROM grest.pool_info_cache WHERE pool_hash_id = _hash_id;
+  -- not sure why we would want to delete all historic update records: DELETE FROM grest.pool_info_cache WHERE pool_hash_id = _hash_id;
 
   INSERT INTO grest.pool_info_cache (
     tx_id,
