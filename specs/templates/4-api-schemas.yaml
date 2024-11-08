@@ -1481,7 +1481,9 @@ schemas:
                   enum: [member, leader, treasury, reserves]
                   example: member
                 pool_id:
-                  $ref: "#/components/schemas/pool_list/items/properties/pool_id_bech32"
+                  anyOf:
+                    - type: 'null'
+                    - $ref: "#/components/schemas/pool_list/items/properties/pool_id_bech32"
     account_updates:
       description: Array of account updates information
       type: array

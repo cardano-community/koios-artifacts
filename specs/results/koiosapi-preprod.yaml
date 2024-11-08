@@ -3157,6 +3157,12 @@ components:
               - 'null'
             description: Pool reward address
             example: stake1uy6yzwsxxc28lfms0qmpxvyz9a7y770rtcqx9y96m42cttqwvp4m5
+          reward_addr_delegated_drep:
+            type:
+              - 'null'
+              - string
+            description: Reward address' current delegation status to DRep ID in CIP-129 Bech32 format
+            example: drep1yfhyq6tztjksqqpd5lglc3zr2tn8vylgjh9xzz7n2p4l4lgk3qam3
           owners:
             type:
               - array
@@ -4310,7 +4316,9 @@ components:
                   enum: [member, leader, treasury, reserves]
                   example: member
                 pool_id:
-                  $ref: "#/components/schemas/pool_list/items/properties/pool_id_bech32"
+                  anyOf:
+                    - type: 'null'
+                    - $ref: "#/components/schemas/pool_list/items/properties/pool_id_bech32"
     account_updates:
       description: Array of account updates information
       type: array
@@ -5508,8 +5516,12 @@ components:
             example: 39.28
           drep_abstain_votes_cast:
             type: number
-            description: Percentage of 'abstain' votes from dreps
+            description: Number of active 'abstain' votes from dreps
             example: 5
+          drep_always_no_confidence_vote_power:
+            type: number
+            description: Power of votes delegated to 'always_no_confidence' predefined drep
+            example: 9999
           pool_yes_votes_cast:
             type: number
             description: Number of 'yes' votes casted by pools
@@ -5537,6 +5549,23 @@ components:
           pool_abstain_votes_cast:
             type: number
             description: Percentage of 'abstain' votes from pools
+            example: 0
+          pool_passive_always_abstain_votes_assigned:
+            type: number
+            description: Number of non-voting SPO pool reward addresses delegating to 'always_abstain' drep
+            example: 1
+          pool_passive_always_abstain_vote_power:
+            type: number
+            description: Combined power of non-voting SPO pool votes where reward addresses delegate to 'always_abstain'
+            example: 12312312
+          pool_passive_always_no_confidence_votes_assigned:
+            type: number
+            description: Number of non-voting SPO pool reward addresses delegating to 'always_no_confidence' drep
+            example: 10
+          pool_passive_always_no_confidence_vote_power:
+            type: number
+            description: Combined power of non-voting SPO pool votes where reward addresses delegate to 'always_no_confidence'
+            example: 321321
           committee_yes_votes_cast:
             type: number
             description: Number of 'yes' votes casted by committee
