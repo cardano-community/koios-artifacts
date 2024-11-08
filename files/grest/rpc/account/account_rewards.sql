@@ -18,44 +18,47 @@ BEGIN
       FROM UNNEST(_stake_addresses) AS n
     );
 
-  IF _epoch_no IS NULL THEN
-    RETURN QUERY
+  RETURN QUERY
+    SELECT
+      grest.cip5_hex_to_stake_addr(all_rewards.stake_address_raw)::varchar,
+      JSONB_AGG(
+        JSONB_BUILD_OBJECT(
+          'earned_epoch', all_rewards.earned_epoch,
+          'spendable_epoch', all_rewards.spendable_epoch,
+          'amount', all_rewards.amount::text,
+          'type', all_rewards.type,
+          'pool_id', CASE WHEN all_rewards.pool_id_raw IS NULL THEN NULL ELSE b32_encode('pool', all_rewards.pool_id_raw::text) END
+        )
+      ) AS rewards
+    FROM (
       SELECT
-        grest.cip5_hex_to_stake_addr(sa.hash_raw)::varchar,
-        JSONB_AGG(
-          JSONB_BUILD_OBJECT(
-          'earned_epoch', r.earned_epoch,
-          'spendable_epoch', r.spendable_epoch,
-          'amount', r.amount::text,
-          'type', r.type,
-          'pool_id', b32_encode('pool', ph.hash_raw::text)
-          )
-        ) AS rewards
+        sa.hash_raw as stake_address_raw,
+        r.type,
+        r.amount,
+        r.earned_epoch,
+        r.spendable_epoch,
+        ph.hash_raw as pool_id_raw
       FROM reward AS r
-        LEFT JOIN pool_hash AS ph ON r.pool_id = ph.id
+        INNER JOIN pool_hash AS ph ON r.pool_id = ph.id
         INNER JOIN stake_address AS sa ON sa.id = r.addr_id
       WHERE r.addr_id = ANY(sa_id_list)
-      GROUP BY sa.hash_raw;
-  ELSE
-    RETURN QUERY
+        AND CASE WHEN _epoch_no IS NULL THEN TRUE ELSE r.earned_epoch = _epoch_no END
+      --
+      UNION ALL
+      --
       SELECT
-        grest.cip5_hex_to_stake_addr(sa.hash_raw)::varchar,
-        JSONB_AGG(
-          JSONB_BUILD_OBJECT(
-            'earned_epoch', r.earned_epoch,
-            'spendable_epoch', r.spendable_epoch,
-            'amount', r.amount::text,
-            'type', r.type,
-            'pool_id', b32_encode('pool', ph.hash_raw::text)
-          )
-        ) AS rewards
-      FROM reward AS r
-        LEFT JOIN pool_hash AS ph ON r.pool_id = ph.id
-        INNER JOIN stake_address AS sa ON sa.id = r.addr_id
-      WHERE r.addr_id = ANY(sa_id_list)
-        AND r.earned_epoch = _epoch_no
-      GROUP BY sa.hash_raw;
-  END IF;
+        sa.hash_raw as stake_address_raw,
+        rr.type,
+        rr.amount,
+        rr.earned_epoch,
+        rr.spendable_epoch,
+        null as pool_id_raw
+      FROM reward_rest AS rr
+        INNER JOIN stake_address AS sa ON sa.id = rr.addr_id
+      WHERE rr.addr_id = ANY(sa_id_list)
+        AND CASE WHEN _epoch_no IS NULL THEN TRUE ELSE rr.earned_epoch = _epoch_no END
+    ) as all_rewards
+    GROUP BY all_rewards.stake_address_raw;
 END;
 $$;
 
