@@ -159,8 +159,9 @@ BEGIN
 	    INNER JOIN public.stake_address AS sa ON pu.reward_addr_id = sa.id
 	    INNER JOIN delegation_vote AS dv on dv.addr_id = sa.id
 	    AND dv.tx_id = (SELECT max(tx_id) FROM delegation_vote dv2 WHERE dv2.addr_id = sa.id
-	    					AND tx_id <= (SELECT COALESCE(max(t.id), (SELECT max(t2.id) FROM tx t2)) FROM tx t INNER JOIN block b ON t.block_id = b.id 
-	    					AND b.epoch_no = ped.epoch_of_interest))
+	    					AND tx_id <= 
+	  					(SELECT COALESCE(t.id, (SELECT id FROM tx t2 ORDER BY id DESC LIMIT 1)) FROM tx t INNER JOIN block b 
+	  					ON t.block_id = b.id AND b.epoch_no = ped.epoch_of_interest ORDER BY t.id DESC LIMIT 1))
 	    INNER JOIN drep_hash AS dh on dh.id = dv.drep_hash_id
 	        and dh.view like 'drep_always%'
 	    INNER JOIN pool_stat AS pstat ON api.pool_hash_id = pstat.pool_hash_id
