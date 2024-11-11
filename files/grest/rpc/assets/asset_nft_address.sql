@@ -27,9 +27,10 @@ BEGIN
   IF EXISTS (SELECT * FROM ma_tx_mint WHERE ident = _asset_id and quantity < 0 LIMIT 1) THEN
     RETURN QUERY
       SELECT
-        txo.address,
+        a.address,
         grest.cip5_hex_to_stake_addr(sa.hash_raw)::varchar AS stake_address
       FROM tx_out AS txo
+      INNER JOIN address AS a ON a.id = txo.address_id
       LEFT JOIN stake_address AS sa ON txo.stake_address_id = sa.id
       WHERE txo.id = (
         SELECT MAX(tx_out_id)
@@ -39,9 +40,10 @@ BEGIN
   ELSE
     RETURN QUERY
       SELECT
-        txo.address,
+        a.address,
         grest.cip5_hex_to_stake_addr(sa.hash_raw)::varchar AS stake_address
       FROM tx_out AS txo
+      INNER JOIN address AS a ON a.id = txo.address_id
       INNER JOIN ma_tx_out mto ON mto.tx_out_id = txo.id
       LEFT JOIN stake_address AS sa ON txo.stake_address_id = sa.id
       WHERE mto.ident = _asset_id

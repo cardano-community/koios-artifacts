@@ -219,7 +219,7 @@ $$;
 
 COMMENT ON FUNCTION grest.get_pool_history_data_bulk IS 'Pool block production and reward history from a given epoch until optional later epoch, for all or particular subset of pools'; -- noqa: LT01
 
-CREATE OR REPLACE FUNCTION grest.pool_history_cache_update(_epoch_no_to_insert_from bigint DEFAULT NULL)
+CREATE OR REPLACE FUNCTION grest.pool_history_cache_update(_epoch_no_to_insert_from bigint DEFAULT null)
 RETURNS void
 LANGUAGE plpgsql
 AS $$

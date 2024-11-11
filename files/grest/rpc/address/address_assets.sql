@@ -14,7 +14,7 @@ BEGIN
 
     WITH _all_assets AS (
       SELECT
-        txo.address,
+        a.address,
         ma.policy,
         ma.name,
         ma.fingerprint,
@@ -24,10 +24,11 @@ BEGIN
       INNER JOIN multi_asset AS ma ON ma.id = mtx.ident
       LEFT JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
       INNER JOIN tx_out AS txo ON txo.id = mtx.tx_out_id
-      WHERE txo.address = ANY(_addresses)
+      INNER JOIN address AS a ON a.id = tx_out.address_id
+      WHERE a.address = ANY(_addresses)
         AND txo.consumed_by_tx_id IS NULL
       GROUP BY
-        txo.address, ma.policy, ma.name, ma.fingerprint, aic.decimals
+        a.address, ma.policy, ma.name, ma.fingerprint, aic.decimals
     )
 
     SELECT

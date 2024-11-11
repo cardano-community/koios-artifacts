@@ -33,11 +33,12 @@ BEGIN
       FROM
         (
           SELECT
-            txo.address,
+            a.address,
             sa.hash_raw AS stake_address_raw,
             atoc.quantity
           FROM grest.asset_tx_out_cache AS atoc
           LEFT JOIN tx_out AS txo ON atoc.txo_id = txo.id
+          INNER JOIN address AS a ON a.id = txo.address_id
           LEFT JOIN stake_address AS sa ON txo.stake_address_id = sa.id
           WHERE atoc.ma_id = _asset_id
             AND txo.consumed_by_tx_id IS NULL
@@ -52,11 +53,12 @@ BEGIN
       FROM
         (
           SELECT
-            txo.address,
+            a.address,
             sa.hash_raw AS stake_address_raw,
             mto.quantity
           FROM ma_tx_out AS mto
           LEFT JOIN tx_out AS txo ON txo.id = mto.tx_out_id
+          INNER JOIN address AS a ON a.id = txo.address_id
           LEFT JOIN stake_address AS sa ON txo.stake_address_id = sa.id
           WHERE mto.ident = _asset_id
             AND txo.consumed_by_tx_id IS NULL

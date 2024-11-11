@@ -1,4 +1,3 @@
-
 CREATE OR REPLACE FUNCTION grest.pool_info(_pool_bech32_ids text [])
 RETURNS TABLE (
   pool_id_bech32 varchar,

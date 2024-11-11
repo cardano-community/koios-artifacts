@@ -1,4 +1,3 @@
-
 CREATE OR REPLACE FUNCTION grest.proposal_voting_summary(_proposal_id text)
 RETURNS TABLE (
   proposal_type text,

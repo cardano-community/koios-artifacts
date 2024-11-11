@@ -29,15 +29,17 @@ BEGIN
   FROM (
     SELECT tx_id
     FROM tx_out
-    WHERE payment_cred = ANY(_payment_cred_bytea)
+      INNER JOIN address AS a ON tx_out.address_id = a.id
+    WHERE a.payment_cred = ANY(_payment_cred_bytea)
       AND tx_id >= _tx_id_min
     --
     UNION
     --
     SELECT consumed_by_tx_id AS tx_id
     FROM tx_out
+      INNER JOIN address AS a ON tx_out.address_id = a.id
     WHERE tx_out.consumed_by_tx_id IS NOT NULL
-      AND tx_out.payment_cred = ANY(_payment_cred_bytea)
+      AND a.payment_cred = ANY(_payment_cred_bytea)
       AND tx_out.consumed_by_tx_id >= _tx_id_min
   ) AS tmp;
 

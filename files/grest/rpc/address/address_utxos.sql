@@ -35,20 +35,21 @@ BEGIN
             )
           END) as assets
         FROM tx_out AS txo
+        INNER JOIN address AS a ON a.id = txo.address_id
         INNER JOIN ma_tx_out AS mto ON mto.tx_out_id = txo.id
         LEFT JOIN multi_asset AS ma ON ma.id = mto.ident
         LEFT JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
-        WHERE txo.address = ANY(_addresses)
+        WHERE a.address = ANY(_addresses)
           AND txo.consumed_by_tx_id IS NULL
         GROUP BY txo.id
       )
     SELECT
       ENCODE(tx.hash, 'hex')::text AS tx_hash,
       tx_out.index::smallint,
-      tx_out.address::text,
+      a.address::text,
       tx_out.value::text,
       grest.cip5_hex_to_stake_addr(sa.hash_raw)::text as stake_address,
-      ENCODE(tx_out.payment_cred, 'hex') AS payment_cred,
+      ENCODE(a.payment_cred, 'hex') AS payment_cred,
       b.epoch_no,
       b.block_no,
       EXTRACT(EPOCH FROM b.time)::integer AS block_time,
@@ -79,13 +80,14 @@ BEGIN
         ELSE true
       END) AS is_spent
     FROM tx_out
+    INNER JOIN address AS a ON a.id = tx_out.address_id
     INNER JOIN tx ON tx_out.tx_id = tx.id
     LEFT JOIN stake_address AS sa ON tx_out.stake_address_id = sa.id
     LEFT JOIN block AS b ON b.id = tx.block_id
     LEFT JOIN datum ON datum.id = tx_out.inline_datum_id
     LEFT JOIN script ON script.id = tx_out.reference_script_id
     LEFT JOIN _assets ON tx_out.id = _assets.id
-    WHERE tx_out.address = ANY(_addresses)
+    WHERE a.address = ANY(_addresses)
       AND tx_out.consumed_by_tx_id IS NULL
   ;
 END;

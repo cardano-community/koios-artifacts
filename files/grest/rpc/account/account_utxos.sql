@@ -54,10 +54,10 @@ BEGIN
     SELECT
       ENCODE(tx.hash, 'hex')::text AS tx_hash,
       tx_out.index::smallint,
-      tx_out.address::text,
+      a.address::text,
       tx_out.value::text,
       grest.cip5_hex_to_stake_addr(sa.hash_raw) as stake_address,
-      ENCODE(tx_out.payment_cred, 'hex') AS payment_cred,
+      ENCODE(a.payment_cred, 'hex') AS payment_cred,
       b.epoch_no,
       b.block_no,
       EXTRACT(EPOCH FROM b.time)::integer AS block_time,
@@ -89,6 +89,7 @@ BEGIN
       END) AS is_spent
     FROM tx_out
     INNER JOIN tx ON tx_out.tx_id = tx.id
+    INNER JOIN address AS a ON a.id = tx_out.address_id
     LEFT JOIN stake_address AS sa ON tx_out.stake_address_id = sa.id
     LEFT JOIN block AS b ON b.id = tx.block_id
     LEFT JOIN datum ON datum.id = tx_out.inline_datum_id

@@ -88,8 +88,8 @@ BEGIN
       _all_collateral_inputs AS (
         SELECT
           collateral_tx_in.tx_in_id           AS tx_id,
-          tx_out.address                      AS payment_addr_bech32,
-          ENCODE(tx_out.payment_cred, 'hex')  AS payment_addr_cred,
+          a.address                           AS payment_addr_bech32,
+          ENCODE(a.payment_cred, 'hex')  AS payment_addr_cred,
           grest.cip5_hex_to_stake_addr(sa.hash_raw) AS stake_addr,
           ENCODE(tx.hash, 'hex')              AS tx_hash,
           tx_out.index                        AS tx_index,
@@ -129,6 +129,7 @@ BEGIN
           INNER JOIN tx_out ON tx_out.tx_id = collateral_tx_in.tx_out_id
             AND tx_out.index = collateral_tx_in.tx_out_index
           INNER JOIN tx ON tx_out.tx_id = tx.id
+          INNER JOIN address AS a ON a.id = tx_out.address_id
           LEFT JOIN stake_address AS sa ON tx_out.stake_address_id = sa.id
           LEFT JOIN ma_tx_out AS mto ON _assets IS TRUE AND mto.tx_out_id = tx_out.id
           LEFT JOIN multi_asset AS ma ON _assets IS TRUE AND ma.id = mto.ident
@@ -143,8 +144,8 @@ BEGIN
       _all_reference_inputs AS (
         SELECT
           reference_tx_in.tx_in_id            AS tx_id,
-          tx_out.address                      AS payment_addr_bech32,
-          ENCODE(tx_out.payment_cred, 'hex')  AS payment_addr_cred,
+          a.address                           AS payment_addr_bech32,
+          ENCODE(a.payment_cred, 'hex')  AS payment_addr_cred,
           grest.cip5_hex_to_stake_addr(sa.hash_raw) AS stake_addr,
           ENCODE(tx.hash, 'hex')              AS tx_hash,
           tx_out.index                        AS tx_index,
@@ -184,6 +185,7 @@ BEGIN
           INNER JOIN tx_out ON tx_out.tx_id = reference_tx_in.tx_out_id
             AND tx_out.index = reference_tx_in.tx_out_index
           INNER JOIN tx ON tx_out.tx_id = tx.id
+          INNER JOIN address AS a ON a.id = tx_out.address_id
           LEFT JOIN stake_address AS sa ON tx_out.stake_address_id = sa.id
           LEFT JOIN ma_tx_out AS mto ON _assets IS TRUE AND mto.tx_out_id = tx_out.id
           LEFT JOIN multi_asset AS ma ON _assets IS TRUE AND ma.id = mto.ident
@@ -198,8 +200,8 @@ BEGIN
       _all_inputs AS (
         SELECT
           tx_out.consumed_by_tx_id           AS tx_id,
-          tx_out.address                     AS payment_addr_bech32,
-          ENCODE(tx_out.payment_cred, 'hex') AS payment_addr_cred,
+          a.address                          AS payment_addr_bech32,
+          ENCODE(a.payment_cred, 'hex') AS payment_addr_cred,
           grest.cip5_hex_to_stake_addr(sa.hash_raw) AS stake_addr,
           ENCODE(tx.hash, 'hex')             AS tx_hash,
           tx_out.index                       AS tx_index,
@@ -237,6 +239,7 @@ BEGIN
           ) AS reference_script
         FROM tx_out
           INNER JOIN tx ON tx_out.tx_id = tx.id
+          INNER JOIN address AS a ON a.id = tx_out.address_id
           LEFT JOIN stake_address AS sa ON tx_out.stake_address_id = sa.id
           LEFT JOIN ma_tx_out AS mto ON _assets IS TRUE AND mto.tx_out_id = tx_out.id
           LEFT JOIN multi_asset AS ma ON _assets IS TRUE AND ma.id = mto.ident
@@ -250,8 +253,8 @@ BEGIN
       _all_collateral_outputs AS (
         SELECT
           tx_out.tx_id,
-          tx_out.address                      AS payment_addr_bech32,
-          ENCODE(tx_out.payment_cred, 'hex')  AS payment_addr_cred,
+          a.address                           AS payment_addr_bech32,
+          ENCODE(a.payment_cred, 'hex')  AS payment_addr_cred,
           grest.cip5_hex_to_stake_addr(sa.hash_raw) AS stake_addr,
           ENCODE(tx.hash, 'hex')              AS tx_hash,
           tx_out.index                        AS tx_index,
@@ -280,6 +283,7 @@ BEGIN
         FROM
           collateral_tx_out AS tx_out
           INNER JOIN tx ON tx_out.tx_id = tx.id
+          INNER JOIN address AS a ON a.id = tx_out.address_id
           LEFT JOIN stake_address AS sa ON tx_out.stake_address_id = sa.id
           LEFT JOIN datum ON _scripts IS TRUE AND datum.id = tx_out.inline_datum_id
           LEFT JOIN script ON _scripts IS TRUE AND script.id = tx_out.reference_script_id
@@ -290,8 +294,8 @@ BEGIN
       _all_outputs AS (
         SELECT
           tx_out.tx_id,
-          tx_out.address                      AS payment_addr_bech32,
-          ENCODE(tx_out.payment_cred, 'hex')  AS payment_addr_cred,
+          a.address                           AS payment_addr_bech32,
+          ENCODE(a.payment_cred, 'hex')  AS payment_addr_cred,
           grest.cip5_hex_to_stake_addr(sa.hash_raw) AS stake_addr,
           ENCODE(tx.hash, 'hex')              AS tx_hash,
           tx_out.index                        AS tx_index,
@@ -329,6 +333,7 @@ BEGIN
           ) AS reference_script
         FROM tx_out
           INNER JOIN tx ON tx_out.tx_id = tx.id
+          INNER JOIN address AS a ON a.id = tx_out.address_id
           LEFT JOIN stake_address AS sa ON tx_out.stake_address_id = sa.id
           LEFT JOIN ma_tx_out AS mto ON _assets IS TRUE AND mto.tx_out_id = tx_out.id
           LEFT JOIN multi_asset AS ma ON _assets IS TRUE AND ma.id = mto.ident

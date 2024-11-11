@@ -32,10 +32,11 @@ BEGIN
         txo.tx_id AS tx_id,
         txo.id AS tx_out_id,
         txo.index AS tx_out_idx,
-        txo.address AS address,
+        a.address AS address,
         txo.stake_address_id AS sa_id
       FROM ma_tx_out AS mto
       INNER JOIN tx_out AS txo ON txo.id = mto.tx_out_id
+      INNER JOIN address AS a ON a.id = txo.address_id
       WHERE mto.ident = _asset_id
         AND txo.consumed_by_tx_id IS NULL)
 

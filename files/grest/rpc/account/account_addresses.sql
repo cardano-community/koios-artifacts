@@ -27,10 +27,11 @@ BEGIN
         FROM
           (
             SELECT
-              txo.address,
+              a.address,
               txo.stake_address_id,
               txo.id
             FROM tx_out AS txo
+            INNER JOIN address AS a ON a.id = txo.address_id
             WHERE txo.stake_address_id = ANY(sa_id_list)
               AND txo.consumed_by_tx_id IS NULL
           ) AS x
@@ -53,10 +54,11 @@ BEGIN
         FROM
           (
             SELECT
-              txo.address,
+              a.address,
               txo.stake_address_id,
               txo.id
             FROM tx_out AS txo
+            INNER JOIN address AS a ON a.id = txo.address_id
             WHERE txo.stake_address_id = ANY(sa_id_list)
             LIMIT (CASE WHEN _first_only IS TRUE THEN 1 ELSE NULL END)
           ) AS x

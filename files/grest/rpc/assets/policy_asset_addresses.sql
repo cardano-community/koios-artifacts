@@ -27,12 +27,13 @@ BEGIN
         (
           SELECT
             atoc.ma_id,
-            txo.address,
+            a.address,
             grest.cip5_hex_to_stake_addr(sa.hash_raw)::varchar AS stake_address,
             atoc.quantity
           FROM grest.asset_tx_out_cache AS atoc
           LEFT JOIN multi_asset AS ma ON ma.id = atoc.ma_id
           LEFT JOIN tx_out AS txo ON txo.id = atoc.txo_id
+          INNER JOIN address AS a ON a.id = txo.address_id
           LEFT JOIN stake_address AS sa ON txo.stake_address_id = sa.id
           WHERE ma.policy = DECODE(_asset_policy, 'hex')
             AND txo.consumed_by_tx_id IS NULL
@@ -46,18 +47,19 @@ BEGIN
     RETURN QUERY
       SELECT
         ENCODE(ma.name, 'hex') AS asset_name,
-        txo.address,
+        a.address,
         grest.cip5_hex_to_stake_addr(sa.hash_raw)::varchar AS stake_address,
         SUM(mto.quantity)::text
       FROM multi_asset AS ma
       LEFT JOIN ma_tx_out AS mto ON mto.ident = ma.id
       LEFT JOIN tx_out AS txo ON txo.id = mto.tx_out_id
+      INNER JOIN address AS a ON a.id = txo.address_id
       LEFT JOIN stake_address AS sa ON txo.stake_address_id = sa.id
       WHERE ma.policy = DECODE(_asset_policy, 'hex')
         AND txo.consumed_by_tx_id IS NULL
       GROUP BY
         ma.name,
-        txo.address,
+        a.address,
         sa.hash_raw;
   END IF;
 END;
