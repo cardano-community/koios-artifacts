@@ -467,6 +467,12 @@ schemas:
               - 'null'
             description: Pool live saturation (decimal format)
             example: 94.52
+          voting_power:
+            type:
+              - string
+              - 'null'
+            description: Current voting power (lovelaces) of this stake pool
+            example: "123456789"
     pool_snapshot:
       type: array
       items:
