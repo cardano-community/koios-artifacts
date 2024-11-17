@@ -25,7 +25,8 @@ RETURNS TABLE (
   live_pledge text,
   live_stake text,
   live_delegators bigint,
-  live_saturation numeric
+  live_saturation numeric,
+  voting_power text
 )
 LANGUAGE plpgsql
 AS $$
@@ -106,7 +107,8 @@ BEGIN
       live.pledge::text,
       live.stake::text,
       live.delegators,
-      ROUND((live.stake / _saturation_limit) * 100, 2)
+      ROUND((live.stake / _saturation_limit) * 100, 2),
+      pst.voting_power::text
     FROM _all_pool_info AS api
     LEFT JOIN public.pool_hash AS ph ON ph.id = api.pool_hash_id
     LEFT JOIN public.pool_update AS pu ON pu.id = api.update_id
@@ -117,6 +119,7 @@ BEGIN
 	        -- could add this condition too since delegations elsewhere are meaningless: and dh.view like 'drep_always%'
     LEFT JOIN public.pool_metadata_ref AS pmr ON pmr.id = api.meta_id
     LEFT JOIN public.off_chain_pool_data AS ocpd ON api.meta_id = ocpd.pmr_id
+    LEFT JOIN public.pool_stat AS pst ON pst.pool_hash_id = api.pool_hash_id AND pst.epoch_no = _epoch_no
     LEFT JOIN LATERAL (
       SELECT
         SUM(COUNT(b.id)) OVER () AS cnt,
