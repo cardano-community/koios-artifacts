@@ -21,7 +21,8 @@ BEGIN
   FROM (
     SELECT tx_id
     FROM tx_out
-    WHERE address = ANY (_addresses)
+    INNER JOIN address AS a on a.id = tx_out.address_id
+    WHERE a.address = ANY (_addresses)
       AND tx_id >= _tx_id_min
     --
     UNION

@@ -24,7 +24,7 @@ BEGIN
       INNER JOIN multi_asset AS ma ON ma.id = mtx.ident
       LEFT JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
       INNER JOIN tx_out AS txo ON txo.id = mtx.tx_out_id
-      INNER JOIN address AS a ON a.id = tx_out.address_id
+      INNER JOIN address AS a ON a.id = txo.address_id
       WHERE a.address = ANY(_addresses)
         AND txo.consumed_by_tx_id IS NULL
       GROUP BY

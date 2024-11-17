@@ -41,7 +41,7 @@ BEGIN
             )
           END) as assets
         FROM tx_out AS txo
-        INNER JOIN address ON a.id = txo.address_id
+        INNER JOIN address AS a ON a.id = txo.address_id
         INNER JOIN ma_tx_out AS mto ON mto.tx_out_id = txo.id
         LEFT JOIN multi_asset AS ma ON ma.id = mto.ident
         LEFT JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
@@ -86,7 +86,7 @@ BEGIN
         ELSE true
       END) AS is_spent
     FROM tx_out
-    INNER JOIN address ON a.id = tx_out.address_id
+    INNER JOIN address AS a ON a.id = tx_out.address_id
     INNER JOIN tx ON tx_out.tx_id = tx.id
     LEFT JOIN stake_address AS sa ON tx_out.stake_address_id = sa.id
     LEFT JOIN block AS b ON b.id = tx.block_id
