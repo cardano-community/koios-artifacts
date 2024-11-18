@@ -1943,9 +1943,9 @@ schemas:
                 expiration:
                   $ref: "#/components/schemas/proposal_list/items/properties/expiration"
                 meta_url:
-                  $ref: "#/components/schemas/drep_metadata/items/properties/url"
+                  $ref: "#/components/schemas/drep_metadata/items/properties/meta_url"
                 meta_hash:
-                  $ref: "#/components/schemas/drep_metadata/items/properties/hash"
+                  $ref: "#/components/schemas/drep_metadata/items/properties/meta_hash"
                 withdrawal:
                   $ref: "#/components/schemas/proposal_list/items/properties/withdrawal"
                 param_proposal:
@@ -2512,11 +2512,11 @@ schemas:
           deposit:
             $ref: "#/components/schemas/drep_info/items/properties/deposit"
           meta_url:
-            $ref: "#/components/schemas/drep_metadata/items/properties/url"
+            $ref: "#/components/schemas/drep_metadata/items/properties/meta_url"
           meta_hash:
-            $ref: "#/components/schemas/drep_metadata/items/properties/hash"
+            $ref: "#/components/schemas/drep_metadata/items/properties/meta_hash"
           meta_json:
-            $ref: "#/components/schemas/drep_metadata/items/properties/json"
+            $ref: "#/components/schemas/drep_metadata/items/properties/meta_json"
     drep_votes:
       description: List of all votes casted by requested delegated representative (DRep)
       type: array
@@ -2538,9 +2538,9 @@ schemas:
             description: Actual Vote casted
             example: "Yes"
           meta_url:
-            $ref: "#/components/schemas/drep_metadata/items/properties/url"
+            $ref: "#/components/schemas/drep_metadata/items/properties/meta_url"
           meta_hash:
-            $ref: "#/components/schemas/drep_metadata/items/properties/hash"
+            $ref: "#/components/schemas/drep_metadata/items/properties/meta_hash"
     pool_votes:
       description: List of all votes casted by requested pool
       type: array
@@ -2617,11 +2617,11 @@ schemas:
               - 'null'
             description: Shows the epoch at which this governance action is expected to expire.
           meta_url:
-            $ref: "#/components/schemas/drep_metadata/items/properties/url"
+            $ref: "#/components/schemas/drep_metadata/items/properties/meta_url"
           meta_hash:
-            $ref: "#/components/schemas/drep_metadata/items/properties/hash"
+            $ref: "#/components/schemas/drep_metadata/items/properties/meta_hash"
           meta_json:
-            $ref: "#/components/schemas/drep_metadata/items/properties/json"
+            $ref: "#/components/schemas/drep_metadata/items/properties/meta_json"
           meta_comment:
             $ref: "#/components/schemas/drep_metadata/items/properties/comment"
           meta_language:
@@ -2781,9 +2781,9 @@ schemas:
           vote:
             $ref: "#/components/schemas/drep_votes/items/properties/vote"
           meta_url:
-            $ref: "#/components/schemas/drep_metadata/items/properties/url"
+            $ref: "#/components/schemas/drep_metadata/items/properties/meta_url"
           meta_hash:
-            $ref: "#/components/schemas/drep_metadata/items/properties/hash"
+            $ref: "#/components/schemas/drep_metadata/items/properties/meta_hash"
     committee_info:
       description: Current governance committee
       type: object
