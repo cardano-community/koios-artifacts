@@ -88,8 +88,8 @@ BEGIN
       _all_collateral_inputs AS (
         SELECT
           collateral_tx_in.tx_in_id           AS tx_id,
-          tx_out.address                      AS payment_addr_bech32,
-          ENCODE(tx_out.payment_cred, 'hex')  AS payment_addr_cred,
+          a.address                           AS payment_addr_bech32,
+          ENCODE(a.payment_cred, 'hex')  AS payment_addr_cred,
           grest.cip5_hex_to_stake_addr(sa.hash_raw) AS stake_addr,
           ENCODE(tx.hash, 'hex')              AS tx_hash,
           tx_out.index                        AS tx_index,
@@ -109,7 +109,7 @@ BEGIN
           (CASE WHEN tx_out.inline_datum_id IS NULL THEN NULL
             ELSE
               JSONB_BUILD_OBJECT(
-                'bytes', ENCODE(datum.bytes, 'hex'),
+                'bytes', CASE WHEN _bytecode IS TRUE THEN ENCODE(datum.bytes, 'hex') ELSE NULL END,
                 'value', datum.value
               )
             END
@@ -118,7 +118,7 @@ BEGIN
             ELSE
               JSONB_BUILD_OBJECT(
                 'hash', ENCODE(script.hash, 'hex'),
-                'bytes', ENCODE(script.bytes, 'hex'),
+                'bytes', CASE WHEN _bytecode IS TRUE THEN ENCODE(script.bytes, 'hex') ELSE NULL END,
                 'value', script.json,
                 'type', script.type::text,
                 'size', script.serialised_size
@@ -129,6 +129,7 @@ BEGIN
           INNER JOIN tx_out ON tx_out.tx_id = collateral_tx_in.tx_out_id
             AND tx_out.index = collateral_tx_in.tx_out_index
           INNER JOIN tx ON tx_out.tx_id = tx.id
+          INNER JOIN address AS a ON a.id = tx_out.address_id
           LEFT JOIN stake_address AS sa ON tx_out.stake_address_id = sa.id
           LEFT JOIN ma_tx_out AS mto ON _assets IS TRUE AND mto.tx_out_id = tx_out.id
           LEFT JOIN multi_asset AS ma ON _assets IS TRUE AND ma.id = mto.ident
@@ -136,15 +137,15 @@ BEGIN
           LEFT JOIN datum ON _scripts IS TRUE AND datum.id = tx_out.inline_datum_id
           LEFT JOIN script ON _scripts IS TRUE AND script.id = tx_out.reference_script_id
         WHERE
-          (_inputs IS TRUE AND _scripts IS TRUE)
+          (_inputs IS TRUE)
           AND collateral_tx_in.tx_in_id = ANY(_tx_id_list)
       ),
 
       _all_reference_inputs AS (
         SELECT
           reference_tx_in.tx_in_id            AS tx_id,
-          tx_out.address                      AS payment_addr_bech32,
-          ENCODE(tx_out.payment_cred, 'hex')  AS payment_addr_cred,
+          a.address                           AS payment_addr_bech32,
+          ENCODE(a.payment_cred, 'hex')  AS payment_addr_cred,
           grest.cip5_hex_to_stake_addr(sa.hash_raw) AS stake_addr,
           ENCODE(tx.hash, 'hex')              AS tx_hash,
           tx_out.index                        AS tx_index,
@@ -164,7 +165,7 @@ BEGIN
           (CASE WHEN tx_out.inline_datum_id IS NULL THEN NULL
             ELSE
               JSONB_BUILD_OBJECT(
-                'bytes', ENCODE(datum.bytes, 'hex'),
+                'bytes', CASE WHEN _bytecode IS TRUE THEN ENCODE(datum.bytes, 'hex') ELSE NULL END,
                 'value', datum.value
               )
             END
@@ -173,7 +174,7 @@ BEGIN
             ELSE
               JSONB_BUILD_OBJECT(
                 'hash', ENCODE(script.hash, 'hex'),
-                'bytes', ENCODE(script.bytes, 'hex'),
+                'bytes', CASE WHEN _bytecode IS TRUE THEN ENCODE(script.bytes, 'hex') ELSE NULL END,
                 'value', script.json,
                 'type', script.type::text,
                 'size', script.serialised_size
@@ -184,6 +185,7 @@ BEGIN
           INNER JOIN tx_out ON tx_out.tx_id = reference_tx_in.tx_out_id
             AND tx_out.index = reference_tx_in.tx_out_index
           INNER JOIN tx ON tx_out.tx_id = tx.id
+          INNER JOIN address AS a ON a.id = tx_out.address_id
           LEFT JOIN stake_address AS sa ON tx_out.stake_address_id = sa.id
           LEFT JOIN ma_tx_out AS mto ON _assets IS TRUE AND mto.tx_out_id = tx_out.id
           LEFT JOIN multi_asset AS ma ON _assets IS TRUE AND ma.id = mto.ident
@@ -191,15 +193,15 @@ BEGIN
           LEFT JOIN datum ON _scripts IS TRUE AND datum.id = tx_out.inline_datum_id
           LEFT JOIN script ON _scripts IS TRUE AND script.id = tx_out.reference_script_id
         WHERE
-          (_inputs IS TRUE AND _scripts IS TRUE)
+          (_inputs IS TRUE)
           AND reference_tx_in.tx_in_id = ANY(_tx_id_list)
       ),
 
       _all_inputs AS (
         SELECT
           tx_out.consumed_by_tx_id           AS tx_id,
-          tx_out.address                     AS payment_addr_bech32,
-          ENCODE(tx_out.payment_cred, 'hex') AS payment_addr_cred,
+          a.address                          AS payment_addr_bech32,
+          ENCODE(a.payment_cred, 'hex') AS payment_addr_cred,
           grest.cip5_hex_to_stake_addr(sa.hash_raw) AS stake_addr,
           ENCODE(tx.hash, 'hex')             AS tx_hash,
           tx_out.index                       AS tx_index,
@@ -219,7 +221,7 @@ BEGIN
           (CASE WHEN tx_out.inline_datum_id IS NULL THEN NULL
             ELSE
               JSONB_BUILD_OBJECT(
-                'bytes', ENCODE(datum.bytes, 'hex'),
+                'bytes', CASE WHEN _bytecode IS TRUE THEN ENCODE(datum.bytes, 'hex') ELSE NULL END,
                 'value', datum.value
               )
             END
@@ -228,7 +230,7 @@ BEGIN
             ELSE
               JSONB_BUILD_OBJECT(
                 'hash', ENCODE(script.hash, 'hex'),
-                'bytes', ENCODE(script.bytes, 'hex'),
+                'bytes', CASE WHEN _bytecode IS TRUE THEN ENCODE(script.bytes, 'hex') ELSE NULL END,
                 'value', script.json,
                 'type', script.type::text,
                 'size', script.serialised_size
@@ -237,6 +239,7 @@ BEGIN
           ) AS reference_script
         FROM tx_out
           INNER JOIN tx ON tx_out.tx_id = tx.id
+          INNER JOIN address AS a ON a.id = tx_out.address_id
           LEFT JOIN stake_address AS sa ON tx_out.stake_address_id = sa.id
           LEFT JOIN ma_tx_out AS mto ON _assets IS TRUE AND mto.tx_out_id = tx_out.id
           LEFT JOIN multi_asset AS ma ON _assets IS TRUE AND ma.id = mto.ident
@@ -250,8 +253,8 @@ BEGIN
       _all_collateral_outputs AS (
         SELECT
           tx_out.tx_id,
-          tx_out.address                      AS payment_addr_bech32,
-          ENCODE(tx_out.payment_cred, 'hex')  AS payment_addr_cred,
+          a.address                           AS payment_addr_bech32,
+          ENCODE(a.payment_cred, 'hex')  AS payment_addr_cred,
           grest.cip5_hex_to_stake_addr(sa.hash_raw) AS stake_addr,
           ENCODE(tx.hash, 'hex')              AS tx_hash,
           tx_out.index                        AS tx_index,
@@ -260,7 +263,7 @@ BEGIN
           (CASE WHEN tx_out.inline_datum_id IS NULL THEN NULL
             ELSE
               JSONB_BUILD_OBJECT(
-                'bytes', ENCODE(datum.bytes, 'hex'),
+                'bytes', CASE WHEN _bytecode IS TRUE THEN ENCODE(datum.bytes, 'hex') ELSE NULL END,
                 'value', datum.value
               )
             END
@@ -269,7 +272,7 @@ BEGIN
             ELSE
               JSONB_BUILD_OBJECT(
                 'hash', ENCODE(script.hash, 'hex'),
-                'bytes', ENCODE(script.bytes, 'hex'),
+                'bytes', CASE WHEN _bytecode IS TRUE THEN ENCODE(script.bytes, 'hex') ELSE NULL END,
                 'value', script.json,
                 'type', script.type::text,
                 'size', script.serialised_size
@@ -280,18 +283,18 @@ BEGIN
         FROM
           collateral_tx_out AS tx_out
           INNER JOIN tx ON tx_out.tx_id = tx.id
+          INNER JOIN address AS a ON a.id = tx_out.address_id
           LEFT JOIN stake_address AS sa ON tx_out.stake_address_id = sa.id
           LEFT JOIN datum ON _scripts IS TRUE AND datum.id = tx_out.inline_datum_id
           LEFT JOIN script ON _scripts IS TRUE AND script.id = tx_out.reference_script_id
-        WHERE _scripts IS TRUE
-          AND tx_out.tx_id = ANY(_tx_id_list)
+        WHERE tx_out.tx_id = ANY(_tx_id_list)
       ),
 
       _all_outputs AS (
         SELECT
           tx_out.tx_id,
-          tx_out.address                      AS payment_addr_bech32,
-          ENCODE(tx_out.payment_cred, 'hex')  AS payment_addr_cred,
+          a.address                           AS payment_addr_bech32,
+          ENCODE(a.payment_cred, 'hex')  AS payment_addr_cred,
           grest.cip5_hex_to_stake_addr(sa.hash_raw) AS stake_addr,
           ENCODE(tx.hash, 'hex')              AS tx_hash,
           tx_out.index                        AS tx_index,
@@ -311,7 +314,7 @@ BEGIN
           (CASE WHEN tx_out.inline_datum_id IS NULL THEN NULL
             ELSE
               JSONB_BUILD_OBJECT(
-                'bytes', ENCODE(datum.bytes, 'hex'),
+                'bytes', CASE WHEN _bytecode IS TRUE THEN ENCODE(datum.bytes, 'hex') ELSE NULL END,
                 'value', datum.value
               )
             END
@@ -320,7 +323,7 @@ BEGIN
             ELSE
               JSONB_BUILD_OBJECT(
                 'hash', ENCODE(script.hash, 'hex'),
-                'bytes', ENCODE(script.bytes, 'hex'),
+                'bytes', CASE WHEN _bytecode IS TRUE THEN ENCODE(script.bytes, 'hex') ELSE NULL END,
                 'value', script.json,
                 'type', script.type::text,
                 'size', script.serialised_size
@@ -329,6 +332,7 @@ BEGIN
           ) AS reference_script
         FROM tx_out
           INNER JOIN tx ON tx_out.tx_id = tx.id
+          INNER JOIN address AS a ON a.id = tx_out.address_id
           LEFT JOIN stake_address AS sa ON tx_out.stake_address_id = sa.id
           LEFT JOIN ma_tx_out AS mto ON _assets IS TRUE AND mto.tx_out_id = tx_out.id
           LEFT JOIN multi_asset AS ma ON _assets IS TRUE AND ma.id = mto.ident
@@ -944,7 +948,7 @@ BEGIN
               'asset_list', COALESCE(JSONB_AGG(asset_list) FILTER (WHERE asset_list IS NOT NULL), JSONB_BUILD_ARRAY())
             ) AS tx_collateral_inputs
           FROM _all_collateral_inputs AS aci
-          WHERE (_inputs IS TRUE AND _scripts IS TRUE) AND aci.tx_id = atx.id
+          WHERE (_inputs IS TRUE) AND aci.tx_id = atx.id
           GROUP BY payment_addr_bech32, payment_addr_cred, stake_addr, aci.tx_hash, tx_index, value, datum_hash, inline_datum, reference_script
         ) AS tmp
       ), JSONB_BUILD_ARRAY()),
@@ -965,7 +969,7 @@ BEGIN
             'asset_list', asset_descr
           ) AS tx_collateral_outputs
         FROM _all_collateral_outputs AS aco
-        WHERE _scripts IS TRUE AND aco.tx_id = atx.id
+        WHERE aco.tx_id = atx.id
         GROUP BY payment_addr_bech32, payment_addr_cred, stake_addr, aco.tx_hash, tx_index, value, datum_hash, inline_datum, reference_script, asset_descr
         LIMIT 1 -- there can only be one collateral output
       ),
@@ -988,7 +992,7 @@ BEGIN
               'asset_list', COALESCE(JSONB_AGG(asset_list) FILTER (WHERE asset_list IS NOT NULL), JSONB_BUILD_ARRAY())
             ) AS tx_reference_inputs
           FROM _all_reference_inputs AS ari
-          WHERE (_inputs IS TRUE AND _scripts IS TRUE) AND ari.tx_id = atx.id
+          WHERE (_inputs IS TRUE) AND ari.tx_id = atx.id
           GROUP BY payment_addr_bech32, payment_addr_cred, stake_addr, ari.tx_hash, tx_index, value, datum_hash, inline_datum, reference_script
         ) AS tmp
       ), JSONB_BUILD_ARRAY()),

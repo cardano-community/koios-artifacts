@@ -13,7 +13,7 @@ cat <<-EOF
 	To run the endpoint validation tests, use the below:
 	
 	  schemathesis run --request-timeout 25000 ../specs/results/koiosapi-guild.yaml --hypothesis-phases=explicit --hypothesis-verbosity quiet \\
-	      -b http://127.0.0.1:8053/api/v1 -c all --validate-schema=true -H "Content-Type: application/json" --experimental=openapi-3.1 --exclude-checks ignored_auths
+	      -b http://127.0.0.1:8053/api/v1 -c all --validate-schema=true -H "Content-Type: application/json" --experimental=openapi-3.1 --exclude-checks ignored_auth
 	
 	      where http://127.0.0.1:8053/api/v1 is the URL of instance you want to test, and guild.koios.rest is the target enviornment for testing.
 	

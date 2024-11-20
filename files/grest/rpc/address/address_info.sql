@@ -13,12 +13,13 @@ DECLARE
 BEGIN
   CREATE TEMPORARY TABLE _known_addresses AS
     SELECT
-      DISTINCT ON (tx_out.address) tx_out.address,
+      DISTINCT ON (tx_out.address_id) a.address,
       sa.hash_raw AS stake_address_raw,
-      COALESCE(tx_out.address_has_script, 'false') AS script_address
+      COALESCE(a.has_script, 'false') AS script_address
     FROM tx_out
+    INNER JOIN address AS a ON a.id = tx_out.address_id
     LEFT JOIN stake_address AS sa ON sa.id = tx_out.stake_address_id
-    WHERE tx_out.address = ANY(_addresses);
+    WHERE a.address = ANY(_addresses);
 
   RETURN QUERY
     WITH _all_utxos AS (
@@ -26,7 +27,7 @@ BEGIN
         tx.id,
         tx.hash,
         tx_out.id AS txo_id,
-        tx_out.address,
+        a.address,
         tx_out.value,
         tx_out.index,
         tx.block_id,
@@ -34,9 +35,10 @@ BEGIN
         tx_out.inline_datum_id,
         tx_out.reference_script_id
       FROM tx_out
+      INNER JOIN address AS a ON a.id = tx_out.address_id
       INNER JOIN tx ON tx.id = tx_out.tx_id
       WHERE tx_out.consumed_by_tx_id IS NULL
-        AND tx_out.address = ANY(_addresses)
+        AND a.address = ANY(_addresses)
     )
 
     SELECT

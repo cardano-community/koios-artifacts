@@ -1,4 +1,3 @@
-
 CREATE OR REPLACE FUNCTION grest.proposal_voting_summary(_proposal_id text)
 RETURNS TABLE (
   proposal_type text,
@@ -10,6 +9,7 @@ RETURNS TABLE (
   drep_no_vote_power lovelace,
   drep_no_pct numeric,
   drep_abstain_votes_cast integer,
+  drep_always_no_confidence_vote_power lovelace,
   pool_yes_votes_cast integer,
   pool_yes_vote_power lovelace,
   pool_yes_pct numeric,
@@ -17,6 +17,10 @@ RETURNS TABLE (
   pool_no_vote_power lovelace,
   pool_no_pct numeric,
   pool_abstain_votes_cast integer,
+  pool_passive_always_abstain_votes_assigned integer,
+  pool_passive_always_abstain_vote_power lovelace,
+  pool_passive_always_no_confidence_votes_assigned integer,
+  pool_passive_always_no_confidence_vote_power lovelace,
   committee_yes_votes_cast integer,
   committee_yes_pct numeric,
   committee_no_votes_cast integer,
@@ -110,9 +114,6 @@ BEGIN
           SUM(voting_power) AS tot_pool_power 
         FROM proposal_epoch_data AS ped
           INNER JOIN pool_stat ON pool_stat.epoch_no = ped.epoch_of_interest
-          -- if hard fork initiation, then need to use full SPO voting power otherwise just voted SPO power
-          WHERE ((ped.proposal_type = 'HardForkInitiation') or EXISTS (SELECT 1 FROM latest_votes vp where vp.voter_role = 'SPO' 
-          AND vp.gov_action_proposal_id = ped.gov_action_proposal_id AND vp.pool_voter = pool_stat.pool_hash_id)) 
         GROUP BY ped.gov_action_proposal_id, pool_stat.epoch_no
       ),
       active_prop_pool_votes AS (
@@ -126,6 +127,46 @@ BEGIN
           INNER JOIN pool_stat ON vp.pool_voter = pool_stat.pool_hash_id AND pool_stat.epoch_no = ped.epoch_of_interest
         GROUP BY ped.gov_action_proposal_id, vote
       ),
+      -- below snippet is cut down version of pool_info endpoint sql, not sure how easy it was to re-use?
+      _all_non_voted_pool_info AS (
+        SELECT DISTINCT ON (pic.pool_hash_id)
+          pic.pool_hash_id,
+          pic.update_id,
+          b32_encode('pool', ph.hash_raw::text) AS pool_id_bech32,
+          ph.hash_raw
+        FROM grest.pool_info_cache AS pic
+        INNER JOIN proposal_epoch_data ped ON true
+        INNER JOIN public.pool_hash AS ph ON ph.id = pic.pool_hash_id
+        INNER JOIN pool_update AS pu ON pu.id = pic.update_id AND pu.active_epoch_no <= ped.epoch_of_interest
+        -- exclude all pools that voted for this proposal
+        WHERE NOT EXISTS (SELECT NULL FROM proposal_epoch_data ped INNER JOIN 
+        					latest_votes AS VP ON vp.voter_role = 'SPO' AND vp.gov_action_proposal_id = ped.gov_action_proposal_id
+        					AND vp.pool_voter = pic.pool_hash_id)
+        ORDER BY
+          pic.pool_hash_id,
+          pic.tx_id DESC
+      ),
+      passive_prop_pool_votes AS (
+      	SELECT
+      	ped.gov_action_proposal_id,
+	    (case when dh.view = 'drep_always_abstain' then 'Abstain' else 'No' end) as vote, -- else = drep_always_no_confidence currently
+	    sum(pstat.voting_power) passive_pool_vote_total,
+	    count(*) AS pool_votes_cast
+	    FROM _all_non_voted_pool_info AS api
+	    INNER JOIN proposal_epoch_data AS ped ON true
+	    INNER JOIN public.pool_update AS pu ON pu.id = api.update_id
+	    INNER JOIN public.stake_address AS sa ON pu.reward_addr_id = sa.id
+	    INNER JOIN delegation_vote AS dv on dv.addr_id = sa.id
+	    AND dv.tx_id = (SELECT max(tx_id) FROM delegation_vote dv2 WHERE dv2.addr_id = sa.id
+	    					AND tx_id <= 
+	  					(SELECT COALESCE(t.id, (SELECT id FROM tx t2 ORDER BY id DESC LIMIT 1)) FROM tx t INNER JOIN block b 
+	  					ON t.block_id = b.id AND b.epoch_no = ped.epoch_of_interest ORDER BY t.id DESC LIMIT 1))
+	    INNER JOIN drep_hash AS dh on dh.id = dv.drep_hash_id
+	        and dh.view like 'drep_always%'
+	    INNER JOIN pool_stat AS pstat ON api.pool_hash_id = pstat.pool_hash_id
+	        and pstat.epoch_no = ped.epoch_of_interest
+	    GROUP BY ped.gov_action_proposal_id, dh.view
+	  ),
       committee_votes AS (
         SELECT
           ped.gov_action_proposal_id,
@@ -168,22 +209,47 @@ BEGIN
       y.proposal_type::text AS proposal_type,
       y.epoch_of_interest AS epoch_no,
       y.drep_yes_votes_cast::integer,
-      y.drep_yes_vote_power::lovelace,
-      ROUND(y.drep_yes_vote_power * 100 / y.drep_non_abstain_total, 2) AS drep_yes_pct,
+      (CASE
+        WHEN y.proposal_type IN ('NoConfidence') THEN y.drep_yes_vote_power + y.drep_no_confidence_vote_power
+        ELSE y.drep_yes_vote_power
+       END)::lovelace AS drep_yes_vote_power,
+   	  (CASE
+        WHEN y.proposal_type IN ('NoConfidence') THEN ROUND((y.drep_yes_vote_power + drep_no_confidence_vote_power) * 100 / y.drep_non_abstain_total, 2)
+        ELSE ROUND(y.drep_yes_vote_power * 100 / y.drep_non_abstain_total, 2) 
+      END) AS drep_yes_pct,
+      
       y.drep_no_votes_cast::integer,
-      (y.drep_non_abstain_total - y.drep_yes_vote_power)::lovelace AS drep_no_vote_power,
-      ROUND((y.drep_non_abstain_total - y.drep_yes_vote_power) * 100 / y.drep_non_abstain_total, 2) AS drep_no_pct,
-      (SELECT COALESCE(SUM(active_drep_votes_cast), 0)::integer FROM active_prop_drep_votes WHERE vote = 'Abstain') AS drep_abstain_votes_cast,
+      
+      (CASE
+        WHEN y.proposal_type IN ('NoConfidence') THEN (y.drep_non_abstain_total - y.drep_yes_vote_power - y.drep_no_confidence_vote_power)
+      	ELSE (y.drep_non_abstain_total - y.drep_yes_vote_power)
+      END)::lovelace AS drep_no_vote_power,
+      
+      (CASE
+        WHEN y.proposal_type IN ('NoConfidence') THEN ROUND((y.drep_non_abstain_total - y.drep_yes_vote_power - y.drep_no_confidence_vote_power) * 100 / y.drep_non_abstain_total, 2)
+        ELSE ROUND((y.drep_non_abstain_total - y.drep_yes_vote_power) * 100 / y.drep_non_abstain_total, 2)
+       END) AS drep_no_pct,
+      
+      (SELECT COALESCE(SUM(active_drep_votes_cast), 0)::integer 
+      FROM active_prop_drep_votes WHERE vote = 'Abstain') 
+      AS drep_abstain_votes_cast,
+      
+      y.drep_no_confidence_vote_power::lovelace AS drep_always_no_confidence_vote_power,
+      
       (CASE
         WHEN y.proposal_type IN ('ParameterChange', 'TreasuryWithdrawals', 'NewConstitution') THEN 0
         ELSE y.pool_yes_votes_cast
       END)::integer AS pool_yes_votes_cast,
+      
       (CASE
         WHEN y.proposal_type IN ('ParameterChange', 'TreasuryWithdrawals', 'NewConstitution') THEN 0
+        WHEN y.proposal_type IN ('NoConfidence') THEN y.pool_yes_vote_power + y.pool_passive_always_no_confidence_vote_power
         ELSE y.pool_yes_vote_power
       END)::lovelace AS pool_yes_vote_power,
+      
       (CASE
         WHEN y.proposal_type IN ('ParameterChange', 'TreasuryWithdrawals', 'NewConstitution') THEN 0
+        WHEN y.proposal_type IN ('NoConfidence') THEN ROUND((y.pool_yes_vote_power + y.pool_passive_always_no_confidence_vote_power) * 100 / y.pool_non_abstain_total, 2)
         ELSE ROUND(y.pool_yes_vote_power * 100 / y.pool_non_abstain_total, 2)
       END) AS pool_yes_pct,
       (CASE
@@ -192,13 +258,19 @@ BEGIN
       END)::integer AS pool_no_votes_cast,
       (CASE
         WHEN y.proposal_type IN ('ParameterChange', 'TreasuryWithdrawals', 'NewConstitution') THEN 0
+        WHEN y.proposal_type IN ('NoConfidence') THEN (y.pool_non_abstain_total - y.pool_yes_vote_power - y.pool_passive_always_no_confidence_vote_power)
         ELSE (y.pool_non_abstain_total - y.pool_yes_vote_power)
       END)::lovelace AS pool_no_vote_power,
       (CASE
         WHEN y.proposal_type IN ('ParameterChange', 'TreasuryWithdrawals', 'NewConstitution') THEN 0
+        WHEN y.proposal_type IN ('NoConfidence') THEN  ROUND((y.pool_non_abstain_total - y.pool_yes_vote_power - y.pool_passive_always_no_confidence_vote_power) * 100 / y.pool_non_abstain_total, 2)
         ELSE ROUND((y.pool_non_abstain_total - y.pool_yes_vote_power) * 100 / y.pool_non_abstain_total, 2)
       END) AS pool_no_pct,
       (SELECT COALESCE(SUM(pool_votes_cast), 0)::integer FROM active_prop_pool_votes WHERE vote = 'Abstain') AS pool_abstain_votes_cast,
+      y.pool_passive_always_abstain_votes_assigned::integer,
+      y.pool_passive_always_abstain_vote_power::lovelace,
+      y.pool_passive_always_no_confidence_votes_assigned::integer,
+      y.pool_passive_always_no_confidence_vote_power::lovelace,
       y.committee_yes_votes_cast::integer,
       (CASE
         WHEN y.proposal_type IN ('NoConfidence', 'NewCommittee') THEN 0
@@ -237,6 +309,9 @@ BEGIN
             FROM active_prop_drep_votes AS c2
             WHERE c2.gov_action_proposal_id = c1.gov_action_proposal_id AND c2.vote = 'No'
           ) + always_no_conf AS drep_no_vote_power,
+          
+          always_no_conf AS drep_no_confidence_vote_power,
+          
           (
             SELECT coalesce(SUM(active_drep_vote_total),0)
             FROM active_prop_drep_votes AS c2
@@ -256,7 +331,34 @@ BEGIN
             SELECT coalesce(SUM(active_pool_vote_total), 0)
             FROM active_prop_pool_votes c3
             WHERE c3.gov_action_proposal_id = c1.gov_action_proposal_id AND c3.vote = 'Abstain'
-          ) AS pool_non_abstain_total,
+          ) 
+          
+          - ( SELECT COALESCE(SUM(passive_pool_vote_total), 0)
+          		FROM passive_prop_pool_votes p3 
+          		WHERE p3.gov_action_proposal_id = c1.gov_action_proposal_id AND p3.vote = 'Abstain')
+          
+          AS pool_non_abstain_total,
+          
+          ( SELECT COALESCE(SUM(passive_pool_vote_total), 0)
+          		FROM passive_prop_pool_votes p3 
+          		WHERE p3.gov_action_proposal_id = c1.gov_action_proposal_id AND p3.vote = 'Abstain')
+          AS pool_passive_always_abstain_vote_power,
+          
+           ( SELECT COALESCE(SUM(pool_votes_cast), 0)
+          		FROM passive_prop_pool_votes p3 
+          		WHERE p3.gov_action_proposal_id = c1.gov_action_proposal_id AND p3.vote = 'Abstain')
+          AS pool_passive_always_abstain_votes_assigned,
+          
+          ( SELECT COALESCE(SUM(passive_pool_vote_total), 0)
+          		FROM passive_prop_pool_votes p3 
+          		WHERE p3.gov_action_proposal_id = c1.gov_action_proposal_id AND p3.vote = 'No')
+          AS pool_passive_always_no_confidence_vote_power,
+          
+           ( SELECT COALESCE(SUM(pool_votes_cast), 0)
+          		FROM passive_prop_pool_votes p3 
+          		WHERE p3.gov_action_proposal_id = c1.gov_action_proposal_id AND p3.vote = 'No')
+          AS pool_passive_always_no_confidence_votes_assigned,
+          
           (
             SELECT coalesce(SUM(pool_votes_cast), 0)
             FROM active_prop_pool_votes AS c2
@@ -289,4 +391,4 @@ BEGIN
 END;
 $$;
 
-COMMENT ON FUNCTION grest.proposal_votes IS 'Get a summary of votes cast on specified governance action'; -- noqa: LT01
+COMMENT ON FUNCTION grest.proposal_voting_summary IS 'Get a summary of votes cast on specified governance action'; -- noqa: LT01

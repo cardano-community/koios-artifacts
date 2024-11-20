@@ -87,6 +87,11 @@ BEGIN
             FROM delegation_vote AS dv1
             WHERE dv1.addr_id = dv.addr_id
               AND dv1.id > dv.id)
+          AND NOT EXISTS (
+            SELECT TRUE
+            FROM stake_deregistration
+            WHERE stake_deregistration.addr_id = dv.addr_id
+              AND stake_deregistration.tx_id > dv.tx_id)
       ) AS vote_t ON vote_t.addr_id = status_t.id
     LEFT JOIN (
         SELECT

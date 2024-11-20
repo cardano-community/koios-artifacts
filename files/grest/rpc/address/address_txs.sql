@@ -21,15 +21,17 @@ BEGIN
   FROM (
     SELECT tx_id
     FROM tx_out
-    WHERE address = ANY (_addresses)
+    INNER JOIN address AS a on a.id = tx_out.address_id
+    WHERE a.address = ANY (_addresses)
       AND tx_id >= _tx_id_min
     --
     UNION
     --
     SELECT consumed_by_tx_id
     FROM tx_out
+    INNER JOIN address AS a ON a.id = tx_out.address_id
     WHERE tx_out.consumed_by_tx_id IS NOT NULL
-      AND tx_out.address = ANY(_addresses)
+      AND a.address = ANY(_addresses)
       AND tx_out.consumed_by_tx_id >= _tx_id_min
   ) AS tmp;
 

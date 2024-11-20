@@ -39,8 +39,8 @@ BEGIN
       _all_inputs AS (
         SELECT
           tx_out.consumed_by_tx_id            AS tx_id,
-          tx_out.address                      AS payment_addr_bech32,
-          ENCODE(tx_out.payment_cred, 'hex')  AS payment_addr_cred,
+          a.address                           AS payment_addr_bech32,
+          ENCODE(a.payment_cred, 'hex')  AS payment_addr_cred,
           grest.cip5_hex_to_stake_addr(sa.hash_raw) AS stake_addr,
           ENCODE(tx.hash, 'hex')              AS tx_hash,
           tx_out.index                        AS tx_index,
@@ -58,6 +58,7 @@ BEGIN
           )                                   AS asset_list
         FROM tx_out
           INNER JOIN tx ON tx_out.tx_id = tx.id
+          INNER JOIN address AS a ON a.id = tx_out.address_id
           LEFT JOIN stake_address AS sa ON tx_out.stake_address_id = sa.id
           LEFT JOIN ma_tx_out AS mto ON mto.tx_out_id = tx_out.id
           LEFT JOIN multi_asset AS ma ON ma.id = mto.ident
@@ -68,8 +69,8 @@ BEGIN
       _all_outputs AS (
         SELECT
           tx_out.tx_id,
-          tx_out.address                      AS payment_addr_bech32,
-          ENCODE(tx_out.payment_cred, 'hex')  AS payment_addr_cred,
+          a.address                           AS payment_addr_bech32,
+          ENCODE(a.payment_cred, 'hex')  AS payment_addr_cred,
           grest.cip5_hex_to_stake_addr(sa.hash_raw) AS stake_addr,
           ENCODE(tx.hash, 'hex')              AS tx_hash,
           tx_out.index                        AS tx_index,
@@ -87,6 +88,7 @@ BEGIN
           )                                   AS asset_list
         FROM tx_out
           INNER JOIN tx ON tx_out.tx_id = tx.id
+          INNER JOIN address AS a ON a.id = tx_out.address_id
           LEFT JOIN stake_address AS sa ON tx_out.stake_address_id = sa.id
           LEFT JOIN ma_tx_out AS mto ON mto.tx_out_id = tx_out.id
           LEFT JOIN multi_asset AS ma ON ma.id = mto.ident

@@ -142,7 +142,7 @@ END;
 $$;
 
 CREATE OR REPLACE FUNCTION grest.cip129_from_gov_action_id(_proposal_id text)
-RETURNS text[]
+RETURNS text []
 LANGUAGE plpgsql STABLE
 AS $$
 DECLARE

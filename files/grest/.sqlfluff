@@ -7,7 +7,7 @@ extended_capitalisation_policy = upper
 idented_joins = True
 indented_using_on = False
 tab_space_size = 2
-large_file_skip_byte_limit=35000
+large_file_skip_byte_limit=50000
 
 [sqlfluff:indentation]
 tab_space_size = 2
