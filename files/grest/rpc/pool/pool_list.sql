@@ -14,6 +14,7 @@ RETURNS TABLE (
   meta_url varchar,
   meta_hash text,
   pool_status text,
+  active_stake text,
   retiring_epoch word31type
 )
 LANGUAGE sql STABLE
@@ -48,15 +49,18 @@ AS $$
     pmr.url AS meta_url,
     pmr.hash AS meta_hash,
     pic.pool_status,
+    pasc.amount::text AS active_stake,
     pic.retiring_epoch
   FROM grest.pool_info_cache AS pic
-    LEFT JOIN public.pool_hash AS ph ON ph.id = pic.pool_hash_id
+    INNER JOIN public.pool_hash AS ph ON ph.id = pic.pool_hash_id
+    LEFT JOIN grest.pool_active_stake_cache AS pasc ON pasc.pool_id = pic.pool_hash_id
     LEFT JOIN public.pool_update AS pu ON pu.id = pic.update_id
     LEFT JOIN public.stake_address AS sa ON pu.reward_addr_id = sa.id
     LEFT JOIN public.pool_metadata_ref AS pmr ON pmr.id = pic.meta_id
     LEFT JOIN public.off_chain_pool_data AS ocpd ON ocpd.pmr_id = pic.meta_id
   ORDER BY
     pic.pool_hash_id,
-    pic.tx_id DESC
+    pic.tx_id DESC,
+    pasc.epoch_no DESC
   ;
 $$;

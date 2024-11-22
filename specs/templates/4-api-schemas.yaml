@@ -208,6 +208,8 @@ schemas:
             $ref: "#/components/schemas/pool_info/items/properties/meta_hash"
           pool_status:
             $ref: "#/components/schemas/pool_info/items/properties/pool_status"
+          active_stake:
+            $ref: "#/components/schemas/pool_info/items/properties/active_stake"
           retiring_epoch:
             $ref: "#/components/schemas/pool_info/items/properties/retiring_epoch"
     pool_history_info:
@@ -221,9 +223,7 @@ schemas:
             description: Epoch for which the pool history data is shown
             example: 312
           active_stake:
-            type: string
-            description: Amount of delegated stake to this pool at the time of epoch snapshot (in numbers)
-            example: "31235800000"
+            $ref: "#/components/schemas/pool_info/items/properties/active_stake"
           active_stake_pct:
             type:
             - number
@@ -431,7 +431,7 @@ schemas:
             type:
               - string
               - 'null'
-            description: Pool active stake (will be null post epoch transition until dbsync calculation is complete)
+            description: Amount of delegated stake to this pool at the time of epoch snapshot
             example: "64328627680963"
           sigma:
             type:
