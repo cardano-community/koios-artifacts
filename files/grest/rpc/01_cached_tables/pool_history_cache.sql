@@ -1,5 +1,3 @@
-DROP TABLE IF EXISTS grest.pool_history_cache;
-
 CREATE TABLE grest.pool_history_cache (
   pool_id bigint,
   epoch_no int8 NULL,
