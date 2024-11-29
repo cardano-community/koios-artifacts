@@ -19,10 +19,19 @@ BEGIN
     FROM UNNEST(_payment_credentials) AS cred_hex
   ) AS tmp;
 
-  SELECT INTO _tx_id_min id
-    FROM tx
-    WHERE block_id >= (SELECT id FROM block WHERE block_no >= _after_block_height ORDER BY id limit 1)
-    ORDER BY id limit 1;
+  SELECT INTO _tx_id_min min(id)
+  FROM tx
+  WHERE block_id = (
+    SELECT id
+    FROM block AS b
+    WHERE block_no >= _after_block_height
+      AND EXISTS (
+        SELECT true
+           FROM tx t
+           WHERE t.block_id = b.id
+      )
+    ORDER BY id LIMIT 1
+  );
 
   -- all tx_out & tx_in tx ids
   SELECT INTO _tx_id_list ARRAY_AGG(tx_id)

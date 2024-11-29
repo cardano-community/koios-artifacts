@@ -12,10 +12,20 @@ DECLARE
   _tx_id_list bigint[];
   _stake_address_id integer;
 BEGIN
-  SELECT INTO _tx_id_min id
-    FROM tx
-    WHERE block_id >= (SELECT id FROM block WHERE block_no >= _after_block_height ORDER BY id limit 1)
-    ORDER BY id limit 1;
+
+  SELECT INTO _tx_id_min min(id)
+  FROM tx 
+  WHERE block_id = (
+    SELECT id
+    FROM block AS b
+    WHERE block_no >= _after_block_height 
+      AND EXISTS (
+        SELECT true
+           FROM tx t 
+           WHERE t.block_id = b.id
+      )
+    ORDER BY id LIMIT 1
+  );
 
   SELECT INTO _stake_address_id id FROM stake_address WHERE hash_raw = (SELECT DECODE(b32_decode(_stake_address), 'hex'));
 
