@@ -1,4 +1,4 @@
-CREATE TABLE grest.pool_info_cache (
+CREATE TABLE IF NOT EXISTS grest.pool_info_cache (
   id serial PRIMARY KEY,
   tx_id bigint NOT NULL,
   update_id bigint NOT NULL,

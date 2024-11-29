@@ -1,4 +1,4 @@
-CREATE TABLE grest.pool_history_cache (
+CREATE TABLE IF NOT EXISTS grest.pool_history_cache (
   pool_id bigint,
   epoch_no int8 NULL,
   active_stake lovelace NULL,
