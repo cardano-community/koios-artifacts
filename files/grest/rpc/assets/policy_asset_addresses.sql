@@ -28,7 +28,7 @@ BEGIN
           SELECT
             atoc.ma_id,
             a.address,
-            grest.cip5_hex_to_stake_addr(sa.hash_raw)::varchar AS stake_address,
+            sa.view::varchar AS stake_address,
             atoc.quantity
           FROM grest.asset_tx_out_cache AS atoc
           LEFT JOIN multi_asset AS ma ON ma.id = atoc.ma_id
@@ -48,7 +48,7 @@ BEGIN
       SELECT
         ENCODE(ma.name, 'hex') AS asset_name,
         a.address,
-        grest.cip5_hex_to_stake_addr(sa.hash_raw)::varchar AS stake_address,
+        sa.view::varchar AS stake_address,
         SUM(mto.quantity)::text
       FROM multi_asset AS ma
       LEFT JOIN ma_tx_out AS mto ON mto.ident = ma.id
@@ -60,7 +60,7 @@ BEGIN
       GROUP BY
         ma.name,
         a.address,
-        sa.hash_raw;
+        sa.view;
   END IF;
 END;
 $$;

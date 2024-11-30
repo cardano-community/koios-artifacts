@@ -115,6 +115,7 @@ BEGIN
               AND NOT EXISTS (SELECT null FROM stake_deregistration AS sd WHERE sd.addr_id = d.addr_id AND sd.tx_id > d.tx_id)
               -- AND NOT grest.is_dangling_delegation(d.id)
               AND NOT EXISTS (SELECT null FROM grest.stake_distribution_cache AS sdc WHERE sdc.stake_address_id = sa.id)
+            WHERE d.active_epoch_no > (SELECT MAX(no) FROM epoch)
           ) z,
           LATERAL grest.account_utxos(array[(SELECT grest.cip5_hex_to_stake_addr(z.stake_address_raw))], false) AS acc_info
         GROUP BY
