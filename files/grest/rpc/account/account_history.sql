@@ -42,7 +42,7 @@ BEGIN
   ELSE
     RETURN QUERY
       SELECT
-        grest.cip5_hex_to_stake_addr(sa.hash_raw) AS stake_address,
+        grest.cip5_hex_to_stake_addr(sa.hash_raw)::varchar AS stake_address,
         JSONB_AGG(
           JSONB_BUILD_OBJECT(
             'pool_id', b32_encode('pool', ph.hash_raw::text),
