@@ -1188,6 +1188,26 @@ schemas:
             $ref: "#/components/schemas/blocks/items/properties/block_height"
           block_time:
             $ref: "#/components/schemas/blocks/items/properties/block_time"
+    block_tx_cbor:
+      description: Array of raw transaction(s) in CBOR format
+      type: array
+      items:
+        type: object
+        properties:
+          tx_hash:
+            $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+          block_hash:
+            $ref: "#/components/schemas/blocks/items/properties/hash"
+          block_height:
+            $ref: "#/components/schemas/blocks/items/properties/block_height"
+          epoch_no:
+            $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+          absolute_slot:
+            $ref: "#/components/schemas/blocks/items/properties/abs_slot"
+          tx_timestamp:
+            $ref: "#/components/schemas/tx_info/items/properties/tx_timestamp"
+          cbor:
+            $ref: "#/components/schemas/tx_cbor/items/properties/cbor"
     block_tx_info:
       description: Array of detailed information about transaction(s)
       type: array
