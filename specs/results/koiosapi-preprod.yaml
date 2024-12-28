@@ -445,6 +445,7 @@ paths:
       operationId: block_txs
   /block_tx_info: #RPC
     post:
+      deprecated: true
       tags:
         - Block
       requestBody:
@@ -456,6 +457,28 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/block_tx_info"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Block Transactions (Detailed Info)
+      description: Get detailed information about transaction(s) for requested blocks
+      operationId: block_tx_info
+  /block_tx_cbor: #RPC
+    post:
+      tags:
+        - Block
+      requestBody:
+        $ref: "#/components/requestBodies/block_hashes"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/block_tx_cbor"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -4023,6 +4046,26 @@ components:
             $ref: "#/components/schemas/blocks/items/properties/block_height"
           block_time:
             $ref: "#/components/schemas/blocks/items/properties/block_time"
+    block_tx_cbor:
+      description: Array of raw transaction(s) in CBOR format
+      type: array
+      items:
+        type: object
+        properties:
+          tx_hash:
+            $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+          block_hash:
+            $ref: "#/components/schemas/blocks/items/properties/hash"
+          block_height:
+            $ref: "#/components/schemas/blocks/items/properties/block_height"
+          epoch_no:
+            $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+          absolute_slot:
+            $ref: "#/components/schemas/blocks/items/properties/abs_slot"
+          tx_timestamp:
+            $ref: "#/components/schemas/tx_info/items/properties/tx_timestamp"
+          cbor:
+            $ref: "#/components/schemas/tx_cbor/items/properties/cbor"
     block_tx_info:
       description: Array of detailed information about transaction(s)
       type: array
