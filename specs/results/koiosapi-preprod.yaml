@@ -2956,6 +2956,22 @@ components:
             type: string
             description: Total Reserves yet to be unlocked on chain
             example: 11771504387608670
+          fees:
+            type: string
+            description: The amount (in Lovelace) in the fee pot.
+            example: 92010214941
+          deposits_stake:
+            type: string
+            description: The amount (in Lovelace) in the obligation pot coming from stake key and pool deposits.
+            example: 3338702000000
+          deposits_drep:
+            type: string
+            description: The amount (in Lovelace) in the obligation pot coming from drep registrations deposits.
+            example: 0
+          deposits_proposal:
+            type: string
+            description: The amount (in Lovelace) in the obligation pot coming from governance proposal deposits.
+            example: 0
     param_updates:
       description: Array of unique param update proposals submitted on chain
       type: array
