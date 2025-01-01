@@ -28,7 +28,7 @@ BEGIN
       ocvd.warning AS warning,
       ocvd.language AS language,
       ocvd.comment AS comment,
-      COALESCE(ocvd.is_valid, true) AS is_valid
+      ocvd.is_valid AS is_valid
     FROM public.drep_hash AS dh
       INNER JOIN (
         SELECT

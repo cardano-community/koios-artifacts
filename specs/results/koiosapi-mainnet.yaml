@@ -5361,8 +5361,8 @@ components:
             type:
               - 'null'
               - boolean
-            description: Indicate whether data is invalid
-            example: true
+            description: Indicate whether data is invalid (currently returns null for all as per dbsync)
+            example: null
     drep_updates:
       description: List of updates for requested (or all) delegated representatives (DReps)
       type: array
