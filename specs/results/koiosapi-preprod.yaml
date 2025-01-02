@@ -1434,6 +1434,29 @@ paths:
       summary: DReps Updates
       description: List of updates for requested (or all) delegated representatives (DReps)
       operationId: drep_updates
+  /drep_history: #RPC
+    get:
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_epoch_no"
+        - $ref: "#/components/parameters/_drep_id_optional"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/drep_history"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: DReps Voting Power History
+      description: History of voting power for DReps against each epoch
+      operationId: drep_history
   /drep_votes: #RPC
     get:
       tags:
@@ -5411,6 +5434,18 @@ components:
             $ref: "#/components/schemas/drep_metadata/items/properties/meta_hash"
           meta_json:
             $ref: "#/components/schemas/drep_metadata/items/properties/meta_json"
+    drep_history:
+      description: History of DReps voting power against each (or requested) epoch
+      type: array
+      items:
+        properties:
+          drep_id:
+            $ref: "#/components/schemas/drep_info/items/properties/drep_id"
+          epoch_no:
+            $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+          amount:
+            type: string
+            description: The voting power for the DRep
     drep_votes:
       description: List of all votes casted by requested delegated representative (DRep)
       type: array

@@ -2553,6 +2553,18 @@ schemas:
             $ref: "#/components/schemas/drep_metadata/items/properties/meta_hash"
           meta_json:
             $ref: "#/components/schemas/drep_metadata/items/properties/meta_json"
+    drep_history:
+      description: History of DReps voting power against each (or requested) epoch
+      type: array
+      items:
+        properties:
+          drep_id:
+            $ref: "#/components/schemas/drep_info/items/properties/drep_id"
+          epoch_no:
+            $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+          amount:
+            type: string
+            description: The voting power for the DRep
     drep_votes:
       description: List of all votes casted by requested delegated representative (DRep)
       type: array

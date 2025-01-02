@@ -1289,6 +1289,29 @@ paths:
       summary: DReps Updates
       description: List of updates for requested (or all) delegated representatives (DReps)
       operationId: drep_updates
+  /drep_history: #RPC
+    get:
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_epoch_no"
+        - $ref: "#/components/parameters/_drep_id_optional"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/drep_history"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: DReps Voting Power History
+      description: History of voting power for DReps against each epoch
+      operationId: drep_history
   /drep_votes: #RPC
     get:
       tags:
