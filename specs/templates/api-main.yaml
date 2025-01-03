@@ -298,6 +298,28 @@ paths:
       summary: Block Transactions
       description: Get a list of all transactions included in provided blocks
       operationId: block_txs
+  /block_tx_cbor: #RPC
+    post:
+      tags:
+        - Block
+      requestBody:
+        $ref: "#/components/requestBodies/block_hashes"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/block_tx_cbor"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Block Transactions (Raw CBOR)
+      description: Get raw CBOR data for all transaction(s) within requested blocks
+      operationId: block_tx_cbor
   /block_tx_info: #RPC
     post:
       deprecated: true
@@ -312,28 +334,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/block_tx_info"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      summary: Block Transactions (Detailed Info)
-      description: Get detailed information about transaction(s) for requested blocks
-      operationId: block_tx_info
-  /block_tx_cbor: #RPC
-    post:
-      tags:
-        - Block
-      requestBody:
-        $ref: "#/components/requestBodies/block_hashes"
-      responses:
-        "200":
-          description: Success!!
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/block_tx_cbor"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -1310,7 +1310,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: DReps Voting Power History
-      description: History of voting power for DReps against each epoch
+      description: History of DReps voting power against each (or requested) epoch
       operationId: drep_history
   /drep_votes: #RPC
     get:
