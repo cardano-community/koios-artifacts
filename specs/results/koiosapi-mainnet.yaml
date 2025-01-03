@@ -443,6 +443,28 @@ paths:
       summary: Block Transactions
       description: Get a list of all transactions included in provided blocks
       operationId: block_txs
+  /block_tx_cbor: #RPC
+    post:
+      tags:
+        - Block
+      requestBody:
+        $ref: "#/components/requestBodies/block_hashes"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/block_tx_cbor"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Block Transactions (Raw CBOR)
+      description: Get raw CBOR data for all transaction(s) within requested blocks
+      operationId: block_tx_cbor
   /block_tx_info: #RPC
     post:
       deprecated: true
@@ -457,28 +479,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/block_tx_info"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      summary: Block Transactions (Detailed Info)
-      description: Get detailed information about transaction(s) for requested blocks
-      operationId: block_tx_info
-  /block_tx_cbor: #RPC
-    post:
-      tags:
-        - Block
-      requestBody:
-        $ref: "#/components/requestBodies/block_hashes"
-      responses:
-        "200":
-          description: Success!!
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/block_tx_cbor"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -1455,7 +1455,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: DReps Voting Power History
-      description: History of voting power for DReps against each epoch
+      description: History of DReps voting power against each (or requested) epoch
       operationId: drep_history
   /drep_votes: #RPC
     get:
@@ -5594,9 +5594,13 @@ components:
             type: number
             description: Number of 'yes' votes casted by dreps
             example: 7
+          drep_active_yes_vote_power:
+            type: number
+            description: Power of 'yes' votes that were explicitly cast
+            example: 31231231231
           drep_yes_vote_power:
             type: number
-            description: Power of 'yes' votes from dreps
+            description: Power of 'yes' votes from dreps (includes explicit yes and inferred via other means)
             example: 31146839512742
           drep_yes_pct:
             type: number
@@ -5606,9 +5610,13 @@ components:
             type: number
             description: Number of 'no' votes casted by dreps
             example: 0
+          drep_active_no_vote_power:
+            type: number
+            description: Power of 'no' votes that were explicitly cast
+            example: 2012312393392
           drep_no_vote_power:
             type: number
-            description: Power of 'no' votes from dreps
+            description: Power of 'no' votes from dreps (includes explicit no and inferred via other means)
             example: 20148194577715
           drep_no_pct:
             type: number
@@ -5618,17 +5626,29 @@ components:
             type: number
             description: Number of active 'abstain' votes from dreps
             example: 5
+          drep_active_abstain_vote_power:
+            type: number
+            description: Power of 'abstain' votes that were explicitly cast
+            example: 123321123321
           drep_always_no_confidence_vote_power:
             type: number
             description: Power of votes delegated to 'always_no_confidence' predefined drep
             example: 9999
+          drep_always_abstain_vote_power:
+            type: number
+            description: Power of votes delegated to 'always_abstain' predefined drep
+            example: 87654321
           pool_yes_votes_cast:
             type: number
             description: Number of 'yes' votes casted by pools
             example: 1
+          pool_active_yes_vote_power:
+            type: number
+            description: Power of 'yes' pool votes that were explicitly cast
+            example: 123123123
           pool_yes_vote_power:
             type: number
-            description: Power of 'yes' votes from pools
+            description: Power of 'yes' votes from pools (includes explicit yes and inferred via other means)
             example: 5234000000
           pool_yes_pct:
             type: number
@@ -5638,9 +5658,12 @@ components:
             type: number
             description: Number of 'no' votes casted by pools
             example: 0
+          pool_active_no_vote_power:
+            type: number
+            description: Power of 'no' pool votes that were explicitly cast
           pool_no_vote_power:
             type: number
-            description: Power of 'no' votes from pools
+            description: Power of 'no' votes from pools (includes explicit no and inferred via other means)
             example: 0
           pool_no_pct:
             type: number
@@ -5650,6 +5673,10 @@ components:
             type: number
             description: Percentage of 'abstain' votes from pools
             example: 0
+          pool_active_abstain_vote_power:
+            type: number
+            description: Power of 'abstain' pool votes that were explicitly cast
+            example: 12312312312
           pool_passive_always_abstain_votes_assigned:
             type: number
             description: Number of non-voting SPO pool reward addresses delegating to 'always_abstain' drep
