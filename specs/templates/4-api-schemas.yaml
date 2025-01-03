@@ -98,6 +98,22 @@ schemas:
             type: string
             description: Total Reserves yet to be unlocked on chain
             example: 11771504387608670
+          fees:
+            type: string
+            description: The amount (in Lovelace) in the fee pot.
+            example: 92010214941
+          deposits_stake:
+            type: string
+            description: The amount (in Lovelace) in the obligation pot coming from stake key and pool deposits.
+            example: 3338702000000
+          deposits_drep:
+            type: string
+            description: The amount (in Lovelace) in the obligation pot coming from drep registrations deposits.
+            example: 0
+          deposits_proposal:
+            type: string
+            description: The amount (in Lovelace) in the obligation pot coming from governance proposal deposits.
+            example: 0
     param_updates:
       description: Array of unique param update proposals submitted on chain
       type: array
@@ -1188,6 +1204,26 @@ schemas:
             $ref: "#/components/schemas/blocks/items/properties/block_height"
           block_time:
             $ref: "#/components/schemas/blocks/items/properties/block_time"
+    block_tx_cbor:
+      description: Array of raw transaction(s) in CBOR format
+      type: array
+      items:
+        type: object
+        properties:
+          tx_hash:
+            $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+          block_hash:
+            $ref: "#/components/schemas/blocks/items/properties/hash"
+          block_height:
+            $ref: "#/components/schemas/blocks/items/properties/block_height"
+          epoch_no:
+            $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+          absolute_slot:
+            $ref: "#/components/schemas/blocks/items/properties/abs_slot"
+          tx_timestamp:
+            $ref: "#/components/schemas/tx_info/items/properties/tx_timestamp"
+          cbor:
+            $ref: "#/components/schemas/tx_cbor/items/properties/cbor"
     block_tx_info:
       description: Array of detailed information about transaction(s)
       type: array
@@ -2483,8 +2519,8 @@ schemas:
             type:
               - 'null'
               - boolean
-            description: Indicate whether data is invalid
-            example: true
+            description: Indicate whether data is invalid (currently returns null for all as per dbsync)
+            example: null
     drep_updates:
       description: List of updates for requested (or all) delegated representatives (DReps)
       type: array
@@ -2517,6 +2553,18 @@ schemas:
             $ref: "#/components/schemas/drep_metadata/items/properties/meta_hash"
           meta_json:
             $ref: "#/components/schemas/drep_metadata/items/properties/meta_json"
+    drep_history:
+      description: History of DReps voting power against each (or requested) epoch
+      type: array
+      items:
+        properties:
+          drep_id:
+            $ref: "#/components/schemas/drep_info/items/properties/drep_id"
+          epoch_no:
+            $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+          amount:
+            type: string
+            description: The voting power for the DRep
     drep_votes:
       description: List of all votes casted by requested delegated representative (DRep)
       type: array
@@ -2665,9 +2713,13 @@ schemas:
             type: number
             description: Number of 'yes' votes casted by dreps
             example: 7
+          drep_active_yes_vote_power:
+            type: number
+            description: Power of 'yes' votes that were explicitly cast
+            example: 31231231231
           drep_yes_vote_power:
             type: number
-            description: Power of 'yes' votes from dreps
+            description: Power of 'yes' votes from dreps (includes explicit yes and inferred via other means)
             example: 31146839512742
           drep_yes_pct:
             type: number
@@ -2677,9 +2729,13 @@ schemas:
             type: number
             description: Number of 'no' votes casted by dreps
             example: 0
+          drep_active_no_vote_power:
+            type: number
+            description: Power of 'no' votes that were explicitly cast
+            example: 2012312393392
           drep_no_vote_power:
             type: number
-            description: Power of 'no' votes from dreps
+            description: Power of 'no' votes from dreps (includes explicit no and inferred via other means)
             example: 20148194577715
           drep_no_pct:
             type: number
@@ -2689,17 +2745,29 @@ schemas:
             type: number
             description: Number of active 'abstain' votes from dreps
             example: 5
+          drep_active_abstain_vote_power:
+            type: number
+            description: Power of 'abstain' votes that were explicitly cast
+            example: 123321123321
           drep_always_no_confidence_vote_power:
             type: number
             description: Power of votes delegated to 'always_no_confidence' predefined drep
             example: 9999
+          drep_always_abstain_vote_power:
+            type: number
+            description: Power of votes delegated to 'always_abstain' predefined drep
+            example: 87654321
           pool_yes_votes_cast:
             type: number
             description: Number of 'yes' votes casted by pools
             example: 1
+          pool_active_yes_vote_power:
+            type: number
+            description: Power of 'yes' pool votes that were explicitly cast
+            example: 123123123
           pool_yes_vote_power:
             type: number
-            description: Power of 'yes' votes from pools
+            description: Power of 'yes' votes from pools (includes explicit yes and inferred via other means)
             example: 5234000000
           pool_yes_pct:
             type: number
@@ -2709,9 +2777,12 @@ schemas:
             type: number
             description: Number of 'no' votes casted by pools
             example: 0
+          pool_active_no_vote_power:
+            type: number
+            description: Power of 'no' pool votes that were explicitly cast
           pool_no_vote_power:
             type: number
-            description: Power of 'no' votes from pools
+            description: Power of 'no' votes from pools (includes explicit no and inferred via other means)
             example: 0
           pool_no_pct:
             type: number
@@ -2721,6 +2792,10 @@ schemas:
             type: number
             description: Percentage of 'abstain' votes from pools
             example: 0
+          pool_active_abstain_vote_power:
+            type: number
+            description: Power of 'abstain' pool votes that were explicitly cast
+            example: 12312312312
           pool_passive_always_abstain_votes_assigned:
             type: number
             description: Number of non-voting SPO pool reward addresses delegating to 'always_abstain' drep

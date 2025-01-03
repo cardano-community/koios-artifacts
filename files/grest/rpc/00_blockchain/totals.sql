@@ -5,7 +5,11 @@ RETURNS TABLE (
   treasury text,
   reward text,
   supply text,
-  reserves text
+  reserves text,
+  fees text,
+  deposits_stake text,
+  deposits_drep text,
+  deposits_proposal text
 )
 LANGUAGE sql STABLE
 AS $$
@@ -15,7 +19,11 @@ AS $$
     ap.treasury::text,
     ap.rewards::text,
     (ap.treasury + ap.rewards + ap.utxo + ap.deposits_stake + ap.deposits_drep + ap.deposits_proposal + ap.fees)::text AS supply,
-    ap.reserves::text
+    ap.reserves::text,
+    ap.fees::text,
+    ap.deposits_stake::text,
+    ap.deposits_drep::text,
+    ap.deposits_proposal::text
   FROM public.ada_pots AS ap
   WHERE (_epoch_no IS NOT NULL AND ap.epoch_no = _epoch_no)
     OR (_epoch_no IS NULL)

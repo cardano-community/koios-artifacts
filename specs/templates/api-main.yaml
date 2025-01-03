@@ -298,8 +298,31 @@ paths:
       summary: Block Transactions
       description: Get a list of all transactions included in provided blocks
       operationId: block_txs
+  /block_tx_cbor: #RPC
+    post:
+      tags:
+        - Block
+      requestBody:
+        $ref: "#/components/requestBodies/block_hashes"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/block_tx_cbor"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Block Transactions (Raw CBOR)
+      description: Get raw CBOR data for all transaction(s) within requested blocks
+      operationId: block_tx_cbor
   /block_tx_info: #RPC
     post:
+      deprecated: true
       tags:
         - Block
       requestBody:
@@ -1266,6 +1289,29 @@ paths:
       summary: DReps Updates
       description: List of updates for requested (or all) delegated representatives (DReps)
       operationId: drep_updates
+  /drep_history: #RPC
+    get:
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_epoch_no"
+        - $ref: "#/components/parameters/_drep_id_optional"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/drep_history"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: DReps Voting Power History
+      description: History of DReps voting power against each (or requested) epoch
+      operationId: drep_history
   /drep_votes: #RPC
     get:
       tags:

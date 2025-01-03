@@ -97,7 +97,7 @@ BEGIN
         SELECT
           drep_state.drep,
           drep_state.deposit,
-          (CASE WHEN (curr_epoch - b.epoch_no) < drep_activity THEN TRUE ELSE FALSE END) AS active,
+          (CASE WHEN (curr_epoch - b.epoch_no) <= drep_activity THEN TRUE ELSE FALSE END) AS active,
           (b.epoch_no + drep_activity) AS expires_epoch_no
         FROM (
           SELECT
