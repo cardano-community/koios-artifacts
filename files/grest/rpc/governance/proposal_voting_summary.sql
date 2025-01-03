@@ -3,20 +3,27 @@ RETURNS TABLE (
   proposal_type text,
   epoch_no integer,
   drep_yes_votes_cast integer,
+  drep_active_yes_vote_power lovelace,
   drep_yes_vote_power lovelace,
   drep_yes_pct numeric,
   drep_no_votes_cast integer,
+  drep_active_no_vote_power lovelace,
   drep_no_vote_power lovelace,
   drep_no_pct numeric,
   drep_abstain_votes_cast integer,
+  drep_active_abstain_vote_power lovelace,
   drep_always_no_confidence_vote_power lovelace,
+  drep_always_abstain_vote_power lovelace,
   pool_yes_votes_cast integer,
+  pool_active_yes_vote_power lovelace,
   pool_yes_vote_power lovelace,
   pool_yes_pct numeric,
   pool_no_votes_cast integer,
+  pool_active_no_vote_power lovelace,
   pool_no_vote_power lovelace,
   pool_no_pct numeric,
   pool_abstain_votes_cast integer,
+  pool_active_abstain_vote_power lovelace,
   pool_passive_always_abstain_votes_assigned integer,
   pool_passive_always_abstain_vote_power lovelace,
   pool_passive_always_no_confidence_votes_assigned integer,
@@ -136,8 +143,12 @@ BEGIN
           ph.hash_raw
         FROM grest.pool_info_cache AS pic
         INNER JOIN proposal_epoch_data ped ON true
+        INNER JOIN pool_stat ps ON ps.pool_hash_id = pic.pool_hash_id AND ps.epoch_no = ped.epoch_of_interest -- AND ps.voting_power is not null
         INNER JOIN public.pool_hash AS ph ON ph.id = pic.pool_hash_id
         INNER JOIN pool_update AS pu ON pu.id = pic.update_id AND pu.active_epoch_no <= ped.epoch_of_interest
+        INNER JOIN public.stake_address AS sa ON pu.reward_addr_id = sa.id
+        -- reward address delegated to drep at least once?
+        AND EXISTS (SELECT NULL FROM delegation_vote dv WHERE dv.addr_id = sa.id)
         -- exclude all pools that voted for this proposal
         WHERE NOT EXISTS (SELECT NULL FROM proposal_epoch_data ped INNER JOIN 
         					latest_votes AS VP ON vp.voter_role = 'SPO' AND vp.gov_action_proposal_id = ped.gov_action_proposal_id
@@ -157,10 +168,18 @@ BEGIN
 	    INNER JOIN public.pool_update AS pu ON pu.id = api.update_id
 	    INNER JOIN public.stake_address AS sa ON pu.reward_addr_id = sa.id
 	    INNER JOIN delegation_vote AS dv on dv.addr_id = sa.id
+      -- get the details of most recent vote delegation for this addr before last tx of epoch-of-interest
 	    AND dv.tx_id = (SELECT max(tx_id) FROM delegation_vote dv2 WHERE dv2.addr_id = sa.id
-	    					AND tx_id <= 
-	  					(SELECT COALESCE(t.id, (SELECT id FROM tx t2 ORDER BY id DESC LIMIT 1)) FROM tx t INNER JOIN block b 
-	  					ON t.block_id = b.id AND b.epoch_no = ped.epoch_of_interest ORDER BY t.id DESC LIMIT 1))
+	    					AND tx_id <=
+              -- TODO - maybe calculate these once off in the early CTE and use it from there
+	  					(CASE WHEN
+                  (SELECT max(no) FROM epoch) = ped.epoch_of_interest 
+                  THEN 
+                    (SELECT t.id FROM tx t ORDER BY id DESC LIMIT 1) 
+                  ELSE
+                    (SELECT max(i_last_tx_id) FROM grest.epoch_info_cache eic WHERE eic.epoch_no <= ped.epoch_of_interest)
+                END)
+      )
 	    INNER JOIN drep_hash AS dh on dh.id = dv.drep_hash_id
 	        and dh.view like 'drep_always%'
 	    INNER JOIN pool_stat AS pstat ON api.pool_hash_id = pstat.pool_hash_id
@@ -209,10 +228,14 @@ BEGIN
       y.proposal_type::text AS proposal_type,
       y.epoch_of_interest AS epoch_no,
       y.drep_yes_votes_cast::integer,
+
+      y.drep_yes_vote_power::lovelace as drep_active_yes_vote_power,
+
       (CASE
         WHEN y.proposal_type IN ('NoConfidence') THEN y.drep_yes_vote_power + y.drep_no_confidence_vote_power
         ELSE y.drep_yes_vote_power
        END)::lovelace AS drep_yes_vote_power,
+
    	  (CASE
         WHEN y.proposal_type IN ('NoConfidence') THEN ROUND((y.drep_yes_vote_power + drep_no_confidence_vote_power) * 100 / y.drep_non_abstain_total, 2)
         ELSE ROUND(y.drep_yes_vote_power * 100 / y.drep_non_abstain_total, 2) 
@@ -220,6 +243,8 @@ BEGIN
       
       y.drep_no_votes_cast::integer,
       
+      y.drep_no_vote_power::lovelace as drep_active_no_vote_power,
+
       (CASE
         WHEN y.proposal_type IN ('NoConfidence') THEN (y.drep_non_abstain_total - y.drep_yes_vote_power - y.drep_no_confidence_vote_power)
       	ELSE (y.drep_non_abstain_total - y.drep_yes_vote_power)
@@ -233,14 +258,20 @@ BEGIN
       (SELECT COALESCE(SUM(active_drep_votes_cast), 0)::integer 
       FROM active_prop_drep_votes WHERE vote = 'Abstain') 
       AS drep_abstain_votes_cast,
+
+      y.drep_abstain_vote_power::lovelace as drep_active_abstain_vote_power,
       
       y.drep_no_confidence_vote_power::lovelace AS drep_always_no_confidence_vote_power,
+
+      y.drep_always_abstain_vote_power::lovelace AS drep_always_abstain_vote_power,
       
       (CASE
         WHEN y.proposal_type IN ('ParameterChange', 'TreasuryWithdrawals', 'NewConstitution') THEN 0
         ELSE y.pool_yes_votes_cast
       END)::integer AS pool_yes_votes_cast,
       
+      y.pool_yes_vote_power::lovelace as pool_active_yes_vote_power,
+
       (CASE
         WHEN y.proposal_type IN ('ParameterChange', 'TreasuryWithdrawals', 'NewConstitution') THEN 0
         WHEN y.proposal_type IN ('NoConfidence') THEN y.pool_yes_vote_power + y.pool_passive_always_no_confidence_vote_power
@@ -252,10 +283,14 @@ BEGIN
         WHEN y.proposal_type IN ('NoConfidence') THEN ROUND((y.pool_yes_vote_power + y.pool_passive_always_no_confidence_vote_power) * 100 / y.pool_non_abstain_total, 2)
         ELSE ROUND(y.pool_yes_vote_power * 100 / y.pool_non_abstain_total, 2)
       END) AS pool_yes_pct,
+
       (CASE
         WHEN y.proposal_type IN ('ParameterChange', 'TreasuryWithdrawals', 'NewConstitution') THEN 0
         ELSE y.pool_no_votes_cast
       END)::integer AS pool_no_votes_cast,
+
+      y.pool_no_vote_power::lovelace as pool_active_no_vote_power,
+
       (CASE
         WHEN y.proposal_type IN ('ParameterChange', 'TreasuryWithdrawals', 'NewConstitution') THEN 0
         WHEN y.proposal_type IN ('NoConfidence') THEN (y.pool_non_abstain_total - y.pool_yes_vote_power - y.pool_passive_always_no_confidence_vote_power)
@@ -267,6 +302,7 @@ BEGIN
         ELSE ROUND((y.pool_non_abstain_total - y.pool_yes_vote_power) * 100 / y.pool_non_abstain_total, 2)
       END) AS pool_no_pct,
       (SELECT COALESCE(SUM(pool_votes_cast), 0)::integer FROM active_prop_pool_votes WHERE vote = 'Abstain') AS pool_abstain_votes_cast,
+      y.pool_abstain_vote_power::lovelace as pool_active_abstain_vote_power,
       y.pool_passive_always_abstain_votes_assigned::integer,
       y.pool_passive_always_abstain_vote_power::lovelace,
       y.pool_passive_always_no_confidence_votes_assigned::integer,
@@ -308,15 +344,17 @@ BEGIN
             SELECT coalesce(SUM(active_drep_vote_total), 0)
             FROM active_prop_drep_votes AS c2
             WHERE c2.gov_action_proposal_id = c1.gov_action_proposal_id AND c2.vote = 'No'
-          ) + always_no_conf AS drep_no_vote_power,
+          ) AS drep_no_vote_power,
           
           always_no_conf AS drep_no_confidence_vote_power,
+
+          always_abstain AS drep_always_abstain_vote_power,
           
           (
             SELECT coalesce(SUM(active_drep_vote_total),0)
             FROM active_prop_drep_votes AS c2
             WHERE c2.gov_action_proposal_id = c1.gov_action_proposal_id AND c2.vote = 'Abstain'
-          ) + always_abstain AS drep_abstain_vote_power,
+          ) AS drep_abstain_vote_power,
           tot_drep_power - always_abstain - (
             SELECT coalesce(SUM(active_drep_vote_total), 0)
             FROM active_prop_drep_votes AS c3
@@ -327,6 +365,19 @@ BEGIN
             FROM active_prop_pool_votes AS c2
             WHERE c2.gov_action_proposal_id = c1.gov_action_proposal_id AND c2.vote = 'Yes'
           ) AS pool_yes_vote_power,
+
+          (
+            SELECT coalesce(SUM(active_pool_vote_total), 0)
+            FROM active_prop_pool_votes AS c2
+            WHERE c2.gov_action_proposal_id = c1.gov_action_proposal_id AND c2.vote = 'No'
+          ) AS pool_no_vote_power,
+
+           (
+            SELECT coalesce(SUM(active_pool_vote_total), 0)
+            FROM active_prop_pool_votes AS c2
+            WHERE c2.gov_action_proposal_id = c1.gov_action_proposal_id AND c2.vote = 'Abstain'
+          ) AS pool_abstain_vote_power,
+
           tot_pool_power - (
             SELECT coalesce(SUM(active_pool_vote_total), 0)
             FROM active_prop_pool_votes c3
