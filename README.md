@@ -39,4 +39,4 @@ The specs can be browsed for each network using below:
 
 ## Further discussions
 
-You can connect and discuss with Koios teams on [Telegram](https://t.me/CardanoKoios/1), or feel free to contribute to any of the repositories.
+You can connect and discuss with Koios teams on [Telegram](https://t.me/CardanoKoios/1), [Discord](https://discord.gg/paJMG5wAdb) or feel free to contribute to any of the repositories.
