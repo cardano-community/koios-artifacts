@@ -29,4 +29,4 @@ BEGIN
 END;
 $$;
 
-COMMENT ON FUNCTION grest.pool_delegators IS 'Return information about active delegators (incl. history) for a given pool and epoch number - current epoch if not provided.'; --noqa: LT01
+COMMENT ON FUNCTION grest.pool_delegators_history IS 'Return information about active delegators (incl. history) for a given pool and epoch number - current epoch if not provided.'; --noqa: LT01
