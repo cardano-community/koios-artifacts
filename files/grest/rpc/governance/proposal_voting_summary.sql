@@ -38,15 +38,22 @@ LANGUAGE plpgsql
 AS $$
 DECLARE
   proposal text[];
+  proposal_id integer;
 BEGIN
 
   SELECT INTO proposal grest.cip129_from_gov_action_id(_proposal_id);
+
+  SELECT gap.id INTO proposal_id
+    FROM gov_action_proposal AS gap
+      LEFT JOIN tx AS t ON gap.tx_id = t.id
+    WHERE t.hash = DECODE(proposal[1], 'hex') AND gap.index = proposal[2]::smallint;
 
   RETURN QUERY (
     WITH
       latest_votes AS (
         SELECT * FROM voting_procedure AS vp
-        WHERE NOT EXISTS (SELECT 1 FROM voting_procedure AS vp2
+        WHERE vp.gov_action_proposal_id = proposal_id
+          AND NOT EXISTS (SELECT 1 FROM voting_procedure AS vp2
                           WHERE vp2.gov_action_proposal_id = vp.gov_action_proposal_id
                           AND vp2.id > vp.id
                           AND vp2.voter_role = vp.voter_role
@@ -62,7 +69,7 @@ BEGIN
           dropped_epoch,
           (coalesce(ratified_epoch, expired_epoch, dropped_epoch, ( SELECT MAX(no) FROM epoch))) AS epoch_of_interest
         FROM gov_action_proposal AS gap 
-          INNER JOIN tx AS t ON gap.tx_id = t.id AND t.hash = DECODE(proposal[1], 'hex') AND gap.index = proposal[2]::smallint
+        WHERE proposal_id = gap.id
       ),
       tot_drep_power AS (
         SELECT ped.gov_action_proposal_id, SUM(amount) AS tot_drep_power 

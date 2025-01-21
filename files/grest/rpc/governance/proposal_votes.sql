@@ -13,9 +13,15 @@ LANGUAGE plpgsql
 AS $$
 DECLARE
   proposal  text[];
+  proposal_id integer;
 BEGIN
 
   SELECT INTO proposal grest.cip129_from_gov_action_id(_proposal_id);
+
+  SELECT gap.id INTO proposal_id
+    FROM gov_action_proposal AS gap
+      LEFT JOIN tx AS t ON gap.tx_id = t.id
+    WHERE t.hash = DECODE(proposal[1], 'hex') AND gap.index = proposal[2]::smallint;
 
   RETURN QUERY (
     SELECT z.*
@@ -49,8 +55,7 @@ BEGIN
         LEFT JOIN public.pool_hash AS ph ON vp.pool_voter = ph.id
         LEFT JOIN public.committee_hash AS ch ON vp.committee_voter = ch.id
         LEFT JOIN public.voting_anchor AS va ON vp.voting_anchor_id = va.id
-      WHERE tx.hash = DECODE(proposal[1], 'hex')
-        AND gap.index = proposal[2]::smallint
+      WHERE gap.id = proposal_id
         -- TODO: will we need a similar filters to the one below for pool and committee member retirements?
         AND (
           CASE
