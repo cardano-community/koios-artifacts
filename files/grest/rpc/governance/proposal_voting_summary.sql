@@ -146,7 +146,8 @@ BEGIN
           b32_encode('pool', ph.hash_raw::text) AS pool_id_bech32,
           ph.hash_raw
         FROM grest.pool_info_cache AS pic
-          INNER JOIN proposal_epoch_data ped ON true
+          -- short-circuit non-voted pool data for proposals where SPO cannot vote - TODO parameter change logic, hopefully not too ugly
+          INNER JOIN proposal_epoch_data ped ON ped.proposal_type NOT IN ('TreasuryWithdrawals', 'NewConstitution')
           INNER JOIN pool_stat ps ON ps.pool_hash_id = pic.pool_hash_id AND ps.epoch_no = ped.epoch_of_interest -- AND ps.voting_power is not null
           INNER JOIN public.pool_hash AS ph ON ph.id = pic.pool_hash_id
           INNER JOIN pool_update AS pu ON pu.id = pic.update_id AND pu.active_epoch_no <= ped.epoch_of_interest
@@ -194,6 +195,7 @@ BEGIN
           COUNT(*) AS committee_votes_cast
         FROM proposal_epoch_data AS ped 
           INNER JOIN latest_votes AS vp ON vp.voter_role = 'ConstitutionalCommittee'
+          -- TODO: add logic to only count valid committee member votes, need a way to get committee ids for a given epoch...
           AND vp.gov_action_proposal_id = ped.gov_action_proposal_id
         GROUP BY ped.gov_action_proposal_id, vote
       ),
