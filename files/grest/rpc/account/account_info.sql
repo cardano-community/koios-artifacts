@@ -59,6 +59,7 @@ BEGIN
                 WHERE
                   sd.addr_id = sr.addr_id
                   AND sd.tx_id > sr.tx_id
+                LIMIT 1
               )
           ) AS registered,
           (
@@ -70,6 +71,7 @@ BEGIN
                 WHERE
                   sd.addr_id = sr.addr_id
                   AND sd.tx_id > sr.tx_id
+                LIMIT 1
               )
           ) AS deposit
         FROM public.stake_address sa
@@ -86,12 +88,22 @@ BEGIN
             SELECT TRUE
             FROM delegation_vote AS dv1
             WHERE dv1.addr_id = dv.addr_id
-              AND dv1.id > dv.id)
+              AND dv1.id > dv.id
+            LIMIT 1)
           AND NOT EXISTS (
             SELECT TRUE
             FROM stake_deregistration
             WHERE stake_deregistration.addr_id = dv.addr_id
-              AND stake_deregistration.tx_id > dv.tx_id)
+              AND stake_deregistration.tx_id > dv.tx_id
+            LIMIT 1)
+          AND NOT EXISTS (
+            SELECT TRUE
+            FROM drep_registration
+            WHERE drep_registration.drep_hash_id = dv.drep_hash_id
+              AND drep_registration.tx_id > dv.tx_id
+              AND drep_registration.deposit < 0
+            LIMIT 1
+          )
       ) AS vote_t ON vote_t.addr_id = status_t.id
     LEFT JOIN (
         SELECT

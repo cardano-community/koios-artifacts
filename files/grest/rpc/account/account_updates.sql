@@ -54,11 +54,21 @@ BEGIN
       )
     UNION (
         SELECT
-          'delegation' AS action_type,
+          'delegation_pool' AS action_type,
           tx_id,
           addr_id
         FROM
           delegation
+        WHERE
+          addr_id = ANY(sa_id_list)
+      )
+    UNION (
+        SELECT
+          'delegation_drep' AS action_type,
+          tx_id,
+          addr_id
+        FROM
+          delegation_vote
         WHERE
           addr_id = ANY(sa_id_list)
       )
