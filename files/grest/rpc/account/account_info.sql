@@ -102,8 +102,7 @@ BEGIN
             WHERE drep_registration.drep_hash_id = dv.drep_hash_id
               AND drep_registration.tx_id > dv.tx_id
               AND drep_registration.deposit < 0
-            LIMIT 1
-          )
+            LIMIT 1)
       ) AS vote_t ON vote_t.addr_id = status_t.id
     LEFT JOIN (
         SELECT

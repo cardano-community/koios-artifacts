@@ -37,7 +37,7 @@ BEGIN
       ELSE
         'not registered'
       END AS status,
-      b32_encode('pool', ph.hash_raw::text)::varchar AS delegated_pool,
+      pool_t.delegated_pool,
       vote_t.delegated_drep,
       sdc.total_balance::text,
       sdc.utxo::text,
@@ -89,8 +89,42 @@ BEGIN
             SELECT TRUE
             FROM delegation_vote AS dv1
             WHERE dv1.addr_id = dv.addr_id
-              AND dv1.id > dv.id)
+              AND dv1.id > dv.id
+            LIMIT 1)
+          AND NOT EXISTS (
+            SELECT TRUE
+            FROM stake_deregistration
+            WHERE stake_deregistration.addr_id = dv.addr_id
+              AND stake_deregistration.tx_id > dv.tx_id
+            LIMIT 1)
+          AND NOT EXISTS (
+            SELECT TRUE
+            FROM drep_registration
+            WHERE drep_registration.drep_hash_id = dv.drep_hash_id
+              AND drep_registration.tx_id > dv.tx_id
+              AND drep_registration.deposit < 0
+            LIMIT 1)
       ) AS vote_t ON vote_t.addr_id = status_t.id
+      LEFT JOIN (
+        SELECT
+          delegation.addr_id,
+          b32_encode('pool', ph.hash_raw::text)::varchar AS delegated_pool
+        FROM delegation
+          INNER JOIN pool_hash AS ph ON ph.id = delegation.pool_hash_id
+        WHERE delegation.addr_id = ANY(sa_id_list)
+          AND NOT EXISTS (
+            SELECT TRUE
+            FROM delegation AS d
+            WHERE d.addr_id = delegation.addr_id
+              AND d.id > delegation.id)
+            AND NOT EXISTS (
+              SELECT TRUE
+              FROM stake_deregistration
+              WHERE stake_deregistration.addr_id = delegation.addr_id
+                AND stake_deregistration.tx_id > delegation.tx_id)
+            -- skip delegations that were followed by at least one pool retirement
+            AND NOT grest.is_dangling_delegation(delegation.id)
+      ) AS pool_t ON pool_t.addr_id = status_t.id
       LEFT JOIN (
         SELECT
           r.addr_id,
