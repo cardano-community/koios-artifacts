@@ -77,6 +77,15 @@ BEGIN
           INNER JOIN proposal_epoch_data AS ped ON dd.epoch_no = epoch_of_interest
         GROUP BY ped.gov_action_proposal_id
       ),
+      -- voting power for drep that's been inactive for too long will be treated as abstain
+      inactive_drep_power AS (
+        SELECT ped.gov_action_proposal_id, SUM(amount) AS inactive_drep_power 
+        FROM drep_distr AS dd 
+          INNER JOIN proposal_epoch_data AS ped ON dd.epoch_no = epoch_of_interest
+          AND dd.active_until is not NULL AND dd.active_until < epoch_of_interest
+          AND NOT EXISTS (SELECT 1 FROM voting_procedure vp INNER JOIN tx t on vp.tx_id = t.id INNER JOIN block b on b.id = t.block_id AND b.epoch_no = epoch_of_interest AND vp.voter_role = 'DRep' and vp.drep_voter = dd.hash_id)        
+        GROUP BY ped.gov_action_proposal_id
+      ),
       active_prop_drep_votes AS (
         SELECT
           ped.gov_action_proposal_id,
@@ -215,12 +224,14 @@ BEGIN
           ped.proposal_type,
           ped.epoch_of_interest,
           tot_drep_power,
+          inactive_drep_power,
           always_no_conf,
           always_abstain,
           committee_size,
           tot_pool_power
         FROM proposal_epoch_data AS ped
           INNER JOIN tot_drep_power ON tot_drep_power.gov_action_proposal_id = ped.gov_action_proposal_id
+          INNER JOIN inactive_drep_power ON inactive_drep_power.gov_action_proposal_id = ped.gov_action_proposal_id
           INNER JOIN always_no_conf_data ON always_no_conf_data.gov_action_proposal_id = ped.gov_action_proposal_id
           INNER JOIN always_abstain_data ON always_abstain_data.gov_action_proposal_id = ped.gov_action_proposal_id
           INNER JOIN tot_pool_power ON tot_pool_power.gov_action_proposal_id = ped.gov_action_proposal_id
@@ -332,7 +343,7 @@ BEGIN
             FROM active_prop_drep_votes AS c2
             WHERE c2.gov_action_proposal_id = c1.gov_action_proposal_id AND c2.vote = 'Abstain'
           ) AS drep_abstain_vote_power,
-          tot_drep_power - always_abstain - (
+          tot_drep_power - inactive_drep_power - always_abstain - (
             SELECT coalesce(SUM(active_drep_vote_total), 0)
             FROM active_prop_drep_votes AS c3
             WHERE c3.gov_action_proposal_id = c1.gov_action_proposal_id AND c3.vote = 'Abstain'
