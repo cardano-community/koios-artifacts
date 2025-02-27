@@ -35,6 +35,7 @@ $$;
 GRANT USAGE ON SCHEMA public TO authenticator, web_anon;
 GRANT USAGE ON SCHEMA grest TO authenticator, web_anon;
 GRANT USAGE ON SCHEMA grestv0 TO authenticator, web_anon;
+GRANT USAGE ON SCHEMA cardano TO authenticator, web_anon; -- currently, pg_cardano extension has a hardcoded reference to cardano schema
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO authenticator, web_anon;
 GRANT SELECT ON ALL TABLES IN SCHEMA grest TO authenticator, web_anon;
 GRANT SELECT ON ALL TABLES IN SCHEMA grestv0 TO authenticator, web_anon;

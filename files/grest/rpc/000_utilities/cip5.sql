@@ -9,11 +9,14 @@ AS $$
 BEGIN
   IF _raw IS NULL THEN
    RETURN NULL;
-  END IF;
-  IF SUBSTRING(ENCODE(_raw, 'hex') from 2 for 1) = '0' THEN
-    RETURN b32_encode('stake_test', _raw::text);
   ELSE
-    RETURN b32_encode('stake', _raw::text);
+    RETURN cardano.tools_shelley_address_build(
+      ''::bytea,
+      FALSE,
+      SUBSTRING(_raw FROM 2),
+      FALSE,
+      SUBSTRING(ENCODE(_raw, 'hex') from 2 for 1)::integer
+      )::text;
   END IF;
 END;
 $$;

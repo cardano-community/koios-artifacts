@@ -62,4 +62,4 @@ BEGIN
 END;
 $$;
 
-COMMENT ON FUNCTION grest.account_history IS 'Get the active stake history of given accounts'; -- noqa: LT01
+COMMENT ON FUNCTION grest.account_history IS 'DEPRECATED: Get the active stake history of given accounts'; -- noqa: LT01

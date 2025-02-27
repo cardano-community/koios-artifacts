@@ -286,6 +286,24 @@ schemas:
             type: number
             description: Annualized ROS (return on staking) for delegators for this epoch
             example: 3.000340466
+    pool_owner_history:
+      description: Array of pool owner's stake history
+      type: array
+      items:
+        type: object
+        properties:
+          pool_id_bech32:
+            $ref: "#/components/schemas/pool_info/items/properties/pool_id_bech32"
+          stake_address:
+            type: string
+            description: Individual Stake account registered as (one of the) pool owner(s)
+            example: stake1uy6yzwsxxc28lfms0qmpxvyz9a7y770rtcqx9y96m42cttqwvp4m5
+          declared_pledge:
+            $ref: "#/components/schemas/pool_info/items/properties/pledge"
+          epoch:
+            $ref: "#/components/schemas/pool_history_info/items/properties/epoch_no"
+          active_stake:
+            $ref: "#/components/schemas/pool_info/items/properties/active_stake"
     pool_info:
       description: Array of pool information
       type: array
@@ -1342,6 +1360,32 @@ schemas:
             $ref: "#/components/schemas/blocks/items/properties/block_height"
           block_time:
             $ref: "#/components/schemas/blocks/items/properties/block_time"
+    address_outputs:
+      description: Array of basic transaction output information
+      type: array
+      items:
+        type: object
+        properties:
+          address:
+            $ref: "#/components/schemas/utxo_infos/items/properties/address"
+          tx_hash:
+            $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+          tx_index:
+            $ref: "#/components/schemas/utxo_infos/items/properties/tx_index"
+          value:
+            $ref: "#/components/schemas/utxo_infos/items/properties/value"
+          stake_address:
+            $ref: "#/components/schemas/utxo_infos/items/properties/stake_address"
+          payment_cred:
+            $ref: "#/components/schemas/utxo_infos/items/properties/payment_cred"
+          epoch_no:
+            $ref: "#/components/schemas/utxo_infos/items/properties/epoch_no"
+          block_height:
+            $ref: "#/components/schemas/utxo_infos/items/properties/block_height"
+          block_time:
+            $ref: "#/components/schemas/utxo_infos/items/properties/block_time"
+          is_spent:
+            $ref: "#/components/schemas/utxo_infos/items/properties/is_spent"
     address_assets:
       description: Array of address-owned assets
       type: array
@@ -1610,6 +1654,27 @@ schemas:
                   type: string
                   description: Active stake amount (in numbers)
                   example: 682334162
+    account_stake_history:
+      description: Array of active stake values per epoch
+      type: array
+      items:
+        properties:
+          stake_address:
+            type: string
+            description: Cardano staking address (reward account) in bech32 format
+            example: stake1u8yxtugdv63wxafy9d00nuz6hjyyp4qnggvc9a3vxh8yl0ckml2uz
+          pool_id_bech32:
+            type: string
+            description: Bech32 representation of pool ID
+            example: pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt
+          epoch_no:
+            type: number
+            description: Epoch number
+            example: 301
+          active_stake:
+            type: string
+            description: Active stake amount (in numbers)
+            example: 682334162
     tx_info:
       description: Array of detailed information about transaction(s)
       type: array

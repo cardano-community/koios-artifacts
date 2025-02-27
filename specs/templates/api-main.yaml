@@ -573,6 +573,28 @@ paths:
       summary: Address UTXOs
       description: Get UTxO set for given addresses
       operationId: address_utxos
+  /address_outputs: #RPC
+    post:
+      tags:
+        - Address
+      requestBody:
+        $ref: "#/components/requestBodies/address_txs"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/address_outputs"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Address Outputs
+      description: Basic transaction output info for given addresses
+      operationId: address_outputs
   /credential_utxos: #RPC
     post:
       tags:
@@ -864,6 +886,7 @@ paths:
       operationId: account_assets
   /account_history: #RPC
     post:
+      deprecated: true
       tags:
         - Stake Account
       requestBody:
@@ -884,6 +907,28 @@ paths:
       summary: Account History
       description: Get the staking history of given stake addresses (accounts)
       operationId: account_history
+  /account_stake_history: #RPC
+    post:
+      tags:
+        - Stake Account
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account_stake_history"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Account Stake History
+      description: Get the staking history of given stake addresses (accounts)
+      operationId: account_stake_history
 
   /asset_list: #RPC
     get:
@@ -1619,6 +1664,29 @@ paths:
         Return information about blocks minted by a given pool for all epochs
         (or _epoch_no if provided)
       operationId: pool_blocks
+  /pool_owner_history: #RPC
+    get:
+      tags:
+        - Pool
+      parameters:
+        - $ref: "#/components/parameters/_pool_bech32"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_owner_history"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Pool Owner History
+      description: >-
+        Return information about pool owner's historical stake and their promised pledge to their pools
+      operationId: pool_owner_history
   /pool_history: #RPC
     get:
       tags:

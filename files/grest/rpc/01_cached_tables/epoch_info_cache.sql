@@ -89,6 +89,7 @@ BEGIN
     INNER JOIN tx ON tx.block_id = b.id
     WHERE b.block_no IS NOT NULL
       AND b.tx_count != 0
+      AND b.epoch_no >= COALESCE((SELECT MAX(epoch_no) FROM grest.epoch_info_cache), 0)
     GROUP BY b.epoch_no;
 
   INSERT INTO grest.epoch_info_cache
