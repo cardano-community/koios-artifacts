@@ -30,7 +30,7 @@ BEGIN
       INNER JOIN stake_address AS sa ON po.addr_id = sa.id
       INNER JOIN epoch_stake AS es ON po.addr_id = es.addr_id AND es.pool_id = ph.id AND es.epoch_no > b.epoch_no
     WHERE ph.id = (SELECT id FROM pool_hash AS ph WHERE ph.hash_raw = ANY(
-          SELECT DECODE(b32_decode(p),'hex')
+          SELECT cardano.bech32_decode_data(p)
           FROM UNNEST(_pool_bech32_ids) AS p))
       AND pu.pledge != 0
       AND es.amount != 0

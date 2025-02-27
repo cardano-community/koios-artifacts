@@ -25,7 +25,7 @@ BEGIN
     ARRAY_AGG(stake_address.id)
   FROM stake_address
   WHERE stake_address.hash_raw = ANY(
-      SELECT DECODE(b32_decode(n), 'hex')
+      SELECT cardano.bech32_decode_data(n)
       FROM UNNEST(_stake_addresses) AS n
     );
 

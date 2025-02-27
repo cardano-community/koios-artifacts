@@ -31,7 +31,7 @@ BEGIN
         vp.voter_role::text,
         CASE
           WHEN dh.raw IS NOT NULL THEN grest.cip129_hex_to_drep_id(dh.raw, dh.has_script)
-          WHEN ph.id IS NOT NULL THEN b32_encode('pool', ph.hash_raw::text)
+          WHEN ph.id IS NOT NULL THEN cardano.bech32_encode('pool', ph.hash_raw)
           WHEN ch.raw IS NOT NULL THEN grest.cip129_hex_to_cc_hot(ch.raw, ch.has_script)
         ELSE
           '' -- shouldn't happen

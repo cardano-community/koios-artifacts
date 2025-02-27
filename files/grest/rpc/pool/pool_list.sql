@@ -20,7 +20,7 @@ RETURNS TABLE (
 LANGUAGE sql STABLE
 AS $$
   SELECT DISTINCT ON (pic.pool_hash_id)
-    b32_encode('pool', ph.hash_raw::text)::varchar AS pool_id_bech32,
+    cardano.bech32_encode('pool', ph.hash_raw)::varchar AS pool_id_bech32,
     ENCODE(ph.hash_raw,'hex') as pool_id_hex,
     pu.active_epoch_no,
     pu.margin,

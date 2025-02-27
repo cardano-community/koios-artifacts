@@ -22,7 +22,7 @@ BEGIN
     array_agg(id)
   FROM stake_address
   WHERE stake_address.hash_raw = ANY(
-    SELECT DECODE(b32_decode(n), 'hex')
+    SELECT cardano.bech32_decode_data(n)
     FROM UNNEST(_stake_addresses) AS n
   );
 
@@ -107,7 +107,7 @@ BEGIN
     LEFT JOIN (
         SELECT
           delegation.addr_id,
-          b32_encode('pool', ph.hash_raw::text)::varchar AS delegated_pool
+          cardano.bech32_encode('pool', ph.hash_raw)::varchar AS delegated_pool
         FROM delegation
           INNER JOIN pool_hash AS ph ON ph.id = delegation.pool_hash_id
         WHERE delegation.addr_id = ANY(sa_id_list)

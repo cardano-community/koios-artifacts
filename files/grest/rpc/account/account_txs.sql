@@ -27,7 +27,7 @@ BEGIN
     ORDER BY id LIMIT 1
   );
 
-  SELECT INTO _stake_address_id id FROM stake_address WHERE hash_raw = (SELECT DECODE(b32_decode(_stake_address), 'hex'));
+  SELECT INTO _stake_address_id id FROM stake_address WHERE hash_raw = (SELECT cardano.bech32_decode_data(_stake_address));
 
   -- all tx_out & tx_in tx ids
   SELECT INTO _tx_id_list ARRAY_AGG(tx_id)

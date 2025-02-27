@@ -30,7 +30,7 @@ BEGIN
       SELECT
         ENCODE(tx.hash::bytea, 'hex') AS tx_hash,
         EXTRACT(EPOCH FROM b.time)::integer AS block_time,
-        b32_encode('pool', ph.hash_raw::text)::varchar AS pool_id_bech32,
+        cardano.bech32_encode('pool', ph.hash_raw)::varchar AS pool_id_bech32,
         ENCODE(ph.hash_raw::bytea, 'hex') AS pool_id_hex,
         pu.active_epoch_no,
         ENCODE(pu.vrf_key_hash, 'hex') AS vrf_key_hash,
@@ -65,13 +65,13 @@ BEGIN
         LEFT JOIN public.pool_metadata_ref AS pmr ON pu.meta_id = pmr.id
         LEFT JOIN public.off_chain_pool_data AS ocpd ON pu.meta_id = ocpd.pmr_id
       WHERE _pool_bech32 IS NULL
-        OR ph.hash_raw = DECODE(b32_decode(_pool_bech32),'hex')
+        OR ph.hash_raw = cardano.bech32_decode_data(_pool_bech32)
       GROUP BY tx.hash, b.time, ph.hash_raw, ph.hash_raw, pu.active_epoch_no, pu.vrf_key_hash, pu.margin, pu.fixed_cost, pu.pledge, sa.hash_raw, pmr.url, pmr.hash, ocpd.json),
     pool_dereg AS (
         SELECT
           ENCODE(tx.hash::bytea, 'hex') AS tx_hash,
           EXTRACT(EPOCH FROM b.time)::integer AS block_time,
-          b32_encode('pool', ph.hash_raw::text) AS pool_id_bech32,
+          cardano.bech32_encode('pool', ph.hash_raw) AS pool_id_bech32,
           ENCODE(ph.hash_raw::bytea, 'hex') AS pool_id_hex,
           NULL::bigint AS active_epoch_no,
           NULL AS vrf_key_hash,
@@ -91,7 +91,7 @@ BEGIN
           INNER JOIN public.tx ON tx.id = pr.announced_tx_id
           INNER JOIN public.block AS b ON b.id = tx.block_id
           WHERE _pool_bech32 IS NULL
-            OR ph.hash_raw = DECODE(b32_decode(_pool_bech32),'hex'))
+            OR ph.hash_raw = cardano.bech32_decode_data(_pool_bech32))
   SELECT * FROM pool_reg
     UNION SELECT * FROM pool_dereg
   ORDER BY

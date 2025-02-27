@@ -152,7 +152,7 @@ BEGIN
         SELECT DISTINCT ON (pic.pool_hash_id)
           pic.pool_hash_id,
           pic.update_id,
-          b32_encode('pool', ph.hash_raw::text) AS pool_id_bech32,
+          cardano.bech32_encode('pool', ph.hash_raw) AS pool_id_bech32,
           ph.hash_raw
         FROM grest.pool_info_cache AS pic
           -- short-circuit non-voted pool data for proposals where SPO cannot vote - TODO parameter change logic, hopefully not too ugly

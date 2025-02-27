@@ -51,7 +51,7 @@ BEGIN
           pic.pool_status,
           pic.retiring_epoch,
           pic.meta_id,
-          b32_encode('pool', ph.hash_raw::text) AS pool_id_bech32,
+          cardano.bech32_encode('pool', ph.hash_raw) AS pool_id_bech32,
           ph.hash_raw
         FROM grest.pool_info_cache AS pic
         INNER JOIN public.pool_hash AS ph ON ph.id = pic.pool_hash_id
@@ -60,7 +60,7 @@ BEGIN
             OR ( NOT EXISTS (SELECT 1 from grest.pool_info_cache AS pic2 where pic2.pool_hash_id = pic.pool_hash_id
                 AND pic2.active_epoch_no <= _epoch_no) ) )
         WHERE ph.hash_raw = ANY(
-          SELECT DECODE(b32_decode(p),'hex')
+          SELECT cardano.bech32_decode_data(p)
           FROM UNNEST(_pool_bech32_ids) AS p)
         ORDER BY
           pic.pool_hash_id,
@@ -162,7 +162,7 @@ BEGIN
           THEN NULL
         ELSE
           SUM(CASE
-            WHEN DECODE(b32_decode(pool_delegs.stake_address), 'hex') IN (
+            WHEN cardano.bech32_decode_data(pool_delegs.stake_address) IN (
                 SELECT sa.hash_raw
                 FROM public.pool_owner AS po
                 INNER JOIN public.stake_address AS sa ON sa.id = po.addr_id
