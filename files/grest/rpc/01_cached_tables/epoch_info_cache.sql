@@ -24,7 +24,7 @@ AS $$
 DECLARE
   _curr_epoch bigint;
   _latest_epoch_no_in_cache bigint;
-  _cutoff_epoch;
+  _cutoff_epoch bigint;
 BEGIN
   -- Check previous cache update completed before running
   IF (
