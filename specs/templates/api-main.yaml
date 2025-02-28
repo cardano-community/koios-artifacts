@@ -864,6 +864,30 @@ paths:
         Get the account updates (registration, deregistration, delegation and
         withdrawals) for given stake addresses
       operationId: account_updates
+  /account_update_history: #RPC
+    post:
+      tags:
+        - Stake Account
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account_update_history"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Account Update History
+      description: >-
+        Get the account updates (registration, deregistration, delegation and
+        withdrawals) for given stake addresses
+      operationId: account_update_history
   /account_addresses: #RPC
     post:
       tags:

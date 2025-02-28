@@ -19,40 +19,40 @@ AS $$
         FROM UNNEST(_stake_addresses) AS n
       )
   )
+  SELECT
+    all_rewards.stake_address,
+    all_rewards.earned_epoch,
+    all_rewards.spendable_epoch,
+    all_rewards.amount::text,
+    all_rewards.type::text,
+    all_rewards.pool_id_bech32::varchar
+  FROM (
     SELECT
-      all_rewards.stake_address,
-      all_rewards.earned_epoch,
-      all_rewards.spendable_epoch,
-      all_rewards.amount::text,
-      all_rewards.type::text,
-      all_rewards.pool_id_bech32::varchar
-    FROM (
-      SELECT
-        sa.stake_address,
-        r.type,
-        r.amount,
-        r.earned_epoch,
-        r.spendable_epoch,
-        cardano.bech32_encode('pool', ph.hash_raw) AS pool_id_bech32
-      FROM sa_id_list AS sa
-        INNER JOIN reward AS r ON r.addr_id = sa.id
-        INNER JOIN pool_hash AS ph ON r.pool_id = ph.id
-      WHERE CASE WHEN _epoch_no IS NULL THEN TRUE ELSE r.earned_epoch = _epoch_no END
-      --
-      UNION ALL
-      --
-      SELECT
-        sa.stake_address,
-        rr.type,
-        rr.amount,
-        rr.earned_epoch,
-        rr.spendable_epoch,
-        null AS pool_id_bech32
-      FROM sa_id_list AS sa
-        INNER JOIN reward_rest AS rr ON rr.addr_id = sa.id
-      WHERE CASE WHEN _epoch_no IS NULL THEN TRUE ELSE rr.earned_epoch = _epoch_no END
-    ) as all_rewards
-    ORDER BY all_rewards.stake_address;
+      sa.stake_address,
+      r.type,
+      r.amount,
+      r.earned_epoch,
+      r.spendable_epoch,
+      cardano.bech32_encode('pool', ph.hash_raw) AS pool_id_bech32
+    FROM sa_id_list AS sa
+      INNER JOIN reward AS r ON r.addr_id = sa.id
+      INNER JOIN pool_hash AS ph ON r.pool_id = ph.id
+    WHERE CASE WHEN _epoch_no IS NULL THEN TRUE ELSE r.earned_epoch = _epoch_no END
+    --
+    UNION ALL
+    --
+    SELECT
+      sa.stake_address,
+      rr.type,
+      rr.amount,
+      rr.earned_epoch,
+      rr.spendable_epoch,
+      null AS pool_id_bech32
+    FROM sa_id_list AS sa
+      INNER JOIN reward_rest AS rr ON rr.addr_id = sa.id
+    WHERE CASE WHEN _epoch_no IS NULL THEN TRUE ELSE rr.earned_epoch = _epoch_no END
+  ) as all_rewards
+  ORDER BY all_rewards.stake_address;
 $$;
 
 COMMENT ON FUNCTION grest.account_reward_history IS 'Get the full rewards history (including MIR) for given stake addresses, or certain epoch if specified'; -- noqa: LT01

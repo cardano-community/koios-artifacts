@@ -1009,6 +1009,30 @@ paths:
         Get the account updates (registration, deregistration, delegation and
         withdrawals) for given stake addresses
       operationId: account_updates
+  /account_update_history: #RPC
+    post:
+      tags:
+        - Stake Account
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account_update_history"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Account Update History
+      description: >-
+        Get the account updates (registration, deregistration, delegation and
+        withdrawals) for given stake addresses
+      operationId: account_update_history
   /account_addresses: #RPC
     post:
       tags:
@@ -4595,6 +4619,29 @@ components:
                   $ref: "#/components/schemas/blocks/items/properties/abs_slot"
                 block_time:
                   $ref: "#/components/schemas/blocks/items/properties/block_time"
+    account_update_history:
+      description: Array of account update history information
+      type: array
+      items:
+        type: object
+        properties:
+          stake_address:
+            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+          action_type:
+            type: string
+            description: Type of certificate submitted
+            enum: ["registration", "delegation_pool", "delegation_drep", "withdrawal", "deregistration"]
+            example: "registration"
+          tx_hash:
+            $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+          epoch_no:
+            $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+          epoch_slot:
+            $ref: "#/components/schemas/blocks/items/properties/epoch_slot"
+          absolute_slot:
+            $ref: "#/components/schemas/blocks/items/properties/abs_slot"
+          block_time:
+            $ref: "#/components/schemas/blocks/items/properties/block_time"
     account_addresses:
       description: Array of payment addresses
       type: array
