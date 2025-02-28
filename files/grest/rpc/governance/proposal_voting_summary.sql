@@ -205,6 +205,23 @@ BEGIN
         FROM proposal_epoch_data AS ped 
           INNER JOIN latest_votes AS vp ON vp.voter_role = 'ConstitutionalCommittee'
           -- TODO: add logic to only count valid committee member votes, need a way to get committee ids for a given epoch...
+
+          INNER JOIN committee_registration cr ON cr.hot_key_id = vp.committee_voter 
+          INNER JOIN committee_member cm ON cr.cold_key_id = cm.committee_hash_id 
+          INNER JOIN committee c ON c.id = cm.committee_id 
+            AND c.id = (SELECT id FROM committee 
+              WHERE 
+              (gov_action_proposal_id IN
+                (
+                  SELECT id 
+                  FROM gov_action_proposal 
+                  WHERE enacted_epoch IS NOT null AND enacted_epoch <= ped.epoch_of_interest AND type = 'NewCommittee' 
+                  ORDER BY id DESC
+                  LIMIT 1
+                )
+              OR gov_action_proposal_id IS null)
+          ORDER BY id DESC LIMIT 1)
+
           AND vp.gov_action_proposal_id = ped.gov_action_proposal_id
         GROUP BY ped.gov_action_proposal_id, vote
       ),
