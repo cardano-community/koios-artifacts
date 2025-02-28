@@ -795,6 +795,7 @@ paths:
       operationId: account_txs
   /account_rewards: #RPC
     post:
+      deprecated: true
       tags:
         - Stake Account
       requestBody:
@@ -816,6 +817,29 @@ paths:
       description: >-
         Get the full rewards history (including MIR) for given stake addresses
       operationId: account_rewards
+  /account_reward_history: #RPC
+    post:
+      tags:
+        - Stake Account
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account_reward_history"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Account Reward History
+      description: >-
+        Get the full rewards history (including MIR) for given stake addresses
+      operationId: account_reward_history
   /account_updates: #RPC
     post:
       tags:
