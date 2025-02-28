@@ -188,6 +188,5 @@ $$
 $$;
 
 -- Refresh asset token registry cache from github, to avoid stale deletes
-DELETE FROM grest.control_table WHERE key = 'asset_registry_commit';
--- DATABASE INDEXES --
--- Empty
+DELETE FROM grest.control_table
+WHERE key = 'asset_registry_commit';
