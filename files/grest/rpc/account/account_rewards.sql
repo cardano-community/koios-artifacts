@@ -62,4 +62,4 @@ BEGIN
 END;
 $$;
 
-COMMENT ON FUNCTION grest.account_rewards IS 'Get the full rewards history (including MIR) for given stake addresses, or certain epoch if specified'; -- noqa: LT01
+COMMENT ON FUNCTION grest.account_rewards IS 'DEPRECATED: Get the full rewards history (including MIR) for given stake addresses, or certain epoch if specified'; -- noqa: LT01
