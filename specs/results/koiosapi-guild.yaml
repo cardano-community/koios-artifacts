@@ -2035,6 +2035,26 @@ paths:
       summary: Pool Metadata
       description: Metadata (on & off-chain) for all pools
       operationId: pool_metadata
+  /pool_calidus_keys: #RPC
+    get:
+      tags:
+        - Pool
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_calidus_keys"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Pool Calidus Keys
+      description: List of valid calidus keys for all pools
+      operationId: pool_calidus_keys
 
   /script_info: #RPC
     post:
@@ -3010,7 +3030,10 @@ components:
           epoch_slot:
             $ref: "#/components/schemas/blocks/items/properties/epoch_slot"
           block_no:
-            $ref: "#/components/schemas/blocks/items/properties/block_height"
+            deprecated: true
+            type: number
+            description: DEPRECATED!! Use Block height instead
+            example: 1794506
           block_time:
             $ref: "#/components/schemas/blocks/items/properties/block_time"
     genesis:
@@ -3673,6 +3696,35 @@ components:
             $ref: "#/components/schemas/pool_info/items/properties/meta_hash"
           meta_json:
             $ref: "#/components/schemas/pool_info/items/properties/meta_json"
+    pool_calidus_keys:
+      description: Array of valid calidus keys for all pools
+      type: array
+      items:
+        properties:
+          pool_id_bech32:
+            $ref: "#/components/schemas/pool_info/items/properties/pool_id_bech32"
+          pool_status:
+            $ref: "#/components/schemas/pool_info/items/properties/pool_status"
+          calidus_nonce:
+            type: number
+            description: Epoch number
+            example: 294
+          calidus_pub_key:
+            type: string
+            description: Total output value across all transactions in epoch
+            example: 15432725054364942
+          calidus_id_bech32:
+            type: string
+            description: Total output value across all transactions in epoch
+            example: 15432725054364942
+          tx_hash:
+            $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+          epoch_no:
+            $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+          block_height:
+            $ref: "#/components/schemas/blocks/items/properties/block_height"
+          block_time:
+            $ref: "#/components/schemas/blocks/items/properties/block_time"
     epoch_info:
       description: Array of detailed summary for each epoch
       type: array
@@ -4104,9 +4156,7 @@ components:
             description: Slot number of the block in epoch
             example: 171530
           block_height:
-            anyOf:
-              - type: number
-              - type: 'null'
+            type: number
             description: Block height
             example: 1794506
           block_size:

@@ -1890,6 +1890,26 @@ paths:
       summary: Pool Metadata
       description: Metadata (on & off-chain) for all pools
       operationId: pool_metadata
+  /pool_calidus_keys: #RPC
+    get:
+      tags:
+        - Pool
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_calidus_keys"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Pool Calidus Keys
+      description: List of valid calidus keys for all pools
+      operationId: pool_calidus_keys
 
   /script_info: #RPC
     post:

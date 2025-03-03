@@ -1,6 +1,6 @@
 [sqlfluff]
 dialect = postgres
-exclude_rules = structure.column_order, references.keywords
+#exclude_rules = structure.column_order, references.keywords
 max_line_length=260
 capitalisation_policy = upper
 extended_capitalisation_policy = upper

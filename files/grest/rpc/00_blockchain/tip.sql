@@ -4,6 +4,7 @@ RETURNS TABLE (
   epoch_no word31type,
   abs_slot word63type,
   epoch_slot word31type,
+  block_height word31type,
   block_no word31type,
   block_time integer
 )
@@ -14,7 +15,8 @@ AS $$
     b.epoch_no AS epoch_no,
     b.slot_no AS abs_slot,
     b.epoch_slot_no AS epoch_slot,
-    b.block_no,
+    b.block_no AS block_height,
+    b.block_no AS block_no,
     EXTRACT(EPOCH FROM b.time)::integer
   FROM block AS b
   ORDER BY b.id DESC
