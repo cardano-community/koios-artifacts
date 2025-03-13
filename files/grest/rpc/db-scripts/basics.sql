@@ -82,7 +82,7 @@ CREATE TABLE grest.genesis (
 
 -- POOL_GROUPS TABLE --
 DROP TABLE IF EXISTS grest.pool_groups;
-CREATE TABLE IF grest.pool_groups (
+CREATE TABLE grest.pool_groups (
   pool_id_bech32 text PRIMARY KEY NOT NULL,
   pool_group text,
   ticker text,

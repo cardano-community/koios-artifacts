@@ -48,3 +48,4 @@ AS $$
   ORDER BY x.pool_id_bech32, x.calidus_nonce DESC;
 $$;
 
+COMMENT ON FUNCTION grest.pool_calidus_keys IS 'List of valid calidus keys for all pools'; --noqa: LT01

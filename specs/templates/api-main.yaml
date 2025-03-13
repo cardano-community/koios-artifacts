@@ -938,7 +938,7 @@ paths:
       tags:
         - Stake Account
       requestBody:
-        $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
+        $ref: "#/components/requestBodies/stake_addresses"
       responses:
         "200":
           description: Success!!
@@ -1713,11 +1713,11 @@ paths:
         (or _epoch_no if provided)
       operationId: pool_blocks
   /pool_owner_history: #RPC
-    get:
+    post:
       tags:
         - Pool
-      parameters:
-        - $ref: "#/components/parameters/_pool_bech32"
+      requestBody:
+        $ref: "#/components/requestBodies/pool_ids"
       responses:
         "200":
           description: Success!!
@@ -1871,9 +1871,7 @@ paths:
   /pool_groups: #RPC
     get:
       tags:
-        - Governance
-      parameters:
-        - $ref: "#/components/parameters/_pool_bech32"
+        - Pool
       responses:
         "200":
           description: Success!!

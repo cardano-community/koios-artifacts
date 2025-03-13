@@ -11,6 +11,7 @@ RETURNS TABLE (
   owners varchar [],
   relays jsonb [],
   ticker varchar,
+  pool_group text,
   meta_url varchar,
   meta_hash text,
   pool_status text,

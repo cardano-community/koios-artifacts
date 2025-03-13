@@ -222,7 +222,7 @@ schemas:
             description: Pool ticker
             example: AHL
           pool_group:
-            $ref: "#/components/schemaas/pool_groups/items/properties/pool_group"
+            $ref: "#/components/schemas/pool_groups/items/properties/pool_group"
           meta_url:
             $ref: "#/components/schemas/pool_info/items/properties/meta_url"
           meta_hash:
@@ -453,7 +453,7 @@ schemas:
               - type: number
               - type: 'null'
             description: Announced retiring epoch (nullable)
-            example: 'null'
+            example: null
           op_cert:
             anyOf:
               - type: string
@@ -547,7 +547,7 @@ schemas:
           amount:
             type: string
             description: Current delegator live stake (in number)
-            example: 64328591517480
+            example: "64328591517480"
           active_epoch_no:
             type: number
             description: Epoch number in which the delegation becomes active
@@ -654,7 +654,7 @@ schemas:
             type: string
             description: Type of update task
             enum: ["registration", "deregistration"]
-            example: registered
+            example: registration
           retiring_epoch:
             $ref: "#/components/schemas/pool_info/items/properties/retiring_epoch"
     pool_relays:
@@ -750,11 +750,11 @@ schemas:
           out_sum:
             type: string
             description: Total output value across all transactions in epoch
-            example: 15432725054364942
+            example: "15432725054364942"
           fees:
             type: string
             description: Total fees incurred by transactions in epoch
-            example: 74325855210
+            example: "74325855210"
           tx_count:
             type: number
             description: Number of transactions submitted in epoch
@@ -784,19 +784,19 @@ schemas:
               - type: string
               - type: 'null'
             description: Total active stake in epoch stake snapshot (null for pre-Shelley epochs)
-            example: 23395112387185880
+            example: "23395112387185880"
           total_rewards:
             anyOf:
               - type: string
               - type: 'null'
             description: Total rewards earned in epoch (null for pre-Shelley epochs)
-            example: 252902897534230
+            example: "252902897534230"
           avg_blk_reward:
             anyOf:
               - type: string
               - type: 'null'
             description: Average block reward for epoch (null for pre-Shelley epochs)
-            example: 660233450
+            example: "660233450"
     epoch_params:
       description: Epoch parameters (all fields nullable for pre-Shelley/Gougen epochs except first block hash)
       type: array
@@ -841,13 +841,13 @@ schemas:
               - type: string
               - type: 'null'
             description: The amount (in number) required for a deposit to register a stake address
-            example: 2000000
+            example: "2000000"
           pool_deposit:
             anyOf:
               - type: string
               - type: 'null'
             description: The amount (in number) required for a deposit to register a stake pool
-            example: 500000000
+            example: "500000000"
           max_epoch:
             anyOf:
               - type: number
@@ -911,13 +911,13 @@ schemas:
               - type: string
               - type: 'null'
             description: The minimum value of a UTxO entry
-            example: 34482
+            example: "34482"
           min_pool_cost:
             anyOf:
               - type: string
               - type: 'null'
             description: The minimum pool cost
-            example: 340000000
+            example: "340000000"
           nonce:
             anyOf:
               - type: string
@@ -933,7 +933,7 @@ schemas:
               - type: object
               - type: 'null'
             description: The per language cost model in JSON
-            example: 'null'
+            example: null
           price_mem:
             anyOf:
               - type: number
@@ -995,7 +995,7 @@ schemas:
               - type: string
               - type: 'null'
             description: The cost per UTxO size
-            example: 34482
+            example: "34482"
           pvt_motion_no_confidence:
             anyOf:
               - type: number
@@ -1246,13 +1246,13 @@ schemas:
               - type: string
               - type: 'null'
             description: Total output of the block (in number)
-            example: 92384672389
+            example: "92384672389"
           total_fees:
             anyOf:
               - type: string
               - type: 'null'
             description: Total fees of the block (in number)
-            example: 2346834
+            example: "2346834"
           num_confirmations:
             type: number
             description: Number of confirmations for the block
@@ -1373,7 +1373,7 @@ schemas:
           balance:
             type: string
             description: Sum of all UTxO values beloning to address
-            example: 10723473983
+            example: "10723473983"
           stake_address:
             anyOf:
             - $ref: "#/components/schemas/account_history/items/properties/stake_address"
@@ -1508,27 +1508,27 @@ schemas:
           total_balance:
             type: string
             description: Total balance of the account including UTxO, rewards and MIRs (in number)
-            example: 207116800428
+            example: "207116800428"
           utxo:
             type: string
             description: Total UTxO balance of the account
-            example: 162764177131
+            example: "162764177131"
           rewards:
             type: string
             description: Total rewards earned by the account
-            example: 56457728047
+            example: "56457728047"
           withdrawals:
             type: string
             description: Total rewards withdrawn by the account
-            example: 12105104750
+            example: "12105104750"
           rewards_available:
             type: string
             description: Total rewards available for withdrawal
-            example: 44352623297
+            example: "44352623297"
           deposit:
             type: string
             description: Total deposit available for withdrawal
-            example: 2000000
+            example: "2000000"
           reserves:
             type: string
             description: Total reserves MIR value of the account
@@ -1595,7 +1595,7 @@ schemas:
                 quantity:
                   type: string
                   description: Quantity of assets on the UTxO
-                  example: 1
+                  example: "1"
           is_spent:
             type: boolean
             description: True if the UTXO has been spent
@@ -1814,30 +1814,31 @@ schemas:
           total_output:
             type: string
             description: Total sum of all transaction outputs (in numbers)
-            example: 157832856
+            example: "157832856"
           fee:
             type: string
             description: Total Transaction fee (in numbers)
-            example: 172761
+            example: "172761"
           treasury_donation:
             type: string
             description: Total Donation to on-chain treasury (in numbers)
-            example: 0
+            example: "0"
           deposit:
             type: string
             description: Total Deposits included in transaction (for example, if it is registering a pool/key)
-            example: 0
+            example: "0"
           invalid_before:
             anyOf:
               - type: string
               - type: 'null'
             description: Slot before which transaction cannot be validated (if supplied, else null)
+            example: "42331172"
           invalid_after:
             anyOf:
               - type: string
               - type: 'null'
             description: Slot after which transaction cannot be validated
-            example: 42332172
+            example: "42332172"
           collateral_inputs:
             description: An array of collateral inputs needed for smart contracts in case of contract failure
             anyOf:
@@ -1901,7 +1902,7 @@ schemas:
                 value:
                   type: string
                   description: Total sum of ADA on the UTxO
-                  example: 157832856
+                  example: "157832856"
                 datum_hash:
                   anyOf:
                     - type: string
@@ -1949,7 +1950,7 @@ schemas:
                         - type: object
                         - type: 'null'
                       description: Value (json)
-                      example: 'null'
+                      example: null
                 asset_list:
                   $ref: "#/components/schemas/utxo_infos/items/properties/asset_list"
           withdrawals:
@@ -1963,7 +1964,7 @@ schemas:
                 amount:
                   type: string
                   description: Withdrawal amount (in numbers)
-                  example: 9845162
+                  example: "9845162"
                 stake_addr:
                   type: string
                   description: A Cardano staking address (reward account, bech32 encoded)
@@ -1986,7 +1987,7 @@ schemas:
                 quantity:
                   type: string
                   description: Quantity of minted assets (negative on burn)
-                  example: 1
+                  example: "1"
           metadata:
             $ref: "#/components/schemas/tx_metadata/items/properties/metadata"
           certificates:
@@ -2159,7 +2160,7 @@ schemas:
                   $ref: "#/components/schemas/proposal_list/items/properties/param_proposal"
     tx_cbor:
       description: Raw Transaction(s) in CBOR format
-      item:
+      items:
         properties:
           tx_hash:
             $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
@@ -2309,7 +2310,7 @@ schemas:
           quantity:
             type: string
             description: Asset balance on the payment address
-            example: 23
+            example: "23"
     asset_nft_address:
       description: An array of payment addresses holding the given token
       type: array
@@ -2570,7 +2571,7 @@ schemas:
               - type: string
               - type: 'null'
             description: DRep's registration deposit  in number
-            example: 500000000
+            example: "500000000"
           active:
             type: boolean
             description: Flag to show if the DRep is  (i.e. not expired)
@@ -2584,7 +2585,7 @@ schemas:
           amount:
             type: string
             description: The total amount of voting power this DRep is delegated.
-            example: 599496769641
+            example: "599496769641"
           meta_url:
             anyOf:
               - type: string
@@ -2607,7 +2608,7 @@ schemas:
           amount:
             type: string
             description: The total amount of voting power between all DReps including pre-defined roles for the epoch.
-            example: 599496769641
+            example: "599496769641"
           dreps:
             type: number
             description: The total number of DReps with vote power for the epoch.
@@ -3106,7 +3107,7 @@ schemas:
               - type: object
               - type: 'null'
             description: Data in JSON format
-            example: 'null'
+            example: null
           bytes:
             anyOf:
               - type: string
@@ -3164,7 +3165,7 @@ schemas:
                 fee:
                   type: string
                   description: The budget in fees to run a script - the fees depend on the ExUnits and the current prices
-                  example: 45282
+                  example: "45282"
                 purpose:
                   type: string
                   description: What kind of validation this redeemer is used for
@@ -3197,12 +3198,10 @@ schemas:
       type: object
       properties:
         jsonrpc:
-          format: text
           type: string
           description: Identifier for JSON-RPC 2.0 standard
           example: "2.0"
         method:
-          format: text
           type: string
           description: The Ogmios method that was called in the request
           example: "queryNetwork/tip"
