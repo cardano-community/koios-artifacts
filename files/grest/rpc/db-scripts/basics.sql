@@ -80,6 +80,15 @@ CREATE TABLE grest.genesis (
   alonzogenesis varchar
 );
 
+-- POOL_GROUPS TABLE --
+DROP TABLE IF EXISTS grest.pool_groups;
+CREATE TABLE IF grest.pool_groups (
+  pool_id_bech32 text PRIMARY KEY NOT NULL,
+  pool_group text,
+  ticker text,
+  adastat_group text,
+  balanceanalytics_group text
+);
 
 -- DROP EXISTING FUNCTIONS
 DO

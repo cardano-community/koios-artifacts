@@ -221,6 +221,8 @@ schemas:
               - type: 'null'
             description: Pool ticker
             example: AHL
+          pool_group:
+            $ref: "#/components/schemaas/pool_groups/items/properties/pool_group"
           meta_url:
             $ref: "#/components/schemas/pool_info/items/properties/meta_url"
           meta_hash:
@@ -708,6 +710,33 @@ schemas:
             $ref: "#/components/schemas/blocks/items/properties/block_height"
           block_time:
             $ref: "#/components/schemas/blocks/items/properties/block_time"
+    pool_groups:
+      description: Array of pools with their corresponding group information
+      type: array
+      items:
+        properties:
+          pool_id_bech32:
+            $ref: "#/components/schemas/pool_info/items/properties/pool_id_bech32"
+          pool_group:
+            anyOf:
+              - type: string
+              - type: 'null'
+            description: A group that the pool was identified to be associated with
+            example: IOG
+          ticker:
+            $ref: "#/components/schemas/pool_info/items/properties/meta_json/properties/ticker"
+          adastat_group:
+            anyOf:
+              - type: string
+              - type: 'null'
+            description: The pool's group identification as per adastat.net
+            example: iohk.io
+          balanceanalytics_group:
+            anyOf:
+              - type: string
+              - type: 'null'
+            description: The pool's group identification as per balanceanalytics.io
+            example: IOG
     epoch_info:
       description: Array of detailed summary for each epoch
       type: array

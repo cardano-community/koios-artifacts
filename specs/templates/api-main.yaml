@@ -1868,6 +1868,28 @@ paths:
       summary: Pool Votes
       description: List of all votes casted by a pool
       operationId: pool_votes
+  /pool_groups: #RPC
+    get:
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_pool_bech32"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_groups"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Pool Groups
+      description: List of all registered pool and their groups across sources from [pool_groups](https://github.com/cardano-community/pool_groups) repository. This is only relevant for mainnet
+      operationId: pool_groups
   /pool_metadata: #RPC
     post:
       tags:
