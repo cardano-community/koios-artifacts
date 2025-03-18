@@ -343,6 +343,9 @@ paths:
       summary: Block Transactions (Detailed Info)
       description: Get detailed information about transaction(s) for requested blocks
       operationId: block_tx_info
+      x-badges:
+        - color: red
+          label: 'Deprecated'
 
   /utxo_info: #RPC
     post:
@@ -528,6 +531,9 @@ paths:
       summary: Transaction UTxOs
       description: Get UTxO set (inputs/outputs) of transactions [DEPRECATED - Use /utxo_info instead].
       operationId: tx_utxos
+      x-badges:
+        - color: red
+          label: 'Deprecated'
 
   /address_info: #RPC
     post:
@@ -817,6 +823,9 @@ paths:
       description: >-
         Get the full rewards history (including MIR) for given stake addresses
       operationId: account_rewards
+      x-badges:
+        - color: red
+          label: 'Deprecated'
   /account_reward_history: #RPC
     post:
       tags:
@@ -955,6 +964,9 @@ paths:
       summary: Account History
       description: Get the staking history of given stake addresses (accounts)
       operationId: account_history
+      x-badges:
+        - color: red
+          label: 'Deprecated'
   /account_stake_history: #RPC
     post:
       tags:
@@ -1384,6 +1396,7 @@ paths:
       operationId: drep_updates
   /drep_history: #RPC
     get:
+      deprecated: true
       tags:
         - Governance
       parameters:
@@ -1395,7 +1408,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/drep_history"
+                $ref: "#/components/schemas/drep_voting_power_history"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -1405,8 +1418,35 @@ paths:
       summary: DReps Voting Power History
       description: History of DReps voting power against each (or requested) epoch
       operationId: drep_history
+      x-badges:
+        - color: red
+          label: 'Deprecated'
+  /drep_voting_power_history: #RPC
+    get:
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_epoch_no"
+        - $ref: "#/components/parameters/_drep_id_optional"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/drep_voting_power_history"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: DReps Voting Power History
+      description: History of DReps voting power against each (or requested) epoch
+      operationId: drep_voting_power_history
   /drep_votes: #RPC
     get:
+      deprecated: true
       tags:
         - Governance
       parameters:
@@ -1427,6 +1467,9 @@ paths:
       summary: DReps Votes
       description: List of all votes casted by requested delegated representative (DRep)
       operationId: drep_votes
+      x-badges:
+        - color: red
+          label: 'Deprecated'
   /drep_delegators: #RPC
     get:
       tags:
@@ -1577,6 +1620,26 @@ paths:
       summary: Proposal Votes
       description: List of all votes cast on specified governance action
       operationId: proposal_votes
+  /vote_list: #RPC
+    get:
+      tags:
+        - Governance      
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/vote_list"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Vote List
+      description: List of all votes posted on-chain
+      operationId: vote_list
 
   /pool_list: #RPC
     get:
@@ -1846,7 +1909,31 @@ paths:
       summary: Pool Relays
       description: A list of registered relays for all pools
       operationId: pool_relays
+  /pool_voting_power_history: #RPC
+    get:
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_epoch_no"
+        - $ref: "#/components/parameters/_pool_bech32_optional"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/drep_voting_power_history"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Pool's Voting Power History
+      description: History of Pool voting power against each (or requested) epoch
+      operationId: pool_voting_power_history
   /pool_votes: #RPC
+    deprecated: true
     get:
       tags:
         - Governance
@@ -1868,6 +1955,10 @@ paths:
       summary: Pool Votes
       description: List of all votes casted by a pool
       operationId: pool_votes
+      x-badges:
+        - color: red
+          label: 'Deprecated'
+  
   /pool_groups: #RPC
     get:
       tags:

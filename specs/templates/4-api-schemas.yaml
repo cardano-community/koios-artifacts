@@ -2725,7 +2725,7 @@ schemas:
             $ref: "#/components/schemas/drep_metadata/items/properties/meta_hash"
           meta_json:
             $ref: "#/components/schemas/drep_metadata/items/properties/meta_json"
-    drep_history:
+    drep_voting_power_history:
       description: History of DReps voting power against each (or requested) epoch
       type: array
       items:
@@ -2737,6 +2737,7 @@ schemas:
           amount:
             type: string
             description: The voting power for the DRep
+            example: "14231445553"
     drep_votes:
       description: List of all votes casted by requested delegated representative (DRep)
       type: array
@@ -2761,6 +2762,19 @@ schemas:
             $ref: "#/components/schemas/drep_metadata/items/properties/meta_url"
           meta_hash:
             $ref: "#/components/schemas/drep_metadata/items/properties/meta_hash"
+    pool_voting_power_history:
+      description: History of Pool's voting power against each (or requested) epoch
+      type: array
+      items:
+        properties:
+          pool_id_bech32:
+            $ref: "#/components/schemas/pool_info/items/properties/pool_id_bech32"
+          epoch_no:
+            $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+          amount:
+            type: string
+            description: The voting power for the pool for the epoch
+            example: "11231445553"
     pool_votes:
       description: List of all votes casted by requested pool
       type: array
@@ -2886,13 +2900,13 @@ schemas:
             description: Number of 'yes' votes casted by dreps
             example: 7
           drep_active_yes_vote_power:
-            type: number
+            type: string
             description: Power of 'yes' votes that were explicitly cast
-            example: 31231231231
+            example: "31231231231"
           drep_yes_vote_power:
-            type: number
+            type: string
             description: Power of 'yes' votes from dreps (includes explicit yes and inferred via other means)
-            example: 31146839512742
+            example: "31146839512742"
           drep_yes_pct:
             type: number
             description: Percentage of 'yes' votes from dreps
@@ -2902,13 +2916,13 @@ schemas:
             description: Number of 'no' votes casted by dreps
             example: 0
           drep_active_no_vote_power:
-            type: number
+            type: string
             description: Power of 'no' votes that were explicitly cast
-            example: 2012312393392
+            example: "2012312393392"
           drep_no_vote_power:
-            type: number
+            type: string
             description: Power of 'no' votes from dreps (includes explicit no and inferred via other means)
-            example: 20148194577715
+            example: "20148194577715"
           drep_no_pct:
             type: number
             description: Percentage of 'no' votes from dreps
@@ -2918,29 +2932,29 @@ schemas:
             description: Number of active 'abstain' votes from dreps
             example: 5
           drep_active_abstain_vote_power:
-            type: number
+            type: string
             description: Power of 'abstain' votes that were explicitly cast
-            example: 123321123321
+            example: "123321123321"
           drep_always_no_confidence_vote_power:
-            type: number
+            type: string
             description: Power of votes delegated to 'always_no_confidence' predefined drep
-            example: 9999
+            example: "9999"
           drep_always_abstain_vote_power:
-            type: number
+            type: string
             description: Power of votes delegated to 'always_abstain' predefined drep
-            example: 87654321
+            example: "87654321"
           pool_yes_votes_cast:
             type: number
             description: Number of 'yes' votes casted by pools
             example: 1
           pool_active_yes_vote_power:
-            type: number
+            type: string
             description: Power of 'yes' pool votes that were explicitly cast
-            example: 123123123
+            example: "123123123"
           pool_yes_vote_power:
-            type: number
+            type: string
             description: Power of 'yes' votes from pools (includes explicit yes and inferred via other means)
-            example: 5234000000
+            example: "5234000000"
           pool_yes_pct:
             type: number
             description: Percentage of 'yes' votes from pools
@@ -2950,12 +2964,13 @@ schemas:
             description: Number of 'no' votes casted by pools
             example: 0
           pool_active_no_vote_power:
-            type: number
+            type: string
             description: Power of 'no' pool votes that were explicitly cast
+            example: "0"
           pool_no_vote_power:
-            type: number
+            type: string
             description: Power of 'no' votes from pools (includes explicit no and inferred via other means)
-            example: 0
+            example: "0"
           pool_no_pct:
             type: number
             description: Percentage of 'no' votes from pools
@@ -2965,25 +2980,25 @@ schemas:
             description: Percentage of 'abstain' votes from pools
             example: 0
           pool_active_abstain_vote_power:
-            type: number
+            type: string
             description: Power of 'abstain' pool votes that were explicitly cast
-            example: 12312312312
+            example: "12312312312"
           pool_passive_always_abstain_votes_assigned:
             type: number
             description: Number of non-voting SPO pool reward addresses delegating to 'always_abstain' drep
             example: 1
           pool_passive_always_abstain_vote_power:
-            type: number
+            type: string
             description: Combined power of non-voting SPO pool votes where reward addresses delegate to 'always_abstain'
-            example: 12312312
+            example: "12312312"
           pool_passive_always_no_confidence_votes_assigned:
             type: number
             description: Number of non-voting SPO pool reward addresses delegating to 'always_no_confidence' drep
             example: 10
           pool_passive_always_no_confidence_vote_power:
-            type: number
+            type: string
             description: Combined power of non-voting SPO pool votes where reward addresses delegate to 'always_no_confidence'
-            example: 321321
+            example: "321321"
           committee_yes_votes_cast:
             type: number
             description: Number of 'yes' votes casted by committee
@@ -3031,6 +3046,41 @@ schemas:
             $ref: "#/components/schemas/drep_metadata/items/properties/meta_url"
           meta_hash:
             $ref: "#/components/schemas/drep_metadata/items/properties/meta_hash"
+    vote_list:
+      type: array
+      description: List of all votes cast on specified governance action
+      items:
+        properties:
+          vote_tx_hash:
+            type: string
+            description: The transaction hash where-in vote was posted
+            example: e239058473ab5ab1f5829b9058a93cbd0daaf72f9252cc16b34925cd87b37d35
+          voter_role:
+            $ref: "#/components/schemas/proposal_votes/items/properties/voter_role"
+          voter_id:
+            $ref: "#/components/schemas/proposal_votes/items/properties/voter_id"
+          proposal_id:
+            $ref: "#/components/schemas/proposal_list/items/properties/proposal_id"
+          proposal_tx_hash:
+            $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+          proposal_index:
+            $ref: "#/components/schemas/proposal_list/items/properties/proposal_index"
+          proposal_type:
+            $ref: "#/components/schemas/proposal_list/items/properties/proposal_type"
+          epoch_no:
+            $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+          block_height:
+            $ref: "#/components/schemas/blocks/items/properties/block_height"
+          block_time:
+            $ref: "#/components/schemas/blocks/items/properties/block_time"
+          vote:
+            $ref: "#/components/schemas/drep_votes/items/properties/vote"
+          meta_url:
+            $ref: "#/components/schemas/drep_metadata/items/properties/meta_url"
+          meta_hash:
+            $ref: "#/components/schemas/drep_metadata/items/properties/meta_hash"
+          meta_json:
+            $ref: "#/components/schemas/drep_metadata/items/properties/meta_json"
     committee_info:
       description: Current governance committee
       type: object

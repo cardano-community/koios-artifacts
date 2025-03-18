@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION grest.voter_proposal_list(_voter_id text)
+CREATE OR REPLACE FUNCTION grest.voter_proposal_list(_voter_id text DEFAULT NULL)
 RETURNS TABLE (
   block_time integer,
   proposal_id text,
@@ -50,7 +50,7 @@ BEGIN
         WHEN _spo_id IS NOT NULL THEN pool_voter = _spo_id
         WHEN _committee_member_id IS NOT NULL THEN committee_voter = _committee_member_id
       ELSE
-        FALSE
+        TRUE
       END
   ) AS tmp;
 
