@@ -6,7 +6,7 @@ RETURNS TABLE (
 LANGUAGE sql STABLE
 AS $$
   SELECT DISTINCT ON (ph.id)
-    b32_encode('pool', ph.hash_raw::text)::varchar AS pool_id_bech32,
+    cardano.bech32_encode('pool', ph.hash_raw)::varchar AS pool_id_bech32,
     JSONB_AGG(JSONB_BUILD_OBJECT (
         'ipv4', pr.ipv4,
         'ipv6', pr.ipv6,

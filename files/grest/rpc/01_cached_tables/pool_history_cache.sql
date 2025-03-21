@@ -40,7 +40,7 @@ DECLARE
   _pool_ids bigint [];
 BEGIN
   _pool_ids := (SELECT ARRAY_AGG(id) from pool_hash ph where ph.hash_raw = ANY(
-    SELECT DECODE(b32_decode(pool),'hex')
+    SELECT cardano.bech32_decode_data(pool)
     FROM UNNEST(_pool_bech32) AS pool)
   );
 

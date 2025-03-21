@@ -27,9 +27,9 @@ LANGUAGE plpgsql STABLE
 AS $$
 BEGIN
   IF LENGTH(_cc_hot) = 60 THEN
-    RETURN SUBSTRING(b32_decode(_cc_hot) from 3);
+    RETURN SUBSTRING(ENCODE(cardano.bech32_decode_data(_cc_hot),'hex') from 3);
   ELSE
-    RETURN b32_decode(_cc_hot);
+    RETURN ENCODE(cardano.bech32_decode_data(_cc_hot),'hex');
   END IF;
 END;
 $$;
@@ -40,7 +40,7 @@ LANGUAGE plpgsql STABLE
 AS $$
 BEGIN
   IF LENGTH(_cc_hot) = 60 THEN
-    RETURN SUBSTRING(b32_decode(_cc_hot) from 2 for 1) = '3';
+    RETURN SUBSTRING(ENCODE(cardano.bech32_decode_data(_cc_hot),'hex') from 2 for 1) = '3';
   ELSE
     RETURN STARTS_WITH(_cc_hot, 'cc_hot_script');
   END IF;
@@ -54,9 +54,9 @@ AS $$
 BEGIN
   IF _raw IS NULL THEN RETURN NULL; END IF;
   IF _is_script THEN
-    RETURN b32_encode('cc_hot', ('\x03'::bytea || _raw)::text);
+    RETURN cardano.bech32_encode('cc_hot', ('\x03'::bytea || _raw));
   ELSE
-    RETURN b32_encode('cc_hot', ('\x02'::bytea || _raw)::text);
+    RETURN cardano.bech32_encode('cc_hot', ('\x02'::bytea || _raw));
   END IF;
 END;
 $$;
@@ -67,9 +67,9 @@ LANGUAGE plpgsql STABLE
 AS $$
 BEGIN
   IF LENGTH(_cc_cold) = 61 THEN
-    RETURN SUBSTRING(b32_decode(_cc_cold) from 3);
+    RETURN SUBSTRING(ENCODE(cardano.bech32_decode_data(_cc_cold),'hex') from 3);
   ELSE
-    RETURN b32_decode(_cc_cold);
+    RETURN ENCODE(cardano.bech32_decode_data(_cc_cold),'hex');
   END IF;
 END;
 $$;
@@ -80,7 +80,7 @@ LANGUAGE plpgsql STABLE
 AS $$
 BEGIN
   IF LENGTH(_cc_cold) = 61 THEN
-    RETURN SUBSTRING(b32_decode(_cc_cold) from 2 for 1) = '3';
+    RETURN SUBSTRING(ENCODE(cardano.bech32_decode_data(_cc_cold),'hex') from 2 for 1) = '3';
   ELSE
     RETURN STARTS_WITH(_cc_cold, 'cc_cold_script');
   END IF;
@@ -94,9 +94,9 @@ AS $$
 BEGIN
   IF _raw IS NULL THEN RETURN NULL; END IF;
   IF _is_script THEN
-    RETURN b32_encode('cc_cold', ('\x13'::bytea || _raw)::text);
+    RETURN cardano.bech32_encode('cc_cold', ('\x13'::bytea || _raw));
   ELSE
-    RETURN b32_encode('cc_cold', ('\x12'::bytea || _raw)::text);
+    RETURN cardano.bech32_encode('cc_cold', ('\x12'::bytea || _raw));
   END IF;
 END;
 $$;
@@ -107,9 +107,9 @@ LANGUAGE plpgsql STABLE
 AS $$
 BEGIN
   IF LENGTH(_drep_id) = 58 THEN
-    RETURN SUBSTRING(b32_decode(_drep_id) from 3);
+    RETURN SUBSTRING(ENCODE(cardano.bech32_decode_data(_drep_id),'hex') from 3);
   ELSE
-    RETURN b32_decode(_drep_id);
+    RETURN ENCODE(cardano.bech32_decode_data(_drep_id),'hex');
   END IF;
 END;
 $$;
@@ -120,7 +120,7 @@ LANGUAGE plpgsql STABLE
 AS $$
 BEGIN
   IF LENGTH(_drep_id) = 58 THEN
-    RETURN SUBSTRING(b32_decode(_drep_id) from 2 for 1) = '3';
+    RETURN SUBSTRING(ENCODE(cardano.bech32_decode_data(_drep_id),'hex') from 2 for 1) = '3';
   ELSE
     RETURN STARTS_WITH(_drep_id, 'drep_script');
   END IF;
@@ -134,9 +134,9 @@ AS $$
 BEGIN
   IF _raw IS NULL THEN RETURN NULL; END IF;
   IF _is_script THEN
-    RETURN b32_encode('drep', ('\x23'::bytea || _raw)::text);
+    RETURN cardano.bech32_encode('drep', ('\x23'::bytea || _raw));
   ELSE
-    RETURN b32_encode('drep', ('\x22'::bytea || _raw)::text);
+    RETURN cardano.bech32_encode('drep', ('\x22'::bytea || _raw));
   END IF;
 END;
 $$;
@@ -148,7 +148,7 @@ AS $$
 DECLARE
   proposal_id_hex text;
 BEGIN
-  SELECT INTO proposal_id_hex b32_decode(_proposal_id);
+  SELECT INTO proposal_id_hex ENCODE(cardano.bech32_decode_data(_proposal_id),'hex');
   RETURN ARRAY[LEFT(proposal_id_hex, 64), ('x' || RIGHT(proposal_id_hex, -64))::bit(8)::int::text];
 END;
 $$;
@@ -158,7 +158,7 @@ RETURNS text
 LANGUAGE plpgsql STABLE
 AS $$
 BEGIN
-  RETURN b32_encode('gov_action', (_tx_hash || DECODE(LPAD(TO_HEX(_index), 2, '0'), 'hex'))::text);
+  RETURN cardano.bech32_encode('gov_action', (_tx_hash || DECODE(LPAD(TO_HEX(_index), 2, '0'), 'hex')));
 END;
 $$;
 

@@ -442,7 +442,7 @@ BEGIN
               'type', 'pool_delegation',
               'info', JSONB_BUILD_OBJECT(
                 'stake_address', grest.cip5_hex_to_stake_addr(sa.hash_raw),
-                'pool_id_bech32', b32_encode('pool', ph.hash_raw::text),
+                'pool_id_bech32', cardano.bech32_encode('pool', ph.hash_raw),
                 'pool_id_hex', ENCODE(ph.hash_raw, 'hex')
               )
             ) AS data
@@ -525,7 +525,7 @@ BEGIN
               'index', pr.cert_index,
               'type', 'pool_retire',
               'info', JSONB_BUILD_OBJECT(
-                'pool_id_bech32', b32_encode('pool', ph.hash_raw::text),
+                'pool_id_bech32', cardano.bech32_encode('pool', ph.hash_raw),
                 'pool_id_hex', ENCODE(ph.hash_raw, 'hex'),
                 'retiring epoch', pr.retiring_epoch
               )
@@ -543,7 +543,7 @@ BEGIN
               'index', pu.cert_index,
               'type', 'pool_update',
               'info', JSONB_BUILD_OBJECT(
-                'pool_id_bech32', b32_encode('pool', ph.hash_raw::text),
+                'pool_id_bech32', cardano.bech32_encode('pool', ph.hash_raw),
                 'pool_id_hex', ENCODE(ph.hash_raw, 'hex'),
                 'active_epoch_no', pu.active_epoch_no,
                 'vrf_key_hash', ENCODE(pu.vrf_key_hash, 'hex'),
@@ -852,7 +852,7 @@ BEGIN
               'proposal_tx_hash', ENCODE(tx.hash, 'hex'),
               'proposal_index', gap.index,
               'voter_role', vp.voter_role,
-              'voter', COALESCE(grest.cip129_hex_to_drep_id(dh.raw, dh.has_script), dh.view::text, grest.cip129_hex_to_cc_hot(ch.raw, ch.has_script), b32_encode('pool', ph.hash_raw::text)),
+              'voter', COALESCE(grest.cip129_hex_to_drep_id(dh.raw, dh.has_script), dh.view::text, grest.cip129_hex_to_cc_hot(ch.raw, ch.has_script), cardano.bech32_encode('pool', ph.hash_raw)),
               'voter_hex', COALESCE(ENCODE(ch.raw, 'hex'), ENCODE(dh.raw, 'hex'), ENCODE(ph.hash_raw, 'hex')),
               'vote', vp.vote
             ) AS data

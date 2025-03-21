@@ -29,20 +29,13 @@ BEGIN
       SELECT DISTINCT ON (COALESCE(dh.raw, ph.hash_raw, ch.raw))
         EXTRACT(EPOCH FROM vote_block.time)::integer AS block_time,
         vp.voter_role::text,
-        CASE
-          WHEN dh.raw IS NOT NULL THEN grest.cip129_hex_to_drep_id(dh.raw, dh.has_script)
-          WHEN ph.id IS NOT NULL THEN b32_encode('pool', ph.hash_raw::text)
-          WHEN ch.raw IS NOT NULL THEN grest.cip129_hex_to_cc_hot(ch.raw, ch.has_script)
-        ELSE
-          '' -- shouldn't happen
-        END,
+        COALESCE(
+          grest.cip129_hex_to_drep_id(dh.raw, dh.has_script),
+          cardano.bech32_encode('pool', ph.hash_raw),
+          grest.cip129_hex_to_cc_hot(ch.raw, ch.has_script)
+        ),
         COALESCE(ENCODE(ch.raw, 'hex'), ENCODE(dh.raw, 'hex'), ENCODE(ph.hash_raw, 'hex')) AS voter_hex,
-        CASE
-          WHEN dh.raw IS NOT NULL THEN dh.has_script
-          WHEN ch.raw IS NOT NULL THEN ch.has_script
-        ELSE
-          FALSE
-        END AS voter_has_script,
+        COALESCE(dh.has_script, ch.has_script, FALSE) AS voter_has_script,
         vp.vote,
         va.url,
         ENCODE(va.data_hash, 'hex')

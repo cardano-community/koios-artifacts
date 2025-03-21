@@ -8,7 +8,7 @@ info:
   license:
     name: Creative Commons Attribution 4.0 International
     url: https://github.com/cardano-community/koios-artifacts/blob/main/LICENSE
-  version: v1.3.1
+  version: v1.3.2
   description: |
     Koios is best described as a Decentralized and Elastic RESTful query layer for exploring data on Cardano blockchain to consume within applications/wallets/explorers/etc. This page not only provides an OpenAPI Spec for live implementation, but also ability to execute live demo from client browser against each endpoint with pre-filled examples.
 
@@ -488,6 +488,9 @@ paths:
       summary: Block Transactions (Detailed Info)
       description: Get detailed information about transaction(s) for requested blocks
       operationId: block_tx_info
+      x-badges:
+        - color: red
+          label: 'Deprecated'
 
   /utxo_info: #RPC
     post:
@@ -673,6 +676,9 @@ paths:
       summary: Transaction UTxOs
       description: Get UTxO set (inputs/outputs) of transactions [DEPRECATED - Use /utxo_info instead].
       operationId: tx_utxos
+      x-badges:
+        - color: red
+          label: 'Deprecated'
 
   /address_info: #RPC
     post:
@@ -718,6 +724,28 @@ paths:
       summary: Address UTXOs
       description: Get UTxO set for given addresses
       operationId: address_utxos
+  /address_outputs: #RPC
+    post:
+      tags:
+        - Address
+      requestBody:
+        $ref: "#/components/requestBodies/address_txs"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/address_outputs"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Address Outputs
+      description: Basic transaction output info for given addresses
+      operationId: address_outputs
   /credential_utxos: #RPC
     post:
       tags:
@@ -918,6 +946,7 @@ paths:
       operationId: account_txs
   /account_rewards: #RPC
     post:
+      deprecated: true
       tags:
         - Stake Account
       requestBody:
@@ -939,6 +968,32 @@ paths:
       description: >-
         Get the full rewards history (including MIR) for given stake addresses
       operationId: account_rewards
+      x-badges:
+        - color: red
+          label: 'Deprecated'
+  /account_reward_history: #RPC
+    post:
+      tags:
+        - Stake Account
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account_reward_history"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Account Reward History
+      description: >-
+        Get the full rewards history (including MIR) for given stake addresses
+      operationId: account_reward_history
   /account_updates: #RPC
     post:
       tags:
@@ -963,6 +1018,30 @@ paths:
         Get the account updates (registration, deregistration, delegation and
         withdrawals) for given stake addresses
       operationId: account_updates
+  /account_update_history: #RPC
+    post:
+      tags:
+        - Stake Account
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account_update_history"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Account Update History
+      description: >-
+        Get the account updates (registration, deregistration, delegation and
+        withdrawals) for given stake addresses
+      operationId: account_update_history
   /account_addresses: #RPC
     post:
       tags:
@@ -1009,10 +1088,11 @@ paths:
       operationId: account_assets
   /account_history: #RPC
     post:
+      deprecated: true
       tags:
         - Stake Account
       requestBody:
-        $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
+        $ref: "#/components/requestBodies/stake_addresses"
       responses:
         "200":
           description: Success!!
@@ -1029,6 +1109,31 @@ paths:
       summary: Account History
       description: Get the staking history of given stake addresses (accounts)
       operationId: account_history
+      x-badges:
+        - color: red
+          label: 'Deprecated'
+  /account_stake_history: #RPC
+    post:
+      tags:
+        - Stake Account
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account_stake_history"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Account Stake History
+      description: Get the staking history of given stake addresses (accounts)
+      operationId: account_stake_history
 
   /asset_list: #RPC
     get:
@@ -1436,6 +1541,7 @@ paths:
       operationId: drep_updates
   /drep_history: #RPC
     get:
+      deprecated: true
       tags:
         - Governance
       parameters:
@@ -1447,7 +1553,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/drep_history"
+                $ref: "#/components/schemas/drep_voting_power_history"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -1457,8 +1563,35 @@ paths:
       summary: DReps Voting Power History
       description: History of DReps voting power against each (or requested) epoch
       operationId: drep_history
+      x-badges:
+        - color: red
+          label: 'Deprecated'
+  /drep_voting_power_history: #RPC
+    get:
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_epoch_no"
+        - $ref: "#/components/parameters/_drep_id_optional"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/drep_voting_power_history"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: DReps Voting Power History
+      description: History of DReps voting power against each (or requested) epoch
+      operationId: drep_voting_power_history
   /drep_votes: #RPC
     get:
+      deprecated: true
       tags:
         - Governance
       parameters:
@@ -1479,6 +1612,9 @@ paths:
       summary: DReps Votes
       description: List of all votes casted by requested delegated representative (DRep)
       operationId: drep_votes
+      x-badges:
+        - color: red
+          label: 'Deprecated'
   /drep_delegators: #RPC
     get:
       tags:
@@ -1629,6 +1765,26 @@ paths:
       summary: Proposal Votes
       description: List of all votes cast on specified governance action
       operationId: proposal_votes
+  /vote_list: #RPC
+    get:
+      tags:
+        - Governance      
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/vote_list"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Vote List
+      description: List of all votes posted on-chain
+      operationId: vote_list
 
   /pool_list: #RPC
     get:
@@ -1764,6 +1920,29 @@ paths:
         Return information about blocks minted by a given pool for all epochs
         (or _epoch_no if provided)
       operationId: pool_blocks
+  /pool_owner_history: #RPC
+    post:
+      tags:
+        - Pool
+      requestBody:
+        $ref: "#/components/requestBodies/pool_ids"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_owner_history"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Pool Owner History
+      description: >-
+        Return information about pool owner's historical stake and their promised pledge to their pools
+      operationId: pool_owner_history
   /pool_history: #RPC
     get:
       tags:
@@ -1875,8 +2054,32 @@ paths:
       summary: Pool Relays
       description: A list of registered relays for all pools
       operationId: pool_relays
+  /pool_voting_power_history: #RPC
+    get:
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_epoch_no"
+        - $ref: "#/components/parameters/_pool_bech32_optional"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_voting_power_history"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Pool's Voting Power History
+      description: History of Pool voting power against each (or requested) epoch
+      operationId: pool_voting_power_history
   /pool_votes: #RPC
     get:
+      deprecated: true
       tags:
         - Governance
       parameters:
@@ -1897,6 +2100,30 @@ paths:
       summary: Pool Votes
       description: List of all votes casted by a pool
       operationId: pool_votes
+      x-badges:
+        - color: red
+          label: 'Deprecated'
+  
+  /pool_groups: #RPC
+    get:
+      tags:
+        - Pool
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_groups"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Pool Groups
+      description: List of all registered pool and their groups across sources from [pool_groups](https://github.com/cardano-community/pool_groups) repository. This is only relevant for mainnet
+      operationId: pool_groups
   /pool_metadata: #RPC
     post:
       tags:
@@ -1919,6 +2146,26 @@ paths:
       summary: Pool Metadata
       description: Metadata (on & off-chain) for all pools
       operationId: pool_metadata
+  /pool_calidus_keys: #RPC
+    get:
+      tags:
+        - Pool
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_calidus_keys"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Pool Calidus Keys
+      description: List of valid calidus keys for all pools
+      operationId: pool_calidus_keys
 
   /script_info: #RPC
     post:
@@ -2165,8 +2412,8 @@ components:
         type: string
       example: "drep1s9qaseg7qyum807fcv0hdky9gv0c89tn98t4urjn5ewz57dml0r"
       in: query
-      required: true
-      allowEmptyValue: false
+      required: false
+      allowEmptyValue: true
     _drep_id:
       deprecated: false
       name: _drep_id
@@ -2287,7 +2534,6 @@ components:
             type: object
             properties:
               _block_hashes:
-                format: text
                 type: array
                 items:
                   $ref: "#/components/schemas/blocks/items/properties/hash"
@@ -2306,7 +2552,6 @@ components:
             type: object
             properties:
               _block_hashes:
-                format: text
                 type: array
                 items:
                   $ref: "#/components/schemas/blocks/items/properties/hash"
@@ -2360,7 +2605,6 @@ components:
             type: object
             properties:
               _addresses:
-                format: text
                 type: array
                 items:
                   type: string
@@ -2379,7 +2623,6 @@ components:
             type: object
             properties:
               _addresses:
-                format: text
                 type: array
                 items:
                   type: string
@@ -2403,7 +2646,6 @@ components:
             type: object
             properties:
               _addresses:
-                format: text
                 type: array
                 items:
                   type: string
@@ -2427,7 +2669,6 @@ components:
             type: object
             properties:
               _stake_addresses:
-                format: text
                 type: array
                 items:
                   type: string
@@ -2451,7 +2692,6 @@ components:
             type: object
             properties:
               _stake_addresses:
-                format: text
                 type: array
                 items:
                   type: string
@@ -2480,7 +2720,6 @@ components:
             type: object
             properties:
               _stake_addresses:
-                format: text
                 type: array
                 items:
                   type: string
@@ -2504,7 +2743,6 @@ components:
             type: object
             properties:
               _stake_addresses:
-                format: text
                 type: array
                 items:
                   type: string
@@ -2523,7 +2761,6 @@ components:
             type: object
             properties:
               _payment_credentials:
-                format: text
                 type: array
                 items:
                   type: string
@@ -2547,7 +2784,6 @@ components:
             type: object
             properties:
               _payment_credentials:
-                format: text
                 type: array
                 items:
                   type: string
@@ -2571,7 +2807,6 @@ components:
             type: object
             properties:
               _tx_hashes:
-                format: text
                 type: array
                 items:
                   type: string
@@ -2590,7 +2825,6 @@ components:
             type: object
             properties:
               _tx_hashes:
-                format: text
                 type: array
                 items:
                   type: string
@@ -2656,7 +2890,6 @@ components:
             type: object
             properties:
               _pool_bech32_ids:
-                format: text
                 type: array
                 items:
                   type: string
@@ -2674,7 +2907,6 @@ components:
             type: object
             properties:
               _pool_bech32_ids:
-                format: text
                 type: array
                 items:
                   type: string
@@ -2692,7 +2924,6 @@ components:
             type: object
             properties:
               _script_hashes:
-                format: text
                 type: array
                 items:
                   type: string
@@ -2709,7 +2940,6 @@ components:
             type: object
             properties:
               _datum_hashes:
-                format: text
                 type: array
                 items:
                   type: string
@@ -2728,7 +2958,6 @@ components:
             type: object
             properties:
               _asset_list:
-                format: text
                 type: array
                 description: Array of array of policy ID and asset names (hex)
                 items:
@@ -2749,7 +2978,6 @@ components:
             type: object
             properties:
               _asset_list:
-                format: text
                 type: array
                 description: Array of array of policy ID and asset names (hex)
                 items:
@@ -2775,7 +3003,6 @@ components:
             type: object
             properties:
               _drep_ids:
-                format: text
                 type: array
                 descriptions: Array of DRep IDs in bech32 format
                 items:
@@ -2793,7 +3020,6 @@ components:
             type: object
             properties:
               _utxo_refs:
-                format: text
                 type: array
                 items:
                   type: string
@@ -2818,12 +3044,10 @@ components:
             type: object
             properties:
               jsonrpc:
-                format: text
                 type: string
                 description: Identifier for JSON-RPC 2.0 standard
                 example: "2.0"
               method:
-                format: text
                 type: string
                 description: The Ogmios method to be called (see more details [here](#tag--Ogmios)) or browse examples tab
                 enum: ["queryNetwork/blockHeight","queryNetwork/genesisConfiguration","queryNetwork/startTime","queryNetwork/tip","queryLedgerState/epoch","queryLedgerState/eraStart","queryLedgerState/eraSummaries","queryLedgerState/liveStakeDistribution","queryLedgerState/protocolParameters","queryLedgerState/proposedProtocolParameters","queryLedgerState/stakePools","submitTransaction","evaluateTransaction"]
@@ -2894,7 +3118,10 @@ components:
           epoch_slot:
             $ref: "#/components/schemas/blocks/items/properties/epoch_slot"
           block_no:
-            $ref: "#/components/schemas/blocks/items/properties/block_height"
+            deprecated: true
+            type: number
+            description: DEPRECATED!! Use Block height instead
+            example: 1794506
           block_time:
             $ref: "#/components/schemas/blocks/items/properties/block_time"
     genesis:
@@ -3094,11 +3321,13 @@ components:
           relays:
             $ref: "#/components/schemas/pool_info/items/properties/relays"
           ticker:
-            type:
-              - string
-              - 'null'
+            anyOf:
+              - type: string
+              - type: 'null'
             description: Pool ticker
             example: AHL
+          pool_group:
+            $ref: "#/components/schemas/pool_groups/items/properties/pool_group"
           meta_url:
             $ref: "#/components/schemas/pool_info/items/properties/meta_url"
           meta_hash:
@@ -3122,9 +3351,9 @@ components:
           active_stake:
             $ref: "#/components/schemas/pool_info/items/properties/active_stake"
           active_stake_pct:
-            type:
-            - number
-            - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: Active stake for the pool, expressed as a percentage of total active stake on network
             example: 13.512182543475783
           saturation_pct:
@@ -3132,9 +3361,9 @@ components:
             description: Saturation percentage of a pool at the time of snapshot (2 decimals)
             example: 45.32
           block_cnt:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: Number of blocks pool created in that epoch
             example: 14
           delegator_cnt:
@@ -3158,15 +3387,33 @@ components:
             description: Total amount of rewards earned by delegators in that epoch (in numbers)
             example: "123456789123"
           member_rewards:
-            type:
-            - string
-            - 'null'
+            anyOf:
+              - type: string
+              - type: 'null'
             description: Total amount of rewards earned by members (delegator - owner) in that epoch (in numbers)
             example: "123456780123"
           epoch_ros:
             type: number
             description: Annualized ROS (return on staking) for delegators for this epoch
             example: 3.000340466
+    pool_owner_history:
+      description: Array of pool owner's stake history
+      type: array
+      items:
+        type: object
+        properties:
+          pool_id_bech32:
+            $ref: "#/components/schemas/pool_info/items/properties/pool_id_bech32"
+          stake_address:
+            type: string
+            description: Individual Stake account registered as (one of the) pool owner(s)
+            example: stake1uy6yzwsxxc28lfms0qmpxvyz9a7y770rtcqx9y96m42cttqwvp4m5
+          declared_pledge:
+            $ref: "#/components/schemas/pool_info/items/properties/pledge"
+          epoch:
+            $ref: "#/components/schemas/pool_history_info/items/properties/epoch_no"
+          active_stake:
+            $ref: "#/components/schemas/pool_info/items/properties/active_stake"
     pool_info:
       description: Array of pool information
       type: array
@@ -3184,51 +3431,51 @@ components:
           active_epoch_no:
             $ref: "#/components/schemas/pool_updates/items/properties/active_epoch_no"
           vrf_key_hash:
-            type:
-              - string
-              - 'null'
+            anyOf:
+              - type: string
+              - type: 'null'
             description: Pool VRF key hash
             example: 25efdad1bc12944d38e4e3c26c43565bec84973a812737b163b289e87d0d5ed3
           margin:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: Margin (decimal format)
             example: 0.1
           fixed_cost:
-            type:
-              - string
-              - 'null'
+            anyOf:
+              - type: string
+              - type: 'null'
             description: Pool fixed cost per epoch
             example: "500000000"
           pledge:
-            type:
-              - string
-              - 'null'
+            anyOf:
+              - type: string
+              - type: 'null'
             description: Pool pledge in number
             example: "64000000000000"
           deposit:
-            type:
-              - string
-              - 'null'
+            anyOf:
+              - type: string
+              - type: 'null'
             description: Pool's registration deposit in number
             example: "500000000"
           reward_addr:
-            type:
-              - string
-              - 'null'
+            anyOf:
+              - type: string
+              - type: 'null'
             description: Pool reward address
             example: stake1uy6yzwsxxc28lfms0qmpxvyz9a7y770rtcqx9y96m42cttqwvp4m5
           reward_addr_delegated_drep:
-            type:
-              - 'null'
-              - string
+            anyOf:
+              - type: string
+              - type: 'null'
             description: Reward address' current delegation status to DRep ID in CIP-129 Bech32 format
             example: drep1yfhyq6tztjksqqpd5lglc3zr2tn8vylgjh9xzz7n2p4l4lgk3qam3
           owners:
-            type:
-              - array
-              - 'null'
+            anyOf:
+              - type: array
+              - type: 'null'
             items:
               type: string
               description: Pool (co)owner address
@@ -3239,51 +3486,51 @@ components:
               type: object
               properties:
                 dns:
-                  type:
-                    - string
-                    - 'null'
+                  anyOf:
+                    - type: string
+                    - type: 'null'
                   description: DNS name of the relay (nullable)
                   example: relays-new.cardano-mainnet.iohk.io
                 srv:
-                  type:
-                    - string
-                    - 'null'
+                  anyOf:
+                    - type: string
+                    - type: 'null'
                   description: DNS service name of the relay (nullable)
                   example: biostakingpool3.hopto.org
                 ipv4:
-                  type:
-                    - string
-                    - 'null'
+                  anyOf:
+                    - type: string
+                    - type: 'null'
                   description: IPv4 address of the relay (nullable)
                   example: "54.220.20.40"
                 ipv6:
-                  type:
-                    - string
-                    - 'null'
+                  anyOf:
+                    - type: string
+                    - type: 'null'
                   description: IPv6 address of the relay (nullable)
                   example: 2604:ed40:1000:1711:6082:78ff:fe0c:ebf
                 port:
-                  type:
-                    - number
-                    - 'null'
+                  anyOf:
+                    - type: number
+                    - type: 'null'
                   description: Port number of the relay (nullable)
                   example: 6000
           meta_url:
-            type:
-              - string
-              - 'null'
+            anyOf:
+              - type: string
+              - type: 'null'
             description: Pool metadata URL
             example: https://pools.iohk.io/IOGP.json
           meta_hash:
-            type:
-              - string
-              - 'null'
+            anyOf:
+              - type: string
+              - type: 'null'
             description: Pool metadata hash
             example: 37eb004c0dd8a221ac3598ca1c6d6257fb5207ae9857b7c163ae0f39259d6cc0
           meta_json:
-            type:
-              - object
-              - 'null'
+            anyOf:
+              - type: object
+              - type: 'null'
             properties:
               name:
                 type: string
@@ -3307,51 +3554,51 @@ components:
             enum: ["registered", "retiring", "retired"]
             example: registered
           retiring_epoch:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: Announced retiring epoch (nullable)
-            example: 'null'
+            example: null
           op_cert:
-            type:
-              - string
-              - 'null'
+            anyOf:
+              - type: string
+              - type: 'null'
             description: Pool latest operational certificate hash
             example: 37eb004c0dd8a221ac3598ca1c6d6257fb5207ae9857b7c163ae0f39259d6cc0
           op_cert_counter:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: Pool latest operational certificate counter value
             example: 8
           active_stake:
-            type:
-              - string
-              - 'null'
+            anyOf:
+              - type: string
+              - type: 'null'
             description: Amount of delegated stake to this pool at the time of epoch snapshot
             example: "64328627680963"
           sigma:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: Pool relative active stake share
             example: 0.0034839235
           block_count:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: Total pool blocks on chain
             example: 4509
           live_pledge:
-            type:
-              - string
-              - 'null'
+            anyOf:
+              - type: string
+              - type: 'null'
             description: Summary of account balance for all pool owner's
             example: "64328594406327"
           live_stake:
-            type:
-              - string
-              - 'null'
+            anyOf:
+              - type: string
+              - type: 'null'
             description: Pool live stake
             example: "64328627680963"
           live_delegators:
@@ -3359,15 +3606,15 @@ components:
             description: Pool live delegator count
             example: 5
           live_saturation:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: Pool live saturation (decimal format)
             example: 94.52
           voting_power:
-            type:
-              - string
-              - 'null'
+            anyOf:
+              - type: string
+              - type: 'null'
             description: Current voting power (lovelaces) of this stake pool
             example: "123456789"
     pool_snapshot:
@@ -3405,7 +3652,7 @@ components:
           amount:
             type: string
             description: Current delegator live stake (in number)
-            example: 64328591517480
+            example: "64328591517480"
           active_epoch_no:
             type: number
             description: Epoch number in which the delegation becomes active
@@ -3436,9 +3683,9 @@ components:
             $ref: "#/components/schemas/pool_updates/items/properties/active_epoch_no"
     pool_delegators_history:
       description: Array of pool delegators (historical)
-      type:
-        - array
-        - 'null'
+      anyOf:
+        - type: array
+        - type: 'null'
       items:
         type: object
         properties:
@@ -3483,9 +3730,9 @@ components:
           pool_id_hex:
             $ref: "#/components/schemas/pool_info/items/properties/pool_id_hex"
           active_epoch_no:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: Epoch number in which the update becomes active
             example: 324
           vrf_key_hash:
@@ -3512,7 +3759,7 @@ components:
             type: string
             description: Type of update task
             enum: ["registration", "deregistration"]
-            example: registered
+            example: registration
           retiring_epoch:
             $ref: "#/components/schemas/pool_info/items/properties/retiring_epoch"
     pool_relays:
@@ -3539,6 +3786,62 @@ components:
             $ref: "#/components/schemas/pool_info/items/properties/meta_hash"
           meta_json:
             $ref: "#/components/schemas/pool_info/items/properties/meta_json"
+    pool_calidus_keys:
+      description: Array of valid calidus keys for all pools
+      type: array
+      items:
+        properties:
+          pool_id_bech32:
+            $ref: "#/components/schemas/pool_info/items/properties/pool_id_bech32"
+          pool_status:
+            $ref: "#/components/schemas/pool_info/items/properties/pool_status"
+          calidus_nonce:
+            type: number
+            description: Epoch number
+            example: 294
+          calidus_pub_key:
+            type: string
+            description: Total output value across all transactions in epoch
+            example: 15432725054364942
+          calidus_id_bech32:
+            type: string
+            description: Total output value across all transactions in epoch
+            example: 15432725054364942
+          tx_hash:
+            $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+          epoch_no:
+            $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+          block_height:
+            $ref: "#/components/schemas/blocks/items/properties/block_height"
+          block_time:
+            $ref: "#/components/schemas/blocks/items/properties/block_time"
+    pool_groups:
+      description: Array of pools with their corresponding group information
+      type: array
+      items:
+        properties:
+          pool_id_bech32:
+            $ref: "#/components/schemas/pool_info/items/properties/pool_id_bech32"
+          pool_group:
+            anyOf:
+              - type: string
+              - type: 'null'
+            description: A group that the pool was identified to be associated with
+            example: IOG
+          ticker:
+            $ref: "#/components/schemas/pool_info/items/properties/meta_json/properties/ticker"
+          adastat_group:
+            anyOf:
+              - type: string
+              - type: 'null'
+            description: The pool's group identification as per adastat.net
+            example: iohk.io
+          balanceanalytics_group:
+            anyOf:
+              - type: string
+              - type: 'null'
+            description: The pool's group identification as per balanceanalytics.io
+            example: IOG
     epoch_info:
       description: Array of detailed summary for each epoch
       type: array
@@ -3552,11 +3855,11 @@ components:
           out_sum:
             type: string
             description: Total output value across all transactions in epoch
-            example: 15432725054364942
+            example: "15432725054364942"
           fees:
             type: string
             description: Total fees incurred by transactions in epoch
-            example: 74325855210
+            example: "74325855210"
           tx_count:
             type: number
             description: Number of transactions submitted in epoch
@@ -3582,23 +3885,23 @@ components:
             description: UNIX timestamp of the epoch's last block
             example: 1506635091
           active_stake:
-            type:
-              - string
-              - 'null'
+            anyOf:
+              - type: string
+              - type: 'null'
             description: Total active stake in epoch stake snapshot (null for pre-Shelley epochs)
-            example: 23395112387185880
+            example: "23395112387185880"
           total_rewards:
-            type:
-              - string
-              - 'null'
+            anyOf:
+              - type: string
+              - type: 'null'
             description: Total rewards earned in epoch (null for pre-Shelley epochs)
-            example: 252902897534230
+            example: "252902897534230"
           avg_blk_reward:
-            type:
-              - string
-              - 'null'
+            anyOf:
+              - type: string
+              - type: 'null'
             description: Average block reward for epoch (null for pre-Shelley epochs)
-            example: 660233450
+            example: "660233450"
     epoch_params:
       description: Epoch parameters (all fields nullable for pre-Shelley/Gougen epochs except first block hash)
       type: array
@@ -3609,121 +3912,121 @@ components:
             description: Epoch number
             example: 294
           min_fee_a:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: The 'a' parameter to calculate the minimum transaction fee
             example: 44
           min_fee_b:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: The 'b' parameter to calculate the minimum transaction fee
             example: 155381
           max_block_size:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: The maximum block size (in bytes)
             example: 65536
           max_tx_size:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: The maximum transaction size (in bytes)
             example: 16384
           max_bh_size:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: The maximum block header size (in bytes)
             example: 1100
           key_deposit:
-            type:
-              - string
-              - 'null'
+            anyOf:
+              - type: string
+              - type: 'null'
             description: The amount (in number) required for a deposit to register a stake address
-            example: 2000000
+            example: "2000000"
           pool_deposit:
-            type:
-              - string
-              - 'null'
+            anyOf:
+              - type: string
+              - type: 'null'
             description: The amount (in number) required for a deposit to register a stake pool
-            example: 500000000
+            example: "500000000"
           max_epoch:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: The maximum number of epochs in the future that a pool retirement is allowed to be scheduled for
             example: 18
           optimal_pool_count:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: The optimal number of stake pools
             example: 500
           influence:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             format: double
             description: The pledge influence on pool rewards
             example: 0.3
           monetary_expand_rate:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             format: double
             description: The monetary expansion rate
             example: 0.003
           treasury_growth_rate:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             format: double
             description: The treasury growth rate
             example: 0.2
           decentralisation:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             format: double
             description: The decentralisation parameter (1 fully centralised, 0 fully decentralised)
             example: 0.1
           extra_entropy:
-            type:
-              - string
-              - 'null'
+            anyOf:
+              - type: string
+              - type: 'null'
             description: The hash of 32-byte string of extra random-ness added into the protocol's entropy pool
             example: d982e06fd33e7440b43cefad529b7ecafbaa255e38178ad4189a37e4ce9bf1fa
           protocol_major:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: The protocol major version
             example: 5
           protocol_minor:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: The protocol minor version
             example: 0
           min_utxo_value:
-            type:
-              - string
-              - 'null'
+            anyOf:
+              - type: string
+              - type: 'null'
             description: The minimum value of a UTxO entry
-            example: 34482
+            example: "34482"
           min_pool_cost:
-            type:
-              - string
-              - 'null'
+            anyOf:
+              - type: string
+              - type: 'null'
             description: The minimum pool cost
-            example: 340000000
+            example: "340000000"
           nonce:
-            type:
-              - string
-              - 'null'
+            anyOf:
+              - type: string
+              - type: 'null'
             description: The nonce value for this epoch
             example: 01304ddf5613166be96fce27be110747f2c8fcb38776618ee79225ccb59b81e2
           block_hash:
@@ -3731,203 +4034,203 @@ components:
             description: The hash of the first block where these parameters are valid
             example: f9dc2a2fc3a2db09a71af007a740261de585afc9e3022b8e30535592ff4dd9e5
           cost_models:
-            type:
-              - object
-              - 'null'
+            anyOf:
+              - type: object
+              - type: 'null'
             description: The per language cost model in JSON
-            example: 'null'
+            example: null
           price_mem:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             format: double
             description: The per word cost of script memory usage
             example: 0.0577
           price_step:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             format: double
             description: The cost of script execution step usage
             example: 7.21e-05
           max_tx_ex_mem:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: The maximum number of execution memory allowed to be used in a single transaction
             example: 10000000
           max_tx_ex_steps:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: The maximum number of execution steps allowed to be used in a single transaction
             example: 10000000000
           max_block_ex_mem:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: The maximum number of execution memory allowed to be used in a single block
             example: 50000000
           max_block_ex_steps:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: The maximum number of execution steps allowed to be used in a single block
             example: 40000000000
           max_val_size:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: The maximum Val size
             example: 5000
           collateral_percent:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: The percentage of the tx fee which must be provided as collateral when including non-native scripts
             example: 150
           max_collateral_inputs:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: The maximum number of collateral inputs allowed in a transaction
             example: 3
           coins_per_utxo_size:
-            type:
-              - string
-              - 'null'
+            anyOf:
+              - type: string
+              - type: 'null'
             description: The cost per UTxO size
-            example: 34482
+            example: "34482"
           pvt_motion_no_confidence:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: Pool Voting threshold for motion of no-confidence.
             example: 0.6
           pvt_committee_normal:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: Pool Voting threshold for new committee/threshold (normal state).
             example: 0.65
           pvt_committee_no_confidence:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: Pool Voting threshold for new committee/threshold (state of no-confidence).
             example: 0.65
           pvt_hard_fork_initiation:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: Pool Voting threshold for hard-fork initiation.
             example: 0.51
           dvt_motion_no_confidence:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: DRep Vote threshold for motion of no-confidence.
             example: 0.67
           dvt_committee_normal:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: DRep Vote threshold for new committee/threshold (normal state).
             example: 0.67
           dvt_committee_no_confidence:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: DRep Vote threshold for new committee/threshold (state of no-confidence).
             example: 0.65
           dvt_update_to_constitution:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: DRep Vote threshold for update to the Constitution.
             example: 0.75
           dvt_hard_fork_initiation:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: DRep Vote threshold for hard-fork initiation.
             example: 0.6
           dvt_p_p_network_group:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: DRep Vote threshold for protocol parameter changes, network group.
             example: 0.67
           dvt_p_p_economic_group:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: DRep Vote threshold for protocol parameter changes, economic group.
             example: 0.67
           dvt_p_p_technical_group:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: DRep Vote threshold for protocol parameter changes, technical group.
             example: 0.67
           dvt_p_p_gov_group:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: DRep Vote threshold for protocol parameter changes, governance group.
             example: 0.75
           dvt_treasury_withdrawal:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: DRep Vote threshold for treasury withdrawal.
             example: 0.67
           committee_min_size:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: Minimal constitutional committee size.
             example: 5
           committee_max_term_length:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: Constitutional committee term limits.
             example: 146
           gov_action_lifetime:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: Governance action expiration.
             example: 14
           gov_action_deposit:
-            type:
-              - string
-              - 'null'
+            anyOf:
+              - type: string
+              - type: 'null'
             description: Governance action deposit.
             example: 100000000000
           drep_deposit:
-            type:
-              - string
-              - 'null'
+            anyOf:
+              - type: string
+              - type: 'null'
             description: DRep deposit amount.
             example: 500000000
           drep_activity:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: DRep activity period.
             example: 20
           pvtpp_security_group:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: Pool Voting threshold for protocol parameter changes, security group.
             example: 0.6
           min_fee_ref_script_cost_per_byte:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: Minimum Fee for Reference Script cost pre byte
             example: 15
     epoch_block_protocols:
@@ -3970,9 +4273,7 @@ components:
             description: Slot number of the block in epoch
             example: 171530
           block_height:
-            type:
-              - number
-              - 'null'
+            type: number
             description: Block height
             example: 1794506
           block_size:
@@ -3992,9 +4293,9 @@ components:
             description: VRF key of the block producer
             example: "vrf_vk1400ju08429se790upcvurdyqrhl8rhm7spm2jxg0lfnedqeaexfq7jsf2x"
           pool:
-            type:
-              - string
-              - 'null'
+            anyOf:
+              - type: string
+              - type: 'null'
             description: Pool ID in bech32 format (null for pre-Shelley blocks)
             example: pool13m26ky08vz205232k20u8ft5nrg8u68klhn0xfsk9m4gsqsc44v
           op_cert_counter:
@@ -4046,17 +4347,17 @@ components:
           proto_minor:
             $ref: "#/components/schemas/epoch_params/items/properties/protocol_minor"
           total_output:
-            type:
-              - string
-              - 'null'
+            anyOf:
+              - type: string
+              - type: 'null'
             description: Total output of the block (in number)
-            example: 92384672389
+            example: "92384672389"
           total_fees:
-            type:
-              - string
-              - 'null'
+            anyOf:
+              - type: string
+              - type: 'null'
             description: Total fees of the block (in number)
-            example: 2346834
+            example: "2346834"
           num_confirmations:
             type: number
             description: Number of confirmations for the block
@@ -4150,8 +4451,8 @@ components:
           inputs:
             description: An array of UTxO inputs spent in the transaction
             anyOf:
-            - type: 'null'
             - $ref: "#/components/schemas/tx_info/items/properties/outputs"
+            - type: 'null'
           outputs:
             $ref: "#/components/schemas/tx_info/items/properties/outputs"
           withdrawals:
@@ -4177,11 +4478,11 @@ components:
           balance:
             type: string
             description: Sum of all UTxO values beloning to address
-            example: 10723473983
+            example: "10723473983"
           stake_address:
             anyOf:
-            - type: 'null'
             - $ref: "#/components/schemas/account_history/items/properties/stake_address"
+            - type: 'null'
           script_address:
             type: boolean
             description: Signifies whether the address is a script address
@@ -4223,6 +4524,32 @@ components:
             $ref: "#/components/schemas/blocks/items/properties/block_height"
           block_time:
             $ref: "#/components/schemas/blocks/items/properties/block_time"
+    address_outputs:
+      description: Array of basic transaction output information
+      type: array
+      items:
+        type: object
+        properties:
+          address:
+            $ref: "#/components/schemas/utxo_infos/items/properties/address"
+          tx_hash:
+            $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+          tx_index:
+            $ref: "#/components/schemas/utxo_infos/items/properties/tx_index"
+          value:
+            $ref: "#/components/schemas/utxo_infos/items/properties/value"
+          stake_address:
+            $ref: "#/components/schemas/utxo_infos/items/properties/stake_address"
+          payment_cred:
+            $ref: "#/components/schemas/utxo_infos/items/properties/payment_cred"
+          epoch_no:
+            $ref: "#/components/schemas/utxo_infos/items/properties/epoch_no"
+          block_height:
+            $ref: "#/components/schemas/utxo_infos/items/properties/block_height"
+          block_time:
+            $ref: "#/components/schemas/utxo_infos/items/properties/block_time"
+          is_spent:
+            $ref: "#/components/schemas/utxo_infos/items/properties/is_spent"
     address_assets:
       description: Array of address-owned assets
       type: array
@@ -4255,9 +4582,9 @@ components:
             description: Cardano staking address (reward account) in hex format
             example: e1c865f10d66a2e375242b5ef9f05abc8840d413421982f62c35ce4fbf
           script_hash:
-            type:
-              - 'null'
-              - string
+            anyOf:
+              - type: string
+              - type: 'null'
             description: Script hash in case the stake address is locked by a script
             example: bf357f5de69e4aad71954bebd64357a4813ea5233df12fce4a9de582
     account_info:
@@ -4274,39 +4601,39 @@ components:
             enum: ["registered", "not registered"]
             example: registered
           delegated_drep:
-            type:
-            - 'null'
-            - string
+            anyOf:
+              - type: string
+              - type: 'null'
             description: Account's current delegation status to DRep ID in CIP-129 Bech32 format
             example: drep1yfhyq6tztjksqqpd5lglc3zr2tn8vylgjh9xzz7n2p4l4lgk3qam3
           delegated_pool:
             anyOf:
-            - type: 'null'
             - $ref: "#/components/schemas/pool_list/items/properties/pool_id_bech32"
+            - type: 'null'
           total_balance:
             type: string
             description: Total balance of the account including UTxO, rewards and MIRs (in number)
-            example: 207116800428
+            example: "207116800428"
           utxo:
             type: string
             description: Total UTxO balance of the account
-            example: 162764177131
+            example: "162764177131"
           rewards:
             type: string
             description: Total rewards earned by the account
-            example: 56457728047
+            example: "56457728047"
           withdrawals:
             type: string
             description: Total rewards withdrawn by the account
-            example: 12105104750
+            example: "12105104750"
           rewards_available:
             type: string
             description: Total rewards available for withdrawal
-            example: 44352623297
+            example: "44352623297"
           deposit:
             type: string
             description: Total deposit available for withdrawal
-            example: 2000000
+            example: "2000000"
           reserves:
             type: string
             description: Total reserves MIR value of the account
@@ -4338,9 +4665,9 @@ components:
           stake_address:
             $ref: "#/components/schemas/address_info/items/properties/stake_address"
           payment_cred:
-            type:
-              - string
-              - 'null'
+            anyOf:
+              - type: string
+              - type: 'null'
             description: Payment credential
             example: de3c1c527e8826b9cd2030f88f75fc44cd4ce519b9ded9eb794b3794
           epoch_no:
@@ -4356,9 +4683,9 @@ components:
           reference_script:
             $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/reference_script"
           asset_list:
-            type:
-              - array
-              - 'null'
+            anyOf:
+              - type: array
+              - type: 'null'
             description: An array of assets on the UTxO
             items:
               properties:
@@ -4373,7 +4700,7 @@ components:
                 quantity:
                   type: string
                   description: Quantity of assets on the UTxO
-                  example: 1
+                  example: "1"
           is_spent:
             type: boolean
             description: True if the UTXO has been spent
@@ -4401,12 +4728,36 @@ components:
                 type:
                   type: string
                   description: The source of the rewards
-                  enum: [member, leader, treasury, reserves]
+                  enum: [member, leader, treasury, reserves, refund]
                   example: member
                 pool_id:
                   anyOf:
-                    - type: 'null'
                     - $ref: "#/components/schemas/pool_list/items/properties/pool_id_bech32"
+                    - type: 'null'
+    account_reward_history:
+      description: Array of reward history information
+      type: array
+      items:
+        type: object
+        properties:
+          stake_address:
+            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+          earned_epoch:
+            $ref: "#/components/schemas/reserve_withdrawals/items/properties/earned_epoch"
+          spendable_epoch:
+            $ref: "#/components/schemas/reserve_withdrawals/items/properties/spendable_epoch"
+          amount:
+            type: string
+            description: Amount of rewards earned (in number)
+          type:
+            type: string
+            description: The source of the rewards
+            enum: [member, leader, treasury, reserves, refund]
+            example: member
+          pool_id_bec32:
+            anyOf:
+              - $ref: "#/components/schemas/pool_list/items/properties/pool_id_bech32"
+              - type: 'null'
     account_updates:
       description: Array of account updates information
       type: array
@@ -4423,7 +4774,7 @@ components:
                 action_type:
                   type: string
                   description: Type of certificate submitted
-                  enum: ["registration", "delegation", "withdrawal", "deregistration"]
+                  enum: ["registration", "delegation_pool", "delegation_drep", "withdrawal", "deregistration"]
                   example: "registration"
                 tx_hash:
                   $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
@@ -4435,6 +4786,29 @@ components:
                   $ref: "#/components/schemas/blocks/items/properties/abs_slot"
                 block_time:
                   $ref: "#/components/schemas/blocks/items/properties/block_time"
+    account_update_history:
+      description: Array of account update history information
+      type: array
+      items:
+        type: object
+        properties:
+          stake_address:
+            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+          action_type:
+            type: string
+            description: Type of certificate submitted
+            enum: ["registration", "delegation_pool", "delegation_drep", "withdrawal", "deregistration"]
+            example: "registration"
+          tx_hash:
+            $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+          epoch_no:
+            $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+          epoch_slot:
+            $ref: "#/components/schemas/blocks/items/properties/epoch_slot"
+          absolute_slot:
+            $ref: "#/components/schemas/blocks/items/properties/abs_slot"
+          block_time:
+            $ref: "#/components/schemas/blocks/items/properties/block_time"
     account_addresses:
       description: Array of payment addresses
       type: array
@@ -4491,6 +4865,27 @@ components:
                   type: string
                   description: Active stake amount (in numbers)
                   example: 682334162
+    account_stake_history:
+      description: Array of active stake values per epoch
+      type: array
+      items:
+        properties:
+          stake_address:
+            type: string
+            description: Cardano staking address (reward account) in bech32 format
+            example: stake1u8yxtugdv63wxafy9d00nuz6hjyyp4qnggvc9a3vxh8yl0ckml2uz
+          pool_id_bech32:
+            type: string
+            description: Bech32 representation of pool ID
+            example: pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt
+          epoch_no:
+            type: number
+            description: Epoch number
+            example: 301
+          active_stake:
+            type: string
+            description: Active stake amount (in numbers)
+            example: 682334162
     tx_info:
       description: Array of detailed information about transaction(s)
       type: array
@@ -4524,40 +4919,41 @@ components:
           total_output:
             type: string
             description: Total sum of all transaction outputs (in numbers)
-            example: 157832856
+            example: "157832856"
           fee:
             type: string
             description: Total Transaction fee (in numbers)
-            example: 172761
+            example: "172761"
           treasury_donation:
             type: string
             description: Total Donation to on-chain treasury (in numbers)
-            example: 0
+            example: "0"
           deposit:
             type: string
             description: Total Deposits included in transaction (for example, if it is registering a pool/key)
-            example: 0
+            example: "0"
           invalid_before:
-            type:
-              - string
-              - 'null'
+            anyOf:
+              - type: string
+              - type: 'null'
             description: Slot before which transaction cannot be validated (if supplied, else null)
+            example: "42331172"
           invalid_after:
-            type:
-              - string
-              - 'null'
+            anyOf:
+              - type: string
+              - type: 'null'
             description: Slot after which transaction cannot be validated
-            example: 42332172
+            example: "42332172"
           collateral_inputs:
             description: An array of collateral inputs needed for smart contracts in case of contract failure
             anyOf:
-            - type: 'null'
             - $ref: "#/components/schemas/tx_info/items/properties/outputs"
+            - type: 'null'
           collateral_output:
             description: A collateral output for change if the smart contract fails to execute and collateral inputs are spent. (CIP-40)
-            type:
-              - array
-              - 'null'
+            anyOf:
+              - type: array
+              - type: 'null'
             items:
               properties:
                 payment_addr:
@@ -4582,8 +4978,8 @@ components:
           reference_inputs:
             description: An array of reference inputs. A reference input allows looking at an output without spending it. (CIP-31)
             anyOf:
-            - type: 'null'
-            - $ref: "#/components/schemas/tx_info/items/properties/outputs"
+              - $ref: "#/components/schemas/tx_info/items/properties/outputs"
+              - type: 'null'
           inputs:
             $ref: "#/components/schemas/tx_info/items/properties/outputs"
             #description: An array of UTxO inputs spent in the transaction
@@ -4611,17 +5007,17 @@ components:
                 value:
                   type: string
                   description: Total sum of ADA on the UTxO
-                  example: 157832856
+                  example: "157832856"
                 datum_hash:
-                  type:
-                    - string
-                    - 'null'
+                  anyOf:
+                    - type: string
+                    - type: 'null'
                   description: Hash of datum (if any) connected to UTxO 
                   example: 30c16dd243324cf9d90ffcf211b9e0f2117a7dc28d17e85927dfe2af3328e5c9
                 inline_datum:
-                  type:
-                    - object
-                    - 'null'
+                  anyOf:
+                    - type: object
+                    - type: 'null'
                   description: Allows datums to be attached to UTxO (CIP-32)
                   properties:
                     bytes:
@@ -4633,9 +5029,9 @@ components:
                       description: Value (json)
                       example: { "int": 666 }
                 reference_script:
-                  type:
-                    - object
-                    - 'null'
+                  anyOf:
+                    - type: object
+                    - type: 'null'
                   description: Allow reference scripts to be used to satisfy script requirements during validation, rather than requiring the spending transaction to do so. (CIP-33)
                   properties:
                     hash:
@@ -4655,17 +5051,17 @@ components:
                       description: Script bytes (hex)
                       example: 4e4d01000033222220051200120011
                     value:
-                      type:
-                        - object
-                        - 'null'
+                      anyOf:
+                        - type: object
+                        - type: 'null'
                       description: Value (json)
-                      example: 'null'
+                      example: null
                 asset_list:
                   $ref: "#/components/schemas/utxo_infos/items/properties/asset_list"
           withdrawals:
-            type:
-              - array
-              - 'null'
+            anyOf:
+              - type: array
+              - type: 'null'
             description: Array of withdrawals with-in a transaction
             items:
               type: object
@@ -4673,15 +5069,15 @@ components:
                 amount:
                   type: string
                   description: Withdrawal amount (in numbers)
-                  example: 9845162
+                  example: "9845162"
                 stake_addr:
                   type: string
                   description: A Cardano staking address (reward account, bech32 encoded)
                   example: stake1uxggf4shfvpghcangm67ky0q4zlc3xn7gezy0auhxczu3pslm9wrj
           assets_minted:
-            type:
-              - array
-              - 'null'
+            anyOf:
+              - type: array
+              - type: 'null'
             description: Array of minted assets with-in a transaction
             items:
               properties:
@@ -4696,20 +5092,20 @@ components:
                 quantity:
                   type: string
                   description: Quantity of minted assets (negative on burn)
-                  example: 1
+                  example: "1"
           metadata:
             $ref: "#/components/schemas/tx_metadata/items/properties/metadata"
           certificates:
-            type:
-              - array
-              - 'null'
+            anyOf:
+              - type: array
+              - type: 'null'
             description: Certificates present with-in a transaction (if any)
             items:
               properties:
                 index:
-                  type:
-                    - number
-                    - 'null'
+                  anyOf:
+                    - type: number
+                    - type: 'null'
                   description: Certificate index
                   example: 0
                 type:
@@ -4717,9 +5113,9 @@ components:
                   description: Type of certificate (could be delegation, stake_registration, stake_deregistraion, pool_update, pool_retire, param_proposal, reserve_MIR, treasury_MIR)
                   example: delegation
                 info:
-                  type:
-                    - object
-                    - 'null'
+                  anyOf:
+                    - type: object
+                    - type: 'null'
                   description: A JSON array containing information from the certificate
                   example:
                     {
@@ -4727,9 +5123,9 @@ components:
                       "pool": "pool1k53pf4wzn263c08e3wr3gttndfecm9f4uzekgctcx947vt7fh2p",
                     }
           native_scripts:
-            type:
-              - array
-              - 'null'
+            anyOf:
+              - type: array
+              - type: 'null'
             description: Native scripts present in a transaction (if any)
             items:
               properties:
@@ -4758,22 +5154,22 @@ components:
                         ],
                     }
           plutus_contracts:
-            type:
-              - array
-              - 'null'
+            anyOf:
+              - type: array
+              - type: 'null'
             description: Plutus contracts present in transaction (if any)
             items:
               properties:
                 address:
-                  type:
-                    - string
-                    - 'null'
+                  anyOf:
+                    - type: string
+                    - type: 'null'
                   description: Plutus script address
                   example: addr1w999n67e86jn6xal07pzxtrmqynspgx0fwmcmpua4wc6yzsxpljz3
                 spends_input:
-                  type:
-                    - object
-                    - 'null'
+                  anyOf:
+                    - type: object
+                    - type: 'null'
                   properties:
                     tx_hash:
                       $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
@@ -4822,9 +5218,9 @@ components:
                         value:
                           $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_value"
           voting_procedures:
-            type:
-              - array
-              - 'null'
+            anyOf:
+              - type: array
+              - type: 'null'
             description: Governance votes in a transaction (if any)
             items:
               properties:
@@ -4841,9 +5237,9 @@ components:
                 vote:
                   $ref: "#/components/schemas/drep_votes/items/properties/vote"
           proposal_procedures:
-            type:
-              - array
-              - 'null'
+            anyOf:
+              - type: array
+              - type: 'null'
             description: Governance proposals in a transaction (if any)
             items:
               properties:
@@ -4869,7 +5265,7 @@ components:
                   $ref: "#/components/schemas/proposal_list/items/properties/param_proposal"
     tx_cbor:
       description: Raw Transaction(s) in CBOR format
-      item:
+      items:
         properties:
           tx_hash:
             $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
@@ -4926,17 +5322,17 @@ components:
               - $ref: "#/components/schemas/tx_utxos/items/properties/inputs"
     tx_metadata:
       description: Array of metadata information present in each of the transactions queried
-      type:
-        - array
-        - 'null'
+      anyOf:
+        - type: array
+        - type: 'null'
       items:
         properties:
           tx_hash:
             $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
           metadata:
-            type:
-              - object
-              - 'null'
+            anyOf:
+              - type: object
+              - type: 'null'
             description: A JSON array containing details about metadata within transaction
             example:
               {
@@ -4957,9 +5353,9 @@ components:
           tx_hash:
             $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
           num_confirmations:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: Number of block confirmations
             example: 17
     tx_metalabels:
@@ -5019,7 +5415,7 @@ components:
           quantity:
             type: string
             description: Asset balance on the payment address
-            example: 23
+            example: "23"
     asset_nft_address:
       description: An array of payment addresses holding the given token
       type: array
@@ -5066,9 +5462,9 @@ components:
             description: Asset Policy ID (hex)
             example: d3501d9531fcc25e3ca4b6429318c2cc374dbdbcf5e99c1c1e5da1ff
           asset_name:
-            type:
-              - string
-              - 'null'
+            anyOf:
+              - type: string
+              - type: 'null'
             description: Asset Name (hex)
             example: 444f4e545350414d
           asset_name_ascii:
@@ -5104,44 +5500,44 @@ components:
               - $ref: "#/components/schemas/tx_metadata/items/properties/metadata"
             description: Latest minting transaction metadata (aligns with CIP-25)
           token_registry_metadata:
-            type:
-              - object
-              - 'null'
+            anyOf:
+              - type: object
+              - type: 'null'
             description: Asset metadata registered on the Cardano Token Registry
             properties:
               name:
-                type:
-                  - 'null'
-                  - string
+                anyOf:
+                  - type: string
+                  - type: 'null'
                 example: Rackmob
               description:
-                type:
-                  - 'null'
-                  - string
+                anyOf:
+                  - type: string
+                  - type: 'null'
                 example: Metaverse Blockchain Cryptocurrency.
               ticker:
-                type:
-                  - 'null'
-                  - string
+                anyOf:
+                  - type: string
+                  - type: 'null'
                 example: MOB
               url:
-                type:
-                  - 'null'
-                  - string
+                anyOf:
+                  - type: string
+                  - type: 'null'
                 example: https://www.rackmob.com/
               logo:
-                type:
-                  - 'null'
-                  - string
+                anyOf:
+                  - type: string
+                  - type: 'null'
                 description: A PNG image file as a byte string
                 example: iVBORw0KGgoAAAANSUhEUgAAAPoAAAD6CAYAAACI7Fo9AAAACXBIWXMAAA7EAAAOxAGVKw4bAAADnmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSfvu78nIGlkPSdXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQnPz4KPHg6eG1wbWV0YSB4bWxuczp4PSdhZG9iZTpuczptZXRhLyc
               decimals:
                 type: number
                 example: 0
           cip68_metadata:
-            type:
-              - object
-              - 'null'
+            anyOf:
+              - type: object
+              - type: 'null'
             description: CIP 68 metadata if present for asset
             example: {"222": {"fields": [{"map": [{"k": {"bytes": "6e616d65"}, "v": {"bytes": "74657374"}}]}], "constructor": 0}}
     asset_history:
@@ -5156,9 +5552,9 @@ components:
           fingerprint:
             $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
           minting_txs:
-            type:
-              - array
-              - 'null'
+            anyOf:
+              - type: array
+              - type: 'null'
             description: Array of all mint/burn transactions for an asset
             items:
               type: object
@@ -5276,35 +5672,35 @@ components:
             description: Flag to show if the DRep is currently registered
             example: false
           deposit:
-            type:
-              - string
-              - 'null'
+            anyOf:
+              - type: string
+              - type: 'null'
             description: DRep's registration deposit  in number
-            example: 500000000
+            example: "500000000"
           active:
             type: boolean
             description: Flag to show if the DRep is  (i.e. not expired)
             example: true
           expires_epoch_no:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: After which epoch DRep is considered inactive.
             example: 410
           amount:
             type: string
             description: The total amount of voting power this DRep is delegated.
-            example: 599496769641
+            example: "599496769641"
           meta_url:
-            type:
-              - 'null'
-              - string
+            anyOf:
+              - type: string
+              - type: 'null'
             description: A URL to a JSON payload of metadata
             example: "https://hornan7.github.io/Vote_Context.jsonld"
           meta_hash:
-            type:
-              - 'null'
-              - string
+            anyOf:
+              - type: string
+              - type: 'null'
             description: A hash of the contents of the metadata URL
             example: dc208474e195442d07a5b6d42af19bb2db02229427dfb53ab23122e6b0e2487d
     drep_epoch_summary:
@@ -5317,7 +5713,7 @@ components:
           amount:
             type: string
             description: The total amount of voting power between all DReps including pre-defined roles for the epoch.
-            example: 599496769641
+            example: "599496769641"
           dreps:
             type: number
             description: The total number of DReps with vote power for the epoch.
@@ -5368,38 +5764,38 @@ components:
           meta_hash:
             $ref: "#/components/schemas/drep_info/items/properties/meta_hash"
           meta_json:
-            type:
-              - 'null'
-              - object
+            anyOf:
+              - type: object
+              - type: 'null'
             description: The payload as JSON
             example:
               {"body": {"title": "...", "...": "...", "references": [{"uri": "...", "@type": "Other", "label": "Hardfork to PV10"}]}, "authors": [{"name": "...", "witness": {"publicKey": "...", "signature": "...", "witnessAlgorithm": "ed25519"}}], "@context": {"body": {"@id": "CIP108:body", "@context": {"title": "CIP108:title", "abstract": "CIP108:abstract", "rationale": "CIP108:rationale", "motivation": "CIP108:motivation", "references": {"@id": "CIP108:references", "@context": {"uri": "CIP100:reference-uri", "Other": "CIP100:OtherReference", "label": "CIP100:reference-label", "referenceHash": {"@id": "CIP108:referenceHash", "@context": {"hashDigest": "CIP108:hashDigest", "hashAlgorithm": "CIP100:hashAlgorithm"}}, "GovernanceMetadata": "CIP100:GovernanceMetadataReference"}, "@container": "@set"}}}, "CIP100": "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0100/README.md#", "CIP108": "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0108/README.md#", "authors": {"@id": "CIP100:authors", "@context": {"name": "http://xmlns.com/foaf/0.1/name", "witness": {"@id": "CIP100:witness", "@context": {"publicKey": "CIP100:publicKey", "signature": "CIP100:signature", "witnessAlgorithm": "CIP100:witnessAlgorithm"}}}, "@container": "@set"}, "@language": "en-us", "hashAlgorithm": "CIP100:hashAlgorithm"}, "hashAlgorithm": "blake2b-256"}
           bytes:
-            type:
-              - 'null'
-              - string
+            anyOf:
+              - type: string
+              - type: 'null'
             description: The raw bytes of the payload
             example: 7b0a20202240636f6e74657874223a207b0a2020202022406c616e6775616765223a2022656e2d7573222c0a2020202022434950313030223a202268747470733a2f2f6769746875622e636f6d2f63617264616e6f2d666f756e646174696f6e2f434950732f626c6f622f6d61737465722f4349502d303130302f524541444d452e6d6423222c0a2020202022434950313038223a202268747470733a2f2f6769746875622e636f6d2f63617264616e6f2d666f756e646174696f6e2f434950732f626c6f622f6d61737465722f4349502d303130382f524541444d452e6d6423222c0a202020202268617368416c676f726974686d223a20224349503130303a68617368416c676f726974686d222c0a2020202022626f6479223a207b0a20202020202022406964223a20224349503130383a626f6479222c0a2020202020202240636f6e74657874223a207b0a2020202020202020227265666572656e636573223a207b0a2020202020202020202022406964223a20224349503130383a7265666572656e636573222c0a202020202020202020202240636f6e7461696e6572223a202240736574222c0a202020202020202020202240636f6e74657874223a207b0a20202020202020202020202022476f7665726e616e63654d65746164617461223a20224349503130303a476f7665726e616e63654d657461646174615265666572656e6365222c0a202020202020202020202020224f74686572223a20224349503130303a4f746865725265666572656e6365222c0a202020202020202020202020226c6162656c223a20224349503130303a7265666572656e63652d6c6162656c222c0a20202020202020202020202022757269223a20224349503130303a7265666572656e63652d757269222c0a202020202020202020202020227265666572656e636548617368223a207b0a202020202020202020202020202022406964223a20224349503130383a7265666572656e636548617368222c0a20202020202020202020202020202240636f6e74657874223a207b0a202020202020202020202020202020202268617368446967657374223a20224349503130383a68617368446967657374222c0a202020202020202020202020202020202268617368416c676f726974686d223a20224349503130303a68617368416c676f726974686d220a20202020202020202020202020207d0a2020202020202020202020207d0a202020202020202020207d0a20202020202020207d2c0a2020202020202020227469746c65223a20224349503130383a7469746c65222c0a2020202020202020226162737472616374223a20224349503130383a6162737472616374222c0a2020202020202020226d6f7469766174696f6e223a20224349503130383a6d6f7469766174696f6e222c0a202020202020202022726174696f6e616c65223a20224349503130383a726174696f6e616c65220a2020202020207d0a202020207d2c0a2020202022617574686f7273223a207b0a20202020202022406964223a20224349503130303a617574686f7273222c0a2020202020202240636f6e7461696e6572223a202240736574222c0a2020202020202240636f6e74657874223a207b0a2020202020202020226e616d65223a2022687474703a2f2f786d6c6e732e636f6d2f666f61662f302e312f6e616d65222c0a2020202020202020227769746e657373223a207b0a2020202020202020202022406964223a20224349503130303a7769746e657373222c0a202020202020202020202240636f6e74657874223a207b0a202020202020202020202020227769746e657373416c676f726974686d223a20224349503130303a7769746e657373416c676f726974686d222c0a202020202020202020202020227075626c69634b6579223a20224349503130303a7075626c69634b6579222c0a202020202020202020202020227369676e6174757265223a20224349503130303a7369676e6174757265220a202020202020202020207d0a20202020202020207d0a2020202020207d0a202020207d0a20207d2c0a20202268617368416c676f726974686d223a2022626c616b6532622d323536222c0a202022626f6479223a207b0a20202020227469746c65223a202248617264666f726b20746f2050726f746f636f6c2076657273696f6e203130222c0a20202020226162737472616374223a20224c6574277320686176652073616e63686f4e657420696e2066756c6c20676f7665726e616e636520617320736f6f6e20617320706f737369626c65222c0a20202020226d6f7469766174696f6e223a2022505639206973206e6f742061732066756e2061732050563130222c0a2020202022726174696f6e616c65223a20224c65742773206b6565702074657374696e67207374756666222c0a20202020227265666572656e636573223a205b0a2020202020207b0a2020202020202020224074797065223a20224f74686572222c0a2020202020202020226c6162656c223a202248617264666f726b20746f2050563130222c0a202020202020202022757269223a2022220a2020202020207d0a202020205d0a20207d2c0a202022617574686f7273223a205b0a202020207b0a202020202020226e616d65223a20224361726c6f73222c0a202020202020227769746e657373223a207b0a2020202020202020227769746e657373416c676f726974686d223a202265643235353139222c0a2020202020202020227075626c69634b6579223a202237656130396133346165626231336339383431633731333937623163616266656335646466393530343035323933646565343936636163326634333734383061222c0a2020202020202020227369676e6174757265223a20226134373639383562346363306434353766323437373937363131373939613666366138306663386362376563396463623561383232333838386430363138653330646531363566336438363963346130643931303764386135623631326164376335653432343431393037663562393137393666306437313837643634613031220a2020202020207d0a202020207d0a20205d0a7d
           warning:
-            type:
-              - 'null'
-              - string
+            anyOf:
+              - type: string
+              - type: 'null'
             description: A warning that occured while validating the metadata
           language:
-            type:
-              - 'null'
-              - string
+            anyOf:
+              - type: string
+              - type: 'null'
             description: The language described in the context of the metadata as per CIP-100
             example: en-us
           comment:
-            type:
-              - 'null'
-              - string
+            anyOf:
+              - type: string
+              - type: 'null'
             description: Comment attached to the metadata
           is_valid:
-            type:
-              - 'null'
-              - boolean
+            anyOf:
+              - type: boolean
+              - type: 'null'
             description: Indicate whether data is invalid (currently returns null for all as per dbsync)
             example: null
     drep_updates:
@@ -5434,7 +5830,7 @@ components:
             $ref: "#/components/schemas/drep_metadata/items/properties/meta_hash"
           meta_json:
             $ref: "#/components/schemas/drep_metadata/items/properties/meta_json"
-    drep_history:
+    drep_voting_power_history:
       description: History of DReps voting power against each (or requested) epoch
       type: array
       items:
@@ -5444,8 +5840,11 @@ components:
           epoch_no:
             $ref: "#/components/schemas/blocks/items/properties/epoch_no"
           amount:
-            type: string
+            anyOf:
+            - type: string
+            - type: 'null'
             description: The voting power for the DRep
+            example: "14231445553"
     drep_votes:
       description: List of all votes casted by requested delegated representative (DRep)
       type: array
@@ -5470,6 +5869,21 @@ components:
             $ref: "#/components/schemas/drep_metadata/items/properties/meta_url"
           meta_hash:
             $ref: "#/components/schemas/drep_metadata/items/properties/meta_hash"
+    pool_voting_power_history:
+      description: History of Pool's voting power against each (or requested) epoch
+      type: array
+      items:
+        properties:
+          pool_id_bech32:
+            $ref: "#/components/schemas/pool_info/items/properties/pool_id_bech32"
+          epoch_no:
+            $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+          amount:
+            anyOf:
+            - type: string
+            - type: 'null'
+            description: The voting power for the pool for the epoch
+            example: "11231445553"
     pool_votes:
       description: List of all votes casted by requested pool
       type: array
@@ -5517,33 +5931,33 @@ components:
             description: Shows the epoch at which this governance action was proposed.
             example: 660
           ratified_epoch:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: If not null, then this proposal has been ratified at the specfied epoch.
             example: 670
           enacted_epoch:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: If not null, then this proposal has been enacted at the specfied epoch.
             example: 675
           dropped_epoch:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: If not null, then this proposal has been dropped (expired/enacted) at the specfied epoch.
             example: 680
           expired_epoch:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: If not null, then this proposal has been expired at the specfied epoch.
             example: 680
           expiration:
-            type:
-              - number
-              - 'null'
+            anyOf:
+              - type: number
+              - type: 'null'
             description: Shows the epoch at which this governance action is expected to expire.
           meta_url:
             $ref: "#/components/schemas/drep_metadata/items/properties/meta_url"
@@ -5558,9 +5972,9 @@ components:
           meta_is_valid:
             $ref: "#/components/schemas/drep_metadata/items/properties/is_valid"
           withdrawal:
-            type:
-              - object
-              - 'null'
+            anyOf:
+              - type: object
+              - type: 'null'
             description: If not null, the amount withdrawn from treasury into stake address by this this proposal
             properties:
               stake_address:
@@ -5570,9 +5984,9 @@ components:
                 example: "31235800000"
           param_proposal:
             description: If not null, the proposed new parameter set
-            type:
-              - object
-              - 'null'
+            anyOf:
+              - type: object
+              - type: 'null'
             example: {"key_deposit": 1000000}
     voter_proposal_list:
       description: List of all governance action proposals where specified credential(DRep, SPO or Committee member) has cast a vote
@@ -5595,13 +6009,13 @@ components:
             description: Number of 'yes' votes casted by dreps
             example: 7
           drep_active_yes_vote_power:
-            type: number
+            type: string
             description: Power of 'yes' votes that were explicitly cast
-            example: 31231231231
+            example: "31231231231"
           drep_yes_vote_power:
-            type: number
+            type: string
             description: Power of 'yes' votes from dreps (includes explicit yes and inferred via other means)
-            example: 31146839512742
+            example: "31146839512742"
           drep_yes_pct:
             type: number
             description: Percentage of 'yes' votes from dreps
@@ -5611,13 +6025,13 @@ components:
             description: Number of 'no' votes casted by dreps
             example: 0
           drep_active_no_vote_power:
-            type: number
+            type: string
             description: Power of 'no' votes that were explicitly cast
-            example: 2012312393392
+            example: "2012312393392"
           drep_no_vote_power:
-            type: number
+            type: string
             description: Power of 'no' votes from dreps (includes explicit no and inferred via other means)
-            example: 20148194577715
+            example: "20148194577715"
           drep_no_pct:
             type: number
             description: Percentage of 'no' votes from dreps
@@ -5627,29 +6041,29 @@ components:
             description: Number of active 'abstain' votes from dreps
             example: 5
           drep_active_abstain_vote_power:
-            type: number
+            type: string
             description: Power of 'abstain' votes that were explicitly cast
-            example: 123321123321
+            example: "123321123321"
           drep_always_no_confidence_vote_power:
-            type: number
+            type: string
             description: Power of votes delegated to 'always_no_confidence' predefined drep
-            example: 9999
+            example: "9999"
           drep_always_abstain_vote_power:
-            type: number
+            type: string
             description: Power of votes delegated to 'always_abstain' predefined drep
-            example: 87654321
+            example: "87654321"
           pool_yes_votes_cast:
             type: number
             description: Number of 'yes' votes casted by pools
             example: 1
           pool_active_yes_vote_power:
-            type: number
+            type: string
             description: Power of 'yes' pool votes that were explicitly cast
-            example: 123123123
+            example: "123123123"
           pool_yes_vote_power:
-            type: number
+            type: string
             description: Power of 'yes' votes from pools (includes explicit yes and inferred via other means)
-            example: 5234000000
+            example: "5234000000"
           pool_yes_pct:
             type: number
             description: Percentage of 'yes' votes from pools
@@ -5659,12 +6073,13 @@ components:
             description: Number of 'no' votes casted by pools
             example: 0
           pool_active_no_vote_power:
-            type: number
+            type: string
             description: Power of 'no' pool votes that were explicitly cast
+            example: "0"
           pool_no_vote_power:
-            type: number
+            type: string
             description: Power of 'no' votes from pools (includes explicit no and inferred via other means)
-            example: 0
+            example: "0"
           pool_no_pct:
             type: number
             description: Percentage of 'no' votes from pools
@@ -5674,25 +6089,25 @@ components:
             description: Percentage of 'abstain' votes from pools
             example: 0
           pool_active_abstain_vote_power:
-            type: number
+            type: string
             description: Power of 'abstain' pool votes that were explicitly cast
-            example: 12312312312
+            example: "12312312312"
           pool_passive_always_abstain_votes_assigned:
             type: number
             description: Number of non-voting SPO pool reward addresses delegating to 'always_abstain' drep
             example: 1
           pool_passive_always_abstain_vote_power:
-            type: number
+            type: string
             description: Combined power of non-voting SPO pool votes where reward addresses delegate to 'always_abstain'
-            example: 12312312
+            example: "12312312"
           pool_passive_always_no_confidence_votes_assigned:
             type: number
             description: Number of non-voting SPO pool reward addresses delegating to 'always_no_confidence' drep
             example: 10
           pool_passive_always_no_confidence_vote_power:
-            type: number
+            type: string
             description: Combined power of non-voting SPO pool votes where reward addresses delegate to 'always_no_confidence'
-            example: 321321
+            example: "321321"
           committee_yes_votes_cast:
             type: number
             description: Number of 'yes' votes casted by committee
@@ -5740,6 +6155,41 @@ components:
             $ref: "#/components/schemas/drep_metadata/items/properties/meta_url"
           meta_hash:
             $ref: "#/components/schemas/drep_metadata/items/properties/meta_hash"
+    vote_list:
+      type: array
+      description: List of all votes cast on specified governance action
+      items:
+        properties:
+          vote_tx_hash:
+            type: string
+            description: The transaction hash where-in vote was posted
+            example: e239058473ab5ab1f5829b9058a93cbd0daaf72f9252cc16b34925cd87b37d35
+          voter_role:
+            $ref: "#/components/schemas/proposal_votes/items/properties/voter_role"
+          voter_id:
+            $ref: "#/components/schemas/proposal_votes/items/properties/voter_id"
+          proposal_id:
+            $ref: "#/components/schemas/proposal_list/items/properties/proposal_id"
+          proposal_tx_hash:
+            $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+          proposal_index:
+            $ref: "#/components/schemas/proposal_list/items/properties/proposal_index"
+          proposal_type:
+            $ref: "#/components/schemas/proposal_list/items/properties/proposal_type"
+          epoch_no:
+            $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+          block_height:
+            $ref: "#/components/schemas/blocks/items/properties/block_height"
+          block_time:
+            $ref: "#/components/schemas/blocks/items/properties/block_time"
+          vote:
+            $ref: "#/components/schemas/drep_votes/items/properties/vote"
+          meta_url:
+            $ref: "#/components/schemas/drep_metadata/items/properties/meta_url"
+          meta_hash:
+            $ref: "#/components/schemas/drep_metadata/items/properties/meta_hash"
+          meta_json:
+            $ref: "#/components/schemas/drep_metadata/items/properties/meta_json"
     committee_info:
       description: Current governance committee
       type: object
@@ -5776,15 +6226,15 @@ components:
                 description: Flag which shows if this credential is a script hash
                 example: false
               cc_hot_hex:
-                type:
-                  - string
-                  - 'null'
+                anyOf:
+                  - type: string
+                  - type: 'null'
                 description: Committee member key hash from last valid hot key authorization certificate in hex format
                 example: 65d497b875c56ab213586a4006d4f6658970573ea8e2398893857472
               cc_hot_has_script:
-                type:
-                  - boolean
-                  - 'null'
+                anyOf:
+                  - type: boolean
+                  - type: 'null'
                 description: Flag which shows if this credential is a script hash
                 example: false
               expiration_epoch:
@@ -5797,9 +6247,9 @@ components:
         description: Array of information for scripts
         properties:
           script_hash:
-            type:
-              - 'null'
-              - string
+            anyOf:
+              - type: string
+              - type: 'null'
             description: Hash of a script
             example: bfa7ffa9b2e164873db6ac6d0528c82e212963bc62e10fd1d81da4af
           creation_tx_hash:
@@ -5812,15 +6262,15 @@ components:
             enum: ["plutusV1","plutusV2","timelock","multisig"]
             example: plutusV1
           value:
-            type:
-              - object
-              - 'null'
+            anyOf:
+              - type: object
+              - type: 'null'
             description: Data in JSON format
-            example: 'null'
+            example: null
           bytes:
-            type:
-              - string
-              - 'null'
+            anyOf:
+              - type: string
+              - type: 'null'
             description: Script bytes (cborSeq)
             example: 5907f4010000332323232323232323233223232323232332232323232322223232533532533533355300712001323212330012233350052200200200100235001220011233001225335002101710010142325335333573466e3cd400488008d4020880080580544ccd5cd19b873500122001350082200101601510153500122002353500122002222222222200a101413357389201115554784f206e6f7420636f6e73756d6564000133333573466e1cd55cea8012400046644246600200600464646464646464646464646666ae68cdc39aab9d500a480008cccccccccc888888888848cccccccccc00402c02802402001c01801401000c008cd40508c8c8cccd5cd19b8735573aa0049000119910919800801801180f9aba150023019357426ae8940088c98d4cd5ce01581501481409aab9e5001137540026ae854028cd4050054d5d0a804999aa80bbae501635742a010666aa02eeb94058d5d0a80399a80a0109aba15006335014335502402275a6ae854014c8c8c8cccd5cd19b8735573aa00490001199109198008018011919191999ab9a3370e6aae754009200023322123300100300233502575a6ae854008c098d5d09aba2500223263533573805e05c05a05826aae7940044dd50009aba150023232323333573466e1cd55cea8012400046644246600200600466a04aeb4d5d0a80118131aba135744a004464c6a66ae700bc0b80b40b04d55cf280089baa001357426ae8940088c98d4cd5ce01581501481409aab9e5001137540026ae854010cd4051d71aba15003335014335502475c40026ae854008c070d5d09aba2500223263533573804e04c04a04826ae8940044d5d1280089aba25001135744a00226ae8940044d5d1280089aba25001135744a00226aae7940044dd50009aba150023232323333573466e1d400520062321222230040053019357426aae79400c8cccd5cd19b875002480108c848888c008014c06cd5d09aab9e500423333573466e1d400d20022321222230010053015357426aae7940148cccd5cd19b875004480008c848888c00c014dd71aba135573ca00c464c6a66ae7008808408007c0780740704d55cea80089baa001357426ae8940088c98d4cd5ce00d80d00c80c080c89931a99ab9c4910350543500019018135573ca00226ea8004c8004d5405888448894cd40044d400c88004884ccd401488008c010008ccd54c01c4800401401000448c88c008dd6000990009aa80b111999aab9f00125009233500830043574200460066ae880080548c8c8c8cccd5cd19b8735573aa00690001199911091998008020018011919191999ab9a3370e6aae7540092000233221233001003002301735742a00466a01c02c6ae84d5d1280111931a99ab9c01b01a019018135573ca00226ea8004d5d0a801999aa803bae500635742a00466a014eb8d5d09aba2500223263533573802e02c02a02826ae8940044d55cf280089baa0011335500175ceb44488c88c008dd5800990009aa80a11191999aab9f0022500823350073355017300635573aa004600a6aae794008c010d5d100180a09aba100111220021221223300100400312232323333573466e1d4005200023212230020033005357426aae79400c8cccd5cd19b8750024800884880048c98d4cd5ce00980900880800789aab9d500113754002464646666ae68cdc39aab9d5002480008cc8848cc00400c008c014d5d0a8011bad357426ae8940088c98d4cd5ce00800780700689aab9e5001137540024646666ae68cdc39aab9d5001480008dd71aba135573ca004464c6a66ae7003803403002c4dd500089119191999ab9a3370ea00290021091100091999ab9a3370ea00490011190911180180218031aba135573ca00846666ae68cdc3a801a400042444004464c6a66ae7004404003c0380340304d55cea80089baa0012323333573466e1d40052002200523333573466e1d40092000200523263533573801a01801601401226aae74dd5000891001091000919191919191999ab9a3370ea002900610911111100191999ab9a3370ea004900510911111100211999ab9a3370ea00690041199109111111198008048041bae35742a00a6eb4d5d09aba2500523333573466e1d40112006233221222222233002009008375c6ae85401cdd71aba135744a00e46666ae68cdc3a802a400846644244444446600c01201060186ae854024dd71aba135744a01246666ae68cdc3a8032400446424444444600e010601a6ae84d55cf280591999ab9a3370ea00e900011909111111180280418071aba135573ca018464c6a66ae7004c04804404003c03803403002c0284d55cea80209aab9e5003135573ca00426aae7940044dd50009191919191999ab9a3370ea002900111999110911998008028020019bad35742a0086eb4d5d0a8019bad357426ae89400c8cccd5cd19b875002480008c8488c00800cc020d5d09aab9e500623263533573801801601401201026aae75400c4d5d1280089aab9e500113754002464646666ae68cdc3a800a400446424460020066eb8d5d09aab9e500323333573466e1d400920002321223002003375c6ae84d55cf280211931a99ab9c009008007006005135573aa00226ea800444888c8c8cccd5cd19b8735573aa0049000119aa80518031aba150023005357426ae8940088c98d4cd5ce00480400380309aab9e5001137540029309000a490350543100112212330010030021123230010012233003300200200133512233002489209366f09fe40eaaeb17d3cb6b0b61e087d664174c39a48a986f86b2b0ba6e2a7b00480008848cc00400c0088005
           size:
@@ -5858,32 +6308,32 @@ components:
                 tx_index:
                   $ref: "#/components/schemas/utxo_infos/items/properties/tx_index"
                 unit_mem:
-                  type:
-                    - string
-                    - number
-                    - 'null'
+                  anyOf:
+                    - type: string
+                    - type: number
+                    - type: 'null'
                   description: The budget in Memory to run a script
                   example: 520448
                 unit_steps:
-                  type:
-                    - string
-                    - number
-                    - 'null'
+                  anyOf:
+                    - type: string
+                    - type: number
+                    - type: 'null'
                   description: The budget in Cpu steps to run a script
                   example: 211535239
                 fee:
                   type: string
                   description: The budget in fees to run a script - the fees depend on the ExUnits and the current prices
-                  example: 45282
+                  example: "45282"
                 purpose:
                   type: string
                   description: What kind of validation this redeemer is used for
                   enum: ["spend", "mint", "cert", "reward"]
                   example: spend
                 datum_hash:
-                  type:
-                    - string
-                    - 'null'
+                  anyOf:
+                    - type: string
+                    - type: 'null'
                   description: The Hash of the Plutus Data
                   example: 5a595ce795815e81d22a1a522cf3987d546dc5bb016de61b002edd63a5413ec4
                 datum_value:
@@ -5907,22 +6357,20 @@ components:
       type: object
       properties:
         jsonrpc:
-          format: text
           type: string
           description: Identifier for JSON-RPC 2.0 standard
           example: "2.0"
         method:
-          format: text
           type: string
           description: The Ogmios method that was called in the request
           example: "queryNetwork/tip"
         result:
-          type:
-            - object
-            - 'null'
-            - string
-            - array
-            - number
+          anyOf:
+            - type: string
+            - type: number
+            - type: array
+            - type: object
+            - type: 'null'
           description: Result of the query
           properties:
             slot:

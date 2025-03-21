@@ -38,7 +38,7 @@ BEGIN
               sa.id AS stake_address_id,
               sa.hash_raw AS stake_address_raw
             FROM delegation AS d 
-	            INNER JOIN pool_hash AS ph ON d.pool_hash_id = ph.id AND ph.hash_raw = DECODE(b32_decode(_pool_bech32),'hex')
+	            INNER JOIN pool_hash AS ph ON d.pool_hash_id = ph.id AND ph.hash_raw = cardano.bech32_decode_data(_pool_bech32)
               INNER JOIN stake_address AS sa ON d.addr_id = sa.id
               AND NOT EXISTS (SELECT null FROM delegation AS d2 WHERE d2.addr_id = d.addr_id AND d2.id > d.id)
               AND NOT EXISTS (SELECT null FROM stake_deregistration AS sd WHERE sd.addr_id = d.addr_id AND sd.tx_id > d.tx_id)
@@ -81,7 +81,7 @@ AS $$
 DECLARE
   _pool_id bigint;
 BEGIN
-  SELECT id INTO _pool_id FROM pool_hash WHERE pool_hash.hash_raw = DECODE(b32_decode(_pool_bech32),'hex');
+  SELECT id INTO _pool_id FROM pool_hash WHERE pool_hash.hash_raw = cardano.bech32_decode_data(_pool_bech32);
 
   RETURN QUERY
     WITH

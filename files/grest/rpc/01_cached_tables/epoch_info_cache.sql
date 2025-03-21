@@ -24,6 +24,7 @@ AS $$
 DECLARE
   _curr_epoch bigint;
   _latest_epoch_no_in_cache bigint;
+  _cutoff_epoch bigint;
 BEGIN
   -- Check previous cache update completed before running
   IF (
@@ -83,12 +84,25 @@ BEGIN
     tx_id bigint
   );
 
+  -- cutoff epoch is the last epoch with at least one tx referenced in cache table
+  SELECT COALESCE((
+      SELECT MIN(eic.epoch_no) 
+      FROM grest.epoch_info_cache eic
+      WHERE eic.i_last_tx_id = 
+        (SELECT MAX(i_last_tx_id) 
+        FROM grest.epoch_info_cache eic2 
+        WHERE i_last_tx_id is not null
+        )
+      ), 0)
+  INTO _cutoff_epoch;
+
   INSERT INTO last_tx_id_subset
     SELECT b.epoch_no, MAX(tx.id)
     FROM block AS b
     INNER JOIN tx ON tx.block_id = b.id
     WHERE b.block_no IS NOT NULL
       AND b.tx_count != 0
+      AND b.epoch_no >= _cutoff_epoch
     GROUP BY b.epoch_no;
 
   INSERT INTO grest.epoch_info_cache
@@ -148,9 +162,25 @@ CREATE OR REPLACE FUNCTION grest.update_latest_epoch_info_cache(_curr_epoch bigi
 RETURNS void
 LANGUAGE plpgsql
 AS $$
+DECLARE
+  _cutoff_epoch bigint;
 BEGIN
+
+  -- cutoff epoch is the last epoch with at least one tx referenced in cache table
+  SELECT COALESCE((
+      SELECT MIN(eic.epoch_no) 
+      FROM grest.epoch_info_cache eic
+      WHERE eic.i_last_tx_id = 
+        (SELECT MAX(i_last_tx_id) 
+        FROM grest.epoch_info_cache eic2 
+        WHERE i_last_tx_id is not null
+        )
+      ), 0)
+  INTO _cutoff_epoch;
+
   -- only update last tx id in case of new epoch
   IF _curr_epoch <> _epoch_no_to_update THEN
+
     UPDATE grest.epoch_info_cache
     SET i_last_tx_id = last_tx.tx_id
     FROM (
@@ -158,6 +188,7 @@ BEGIN
       FROM block AS b
       INNER JOIN tx ON tx.block_id = b.id
       WHERE b.epoch_no <= _epoch_no_to_update
+        AND b.epoch_no >= _cutoff_epoch
         AND b.block_no IS NOT NULL
         AND b.tx_count != 0
     ) AS last_tx

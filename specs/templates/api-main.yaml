@@ -343,6 +343,9 @@ paths:
       summary: Block Transactions (Detailed Info)
       description: Get detailed information about transaction(s) for requested blocks
       operationId: block_tx_info
+      x-badges:
+        - color: red
+          label: 'Deprecated'
 
   /utxo_info: #RPC
     post:
@@ -528,6 +531,9 @@ paths:
       summary: Transaction UTxOs
       description: Get UTxO set (inputs/outputs) of transactions [DEPRECATED - Use /utxo_info instead].
       operationId: tx_utxos
+      x-badges:
+        - color: red
+          label: 'Deprecated'
 
   /address_info: #RPC
     post:
@@ -573,6 +579,28 @@ paths:
       summary: Address UTXOs
       description: Get UTxO set for given addresses
       operationId: address_utxos
+  /address_outputs: #RPC
+    post:
+      tags:
+        - Address
+      requestBody:
+        $ref: "#/components/requestBodies/address_txs"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/address_outputs"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Address Outputs
+      description: Basic transaction output info for given addresses
+      operationId: address_outputs
   /credential_utxos: #RPC
     post:
       tags:
@@ -773,6 +801,7 @@ paths:
       operationId: account_txs
   /account_rewards: #RPC
     post:
+      deprecated: true
       tags:
         - Stake Account
       requestBody:
@@ -794,6 +823,32 @@ paths:
       description: >-
         Get the full rewards history (including MIR) for given stake addresses
       operationId: account_rewards
+      x-badges:
+        - color: red
+          label: 'Deprecated'
+  /account_reward_history: #RPC
+    post:
+      tags:
+        - Stake Account
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account_reward_history"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Account Reward History
+      description: >-
+        Get the full rewards history (including MIR) for given stake addresses
+      operationId: account_reward_history
   /account_updates: #RPC
     post:
       tags:
@@ -818,6 +873,30 @@ paths:
         Get the account updates (registration, deregistration, delegation and
         withdrawals) for given stake addresses
       operationId: account_updates
+  /account_update_history: #RPC
+    post:
+      tags:
+        - Stake Account
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account_update_history"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Account Update History
+      description: >-
+        Get the account updates (registration, deregistration, delegation and
+        withdrawals) for given stake addresses
+      operationId: account_update_history
   /account_addresses: #RPC
     post:
       tags:
@@ -864,10 +943,11 @@ paths:
       operationId: account_assets
   /account_history: #RPC
     post:
+      deprecated: true
       tags:
         - Stake Account
       requestBody:
-        $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
+        $ref: "#/components/requestBodies/stake_addresses"
       responses:
         "200":
           description: Success!!
@@ -884,6 +964,31 @@ paths:
       summary: Account History
       description: Get the staking history of given stake addresses (accounts)
       operationId: account_history
+      x-badges:
+        - color: red
+          label: 'Deprecated'
+  /account_stake_history: #RPC
+    post:
+      tags:
+        - Stake Account
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account_stake_history"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Account Stake History
+      description: Get the staking history of given stake addresses (accounts)
+      operationId: account_stake_history
 
   /asset_list: #RPC
     get:
@@ -1291,6 +1396,7 @@ paths:
       operationId: drep_updates
   /drep_history: #RPC
     get:
+      deprecated: true
       tags:
         - Governance
       parameters:
@@ -1302,7 +1408,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/drep_history"
+                $ref: "#/components/schemas/drep_voting_power_history"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -1312,8 +1418,35 @@ paths:
       summary: DReps Voting Power History
       description: History of DReps voting power against each (or requested) epoch
       operationId: drep_history
+      x-badges:
+        - color: red
+          label: 'Deprecated'
+  /drep_voting_power_history: #RPC
+    get:
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_epoch_no"
+        - $ref: "#/components/parameters/_drep_id_optional"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/drep_voting_power_history"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: DReps Voting Power History
+      description: History of DReps voting power against each (or requested) epoch
+      operationId: drep_voting_power_history
   /drep_votes: #RPC
     get:
+      deprecated: true
       tags:
         - Governance
       parameters:
@@ -1334,6 +1467,9 @@ paths:
       summary: DReps Votes
       description: List of all votes casted by requested delegated representative (DRep)
       operationId: drep_votes
+      x-badges:
+        - color: red
+          label: 'Deprecated'
   /drep_delegators: #RPC
     get:
       tags:
@@ -1484,6 +1620,26 @@ paths:
       summary: Proposal Votes
       description: List of all votes cast on specified governance action
       operationId: proposal_votes
+  /vote_list: #RPC
+    get:
+      tags:
+        - Governance      
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/vote_list"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Vote List
+      description: List of all votes posted on-chain
+      operationId: vote_list
 
   /pool_list: #RPC
     get:
@@ -1619,6 +1775,29 @@ paths:
         Return information about blocks minted by a given pool for all epochs
         (or _epoch_no if provided)
       operationId: pool_blocks
+  /pool_owner_history: #RPC
+    post:
+      tags:
+        - Pool
+      requestBody:
+        $ref: "#/components/requestBodies/pool_ids"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_owner_history"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Pool Owner History
+      description: >-
+        Return information about pool owner's historical stake and their promised pledge to their pools
+      operationId: pool_owner_history
   /pool_history: #RPC
     get:
       tags:
@@ -1730,8 +1909,32 @@ paths:
       summary: Pool Relays
       description: A list of registered relays for all pools
       operationId: pool_relays
+  /pool_voting_power_history: #RPC
+    get:
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_epoch_no"
+        - $ref: "#/components/parameters/_pool_bech32_optional"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_voting_power_history"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Pool's Voting Power History
+      description: History of Pool voting power against each (or requested) epoch
+      operationId: pool_voting_power_history
   /pool_votes: #RPC
     get:
+      deprecated: true
       tags:
         - Governance
       parameters:
@@ -1752,6 +1955,30 @@ paths:
       summary: Pool Votes
       description: List of all votes casted by a pool
       operationId: pool_votes
+      x-badges:
+        - color: red
+          label: 'Deprecated'
+  
+  /pool_groups: #RPC
+    get:
+      tags:
+        - Pool
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_groups"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Pool Groups
+      description: List of all registered pool and their groups across sources from [pool_groups](https://github.com/cardano-community/pool_groups) repository. This is only relevant for mainnet
+      operationId: pool_groups
   /pool_metadata: #RPC
     post:
       tags:
@@ -1774,6 +2001,26 @@ paths:
       summary: Pool Metadata
       description: Metadata (on & off-chain) for all pools
       operationId: pool_metadata
+  /pool_calidus_keys: #RPC
+    get:
+      tags:
+        - Pool
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_calidus_keys"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Pool Calidus Keys
+      description: List of valid calidus keys for all pools
+      operationId: pool_calidus_keys
 
   /script_info: #RPC
     post:
