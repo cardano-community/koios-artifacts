@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION grest.drep_history(_epoch_no numeric DEFAULT NULL, _drep_id text DEFAULT NULL)
+CREATE OR REPLACE FUNCTION grest.drep_voting_power_history(_epoch_no numeric DEFAULT NULL, _drep_id text DEFAULT NULL)
 RETURNS TABLE (
   drep_id text,
   epoch_no word31type,
@@ -24,4 +24,16 @@ AS $$
   ORDER BY dd.epoch_no DESC;
 $$;
 
-COMMENT ON FUNCTION grest.drep_history IS 'Get history for dreps voting power distribution'; --noqa: LT01
+COMMENT ON FUNCTION grest.drep_voting_power_history IS 'Get history for dreps voting power distribution'; --noqa: LT01
+
+CREATE OR REPLACE FUNCTION grest.drep_history(_epoch_no numeric DEFAULT NULL, _drep_id text DEFAULT NULL)
+RETURNS TABLE (
+  drep_id text,
+  epoch_no word31type,
+  amount text
+)
+LANGUAGE sql STABLE
+AS $$
+  SELECT *
+  FROM grest.drep_voting_power_history(_epoch_no, _drep_id);
+$$;

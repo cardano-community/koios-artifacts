@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION grest.voter_proposal_list(_voter_id text)
+CREATE OR REPLACE FUNCTION grest.voter_proposal_list(_voter_id text DEFAULT NULL)
 RETURNS TABLE (
   block_time integer,
   proposal_id text,
@@ -35,7 +35,7 @@ BEGIN
   IF STARTS_WITH(_voter_id, 'drep') THEN
     SELECT INTO _drep_id id FROM public.drep_hash WHERE raw = DECODE((SELECT grest.cip129_drep_id_to_hex(_voter_id)), 'hex') AND has_script = grest.cip129_drep_id_has_script(_voter_id);
   ELSIF STARTS_WITH(_voter_id, 'pool') THEN
-    SELECT INTO _spo_id id FROM public.pool_hash WHERE hash_raw = DECODE(b32_decode(_voter_id),'hex');
+    SELECT INTO _spo_id id FROM public.pool_hash WHERE hash_raw = cardano.bech32_decode_data(_voter_id);
   ELSIF STARTS_WITH(_voter_id, 'cc_hot') THEN
     SELECT INTO _committee_member_id id FROM public.committee_hash WHERE raw = DECODE((SELECT grest.cip129_cc_hot_to_hex(_voter_id)), 'hex') AND has_script = grest.cip129_cc_hot_has_script(_voter_id);
   END IF;
@@ -50,7 +50,7 @@ BEGIN
         WHEN _spo_id IS NOT NULL THEN pool_voter = _spo_id
         WHEN _committee_member_id IS NOT NULL THEN committee_voter = _committee_member_id
       ELSE
-        FALSE
+        TRUE
       END
   ) AS tmp;
 

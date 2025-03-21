@@ -11,7 +11,8 @@ RETURNS TABLE (
   rewards_available text,
   deposit text,
   reserves text,
-  treasury text
+  treasury text,
+  proposal_refund text
 )
 LANGUAGE plpgsql
 AS $$
@@ -24,7 +25,7 @@ BEGIN
     stake_address
   WHERE
     stake_address.hash_raw = ANY(
-      SELECT DECODE(b32_decode(n), 'hex')
+      SELECT cardano.bech32_decode_data(n)
       FROM UNNEST(_stake_addresses) AS n
     );
 
@@ -37,7 +38,7 @@ BEGIN
       ELSE
         'not registered'
       END AS status,
-      b32_encode('pool', ph.hash_raw::text)::varchar AS delegated_pool,
+      cardano.bech32_encode('pool', ph.hash_raw)::varchar AS delegated_pool,
       vote_t.delegated_drep,
       sdc.total_balance::text,
       sdc.utxo::text,
@@ -46,7 +47,8 @@ BEGIN
       sdc.rewards_available::text,
       COALESCE(status_t.deposit,0)::text AS deposit,
       COALESCE(reserves_t.reserves, 0)::text AS reserves,
-      COALESCE(treasury_t.treasury, 0)::text AS treasury
+      COALESCE(treasury_t.treasury, 0)::text AS treasury,
+      COALESCE(proposal_refund_t.proposal_refund, 0)::text AS proposal_refund
     FROM grest.stake_distribution_cache AS sdc
       INNER JOIN stake_address AS sa ON sa.id = sdc.stake_address_id
       INNER JOIN pool_hash AS ph ON sdc.pool_id = ph.id
@@ -89,7 +91,21 @@ BEGIN
             SELECT TRUE
             FROM delegation_vote AS dv1
             WHERE dv1.addr_id = dv.addr_id
-              AND dv1.id > dv.id)
+              AND dv1.id > dv.id
+            LIMIT 1)
+          AND NOT EXISTS (
+            SELECT TRUE
+            FROM stake_deregistration
+            WHERE stake_deregistration.addr_id = dv.addr_id
+              AND stake_deregistration.tx_id > dv.tx_id
+            LIMIT 1)
+          AND NOT EXISTS (
+            SELECT TRUE
+            FROM drep_registration
+            WHERE drep_registration.drep_hash_id = dv.drep_hash_id
+              AND drep_registration.tx_id > dv.tx_id
+              AND drep_registration.deposit < 0
+            LIMIT 1)
       ) AS vote_t ON vote_t.addr_id = status_t.id
       LEFT JOIN (
         SELECT
@@ -119,6 +135,20 @@ BEGIN
         GROUP BY
           t.addr_id
         ) AS treasury_t ON treasury_t.addr_id = status_t.id
+      LEFT JOIN (
+        SELECT
+          pr.addr_id,
+          COALESCE(SUM(pr.amount), 0) AS proposal_refund
+        FROM reward_rest AS pr
+        WHERE pr.addr_id = ANY(sa_id_list)
+          AND pr.type = 'treasury'
+          AND pr.spendable_epoch <= (
+            SELECT MAX(no)
+            FROM epoch
+          )
+        GROUP BY
+          pr.addr_id
+        ) AS proposal_refund_t ON proposal_refund_t.addr_id = status_t.id
     WHERE sdc.stake_address_id = ANY(sa_id_list)
 
     UNION ALL
@@ -135,7 +165,8 @@ BEGIN
       ai.rewards_available::text,
       ai.deposit,
       ai.reserves,
-      ai.treasury
+      ai.treasury,
+      ai.proposal_refund
       FROM
         (
           SELECT

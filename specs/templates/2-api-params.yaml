@@ -87,8 +87,8 @@ parameters:
         type: string
       example: "##_drep_id_param##"
       in: query
-      required: true
-      allowEmptyValue: false
+      required: false
+      allowEmptyValue: true
     _drep_id:
       deprecated: false
       name: _drep_id

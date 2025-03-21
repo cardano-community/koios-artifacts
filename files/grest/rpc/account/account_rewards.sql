@@ -14,7 +14,7 @@ BEGIN
     stake_address
   WHERE
     stake_address.hash_raw = ANY(
-      SELECT DECODE(b32_decode(n), 'hex')
+      SELECT cardano.bech32_decode_data(n)
       FROM UNNEST(_stake_addresses) AS n
     );
 
@@ -27,7 +27,7 @@ BEGIN
           'spendable_epoch', all_rewards.spendable_epoch,
           'amount', all_rewards.amount::text,
           'type', all_rewards.type,
-          'pool_id', CASE WHEN all_rewards.pool_id_raw IS NULL THEN NULL ELSE b32_encode('pool', all_rewards.pool_id_raw::text) END
+          'pool_id', CASE WHEN all_rewards.pool_id_raw IS NULL THEN NULL ELSE cardano.bech32_encode('pool', all_rewards.pool_id_raw) END
         )
       ) AS rewards
     FROM (
@@ -62,4 +62,4 @@ BEGIN
 END;
 $$;
 
-COMMENT ON FUNCTION grest.account_rewards IS 'Get the full rewards history (including MIR) for given stake addresses, or certain epoch if specified'; -- noqa: LT01
+COMMENT ON FUNCTION grest.account_rewards IS 'DEPRECATED: Get the full rewards history (including MIR) for given stake addresses, or certain epoch if specified'; -- noqa: LT01

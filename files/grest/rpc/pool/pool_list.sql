@@ -11,6 +11,7 @@ RETURNS TABLE (
   owners varchar [],
   relays jsonb [],
   ticker varchar,
+  pool_group text,
   meta_url varchar,
   meta_hash text,
   pool_status text,
@@ -20,7 +21,7 @@ RETURNS TABLE (
 LANGUAGE sql STABLE
 AS $$
   SELECT DISTINCT ON (pic.pool_hash_id)
-    b32_encode('pool', ph.hash_raw::text)::varchar AS pool_id_bech32,
+    cardano.bech32_encode('pool', ph.hash_raw)::varchar AS pool_id_bech32,
     ENCODE(ph.hash_raw,'hex') as pool_id_hex,
     pu.active_epoch_no,
     pu.margin,
@@ -46,6 +47,7 @@ AS $$
       WHERE pr.update_id = pic.update_id
     ) AS relays,
     ocpd.ticker_name,
+    pgrp.pool_group,
     pmr.url AS meta_url,
     pmr.hash AS meta_hash,
     pic.pool_status,
@@ -53,6 +55,7 @@ AS $$
     pic.retiring_epoch
   FROM grest.pool_info_cache AS pic
     INNER JOIN public.pool_hash AS ph ON ph.id = pic.pool_hash_id
+    LEFT JOIN grest.pool_groups AS pgrp ON pgrp.pool_id_bech32 = ph.view
     LEFT JOIN grest.pool_active_stake_cache AS pasc ON pasc.pool_id = pic.pool_hash_id
     LEFT JOIN public.pool_update AS pu ON pu.id = pic.update_id
     LEFT JOIN public.stake_address AS sa ON pu.reward_addr_id = sa.id

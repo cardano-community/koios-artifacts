@@ -39,7 +39,7 @@ BEGIN
         member_rewards::text,
         COALESCE(epoch_ros, 0)
       FROM grest.pool_history_cache AS phc
-      WHERE phc.pool_id = (SELECT id FROM pool_hash AS ph WHERE ph.hash_raw = DECODE(b32_decode(_pool_bech32),'hex'))
+      WHERE phc.pool_id = (SELECT id FROM pool_hash AS ph WHERE ph.hash_raw = cardano.bech32_decode_data(_pool_bech32))
           AND phc.epoch_no < (_curr_epoch - 2) -- temporary condition for testing, until cache table population fixed, then can be removed
       UNION 
       SELECT

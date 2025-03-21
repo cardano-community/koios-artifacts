@@ -14,7 +14,7 @@ BEGIN
     stake_address
   WHERE
     stake_address.hash_raw = ANY(
-      SELECT DECODE(b32_decode(n), 'hex')
+      SELECT cardano.bech32_decode_data(n)
       FROM UNNEST(_stake_addresses) AS n
     );
 
@@ -24,7 +24,7 @@ BEGIN
         grest.cip5_hex_to_stake_addr(sa.hash_raw)::varchar AS stake_address,
         JSONB_AGG(
           JSONB_BUILD_OBJECT(
-            'pool_id', b32_encode('pool', ph.hash_raw::text),
+            'pool_id', cardano.bech32_encode('pool', ph.hash_raw),
             'epoch_no', es.epoch_no::bigint,
             'active_stake', es.amount::text
           )
@@ -45,7 +45,7 @@ BEGIN
         grest.cip5_hex_to_stake_addr(sa.hash_raw)::varchar AS stake_address,
         JSONB_AGG(
           JSONB_BUILD_OBJECT(
-            'pool_id', b32_encode('pool', ph.hash_raw::text),
+            'pool_id', cardano.bech32_encode('pool', ph.hash_raw),
             'epoch_no', es.epoch_no::bigint,
             'active_stake', es.amount::text
           )
@@ -62,4 +62,4 @@ BEGIN
 END;
 $$;
 
-COMMENT ON FUNCTION grest.account_history IS 'Get the active stake history of given accounts'; -- noqa: LT01
+COMMENT ON FUNCTION grest.account_history IS 'DEPRECATED: Get the active stake history of given accounts'; -- noqa: LT01

@@ -8,7 +8,6 @@ requestBodies:
             type: object
             properties:
               _block_hashes:
-                format: text
                 type: array
                 items:
                   $ref: "#/components/schemas/blocks/items/properties/hash"
@@ -27,7 +26,6 @@ requestBodies:
             type: object
             properties:
               _block_hashes:
-                format: text
                 type: array
                 items:
                   $ref: "#/components/schemas/blocks/items/properties/hash"
@@ -81,7 +79,6 @@ requestBodies:
             type: object
             properties:
               _addresses:
-                format: text
                 type: array
                 items:
                   type: string
@@ -100,7 +97,6 @@ requestBodies:
             type: object
             properties:
               _addresses:
-                format: text
                 type: array
                 items:
                   type: string
@@ -124,7 +120,6 @@ requestBodies:
             type: object
             properties:
               _addresses:
-                format: text
                 type: array
                 items:
                   type: string
@@ -148,7 +143,6 @@ requestBodies:
             type: object
             properties:
               _stake_addresses:
-                format: text
                 type: array
                 items:
                   type: string
@@ -172,7 +166,6 @@ requestBodies:
             type: object
             properties:
               _stake_addresses:
-                format: text
                 type: array
                 items:
                   type: string
@@ -201,7 +194,6 @@ requestBodies:
             type: object
             properties:
               _stake_addresses:
-                format: text
                 type: array
                 items:
                   type: string
@@ -225,7 +217,6 @@ requestBodies:
             type: object
             properties:
               _stake_addresses:
-                format: text
                 type: array
                 items:
                   type: string
@@ -244,7 +235,6 @@ requestBodies:
             type: object
             properties:
               _payment_credentials:
-                format: text
                 type: array
                 items:
                   type: string
@@ -268,7 +258,6 @@ requestBodies:
             type: object
             properties:
               _payment_credentials:
-                format: text
                 type: array
                 items:
                   type: string
@@ -292,7 +281,6 @@ requestBodies:
             type: object
             properties:
               _tx_hashes:
-                format: text
                 type: array
                 items:
                   type: string
@@ -311,7 +299,6 @@ requestBodies:
             type: object
             properties:
               _tx_hashes:
-                format: text
                 type: array
                 items:
                   type: string
@@ -377,7 +364,6 @@ requestBodies:
             type: object
             properties:
               _pool_bech32_ids:
-                format: text
                 type: array
                 items:
                   type: string
@@ -395,7 +381,6 @@ requestBodies:
             type: object
             properties:
               _pool_bech32_ids:
-                format: text
                 type: array
                 items:
                   type: string
@@ -413,7 +398,6 @@ requestBodies:
             type: object
             properties:
               _script_hashes:
-                format: text
                 type: array
                 items:
                   type: string
@@ -430,7 +414,6 @@ requestBodies:
             type: object
             properties:
               _datum_hashes:
-                format: text
                 type: array
                 items:
                   type: string
@@ -449,7 +432,6 @@ requestBodies:
             type: object
             properties:
               _asset_list:
-                format: text
                 type: array
                 description: Array of array of policy ID and asset names (hex)
                 items:
@@ -470,7 +452,6 @@ requestBodies:
             type: object
             properties:
               _asset_list:
-                format: text
                 type: array
                 description: Array of array of policy ID and asset names (hex)
                 items:
@@ -496,7 +477,6 @@ requestBodies:
             type: object
             properties:
               _drep_ids:
-                format: text
                 type: array
                 descriptions: Array of DRep IDs in bech32 format
                 items:
@@ -514,7 +494,6 @@ requestBodies:
             type: object
             properties:
               _utxo_refs:
-                format: text
                 type: array
                 items:
                   type: string
@@ -539,12 +518,10 @@ requestBodies:
             type: object
             properties:
               jsonrpc:
-                format: text
                 type: string
                 description: Identifier for JSON-RPC 2.0 standard
                 example: "2.0"
               method:
-                format: text
                 type: string
                 description: The Ogmios method to be called (see more details [here](#tag--Ogmios)) or browse examples tab
                 enum: ["queryNetwork/blockHeight","queryNetwork/genesisConfiguration","queryNetwork/startTime","queryNetwork/tip","queryLedgerState/epoch","queryLedgerState/eraStart","queryLedgerState/eraSummaries","queryLedgerState/liveStakeDistribution","queryLedgerState/protocolParameters","queryLedgerState/proposedProtocolParameters","queryLedgerState/stakePools","submitTransaction","evaluateTransaction"]
