@@ -24,7 +24,7 @@ BEGIN
     stake_address
   WHERE
     stake_address.hash_raw = ANY(
-      SELECT DECODE(b32_decode(n), 'hex')
+      SELECT cardano.bech32_decode_data(n)
       FROM UNNEST(_stake_addresses) AS n
     );
 
@@ -37,7 +37,7 @@ BEGIN
       ELSE
         'not registered'
       END AS status,
-      b32_encode('pool', ph.hash_raw::text)::varchar AS delegated_pool,
+      cardano.bech32_encode('pool', ph.hash_raw)::varchar AS delegated_pool,
       vote_t.delegated_drep,
       sdc.total_balance::text,
       sdc.utxo::text,
@@ -89,7 +89,21 @@ BEGIN
             SELECT TRUE
             FROM delegation_vote AS dv1
             WHERE dv1.addr_id = dv.addr_id
-              AND dv1.id > dv.id)
+              AND dv1.id > dv.id
+            LIMIT 1)
+          AND NOT EXISTS (
+            SELECT TRUE
+            FROM stake_deregistration
+            WHERE stake_deregistration.addr_id = dv.addr_id
+              AND stake_deregistration.tx_id > dv.tx_id
+            LIMIT 1)
+          AND NOT EXISTS (
+            SELECT TRUE
+            FROM drep_registration
+            WHERE drep_registration.drep_hash_id = dv.drep_hash_id
+              AND drep_registration.tx_id > dv.tx_id
+              AND drep_registration.deposit < 0
+            LIMIT 1)
       ) AS vote_t ON vote_t.addr_id = status_t.id
       LEFT JOIN (
         SELECT

@@ -35,6 +35,7 @@ $$;
 GRANT USAGE ON SCHEMA public TO authenticator, web_anon;
 GRANT USAGE ON SCHEMA grest TO authenticator, web_anon;
 GRANT USAGE ON SCHEMA grestv0 TO authenticator, web_anon;
+GRANT USAGE ON SCHEMA cardano TO authenticator, web_anon; -- currently, pg_cardano extension has a hardcoded reference to cardano schema
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO authenticator, web_anon;
 GRANT SELECT ON ALL TABLES IN SCHEMA grest TO authenticator, web_anon;
 GRANT SELECT ON ALL TABLES IN SCHEMA grestv0 TO authenticator, web_anon;
@@ -79,6 +80,15 @@ CREATE TABLE grest.genesis (
   alonzogenesis varchar
 );
 
+-- POOL_GROUPS TABLE --
+DROP TABLE IF EXISTS grest.pool_groups;
+CREATE TABLE grest.pool_groups (
+  pool_id_bech32 text PRIMARY KEY NOT NULL,
+  pool_group text,
+  ticker text,
+  adastat_group text,
+  balanceanalytics_group text
+);
 
 -- DROP EXISTING FUNCTIONS
 DO
@@ -187,6 +197,5 @@ $$
 $$;
 
 -- Refresh asset token registry cache from github, to avoid stale deletes
-DELETE FROM grest.control_table WHERE key = 'asset_registry_commit';
--- DATABASE INDEXES --
--- Empty
+DELETE FROM grest.control_table
+WHERE key = 'asset_registry_commit';
