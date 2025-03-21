@@ -2735,7 +2735,9 @@ schemas:
           epoch_no:
             $ref: "#/components/schemas/blocks/items/properties/epoch_no"
           amount:
-            type: string
+            anyOf:
+            - type: string
+            - type: 'null'
             description: The voting power for the DRep
             example: "14231445553"
     drep_votes:
@@ -2772,7 +2774,9 @@ schemas:
           epoch_no:
             $ref: "#/components/schemas/blocks/items/properties/epoch_no"
           amount:
-            type: string
+            anyOf:
+            - type: string
+            - type: 'null'
             description: The voting power for the pool for the epoch
             example: "11231445553"
     pool_votes:

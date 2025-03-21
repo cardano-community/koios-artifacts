@@ -1117,7 +1117,7 @@ paths:
       tags:
         - Stake Account
       requestBody:
-        $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
+        $ref: "#/components/requestBodies/stake_addresses"
       responses:
         "200":
           description: Success!!
@@ -1591,6 +1591,7 @@ paths:
       operationId: drep_voting_power_history
   /drep_votes: #RPC
     get:
+      deprecated: true
       tags:
         - Governance
       parameters:
@@ -1611,6 +1612,9 @@ paths:
       summary: DReps Votes
       description: List of all votes casted by requested delegated representative (DRep)
       operationId: drep_votes
+      x-badges:
+        - color: red
+          label: 'Deprecated'
   /drep_delegators: #RPC
     get:
       tags:
@@ -2063,7 +2067,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/drep_voting_power_history"
+                $ref: "#/components/schemas/pool_voting_power_history"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -2074,8 +2078,8 @@ paths:
       description: History of Pool voting power against each (or requested) epoch
       operationId: pool_voting_power_history
   /pool_votes: #RPC
-    deprecated: true
     get:
+      deprecated: true
       tags:
         - Governance
       parameters:
@@ -5836,7 +5840,9 @@ components:
           epoch_no:
             $ref: "#/components/schemas/blocks/items/properties/epoch_no"
           amount:
-            type: string
+            anyOf:
+            - type: string
+            - type: 'null'
             description: The voting power for the DRep
             example: "14231445553"
     drep_votes:
@@ -5873,7 +5879,9 @@ components:
           epoch_no:
             $ref: "#/components/schemas/blocks/items/properties/epoch_no"
           amount:
-            type: string
+            anyOf:
+            - type: string
+            - type: 'null'
             description: The voting power for the pool for the epoch
             example: "11231445553"
     pool_votes:

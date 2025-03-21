@@ -972,7 +972,7 @@ paths:
       tags:
         - Stake Account
       requestBody:
-        $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
+        $ref: "#/components/requestBodies/stake_addresses"
       responses:
         "200":
           description: Success!!
@@ -1922,7 +1922,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/drep_voting_power_history"
+                $ref: "#/components/schemas/pool_voting_power_history"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -1933,8 +1933,8 @@ paths:
       description: History of Pool voting power against each (or requested) epoch
       operationId: pool_voting_power_history
   /pool_votes: #RPC
-    deprecated: true
     get:
+      deprecated: true
       tags:
         - Governance
       parameters:
