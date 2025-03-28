@@ -4758,7 +4758,7 @@ components:
             description: The source of the rewards
             enum: [member, leader, treasury, reserves, refund]
             example: member
-          pool_id_bec32:
+          pool_id_bech32:
             anyOf:
               - $ref: "#/components/schemas/pool_list/items/properties/pool_id_bech32"
               - type: 'null'

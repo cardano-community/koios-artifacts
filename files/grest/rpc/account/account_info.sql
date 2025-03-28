@@ -42,11 +42,11 @@ BEGIN
       COALESCE(utxo_t.utxo, 0)::text AS utxo,
       COALESCE(rewards_t.rewards, 0)::text AS rewards,
       COALESCE(withdrawals_t.withdrawals, 0)::text AS withdrawals,
-      (COALESCE(rewards_t.rewards, 0) + COALESCE(reserves_t.reserves, 0) + COALESCE(treasury_t.treasury, 0) + COALESCE(proposal_refund_t.proposal_refund) - COALESCE(withdrawals_t.withdrawals, 0))::text AS rewards_available,
+      (COALESCE(rewards_t.rewards, 0) + COALESCE(reserves_t.reserves, 0) + COALESCE(treasury_t.treasury, 0) + COALESCE(proposal_refund_t.proposal_refund, 0) - COALESCE(withdrawals_t.withdrawals, 0))::text AS rewards_available,
       COALESCE(status_t.deposit,0)::text AS deposit,
       COALESCE(reserves_t.reserves, 0)::text AS reserves,
       COALESCE(treasury_t.treasury, 0)::text AS treasury,
-      COALESCE(proposal_refund_t.proposal_refund)::text AS proposal_refund
+      COALESCE(proposal_refund_t.proposal_refund, 0)::text AS proposal_refund
     FROM
       (
         SELECT
