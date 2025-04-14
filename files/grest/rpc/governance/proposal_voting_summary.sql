@@ -82,8 +82,12 @@ BEGIN
         SELECT ped.gov_action_proposal_id, COALESCE(SUM(amount),0) AS inactive_drep_power 
         FROM proposal_epoch_data AS ped
         LEFT OUTER JOIN drep_distr AS dd on dd.epoch_no = epoch_of_interest
+          -- was not active when epoch started
           AND dd.active_until is not NULL AND dd.active_until < epoch_of_interest
-          AND NOT EXISTS (SELECT 1 FROM voting_procedure vp INNER JOIN tx t on vp.tx_id = t.id INNER JOIN block b on b.id = t.block_id AND b.epoch_no = epoch_of_interest AND vp.voter_role = 'DRep' and vp.drep_voter = dd.hash_id)        
+          -- did not vote in epoch of interest
+          AND NOT EXISTS (SELECT 1 FROM voting_procedure vp INNER JOIN tx t on vp.tx_id = t.id INNER JOIN block b on b.id = t.block_id AND b.epoch_no = epoch_of_interest AND vp.voter_role = 'DRep' and vp.drep_voter = dd.hash_id)
+          -- did not perform drep update in epoch of interest
+          AND NOT EXISTS (SELECT 1 from drep_registration dreg INNER JOIN tx t on dreg.tx_id = t.id AND dreg.drep_hash_id = dd.hash_id INNER JOIN block b on b.id = t.block_id and b.epoch_no = epoch_of_interest)
         GROUP BY ped.gov_action_proposal_id
       ),
       active_prop_drep_votes AS (

@@ -127,8 +127,8 @@ BEGIN
       dh.has_script AS has_script,
       (CASE WHEN starts_with(dh.view,'drep_always') OR (COALESCE(dr.deposit, 0) >= 0 AND dr.drep_hash_id IS NOT NULL) THEN TRUE ELSE FALSE END) AS registered,
       (CASE WHEN (dr.deposit < 0) OR starts_with(dh.view,'drep_always') THEN NULL ELSE ds.deposit END)::text AS deposit,
-      (CASE WHEN starts_with(dh.view,'drep_always') THEN TRUE ELSE COALESCE(dr.deposit, 0) >= 0 AND ds.active END) AS active,
-      (CASE WHEN COALESCE(dr.deposit, 0) >= 0 THEN ds.expires_epoch_no ELSE NULL END) AS expires_epoch_no,
+      (CASE WHEN starts_with(dh.view,'drep_always') THEN TRUE ELSE COALESCE(dr.deposit, 0) >= 0 AND (ds.active OR COALESCE(dd.active_until, 0) > curr_epoch) END) AS active,
+      (CASE WHEN COALESCE(dr.deposit, 0) >= 0 THEN GREATEST(ds.expires_epoch_no, COALESCE(dd.active_until, 0)) ELSE NULL END) AS expires_epoch_no,
       COALESCE(dd.amount, 0)::text AS amount,
       va.url AS meta_url,
       ENCODE(va.data_hash, 'hex') AS meta_hash
