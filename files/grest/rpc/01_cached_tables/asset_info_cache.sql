@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS grest.asset_info_cache (
   asset_id bigint PRIMARY KEY NOT NULL,
-  creation_time date,
+  creation_time timestamp without time zone,
   total_supply numeric,
   decimals integer,
   mint_cnt bigint,

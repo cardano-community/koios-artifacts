@@ -653,6 +653,28 @@ paths:
       summary: Transaction Status
       description: Get the number of block confirmations for a given transaction hash list
       operationId: tx_status
+  /tx_outs_epoch: #RPC
+    get:
+      tags:
+        - Transactions
+      parameters:
+        - $ref: "#/components/parameters/_epoch_no"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tx_outs_epoch"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Transaction outputs by epoch
+      description: Get a list of all transaction outputs for requested epoch
+      operationId: tx_outs_epoch
   /tx_utxos: #RPC
     post:
       tags:
@@ -4705,6 +4727,46 @@ components:
                   type: string
                   description: Quantity of assets on the UTxO
                   example: "1"
+          is_spent:
+            type: boolean
+            description: True if the UTXO has been spent
+            example: true
+    tx_outs_epoch:
+      description: List of transaction outputs with basic details for requested epoch
+      type: array
+      items:
+        type: object
+        properties:
+          tx_hash:
+            type: string
+            description: Hash identifier of the transaction
+            example: f144a8264acf4bdfe2e1241170969c930d64ab6b0996a4a45237b623f1dd670e
+          tx_index:
+            type: number
+            description: Index of UTxO in the transaction 
+            example: 0
+          address:
+            type: string
+            description: A Cardano payment/base address (bech32 encoded)
+            example: addr1qxkfe8s6m8qt5436lec3f0320hrmpppwqgs2gah4360krvyssntpwjcz303mx3h4avg7p29l3zd8u3jyglmewds9ezrqdc3cxp
+          stake_address:
+            $ref: "#/components/schemas/address_info/items/properties/stake_address"
+          payment_cred:
+            anyOf:
+              - type: string
+              - type: 'null'
+            description: Payment credential
+            example: de3c1c527e8826b9cd2030f88f75fc44cd4ce519b9ded9eb794b3794
+          epoch_no:
+            $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+          block_height:
+            $ref: "#/components/schemas/blocks/items/properties/block_height"
+          block_time:
+            $ref: "#/components/schemas/blocks/items/properties/block_time"
+          value:
+            $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/value"
+          datum_hash:
+            $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_hash"
           is_spent:
             type: boolean
             description: True if the UTXO has been spent

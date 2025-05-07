@@ -93,10 +93,7 @@ BEGIN
         WHEN _extended = false THEN NULL
         ELSE COALESCE(assets, JSONB_BUILD_ARRAY())
       END AS asset_list,
-      (CASE
-        WHEN tx_out.consumed_by_tx_id IS NULL THEN false
-        ELSE true
-      END) AS is_spent
+      tx_out.consumed_by_tx_id IS NOT NULL AS is_spent
     FROM tx_out
     INNER JOIN tx ON tx_out.tx_id = tx.id
     INNER JOIN address AS a ON a.id = tx_out.address_id

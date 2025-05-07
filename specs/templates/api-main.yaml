@@ -508,6 +508,28 @@ paths:
       summary: Transaction Status
       description: Get the number of block confirmations for a given transaction hash list
       operationId: tx_status
+  /tx_outs_epoch: #RPC
+    get:
+      tags:
+        - Transactions
+      parameters:
+        - $ref: "#/components/parameters/_epoch_no"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tx_outs_epoch"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Transaction outputs by epoch
+      description: Get a list of all transaction outputs for requested epoch
+      operationId: tx_outs_epoch
   /tx_utxos: #RPC
     post:
       tags:
