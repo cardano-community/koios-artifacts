@@ -10,7 +10,7 @@ RETURNS TABLE (
   block_height word31type,
   block_time integer
 )
-LANGUAGE SQL STABLE
+LANGUAGE sql STABLE
 AS $$
   SELECT DISTINCT ON (x.pool_id_bech32)
     x.pool_id_bech32,

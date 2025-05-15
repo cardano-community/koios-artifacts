@@ -14,17 +14,24 @@ AS $$
     COALESCE(dd.epoch_no, e.no) as epoch_no,
     COALESCE(dd.amount::text, '0') AS amount
   FROM public.drep_hash AS dh
-  INNER JOIN epoch AS e on e.no > (
+  INNER JOIN public.epoch AS e on e.no > (
     -- earliest voting power can be recorded for epoch after very first registration's epoch
     SELECT b.epoch_no
-    FROM drep_registration dr 
-    INNER JOIN tx t ON dr.drep_hash_id = dh.id AND dr.tx_id = t.id 
-    INNER JOIN block b ON t.block_id = b.id 
-    WHERE NOT EXISTS (SELECT 1 FROM drep_registration dr2 WHERE dr2.drep_hash_id = dr.drep_hash_id AND dr2.id < dr.id)
+    FROM drep_registration AS dr
+    INNER JOIN tx AS t ON dr.drep_hash_id = dh.id AND dr.tx_id = t.id 
+    INNER JOIN block AS b ON t.block_id = b.id 
+    WHERE NOT EXISTS (
+      SELECT 1
+      FROM drep_registration AS dr2
+      WHERE dr2.drep_hash_id = dr.drep_hash_id AND dr2.id < dr.id
+    )
   )
   -- previously was doing INNER JOIN of drep_distr with drep_hash but if zero voting power drep_distr not created
   LEFT OUTER JOIN public.drep_distr AS dd on dh.id = dd.hash_id AND e.no = dd.epoch_no
-  WHERE (CASE WHEN _epoch_no IS NULL THEN TRUE ELSE dd.epoch_no = _epoch_no END)
+  WHERE (CASE
+        WHEN _epoch_no IS NULL
+        THEN TRUE ELSE dd.epoch_no = _epoch_no
+      END)
     AND (CASE
           WHEN _drep_id IS NULL THEN TRUE
           WHEN STARTS_WITH(_drep_id,'drep_always') THEN dh.view = _drep_id

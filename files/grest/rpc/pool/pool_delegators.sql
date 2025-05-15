@@ -67,9 +67,6 @@ $$;
 
 COMMENT ON FUNCTION grest.pool_delegators IS 'Return information about live delegators for a given pool.'; --noqa: LT01
 
-
-
-
 CREATE OR REPLACE FUNCTION grest.pool_delegators_list(_pool_bech32 text)
 RETURNS TABLE (
   stake_address varchar,
