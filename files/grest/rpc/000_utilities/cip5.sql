@@ -14,7 +14,7 @@ BEGIN
       ''::bytea,
       FALSE,
       SUBSTRING(_raw FROM 2),
-      FALSE,
+      SUBSTRING(ENCODE(_raw, 'hex') from 1 for 1)::text = 'f',
       SUBSTRING(ENCODE(_raw, 'hex') from 2 for 1)::integer
       )::text;
   END IF;
