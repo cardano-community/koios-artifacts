@@ -128,7 +128,7 @@ BEGIN
       INNER JOIN public.pool_hash AS ph ON ph.id = lpu.hash_id
       INNER JOIN public.tx ON tx.id = lpu.registered_tx_id
       INNER JOIN public.block AS b ON b.id = tx.block_id
-      LEFT JOIN public.pool_metadata_ref AS pmr ON pmr.id = lpu.meta_id
+      LEFT JOIN public.pool_metadata_ref AS pmr ON pmr.id = lpu.meta_id;
 
     INSERT INTO grest.control_table (key, last_value)
       VALUES (
@@ -160,13 +160,15 @@ BEGIN
       )
     )
   THEN RAISE EXCEPTION 'Previous query still running but should have completed! Exiting...';
-
+  END IF;
+  
   SELECT COALESCE(
       (
         SELECT last_value::bigint
         FROM grest.control_table
         WHERE key = 'pool_info_cache_last_block_height'
-      ), 0
+      ),
+      0
     ) INTO _last_update_block_height;
 
   SELECT MAX(block_no)
@@ -179,8 +181,7 @@ BEGIN
     IF (
       _last_update_block_diff >= 45 
       OR _last_update_block_diff < 0 -- Special case for db-sync restart rollback to epoch start
-    )
-    THEN
+    ) THEN
       RAISE NOTICE 'Re-running...';
       CALL grest.update_pool_info_cache ();
     ELSE
@@ -188,7 +189,7 @@ BEGIN
     END IF;
 
     RETURN;
-  END;
+END;
 $$;
 
 COMMENT ON FUNCTION grest.pool_info_cache_update_check IS 'Determines whether or not the pool info cache should be updated based ON the time rule (max once in 60 mins), and ensures previous run completed.';
