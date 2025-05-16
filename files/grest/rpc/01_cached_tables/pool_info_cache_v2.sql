@@ -192,7 +192,7 @@ BEGIN
 END;
 $$;
 
-COMMENT ON FUNCTION grest.pool_info_cache_update_check IS 'Determines whether or not the pool info cache should be updated based ON the time rule (max once in 60 mins), and ensures previous run completed.';
+COMMENT ON FUNCTION grest.pool_info_cache_update_check IS 'Determines whether or not the pool info cache should be updated based ON the time rule (max once in 15 mins), and ensures previous run completed.';
 
 CREATE OR REPLACE FUNCTION grest.pool_info_retire_status()
 RETURNS trigger
