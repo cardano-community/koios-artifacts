@@ -11,11 +11,13 @@ LANGUAGE plpgsql
 AS $$
 DECLARE
   gap_id            bigint;
+  gap_enacted_epoch bigint;
   gap_enacted_tx_id bigint;
 BEGIN
 
   SELECT
     gap.id,
+    gap.enacted_epoch,
     CASE
       WHEN gap.id IS NULL THEN NULL
       ELSE (
@@ -24,7 +26,7 @@ BEGIN
         WHERE eic.epoch_no = (gap.enacted_epoch - 1)
       )
     END
-    INTO gap_id, gap_enacted_tx_id
+    INTO gap_id, gap_enacted_epoch, gap_enacted_tx_id
   FROM public.gov_action_proposal AS gap
   WHERE gap.type = 'NewCommittee'
     AND gap.enacted_epoch IS NOT NULL
@@ -115,6 +117,12 @@ BEGIN
         WHEN gap_id IS NULL THEN c.gov_action_proposal_id IS NULL
         ELSE c.gov_action_proposal_id = gap_id
       END
+      AND NOT EXISTS (
+        SELECT TRUE
+        FROM public.gov_action_proposal AS gap
+        WHERE gap.type = 'NoConfidence'
+        AND gap.enacted_epoch IS NOT NULL AND gap.enacted_epoch >= COALESCE(gap_enacted_epoch, 0)
+      )
     GROUP BY c.gov_action_proposal_id, c.quorum_numerator, c.quorum_denominator
   );
 
