@@ -34,7 +34,7 @@ DECLARE
 BEGIN
   SELECT MAX(block_no) FROM public.block
     WHERE block_no IS NOT NULL INTO _current_block_height;
-  SELECT MAX(epoch_no) FROM public.epoch into _current_epoch_no;
+  SELECT MAX(no) FROM public.epoch into _current_epoch_no;
   SELECT COALESCE(last_value::bigint, 0) INTO _pool_info_cache_last_block_height FROM grest.control_table
     WHERE key = 'pool_info_cache_last_block_height';
   SELECT COALESCE(MAX(tx.id), 0) INTO _pool_info_cache_last_tx_id
