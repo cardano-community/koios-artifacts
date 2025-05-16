@@ -133,10 +133,10 @@ BEGIN
     INSERT INTO grest.control_table (key, last_value)
       VALUES (
           'pool_info_cache_last_block_height',
-          _pool_info_cache_last_block_height
+          _current_block_height
         ) ON CONFLICT (key) DO
       UPDATE
-      SET last_value = _pool_info_cache_last_block_height;
+      SET last_value = _current_block_height;
 END;
 $$;
 
