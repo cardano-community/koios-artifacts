@@ -235,8 +235,8 @@ BEGIN
           count(cm.id) AS committee_size
         FROM epoch_state AS epstate
           INNER JOIN proposal_epoch_data AS ped on epstate.epoch_no = ped.epoch_of_interest
-          INNER JOIN committee AS c on epstate.committee_id = c.id
-          INNER JOIN committee_member AS cm on cm.committee_id = c.id
+          LEFT OUTER JOIN committee AS c on epstate.committee_id = c.id
+          LEFT OUTER JOIN committee_member AS cm on cm.committee_id = c.id
         GROUP BY ped.gov_action_proposal_id
       ),
       combined_data AS (
@@ -326,14 +326,17 @@ BEGIN
       y.pool_passive_always_no_confidence_vote_power::text,
       y.committee_yes_votes_cast::integer,
       (CASE
+        WHEN y.committee_size = 0 THEN 0
         WHEN y.proposal_type IN ('NoConfidence', 'NewCommittee') THEN 0
         ELSE ROUND((y.committee_yes_votes_cast * 100 / y.committee_non_abstain_total), 2)
       END) AS committee_yes_pct,
       (CASE
+        WHEN y.committee_size = 0 THEN 0
         WHEN y.proposal_type IN ('NoConfidence', 'NewCommittee') THEN 0
         ELSE y.committee_no_votes_cast
       END)::integer AS committee_no_votes_cast,
       (CASE
+        WHEN y.committee_size = 0 THEN 0
         WHEN y.proposal_type IN ('NoConfidence', 'NewCommittee') THEN 0
         ELSE ROUND((committee_non_abstain_total - y.committee_yes_votes_cast) * 100 / y.committee_non_abstain_total, 2)
       END) AS committee_no_pct,
