@@ -119,10 +119,10 @@ BEGIN
       always_no_conf_data AS (
         SELECT
           ped.gov_action_proposal_id,
-          amount AS always_no_conf
+          COALESCE(amount, 0) AS always_no_conf
         FROM proposal_epoch_data AS ped
-          INNER JOIN drep_distr AS dd ON dd.epoch_no = ped.epoch_of_interest
-          INNER JOIN drep_hash AS dh ON dh.view = 'drep_always_no_confidence' AND dd.hash_id = dh.id
+          INNER JOIN drep_hash AS dh ON dh.view = 'drep_always_no_confidence'
+          LEFT OUTER JOIN drep_distr AS dd ON dd.epoch_no = ped.epoch_of_interest AND dd.hash_id = dh.id
       ),
       always_abstain_data AS (
         SELECT
