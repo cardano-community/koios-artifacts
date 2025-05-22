@@ -248,7 +248,7 @@ $$;
 
 -- HELPER FUNCTION: grest.stake_distribution_cache_update_check
 -- Determines whether or not the stake distribution cache should be updated
--- based ON the time rule (max once in 60 mins), and ensures previous run completed.
+-- based on a time rule based on network params (minimum 15 mins), and ensures previous run completed.
 
 CREATE OR REPLACE FUNCTION grest.stake_distribution_cache_update_check()
 RETURNS void
@@ -258,6 +258,8 @@ DECLARE
   _last_update_block_height bigint DEFAULT NULL;
   _current_block_height bigint DEFAULT NULL;
   _last_update_block_diff bigint DEFAULT NULL;
+  _blocks_per_15_minutes int DEFAULT NULL;
+  _target_block_diff int DEFAULT NULL;
 BEGIN
   IF (
     -- If checking query with the same name there will be 2 results
@@ -312,22 +314,28 @@ BEGIN
     WHERE BLOCK_NO IS NOT NULL INTO _current_block_height;
 
   SELECT (_current_block_height - _last_update_block_height) INTO _last_update_block_diff;
-  -- Do nothing until there is a 180 blocks difference in height - 60 minutes theoretical time
-  -- 185 in check because last block height considered is 5 blocks behind tip
 
-  Raise NOTICE 'Last stake distribution update was % blocks ago...',
-    _last_update_block_diff;
-    IF (_last_update_block_diff >= 180
-        OR _last_update_block_diff < 0 -- Special case for db-sync restart rollback to epoch start
-      ) THEN
+  SELECT 900 / (slotlength::int / activeslotcoeff::float)::int FROM grest.genesis INTO _blocks_per_15_minutes;
+
+  SELECT (
+    CASE
+      WHEN epochLength::int / slotlength::int * activeslotcoeff::float / 120 < _blocks_per_15_minutes
+      THEN _blocks_per_15_minutes
+      ELSE (epochLength::int / slotlength::int * activeslotcoeff::float / 120)::int
+    END
+  ) FROM grest.genesis INTO _target_block_diff;
+
+  RAISE NOTICE 'Last stake distribution update was % blocks ago...', _last_update_block_diff;
+  IF _last_update_block_diff >= _target_block_diff
+    THEN
       RAISE NOTICE 'Re-running...';
-      CALL grest.update_stake_distribution_cache ();
-    ELSE
-      RAISE NOTICE 'Minimum block height difference(180) for update not reached, skipping...';
-    END IF;
+      CALL grest.update_stake_distribution_cache();
+  ELSE
+    RAISE NOTICE 'Minimum block height difference(%) for update not reached, skipping...', _target_block_diff;
+  END IF;
 
-    RETURN;
-  END;
+  RETURN;
+END;
 $$;
 
 DROP INDEX IF EXISTS grest.idx_pool_id;
