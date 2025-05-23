@@ -720,6 +720,14 @@ schemas:
           $ref: "#/components/schemas/blocks/items/properties/block_height"
         block_time:
           $ref: "#/components/schemas/blocks/items/properties/block_time"
+        registered:
+          type: boolean
+          description: Flag to show if the pool has active calidus key as registered
+          example: true
+        bytes:
+          type: string
+          description: Raw Transaction metadata in hex
+          example: 19029a324512
   pool_groups:
     description: Array of pools with their corresponding group information
     type: array
