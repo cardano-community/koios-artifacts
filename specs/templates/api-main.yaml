@@ -12,7 +12,6 @@ servers:
   - url: https://sancho.koios.rest/api/v1
     description: Sanchonet Network
 paths:
-
   /tip: #RPC
     get:
       tags:
@@ -345,7 +344,7 @@ paths:
       operationId: block_tx_info
       x-badges:
         - color: red
-          label: 'Deprecated'
+          label: "Deprecated"
 
   /utxo_info: #RPC
     post:
@@ -555,7 +554,7 @@ paths:
       operationId: tx_utxos
       x-badges:
         - color: red
-          label: 'Deprecated'
+          label: "Deprecated"
 
   /address_info: #RPC
     post:
@@ -847,7 +846,7 @@ paths:
       operationId: account_rewards
       x-badges:
         - color: red
-          label: 'Deprecated'
+          label: "Deprecated"
   /account_reward_history: #RPC
     post:
       tags:
@@ -988,7 +987,7 @@ paths:
       operationId: account_history
       x-badges:
         - color: red
-          label: 'Deprecated'
+          label: "Deprecated"
   /account_stake_history: #RPC
     post:
       tags:
@@ -1163,8 +1162,8 @@ paths:
           $ref: "#/components/responses/NotFound"
       summary: Asset Addresses
       description: Get the list of all addresses holding a given asset <br><br>
-        `Note - Due to cardano's UTxO design and usage from projects, asset to addresses map can be infinite. Thus, for a small subset of active projects 
-        with millions of transactions, these might end up with timeouts (HTTP code 504) on free layer. Such large-scale projects are free to subscribe to 
+        `Note - Due to cardano's UTxO design and usage from projects, asset to addresses map can be infinite. Thus, for a small subset of active projects
+        with millions of transactions, these might end up with timeouts (HTTP code 504) on free layer. Such large-scale projects are free to subscribe to
         query layers to have a dedicated cache table for themselves served via Koios.`
       operationId: asset_addresses
   /asset_nft_address: #RPC
@@ -1210,9 +1209,10 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
       summary: Policy Asset Address List
-      description: Get the list of addresses with quantity for each asset on the given policy <br><br>
-        `Note - Due to cardano's UTxO design and usage from projects, asset to addresses map can be infinite. Thus, for a small subset of active projects 
-        with millions of transactions, these might end up with timeouts (HTTP code 504) on free layer. Such large-scale projects are free to subscribe to 
+      description:
+        Get the list of addresses with quantity for each asset on the given policy <br><br>
+        `Note - Due to cardano's UTxO design and usage from projects, asset to addresses map can be infinite. Thus, for a small subset of active projects
+        with millions of transactions, these might end up with timeouts (HTTP code 504) on free layer. Such large-scale projects are free to subscribe to
         query layers to have a dedicated cache table for themselves served via Koios.`
       operationId: policy_asset_addresses
   /policy_asset_info: #RPC
@@ -1442,7 +1442,7 @@ paths:
       operationId: drep_history
       x-badges:
         - color: red
-          label: 'Deprecated'
+          label: "Deprecated"
   /drep_voting_power_history: #RPC
     get:
       tags:
@@ -1491,7 +1491,7 @@ paths:
       operationId: drep_votes
       x-badges:
         - color: red
-          label: 'Deprecated'
+          label: "Deprecated"
   /drep_delegators: #RPC
     get:
       tags:
@@ -1645,7 +1645,7 @@ paths:
   /vote_list: #RPC
     get:
       tags:
-        - Governance      
+        - Governance
       responses:
         "200":
           description: Success!!
@@ -1979,8 +1979,8 @@ paths:
       operationId: pool_votes
       x-badges:
         - color: red
-          label: 'Deprecated'
-  
+          label: "Deprecated"
+
   /pool_groups: #RPC
     get:
       tags:
@@ -2198,7 +2198,7 @@ paths:
         We do support transparent forwarding for various methods from Ogmios, you can read about those <a href="#tag--Ogmios">here</a>.
         </div>
       operationId: ogmios
-        
+
 components:
   #!params!#
   #!requestBodies!#

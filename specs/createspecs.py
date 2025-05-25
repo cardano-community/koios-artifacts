@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import json, pathlib, traceback
+import json, pathlib, traceback, re, textwrap
 
 inputspecsfile="templates/api-main.yaml"
 apiinfofile="templates/1-api-info.yaml"
@@ -10,18 +10,40 @@ apischemafile="templates/4-api-schemas.yaml"
 examplesfile="templates/example-map.json"
 examples=json.loads(pathlib.Path(examplesfile).read_text())
 
+PLACEHOLDER_MAP = {
+    "info":         pathlib.Path(apiinfofile).read_text().rstrip(),
+    "params":       pathlib.Path(apiparamsfile).read_text().rstrip(),
+    "requestBodies":pathlib.Path(apirequestBodiesfile).read_text().rstrip(),
+    "schemas":      pathlib.Path(apischemafile).read_text().rstrip(),
+}
+
+_PH_RE = re.compile(
+    r"^(?P<indent>[ \t]*)#!(?P<key>"
+    + "|".join(re.escape(k) for k in PLACEHOLDER_MAP)
+    + r")!#",
+    flags=re.MULTILINE,
+)
+
+def _inject(match: re.Match) -> str:
+    indent = match.group("indent")
+    key    = match.group("key")
+    block  = PLACEHOLDER_MAP[key]
+
+    return textwrap.indent(block, indent)
+
 def populate_spec(network, outf):
   """Populate template spec using network initial and write to outf file"""
   template = pathlib.Path(inputspecsfile).read_text()
+  template = _PH_RE.sub(_inject, template)
   template=template.replace("#!info!#", str(pathlib.Path(apiinfofile).read_text()).rstrip())
   template=template.replace("#!params!#", str(pathlib.Path(apiparamsfile).read_text()).rstrip())
   template=template.replace("#!requestBodies!#", str(pathlib.Path(apirequestBodiesfile).read_text()).rstrip())
   template=template.replace("#!schemas!#", str(pathlib.Path(apischemafile).read_text()).rstrip())
   print("Creating " + outf + " using koiosapi.yaml as template...")
-  for ep in examples["params"]:
-    template=template.replace(str("##" + str(ep) + "_param##"), str(examples["params"][ep][str(network)]))
-  for erb in examples["requestBodies"]:
-    template=template.replace("##" + str(erb) + "_rb##", str(examples["requestBodies"][erb][str(network)]))
+  for ep, vals in examples["params"].items():
+      template = template.replace(f"##{ep}_param##", vals[network])
+  for erb, vals in examples["requestBodies"].items():
+      template = template.replace(f"##{erb}_rb##", vals[network])
   with open(outf, 'w') as f:
     f.write(template)
 
