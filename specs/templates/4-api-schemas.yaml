@@ -117,6 +117,18 @@ schemas:
             type: string
             description: The amount (in Lovelace) in the obligation pot coming from governance proposal deposits.
             example: 0
+          treasury_donation:
+            type: string
+            description: The amount (in Lovelace) donated to the treasury.
+            example: 0
+          treasury_withdrawal:
+            type: string
+            description: The amount (in Lovelace) withdrawn from the treasury.
+            example: 0
+          reserves_withdrawal:
+            type: string
+            description: The amount (in Lovelace) withdrawn from reserves.
+            example: 0
     param_updates:
       description: Array of unique param update proposals submitted on chain
       type: array
