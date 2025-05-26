@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION grest.tx_treasury_donations_epoch(_epoch_no numeric)
+CREATE OR REPLACE FUNCTION grest.tx_treasury_donations_epoch(_epoch_no numeric DEFAULT NULL)
 RETURNS TABLE (
   epoch_no word31type,
   tx_hash text,
