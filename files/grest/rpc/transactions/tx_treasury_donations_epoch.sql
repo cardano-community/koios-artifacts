@@ -20,7 +20,7 @@ AS $$
     tx.treasury_donation::text
   FROM public.tx AS tx
     INNER JOIN public.block AS b ON b.id = tx.block_id
-  WHERE b.epoch_no = _epoch_no::word31type
+  WHERE b.epoch_no = COALESCE(_epoch_no, (SELECT MAX(no) FROM epoch))::word31type
     AND tx.treasury_donation > 0
   GROUP BY tx.id, tx.block_index, b.block_no, b.epoch_no, b.hash, b.time
   ORDER BY tx.id ASC;

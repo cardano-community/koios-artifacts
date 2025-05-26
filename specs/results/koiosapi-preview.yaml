@@ -2561,9 +2561,9 @@ components:
                   $ref: "#/components/schemas/blocks/items/properties/hash"
             example:
               _block_hashes:
-                - a4504e2495ed03b48be36676f430c54dca0769d29f72ebf18d493abf42d2167b
-                - 8e7a6206d2b21ae4f26e7e09353fadae17f838a63d095c2be51acbd16e9b7716
-                - 1baaf7812ed48e663adb9eeaa68fe25034e5e30b4f8e56cc8600cac5e9d42ce7
+                -  a4504e2495ed03b48be36676f430c54dca0769d29f72ebf18d493abf42d2167b
+                -  8e7a6206d2b21ae4f26e7e09353fadae17f838a63d095c2be51acbd16e9b7716
+                -  1baaf7812ed48e663adb9eeaa68fe25034e5e30b4f8e56cc8600cac5e9d42ce7
       description: Array of block hashes
     block_tx_info:
       content:
@@ -2607,9 +2607,9 @@ components:
                 description: Controls whether to include bytecode for associated reference/plutus scripts
             example:
               _block_hashes:
-                - a4504e2495ed03b48be36676f430c54dca0769d29f72ebf18d493abf42d2167b
-                - 8e7a6206d2b21ae4f26e7e09353fadae17f838a63d095c2be51acbd16e9b7716
-                - 1baaf7812ed48e663adb9eeaa68fe25034e5e30b4f8e56cc8600cac5e9d42ce7
+                -  a4504e2495ed03b48be36676f430c54dca0769d29f72ebf18d493abf42d2167b
+                -  8e7a6206d2b21ae4f26e7e09353fadae17f838a63d095c2be51acbd16e9b7716
+                -  1baaf7812ed48e663adb9eeaa68fe25034e5e30b4f8e56cc8600cac5e9d42ce7
               _inputs: false
               _metadata: false
               _assets: false
@@ -2633,8 +2633,8 @@ components:
                 description: Array of Cardano payment address(es) in bech32 format
             example:
               _addresses:
-                - addr_test1vpfwv0ezc5g8a4mkku8hhy3y3vp92t7s3ul8g778g5yegsgalc6gc
-                - addr_test1vqneq3v0dqh3x3muv6ee3lt8e5729xymnxuavx6tndcjc2cv24ef9
+                -  addr_test1vpfwv0ezc5g8a4mkku8hhy3y3vp92t7s3ul8g778g5yegsgalc6gc
+                -  addr_test1vqneq3v0dqh3x3muv6ee3lt8e5729xymnxuavx6tndcjc2cv24ef9
       description: Array of Cardano payment address(es)
     payment_addresses_with_extended:
       content:
@@ -2655,8 +2655,8 @@ components:
                 description: Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call
             example:
               _addresses:
-                - addr_test1vpfwv0ezc5g8a4mkku8hhy3y3vp92t7s3ul8g778g5yegsgalc6gc
-                - addr_test1vqneq3v0dqh3x3muv6ee3lt8e5729xymnxuavx6tndcjc2cv24ef9
+                -  addr_test1vpfwv0ezc5g8a4mkku8hhy3y3vp92t7s3ul8g778g5yegsgalc6gc
+                -  addr_test1vqneq3v0dqh3x3muv6ee3lt8e5729xymnxuavx6tndcjc2cv24ef9
               _extended: true
       description: Array of Cardano payment address(es) with extended flag to toggle additional fields
     address_txs:
@@ -2678,8 +2678,8 @@ components:
                 description: Only fetch information after specific block height
             example:
               _addresses:
-                - addr_test1vpfwv0ezc5g8a4mkku8hhy3y3vp92t7s3ul8g778g5yegsgalc6gc
-                - addr_test1vqneq3v0dqh3x3muv6ee3lt8e5729xymnxuavx6tndcjc2cv24ef9
+                -  addr_test1vpfwv0ezc5g8a4mkku8hhy3y3vp92t7s3ul8g778g5yegsgalc6gc
+                -  addr_test1vqneq3v0dqh3x3muv6ee3lt8e5729xymnxuavx6tndcjc2cv24ef9
               _after_block_height: 40356
       description: Array of Cardano payment address(es)
     stake_addresses_with_epoch_no:
@@ -2701,8 +2701,8 @@ components:
                 description: Only fetch information for a specific epoch
             example:
               _stake_addresses:
-                - stake_test1urqntq4wexjylnrdnp97qq79qkxxvrsa9lcnwr7ckjd6w0cr04y4p
-                - stake_test1up6wqzrw2h9vvjy5zfkjn0dwtymy5r29zyhf8fyhm6fat9c2am5hl
+                -  stake_test1urqntq4wexjylnrdnp97qq79qkxxvrsa9lcnwr7ckjd6w0cr04y4p
+                -  stake_test1up6wqzrw2h9vvjy5zfkjn0dwtymy5r29zyhf8fyhm6fat9c2am5hl
               _epoch_no: 11
       description: Array of Cardano stake address(es) in bech32 format with optional epoch no to filter by
     stake_addresses_with_first_only_and_empty:
@@ -2728,8 +2728,8 @@ components:
                 description: Include zero quantity entries
             example:
               _stake_addresses:
-                - stake_test1urqntq4wexjylnrdnp97qq79qkxxvrsa9lcnwr7ckjd6w0cr04y4p
-                - stake_test1up6wqzrw2h9vvjy5zfkjn0dwtymy5r29zyhf8fyhm6fat9c2am5hl
+                -  stake_test1urqntq4wexjylnrdnp97qq79qkxxvrsa9lcnwr7ckjd6w0cr04y4p
+                -  stake_test1up6wqzrw2h9vvjy5zfkjn0dwtymy5r29zyhf8fyhm6fat9c2am5hl
               _first_only: false
               _empty: false
       description: Array of Cardano stake credential(s) in bech32 format alongwith flag to return first only or used UTxOs
@@ -2752,8 +2752,8 @@ components:
                 description: Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call
             example:
               _stake_addresses:
-                - stake_test1urqntq4wexjylnrdnp97qq79qkxxvrsa9lcnwr7ckjd6w0cr04y4p
-                - stake_test1up6wqzrw2h9vvjy5zfkjn0dwtymy5r29zyhf8fyhm6fat9c2am5hl
+                -  stake_test1urqntq4wexjylnrdnp97qq79qkxxvrsa9lcnwr7ckjd6w0cr04y4p
+                -  stake_test1up6wqzrw2h9vvjy5zfkjn0dwtymy5r29zyhf8fyhm6fat9c2am5hl
               _extended: true
       description: Array of Cardano stake credential(s) in bech32 format alongwith extended flag to return additional columns
     stake_addresses:
@@ -2771,8 +2771,8 @@ components:
                 description: Array of Cardano stake address(es) in bech32 format
             example:
               _stake_addresses:
-                - stake_test1urqntq4wexjylnrdnp97qq79qkxxvrsa9lcnwr7ckjd6w0cr04y4p
-                - stake_test1up6wqzrw2h9vvjy5zfkjn0dwtymy5r29zyhf8fyhm6fat9c2am5hl
+                -  stake_test1urqntq4wexjylnrdnp97qq79qkxxvrsa9lcnwr7ckjd6w0cr04y4p
+                -  stake_test1up6wqzrw2h9vvjy5zfkjn0dwtymy5r29zyhf8fyhm6fat9c2am5hl
       description: Array of Cardano stake credential(s) in bech32 format
     credential_txs:
       content:
@@ -2793,8 +2793,8 @@ components:
                 description: Only fetch information after specific block height
             example:
               _payment_credentials:
-                - 33c378cee41b2e15ac848f7f6f1d2f78155ab12d93b713de898d855f
-                - 52e63f22c5107ed776b70f7b92248b02552fd08f3e747bc745099441
+                -  33c378cee41b2e15ac848f7f6f1d2f78155ab12d93b713de898d855f
+                -  52e63f22c5107ed776b70f7b92248b02552fd08f3e747bc745099441
               _after_block_height: 40356
       description: Array of Cardano payment credential(s) in hex format alongwith filtering based on blockheight
     credential_utxos:
@@ -2816,8 +2816,8 @@ components:
                 description: Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call
             example:
               _payment_credentials:
-                - 33c378cee41b2e15ac848f7f6f1d2f78155ab12d93b713de898d855f
-                - 52e63f22c5107ed776b70f7b92248b02552fd08f3e747bc745099441
+                -  33c378cee41b2e15ac848f7f6f1d2f78155ab12d93b713de898d855f
+                -  52e63f22c5107ed776b70f7b92248b02552fd08f3e747bc745099441
               _extended: true
       description: Array of Cardano payment credential(s) in hex format
     tx_ids:
@@ -2835,8 +2835,8 @@ components:
                 description: Array of Cardano Transaction hashes
             example:
               _tx_hashes:
-                - f1592b29b79ae85d753913dd25644c60925a4a0683979faa33832fead4b4bd9c
-                - 206f6da5b0b0de45605a95f5ce7e172be9674550f7dde3838c45cbf24bab8b00
+                -  f1592b29b79ae85d753913dd25644c60925a4a0683979faa33832fead4b4bd9c
+                -  206f6da5b0b0de45605a95f5ce7e172be9674550f7dde3838c45cbf24bab8b00
       description: Array of Cardano Transaction hashes
     tx_info:
       content:
@@ -2885,8 +2885,8 @@ components:
                 description: Controls whether to include governance certificates, votes and proposals in the result
             example:
               _tx_hashes:
-                - f1592b29b79ae85d753913dd25644c60925a4a0683979faa33832fead4b4bd9c
-                - 206f6da5b0b0de45605a95f5ce7e172be9674550f7dde3838c45cbf24bab8b00
+                -  f1592b29b79ae85d753913dd25644c60925a4a0683979faa33832fead4b4bd9c
+                -  206f6da5b0b0de45605a95f5ce7e172be9674550f7dde3838c45cbf24bab8b00
               _inputs: false
               _metadata: false
               _assets: false
@@ -2918,9 +2918,9 @@ components:
                 description: Array of Cardano pool IDs (bech32 format)
             example:
               _pool_bech32_ids:
-                - pool1p90428kec03mjdya3k4gv5d20w7lmed7ca0snknef5j977l3y8l
-                - pool1wwh3k3ldzujdvgxllfwlnnkxyheafkacqlufnvpr77n5q72f9hw
-                - pool1p835jxsj8py5n34lrgk6fvpgpxxvh585qm8dzvp7ups37vdet5a
+                -  pool1p90428kec03mjdya3k4gv5d20w7lmed7ca0snknef5j977l3y8l
+                -  pool1wwh3k3ldzujdvgxllfwlnnkxyheafkacqlufnvpr77n5q72f9hw
+                -  pool1p835jxsj8py5n34lrgk6fvpgpxxvh585qm8dzvp7ups37vdet5a
       description: Array of Cardano pool IDs (bech32 format)
     pool_ids_optional:
       content:
@@ -2935,9 +2935,9 @@ components:
                 description: Array of Cardano pool IDs (bech32 format)
             example:
               _pool_bech32_ids:
-                - pool1p90428kec03mjdya3k4gv5d20w7lmed7ca0snknef5j977l3y8l
-                - pool1wwh3k3ldzujdvgxllfwlnnkxyheafkacqlufnvpr77n5q72f9hw
-                - pool1p835jxsj8py5n34lrgk6fvpgpxxvh585qm8dzvp7ups37vdet5a
+                -  pool1p90428kec03mjdya3k4gv5d20w7lmed7ca0snknef5j977l3y8l
+                -  pool1wwh3k3ldzujdvgxllfwlnnkxyheafkacqlufnvpr77n5q72f9hw
+                -  pool1p835jxsj8py5n34lrgk6fvpgpxxvh585qm8dzvp7ups37vdet5a
       description: Array of Cardano pool IDs (bech32 format) [Optional]
     script_hashes:
       content:
@@ -2952,8 +2952,8 @@ components:
                 description: Array of Cardano script hashes
             example:
               _script_hashes:
-                - c6d963e8892916ab8753d3c342037cd122123c4dd783a07af21f8dac
-                - c0c671fba483641a71bb92d3a8b7c52c90bf1c01e2b83116ad7d4536
+                -  c6d963e8892916ab8753d3c342037cd122123c4dd783a07af21f8dac
+                -  c0c671fba483641a71bb92d3a8b7c52c90bf1c01e2b83116ad7d4536
       description: Array of Cardano script hashes
     datum_hashes:
       content:
@@ -2968,8 +2968,8 @@ components:
                 description: Array of Cardano datum hashes
             example:
               _datum_hashes:
-                - 6181b3dc623cd8812caf027a3507e9b3095388a7cf3db65983e1fddd3a84c88c
-                - f8ae55ff89e1f5366f23e16bcaf2073252337b96031a02d79e41d653b5f0a978
+                -  6181b3dc623cd8812caf027a3507e9b3095388a7cf3db65983e1fddd3a84c88c
+                -  f8ae55ff89e1f5366f23e16bcaf2073252337b96031a02d79e41d653b5f0a978
       description: Array of Cardano datum hashes
     asset_list:
       content:
@@ -2988,14 +2988,8 @@ components:
                     type: string
             example:
               _asset_list:
-                - [
-                    "065270479316f1d92e00f7f9f095ebeaac9d009c878dc35ce36d3404",
-                    "433374",
-                  ]
-                - [
-                    "189e2c53985411addb8df0f3e09f70e343da69f06746c408aba672a8",
-                    "15fc257714a51769e192761d674db2ee2e80137428e522f9b914debb5f785301",
-                  ]
+                -  ['065270479316f1d92e00f7f9f095ebeaac9d009c878dc35ce36d3404','433374']
+                -  ['189e2c53985411addb8df0f3e09f70e343da69f06746c408aba672a8','15fc257714a51769e192761d674db2ee2e80137428e522f9b914debb5f785301']
       description: Array of array of policyID and asset names (hex)
     asset_list_with_extended:
       content:
@@ -3018,14 +3012,8 @@ components:
                 description: Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call
             example:
               _asset_list:
-                - [
-                    "065270479316f1d92e00f7f9f095ebeaac9d009c878dc35ce36d3404",
-                    "433374",
-                  ]
-                - [
-                    "189e2c53985411addb8df0f3e09f70e343da69f06746c408aba672a8",
-                    "15fc257714a51769e192761d674db2ee2e80137428e522f9b914debb5f785301",
-                  ]
+                -  ['065270479316f1d92e00f7f9f095ebeaac9d009c878dc35ce36d3404','433374']
+                -  ['189e2c53985411addb8df0f3e09f70e343da69f06746c408aba672a8','15fc257714a51769e192761d674db2ee2e80137428e522f9b914debb5f785301']
               _extended: true
       description: Array of array of policyID and asset names (hex) alongwith extended flag to return additional columns
     drep_id_bulk:
@@ -3043,8 +3031,8 @@ components:
                   type: string
             example:
               _drep_ids:
-                - drep1yt76he02dprm2af6x26vg76mhs2vajlg43cr9jh9dq3f2qs68ts3s
-                - drep1g5vl99xcpv8uce5hhh50xe3fh68tl9f8hcprleekw0c6jhhr45f
+                -  drep1yt76he02dprm2af6x26vg76mhs2vajlg43cr9jh9dq3f2qs68ts3s
+                -  drep1g5vl99xcpv8uce5hhh50xe3fh68tl9f8hcprleekw0c6jhhr45f
     utxo_refs_with_extended:
       content:
         application/json:
@@ -3064,8 +3052,8 @@ components:
                 description: Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call
             example:
               _utxo_refs:
-                - 206f6da5b0b0de45605a95f5ce7e172be9674550f7dde3838c45cbf24bab8b00#0
-                - f1592b29b79ae85d753913dd25644c60925a4a0683979faa33832fead4b4bd9c#0
+                -  206f6da5b0b0de45605a95f5ce7e172be9674550f7dde3838c45cbf24bab8b00#0
+                -  f1592b29b79ae85d753913dd25644c60925a4a0683979faa33832fead4b4bd9c#0
               _extended: false
       description: Array of Cardano UTxO references in the form "hash#index" with extended flag to toggle additional fields
     ogmios:
@@ -3156,8 +3144,7 @@ components:
                 }
             StakePools:
               description: Query the list of all stake pool identifiers currently registered and active.
-              value:
-                { "jsonrpc": "2.0", "method": "queryLedgerState/stakePools" }
+              value: { "jsonrpc": "2.0", "method": "queryLedgerState/stakePools" }
             submitTransaction:
               description: Submit a signed and serialized transaction to the network.
               value:
@@ -5531,7 +5518,7 @@ components:
             description: True if the UTXO has been spent
             example: true
     tx_treasury_donations_epoch:
-      description: List of treasury donation transactions for requested epoch
+      description: List of treasury donation transactions for requested epoch (current if NULL)
       type: array
       items:
         type: object
