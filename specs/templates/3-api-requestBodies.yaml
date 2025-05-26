@@ -1,573 +1,629 @@
 requestBodies:
-    block_hashes:
-      content:
-        application/json:
-          schema:
-            required:
-              - _block_hashes
-            type: object
-            properties:
-              _block_hashes:
-                type: array
-                items:
-                  $ref: "#/components/schemas/blocks/items/properties/hash"
-            example:
-              _block_hashes:
-                - ##block_info1_rb##
-                - ##block_info2_rb##
-                - ##block_info3_rb##
-      description: Array of block hashes
-    block_tx_info:
-      content:
-        application/json:
-          schema:
-            required:
-              - _block_hashes
-            type: object
-            properties:
-              _block_hashes:
-                type: array
-                items:
-                  $ref: "#/components/schemas/blocks/items/properties/hash"
-              _inputs:
-                format: boolean
-                type: boolean
-                description: Controls whether to include transaction inputs in the result
-              _metadata:
-                format: boolean
-                type: boolean
-                description: Controls whether to include transaction metadata in the result
-              _assets:
-                format: boolean
-                type: boolean
-                description: Controls whether to include assets involved within transaction the result
-              _withdrawals:
-                format: boolean
-                type: boolean
-                description: Controls whether to include any stake account reward withdrawals in the result
-              _certs:
-                format: boolean
-                type: boolean
-                description: Controls whether to include transaction certificates in the result
-              _scripts:
-                format: boolean
-                type: boolean
-                description: Controls whether to include any details regarding collateral/reference/datum/script objects in the result
-              _bytecode:
-                format: boolean
-                type: boolean
-                description: Controls whether to include bytecode for associated reference/plutus scripts
-            example:
-              _block_hashes:
-                - ##block_info1_rb##
-                - ##block_info2_rb##
-                - ##block_info3_rb##
-              _inputs: false
-              _metadata: false
-              _assets: false
-              _withdrawals: false
-              _certs: false
-              _scripts: false
-              _bytecode: false
-      description: Array of block hashes
-    payment_addresses:
-      content:
-        application/json:
-          schema:
-            required:
-              - _addresses
-            type: object
-            properties:
-              _addresses:
-                type: array
-                items:
-                  type: string
-                description: Array of Cardano payment address(es) in bech32 format
-            example:
-              _addresses:
-                - ##payment_addresses1_rb##
-                - ##payment_addresses2_rb##
-      description: Array of Cardano payment address(es)
-    payment_addresses_with_extended:
-      content:
-        application/json:
-          schema:
-            required:
-              - _addresses
-            type: object
-            properties:
-              _addresses:
-                type: array
-                items:
-                  type: string
-                description: Array of Cardano payment address(es) in bech32 format
-              _extended:
-                format: boolean
-                type: boolean
-                description: Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call
-            example:
-              _addresses:
-                - ##payment_addresses1_rb##
-                - ##payment_addresses2_rb##
-              _extended: true
-      description: Array of Cardano payment address(es) with extended flag to toggle additional fields
-    address_txs:
-      content:
-        application/json:
-          schema:
-            required:
-              - _addresses
-            type: object
-            properties:
-              _addresses:
-                type: array
-                items:
-                  type: string
-                description: Array of Cardano payment address(es) in bech32 format
-              _after_block_height:
-                format: integer
-                type: number
-                description: Only fetch information after specific block height
-            example:
-              _addresses:
-                - ##payment_addresses1_rb##
-                - ##payment_addresses2_rb##
-              _after_block_height: ##address_txs_after_block_height_rb##
-      description: Array of Cardano payment address(es)
-    stake_addresses_with_epoch_no:
-      content:
-        application/json:
-          schema:
-            required:
-              - _stake_addresses
-            type: object
-            properties:
-              _stake_addresses:
-                type: array
-                items:
-                  type: string
-                description: Array of Cardano stake address(es) in bech32 format
-              _epoch_no:
-                format: integer
-                type: number
-                description: Only fetch information for a specific epoch
-            example:
-              _stake_addresses:
-                - ##stake_addresses1_rb##
-                - ##stake_addresses2_rb##
-              _epoch_no: ##epoch_no_rb##
-      description: Array of Cardano stake address(es) in bech32 format with optional epoch no to filter by
-    stake_addresses_with_first_only_and_empty:
-      content:
-        application/json:
-          schema:
-            required:
-              - _stake_addresses
-            type: object
-            properties:
-              _stake_addresses:
-                type: array
-                items:
-                  type: string
-                description: Array of Cardano stake address(es) in bech32 format
-              _first_only:
-                format: boolean
-                type: boolean
-                description: Only return the first result
-              _empty:
-                format: boolean
-                type: boolean
-                description: Include zero quantity entries
-            example:
-              _stake_addresses:
-                - ##stake_addresses1_rb##
-                - ##stake_addresses2_rb##
-              _first_only: false
-              _empty: false
-      description: Array of Cardano stake credential(s) in bech32 format alongwith flag to return first only or used UTxOs
-    stake_addresses_with_extended:
-      content:
-        application/json:
-          schema:
-            required:
-              - _stake_addresses
-            type: object
-            properties:
-              _stake_addresses:
-                type: array
-                items:
-                  type: string
-                description: Array of Cardano stake address(es) in bech32 format
-              _extended:
-                format: boolean
-                type: boolean
-                description: Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call
-            example:
-              _stake_addresses:
-                - ##stake_addresses1_rb##
-                - ##stake_addresses2_rb##
-              _extended: true
-      description: Array of Cardano stake credential(s) in bech32 format alongwith extended flag to return additional columns
-    stake_addresses:
-      content:
-        application/json:
-          schema:
-            required:
-              - _stake_addresses
-            type: object
-            properties:
-              _stake_addresses:
-                type: array
-                items:
-                  type: string
-                description: Array of Cardano stake address(es) in bech32 format
-            example:
-              _stake_addresses:
-                - ##stake_addresses1_rb##
-                - ##stake_addresses2_rb##
-      description: Array of Cardano stake credential(s) in bech32 format
-    credential_txs:
-      content:
-        application/json:
-          schema:
-            required:
-              - _payment_credentials
-            type: object
-            properties:
-              _payment_credentials:
-                type: array
-                items:
-                  type: string
-                description: Array of Cardano payment credential(s) in hex format
-              _after_block_height:
-                format: integer
-                type: number
-                description: Only fetch information after specific block height
-            example:
-              _payment_credentials:
-                - ##credential_txs_payment_credentials1_rb##
-                - ##credential_txs_payment_credentials2_rb##
-              _after_block_height: ##address_txs_after_block_height_rb##
-      description: Array of Cardano payment credential(s) in hex format alongwith filtering based on blockheight
-    credential_utxos:
-      content:
-        application/json:
-          schema:
-            required:
-              - _payment_credentials
-            type: object
-            properties:
-              _payment_credentials:
-                type: array
-                items:
-                  type: string
-                description: Array of Cardano payment credential(s) in hex format
-              _extended:
-                format: boolean
-                type: boolean
-                description: Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call           
-            example:
-              _payment_credentials:
-                - ##credential_txs_payment_credentials1_rb##
-                - ##credential_txs_payment_credentials2_rb##
-              _extended: true
-      description: Array of Cardano payment credential(s) in hex format
-    tx_ids:
-      content:
-        application/json:
-          schema:
-            required:
-              - _tx_hashes
-            type: object
-            properties:
-              _tx_hashes:
-                type: array
-                items:
-                  type: string
-                description: Array of Cardano Transaction hashes
-            example:
-              _tx_hashes:
-                - ##tx_ids_tx_hashes1_rb##
-                - ##tx_ids_tx_hashes2_rb##
-      description: Array of Cardano Transaction hashes
-    tx_info:
-      content:
-        application/json:
-          schema:
-            required:
-              - _tx_hashes
-            type: object
-            properties:
-              _tx_hashes:
-                type: array
-                items:
-                  type: string
-                description: Array of Cardano Transaction hashes
-              _inputs:
-                format: boolean
-                type: boolean
-                description: Controls whether to include transaction inputs in the result
-              _metadata:
-                format: boolean
-                type: boolean
-                description: Controls whether to include transaction metadata in the result
-              _assets:
-                format: boolean
-                type: boolean
-                description: Controls whether to include assets involved within transaction the result
-              _withdrawals:
-                format: boolean
-                type: boolean
-                description: Controls whether to include any stake account reward withdrawals in the result
-              _certs:
-                format: boolean
-                type: boolean
-                description: Controls whether to include transaction certificates in the result
-              _scripts:
-                format: boolean
-                type: boolean
-                description: Controls whether to include any details regarding collateral/reference/datum/script objects in the result
-              _bytecode:
-                format: boolean
-                type: boolean
-                description: Controls whether to include bytecode for associated reference/plutus scripts
-              _governance:
-                format: boolean
-                type: boolean
-                description: Controls whether to include governance certificates, votes and proposals in the result
-            example:
-              _tx_hashes:
-                - ##tx_ids_tx_hashes1_rb##
-                - ##tx_ids_tx_hashes2_rb##
-              _inputs: false
-              _metadata: false
-              _assets: false
-              _withdrawals: false
-              _certs: false
-              _scripts: false
-              _bytecode: false
-      description: Array of Cardano Transaction hashes
-    txbin:
-      content:
-        application/cbor:
-          schema:
-            type: string
-            format: binary
-            example: ##txbin_rb##
-      description: Serialised Cardano Transaction
-    pool_ids:
-      content:
-        application/json:
-          schema:
-            required:
-              - _pool_bech32_ids
-            type: object
-            properties:
-              _pool_bech32_ids:
-                type: array
-                items:
-                  type: string
-                description: Array of Cardano pool IDs (bech32 format)
-            example:
-              _pool_bech32_ids:
-                - ##pool_ids_pool_bech32_ids1_rb##
-                - ##pool_ids_pool_bech32_ids2_rb##
-                - ##pool_ids_pool_bech32_ids3_rb##
-      description: Array of Cardano pool IDs (bech32 format)
-    pool_ids_optional:
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              _pool_bech32_ids:
-                type: array
-                items:
-                  type: string
-                description: Array of Cardano pool IDs (bech32 format)
-            example:
-              _pool_bech32_ids:
-                - ##pool_ids_pool_bech32_ids1_rb##
-                - ##pool_ids_pool_bech32_ids2_rb##
-                - ##pool_ids_pool_bech32_ids3_rb##
-      description: Array of Cardano pool IDs (bech32 format) [Optional]
-    script_hashes:
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              _script_hashes:
-                type: array
-                items:
-                  type: string
-                description: Array of Cardano script hashes
-            example:
-              _script_hashes:
-                  - ##script_hashes1_rb##
-                  - ##script_hashes2_rb##
-      description: Array of Cardano script hashes
-    datum_hashes:
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              _datum_hashes:
-                type: array
-                items:
-                  type: string
-                description: Array of Cardano datum hashes
-            example:
-              _datum_hashes:
-                  - ##datum_hashes1_rb##
-                  - ##datum_hashes2_rb##
-      description: Array of Cardano datum hashes
-    asset_list:
-      content:
-        application/json:
-          schema:
-            required:
-              - _asset_list
-            type: object
-            properties:
-              _asset_list:
-                type: array
-                description: Array of array of policy ID and asset names (hex)
-                items:
-                  type: array
-                  items:
-                    type: string
-            example:
-              _asset_list:
-                - ##asset1_rb##
-                - ##asset2_rb##
-      description: Array of array of policyID and asset names (hex)
-    asset_list_with_extended:
-      content:
-        application/json:
-          schema:
-            required:
-              - _asset_list
-            type: object
-            properties:
-              _asset_list:
-                type: array
-                description: Array of array of policy ID and asset names (hex)
-                items:
-                  type: array
-                  items:
-                    type: string
-              _extended:
-                format: boolean
-                type: boolean
-                description: Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call
-            example:
-              _asset_list:
-                - ##asset1_rb##
-                - ##asset2_rb##
-              _extended: true
-      description: Array of array of policyID and asset names (hex) alongwith extended flag to return additional columns
-    drep_id_bulk:
-      content:
-        application/json:
-          schema:
-            required:
-              - _drep_ids
-            type: object
-            properties:
-              _drep_ids:
-                type: array
-                descriptions: Array of DRep IDs in bech32 format
-                items:
-                  type: string
-            example:
-              _drep_ids:
-                - ##drep_ids1_rb##
-                - ##drep_ids2_rb##
-    utxo_refs_with_extended:
-      content:
-        application/json:
-          schema:
-            required:
-              - _utxo_refs
-            type: object
-            properties:
-              _utxo_refs:
-                type: array
-                items:
-                  type: string
-                description: Array of Cardano utxo references in the form "hash#index"
-              _extended:
-                format: boolean
-                type: boolean
-                description: Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call           
-            example:
-              _utxo_refs:
-                - ##utxo_ref1_rb##
-                - ##utxo_ref2_rb##
-              _extended: false
-      description: Array of Cardano UTxO references in the form "hash#index" with extended flag to toggle additional fields
-    ogmios:
-      content:
-        application/json:
-          schema:
-            required:
-              - jsonrpc
-              - method
-            type: object
-            properties:
-              jsonrpc:
+  block_hashes:
+    content:
+      application/json:
+        schema:
+          required:
+            - _block_hashes
+          type: object
+          properties:
+            _block_hashes:
+              type: array
+              items:
+                $ref: "#/components/schemas/blocks/items/properties/hash"
+          example:
+            _block_hashes:
+              -  ##block_info1_rb##
+              -  ##block_info2_rb##
+              -  ##block_info3_rb##
+    description: Array of block hashes
+  block_tx_info:
+    content:
+      application/json:
+        schema:
+          required:
+            - _block_hashes
+          type: object
+          properties:
+            _block_hashes:
+              type: array
+              items:
+                $ref: "#/components/schemas/blocks/items/properties/hash"
+            _inputs:
+              format: boolean
+              type: boolean
+              description: Controls whether to include transaction inputs in the result
+            _metadata:
+              format: boolean
+              type: boolean
+              description: Controls whether to include transaction metadata in the result
+            _assets:
+              format: boolean
+              type: boolean
+              description: Controls whether to include assets involved within transaction the result
+            _withdrawals:
+              format: boolean
+              type: boolean
+              description: Controls whether to include any stake account reward withdrawals in the result
+            _certs:
+              format: boolean
+              type: boolean
+              description: Controls whether to include transaction certificates in the result
+            _scripts:
+              format: boolean
+              type: boolean
+              description: Controls whether to include any details regarding collateral/reference/datum/script objects in the result
+            _bytecode:
+              format: boolean
+              type: boolean
+              description: Controls whether to include bytecode for associated reference/plutus scripts
+          example:
+            _block_hashes:
+              -  ##block_info1_rb##
+              -  ##block_info2_rb##
+              -  ##block_info3_rb##
+            _inputs: false
+            _metadata: false
+            _assets: false
+            _withdrawals: false
+            _certs: false
+            _scripts: false
+            _bytecode: false
+    description: Array of block hashes
+  payment_addresses:
+    content:
+      application/json:
+        schema:
+          required:
+            - _addresses
+          type: object
+          properties:
+            _addresses:
+              type: array
+              items:
                 type: string
-                description: Identifier for JSON-RPC 2.0 standard
-                example: "2.0"
-              method:
+              description: Array of Cardano payment address(es) in bech32 format
+          example:
+            _addresses:
+              -  ##payment_addresses1_rb##
+              -  ##payment_addresses2_rb##
+    description: Array of Cardano payment address(es)
+  payment_addresses_with_extended:
+    content:
+      application/json:
+        schema:
+          required:
+            - _addresses
+          type: object
+          properties:
+            _addresses:
+              type: array
+              items:
                 type: string
-                description: The Ogmios method to be called (see more details [here](#tag--Ogmios)) or browse examples tab
-                enum: ["queryNetwork/blockHeight","queryNetwork/genesisConfiguration","queryNetwork/startTime","queryNetwork/tip","queryLedgerState/epoch","queryLedgerState/eraStart","queryLedgerState/eraSummaries","queryLedgerState/liveStakeDistribution","queryLedgerState/protocolParameters","queryLedgerState/proposedProtocolParameters","queryLedgerState/stakePools","submitTransaction","evaluateTransaction"]
-                example: "queryNetwork/tip"
-              params:
-                type: object
-                description: Any parameters relevant to the specific method to be called
-                nullable: true
-          examples:
-            blockHeight:
-              description: Query the network’s highest block number.
-              value: { "jsonrpc": "2.0", "method": "queryNetwork/blockHeight" }
-            genesisConfiguration:
-              description: Query the genesis configuration of a given era.
-              value: { "jsonrpc": "2.0", "method": "queryNetwork/genesisConfiguration", "params": { "era": "shelley" } }
-            startTimeTime:
-              description: Query the network start time.
-              value: { "jsonrpc": "2.0", "method": "queryNetwork/startTime" }
-            tip:
-              description: Query tip of the Network
-              value: { "jsonrpc": "2.0", "method": "queryNetwork/tip" }
-            epoch:
-              description: Query the current epoch of the ledger.
-              value: { "jsonrpc": "2.0", "method": "queryLedgerState/epoch" }
-            eraStart:
-              description: Query information regarding the beginning of the current ledger era.
-              value: { "jsonrpc": "2.0", "method": "queryLedgerState/eraStart" }
-            eraSummaries:
-              description: Query era bounds and slot parameters details, required for proper sloting arithmetic.
-              value: { "jsonrpc": "2.0", "method": "queryLedgerState/eraSummaries" }
-            liveStakeDistribution:
-              description: Query distribution of the stake across all known stake pools, relative to the total stake in the network.
-              value: { "jsonrpc": "2.0", "method": "queryLedgerState/liveStakeDistribution" }
-            protocolParameters:
-              description: Query the current protocol parameters.
-              value: { "jsonrpc": "2.0", "method": "queryLedgerState/protocolParameters" }
-            proposedProtocolParameters:
-              description: Query the last update proposal w.r.t. protocol parameters, if any.
-              value: { "jsonrpc": "2.0", "method": "queryLedgerState/proposedProtocolParameters" }
-            StakePools:
-              description: Query the list of all stake pool identifiers currently registered and active.
-              value: { "jsonrpc": "2.0", "method": "queryLedgerState/stakePools" }
-            submitTransaction:
-              description: Submit a signed and serialized transaction to the network.
-              value: { "jsonrpc": "2.0", "method": "submitTransaction", "params": { "transaction": { "cbor": "<CBOR-serialized signed transaction (base16)>" } } }
-            evaluateTransaction:
-              description: Evaluate execution units of scripts in a well-formed transaction.
-              value: { "jsonrpc": "2.0", "method": "evaluateTransaction", "params": { "transaction": { "cbor": "<CBOR-serialized signed transaction (base16)>" }, "additionalUtxo": [ { ... } ] } }
-      description: JSON-RPC 2.0 standard request body
+              description: Array of Cardano payment address(es) in bech32 format
+            _extended:
+              format: boolean
+              type: boolean
+              description: Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call
+          example:
+            _addresses:
+              -  ##payment_addresses1_rb##
+              -  ##payment_addresses2_rb##
+            _extended: true
+    description: Array of Cardano payment address(es) with extended flag to toggle additional fields
+  address_txs:
+    content:
+      application/json:
+        schema:
+          required:
+            - _addresses
+          type: object
+          properties:
+            _addresses:
+              type: array
+              items:
+                type: string
+              description: Array of Cardano payment address(es) in bech32 format
+            _after_block_height:
+              format: integer
+              type: number
+              description: Only fetch information after specific block height
+          example:
+            _addresses:
+              -  ##payment_addresses1_rb##
+              -  ##payment_addresses2_rb##
+            _after_block_height: ##address_txs_after_block_height_rb##
+    description: Array of Cardano payment address(es)
+  stake_addresses_with_epoch_no:
+    content:
+      application/json:
+        schema:
+          required:
+            - _stake_addresses
+          type: object
+          properties:
+            _stake_addresses:
+              type: array
+              items:
+                type: string
+              description: Array of Cardano stake address(es) in bech32 format
+            _epoch_no:
+              format: integer
+              type: number
+              description: Only fetch information for a specific epoch
+          example:
+            _stake_addresses:
+              -  ##stake_addresses1_rb##
+              -  ##stake_addresses2_rb##
+            _epoch_no: ##epoch_no_rb##
+    description: Array of Cardano stake address(es) in bech32 format with optional epoch no to filter by
+  stake_addresses_with_first_only_and_empty:
+    content:
+      application/json:
+        schema:
+          required:
+            - _stake_addresses
+          type: object
+          properties:
+            _stake_addresses:
+              type: array
+              items:
+                type: string
+              description: Array of Cardano stake address(es) in bech32 format
+            _first_only:
+              format: boolean
+              type: boolean
+              description: Only return the first result
+            _empty:
+              format: boolean
+              type: boolean
+              description: Include zero quantity entries
+          example:
+            _stake_addresses:
+              -  ##stake_addresses1_rb##
+              -  ##stake_addresses2_rb##
+            _first_only: false
+            _empty: false
+    description: Array of Cardano stake credential(s) in bech32 format alongwith flag to return first only or used UTxOs
+  stake_addresses_with_extended:
+    content:
+      application/json:
+        schema:
+          required:
+            - _stake_addresses
+          type: object
+          properties:
+            _stake_addresses:
+              type: array
+              items:
+                type: string
+              description: Array of Cardano stake address(es) in bech32 format
+            _extended:
+              format: boolean
+              type: boolean
+              description: Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call
+          example:
+            _stake_addresses:
+              -  ##stake_addresses1_rb##
+              -  ##stake_addresses2_rb##
+            _extended: true
+    description: Array of Cardano stake credential(s) in bech32 format alongwith extended flag to return additional columns
+  stake_addresses:
+    content:
+      application/json:
+        schema:
+          required:
+            - _stake_addresses
+          type: object
+          properties:
+            _stake_addresses:
+              type: array
+              items:
+                type: string
+              description: Array of Cardano stake address(es) in bech32 format
+          example:
+            _stake_addresses:
+              -  ##stake_addresses1_rb##
+              -  ##stake_addresses2_rb##
+    description: Array of Cardano stake credential(s) in bech32 format
+  credential_txs:
+    content:
+      application/json:
+        schema:
+          required:
+            - _payment_credentials
+          type: object
+          properties:
+            _payment_credentials:
+              type: array
+              items:
+                type: string
+              description: Array of Cardano payment credential(s) in hex format
+            _after_block_height:
+              format: integer
+              type: number
+              description: Only fetch information after specific block height
+          example:
+            _payment_credentials:
+              -  ##credential_txs_payment_credentials1_rb##
+              -  ##credential_txs_payment_credentials2_rb##
+            _after_block_height: ##address_txs_after_block_height_rb##
+    description: Array of Cardano payment credential(s) in hex format alongwith filtering based on blockheight
+  credential_utxos:
+    content:
+      application/json:
+        schema:
+          required:
+            - _payment_credentials
+          type: object
+          properties:
+            _payment_credentials:
+              type: array
+              items:
+                type: string
+              description: Array of Cardano payment credential(s) in hex format
+            _extended:
+              format: boolean
+              type: boolean
+              description: Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call
+          example:
+            _payment_credentials:
+              -  ##credential_txs_payment_credentials1_rb##
+              -  ##credential_txs_payment_credentials2_rb##
+            _extended: true
+    description: Array of Cardano payment credential(s) in hex format
+  tx_ids:
+    content:
+      application/json:
+        schema:
+          required:
+            - _tx_hashes
+          type: object
+          properties:
+            _tx_hashes:
+              type: array
+              items:
+                type: string
+              description: Array of Cardano Transaction hashes
+          example:
+            _tx_hashes:
+              -  ##tx_ids_tx_hashes1_rb##
+              -  ##tx_ids_tx_hashes2_rb##
+    description: Array of Cardano Transaction hashes
+  tx_info:
+    content:
+      application/json:
+        schema:
+          required:
+            - _tx_hashes
+          type: object
+          properties:
+            _tx_hashes:
+              type: array
+              items:
+                type: string
+              description: Array of Cardano Transaction hashes
+            _inputs:
+              format: boolean
+              type: boolean
+              description: Controls whether to include transaction inputs in the result
+            _metadata:
+              format: boolean
+              type: boolean
+              description: Controls whether to include transaction metadata in the result
+            _assets:
+              format: boolean
+              type: boolean
+              description: Controls whether to include assets involved within transaction the result
+            _withdrawals:
+              format: boolean
+              type: boolean
+              description: Controls whether to include any stake account reward withdrawals in the result
+            _certs:
+              format: boolean
+              type: boolean
+              description: Controls whether to include transaction certificates in the result
+            _scripts:
+              format: boolean
+              type: boolean
+              description: Controls whether to include any details regarding collateral/reference/datum/script objects in the result
+            _bytecode:
+              format: boolean
+              type: boolean
+              description: Controls whether to include bytecode for associated reference/plutus scripts
+            _governance:
+              format: boolean
+              type: boolean
+              description: Controls whether to include governance certificates, votes and proposals in the result
+          example:
+            _tx_hashes:
+              -  ##tx_ids_tx_hashes1_rb##
+              -  ##tx_ids_tx_hashes2_rb##
+            _inputs: false
+            _metadata: false
+            _assets: false
+            _withdrawals: false
+            _certs: false
+            _scripts: false
+            _bytecode: false
+    description: Array of Cardano Transaction hashes
+  txbin:
+    content:
+      application/cbor:
+        schema:
+          type: string
+          format: binary
+          example: ##txbin_rb##
+    description: Serialised Cardano Transaction
+  pool_ids:
+    content:
+      application/json:
+        schema:
+          required:
+            - _pool_bech32_ids
+          type: object
+          properties:
+            _pool_bech32_ids:
+              type: array
+              items:
+                type: string
+              description: Array of Cardano pool IDs (bech32 format)
+          example:
+            _pool_bech32_ids:
+              -  ##pool_ids_pool_bech32_ids1_rb##
+              -  ##pool_ids_pool_bech32_ids2_rb##
+              -  ##pool_ids_pool_bech32_ids3_rb##
+    description: Array of Cardano pool IDs (bech32 format)
+  pool_ids_optional:
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            _pool_bech32_ids:
+              type: array
+              items:
+                type: string
+              description: Array of Cardano pool IDs (bech32 format)
+          example:
+            _pool_bech32_ids:
+              -  ##pool_ids_pool_bech32_ids1_rb##
+              -  ##pool_ids_pool_bech32_ids2_rb##
+              -  ##pool_ids_pool_bech32_ids3_rb##
+    description: Array of Cardano pool IDs (bech32 format) [Optional]
+  script_hashes:
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            _script_hashes:
+              type: array
+              items:
+                type: string
+              description: Array of Cardano script hashes
+          example:
+            _script_hashes:
+              -  ##script_hashes1_rb##
+              -  ##script_hashes2_rb##
+    description: Array of Cardano script hashes
+  datum_hashes:
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            _datum_hashes:
+              type: array
+              items:
+                type: string
+              description: Array of Cardano datum hashes
+          example:
+            _datum_hashes:
+              -  ##datum_hashes1_rb##
+              -  ##datum_hashes2_rb##
+    description: Array of Cardano datum hashes
+  asset_list:
+    content:
+      application/json:
+        schema:
+          required:
+            - _asset_list
+          type: object
+          properties:
+            _asset_list:
+              type: array
+              description: Array of array of policy ID and asset names (hex)
+              items:
+                type: array
+                items:
+                  type: string
+          example:
+            _asset_list:
+              -  ##asset1_rb##
+              -  ##asset2_rb##
+    description: Array of array of policyID and asset names (hex)
+  asset_list_with_extended:
+    content:
+      application/json:
+        schema:
+          required:
+            - _asset_list
+          type: object
+          properties:
+            _asset_list:
+              type: array
+              description: Array of array of policy ID and asset names (hex)
+              items:
+                type: array
+                items:
+                  type: string
+            _extended:
+              format: boolean
+              type: boolean
+              description: Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call
+          example:
+            _asset_list:
+              -  ##asset1_rb##
+              -  ##asset2_rb##
+            _extended: true
+    description: Array of array of policyID and asset names (hex) alongwith extended flag to return additional columns
+  drep_id_bulk:
+    content:
+      application/json:
+        schema:
+          required:
+            - _drep_ids
+          type: object
+          properties:
+            _drep_ids:
+              type: array
+              descriptions: Array of DRep IDs in bech32 format
+              items:
+                type: string
+          example:
+            _drep_ids:
+              -  ##drep_ids1_rb##
+              -  ##drep_ids2_rb##
+  utxo_refs_with_extended:
+    content:
+      application/json:
+        schema:
+          required:
+            - _utxo_refs
+          type: object
+          properties:
+            _utxo_refs:
+              type: array
+              items:
+                type: string
+              description: Array of Cardano utxo references in the form "hash#index"
+            _extended:
+              format: boolean
+              type: boolean
+              description: Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call
+          example:
+            _utxo_refs:
+              -  ##utxo_ref1_rb##
+              -  ##utxo_ref2_rb##
+            _extended: false
+    description: Array of Cardano UTxO references in the form "hash#index" with extended flag to toggle additional fields
+  ogmios:
+    content:
+      application/json:
+        schema:
+          required:
+            - jsonrpc
+            - method
+          type: object
+          properties:
+            jsonrpc:
+              type: string
+              description: Identifier for JSON-RPC 2.0 standard
+              example: "2.0"
+            method:
+              type: string
+              description: The Ogmios method to be called (see more details [here](#tag--Ogmios)) or browse examples tab
+              enum:
+                [
+                  "queryNetwork/blockHeight",
+                  "queryNetwork/genesisConfiguration",
+                  "queryNetwork/startTime",
+                  "queryNetwork/tip",
+                  "queryLedgerState/epoch",
+                  "queryLedgerState/eraStart",
+                  "queryLedgerState/eraSummaries",
+                  "queryLedgerState/liveStakeDistribution",
+                  "queryLedgerState/protocolParameters",
+                  "queryLedgerState/proposedProtocolParameters",
+                  "queryLedgerState/stakePools",
+                  "submitTransaction",
+                  "evaluateTransaction",
+                ]
+              example: "queryNetwork/tip"
+            params:
+              type: object
+              description: Any parameters relevant to the specific method to be called
+              nullable: true
+        examples:
+          blockHeight:
+            description: Query the network’s highest block number.
+            value: { "jsonrpc": "2.0", "method": "queryNetwork/blockHeight" }
+          genesisConfiguration:
+            description: Query the genesis configuration of a given era.
+            value:
+              {
+                "jsonrpc": "2.0",
+                "method": "queryNetwork/genesisConfiguration",
+                "params": { "era": "shelley" },
+              }
+          startTimeTime:
+            description: Query the network start time.
+            value: { "jsonrpc": "2.0", "method": "queryNetwork/startTime" }
+          tip:
+            description: Query tip of the Network
+            value: { "jsonrpc": "2.0", "method": "queryNetwork/tip" }
+          epoch:
+            description: Query the current epoch of the ledger.
+            value: { "jsonrpc": "2.0", "method": "queryLedgerState/epoch" }
+          eraStart:
+            description: Query information regarding the beginning of the current ledger era.
+            value: { "jsonrpc": "2.0", "method": "queryLedgerState/eraStart" }
+          eraSummaries:
+            description: Query era bounds and slot parameters details, required for proper sloting arithmetic.
+            value:
+              { "jsonrpc": "2.0", "method": "queryLedgerState/eraSummaries" }
+          liveStakeDistribution:
+            description: Query distribution of the stake across all known stake pools, relative to the total stake in the network.
+            value:
+              {
+                "jsonrpc": "2.0",
+                "method": "queryLedgerState/liveStakeDistribution",
+              }
+          protocolParameters:
+            description: Query the current protocol parameters.
+            value:
+              {
+                "jsonrpc": "2.0",
+                "method": "queryLedgerState/protocolParameters",
+              }
+          proposedProtocolParameters:
+            description: Query the last update proposal w.r.t. protocol parameters, if any.
+            value:
+              {
+                "jsonrpc": "2.0",
+                "method": "queryLedgerState/proposedProtocolParameters",
+              }
+          StakePools:
+            description: Query the list of all stake pool identifiers currently registered and active.
+            value: { "jsonrpc": "2.0", "method": "queryLedgerState/stakePools" }
+          submitTransaction:
+            description: Submit a signed and serialized transaction to the network.
+            value:
+              {
+                "jsonrpc": "2.0",
+                "method": "submitTransaction",
+                "params":
+                  {
+                    "transaction":
+                      {
+                        "cbor": "<CBOR-serialized signed transaction (base16)>",
+                      },
+                  },
+              }
+          evaluateTransaction:
+            description: Evaluate execution units of scripts in a well-formed transaction.
+            value:
+              {
+                "jsonrpc": "2.0",
+                "method": "evaluateTransaction",
+                "params":
+                  {
+                    "transaction":
+                      {
+                        "cbor": "<CBOR-serialized signed transaction (base16)>",
+                      },
+                    "additionalUtxo": [{ ... }],
+                  },
+              }
+    description: JSON-RPC 2.0 standard request body

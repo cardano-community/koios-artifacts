@@ -1,201 +1,201 @@
 parameters:
-    _after_block_height:
-      deprecated: false
-      name: _after_block_height
-      description: Block height for specifying time delta
-      schema:
-        type: number
-        example: 50000
-      in: query
-      required: false
-      allowEmptyValue: true
-    _epoch_no:
-      deprecated: false
-      name: _epoch_no
-      description: Epoch Number to fetch details for
-      schema:
-        type: string
-      example: "##_epoch_no_param##"
-      in: query
-      required: false
-      allowEmptyValue: true
-    _stake_address:
-      deprecated: false
-      name: _stake_address
-      description: Cardano staking address (reward account) in bech32 format
-      schema:
-        type: string
-      example: "##_stake_address_param##"
-      in: query
-      required: true
-      allowEmptyValue: false
-    _tx_hash:
-      deprecated: false
-      name: _tx_hash
-      description: Transaction Hash in hexadecimal format (hex)
-      example: "##_tx_hash_param##"
-      schema:
-        type: string
-      in: query
-      required: true
-      allowEmptyValue: false
-    _asset_policy:
-      deprecated: false
-      name: _asset_policy
-      description: Asset Policy ID in hexadecimal format (hex)
-      schema:
-        type: string
-      example: "##_asset_policy_param##"
-      in: query
-      required: true
-      allowEmptyValue: false
-    _asset_name:
-      deprecated: false
-      name: _asset_name
-      description: Asset Name in hexadecimal format (hex), empty asset name returns royalties
-      schema:
-        type: string
-      example: "##_asset_name_param##"
-      in: query
-      required: false
-      allowEmptyValue: true
-    _asset_policy_nft:
-      deprecated: false
-      name: _asset_policy
-      description: NFT Policy ID in hexadecimal format (hex)
-      schema:
-        type: string
-      example: "##_asset_policy_nft_param##"
-      in: query
-      required: true
-      allowEmptyValue: false
-    _asset_name_nft:
-      deprecated: false
-      name: _asset_name
-      description: NFT Name in hexadecimal format (hex)
-      schema:
-        type: string
-      example: "##_asset_name_nft_param##"
-      in: query
-      required: false
-      allowEmptyValue: true
-    _voter_id:
-      deprecated: false
-      name: _voter_id
-      description: Voter ID (Drep, SPO, Committee Member) in Bech32 format (CIP-5 | CIP-129)
-      schema:
-        type: string
-      example: "##_drep_id_param##"
-      in: query
-      required: false
-      allowEmptyValue: true
-    _drep_id:
-      deprecated: false
-      name: _drep_id
-      description: DRep ID in bech32 format
-      schema:
-        type: string
-      example: "##_drep_id_param##"
-      in: query
-      required: true
-      allowEmptyValue: false
-    _drep_id_optional:
-      deprecated: false
-      name: _drep_id
-      description: DRep ID in bech32 format
-      schema:
-        type: string
-      example: "##_drep_id_param##"
-      in: query
-      required: false
-      allowEmptyValue: true
-    _cc_hot_id:
-      deprecated: false
-      name: _cc_hot_id
-      description: Committee member hot key ID in Bech32 format (CIP-5 | CIP-129)
-      schema:
-        type: string
-      example: "##_cc_hot_id_param##"
-      in: query
-      required: false
-      allowEmptyValue: true
-    _extended:
-      deprecated: false
-      name: _extended
-      description: Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call
-      schema:
-        type: boolean
-      example: false
-      in: query
-      required: false
-      allowEmptyValue: true
-    _history:
-      deprecated: false
-      name: _history
-      description: Include all historical transactions, setting to false includes only the non-empty ones
-      schema:
-        type: boolean
-      example: false
-      in: query
-      required: false
-      allowEmptyValue: false
-    _include_next_epoch:
-      deprecated: false
-      name: _include_next_epoch
-      description: Include information about nearing but not yet started epoch, to get access to active stake snapshot information if available
-      schema:
-        type: boolean
-      example: false
-      in: query
-      required: false
-      allowEmptyValue: true
-    _pool_bech32:
-      deprecated: false
-      name: _pool_bech32
-      description: Pool ID in bech32 format
-      schema:
-        type: string
-      example: "##_pool_bech32_param##"
-      in: query
-      required: true
-      allowEmptyValue: false
-    _pool_bech32_optional:
-      deprecated: false
-      name: _pool_bech32
-      description: Pool ID in bech32 format (optional)
-      schema:
-        type: string
-      example: "##_pool_bech32_optional_param##"
-      in: query
-      required: false
-      allowEmptyValue: true
-    _pool_epoch_no:
-      deprecated: false
-      name: _epoch_no
-      description: Epoch Number to fetch details for
-      schema:
-        type: string
-      example: "##_pool_epoch_no_param##"
-      in: query
-      required: false
-      allowEmptyValue: true
-    _script_hash:
-      deprecated: false
-      name: _script_hash
-      description: Script hash in hexadecimal format (hex)
-      schema:
-        type: string
-      example: "##_script_hash_param##"
-      in: query
-      required: true
-      allowEmptyValue: false
-    _proposal_id:
-      deprecated: false
-      name: _proposal_id
-      description: Government proposal ID in CIP-129 Bech32 format
-      example: "##_proposal_id_param##"
-      schema:
-        type: string
-      in: query
-      required: true
-      allowEmptyValue: false
+  _after_block_height:
+    deprecated: false
+    name: _after_block_height
+    description: Block height for specifying time delta
+    schema:
+      type: number
+      example: 50000
+    in: query
+    required: false
+    allowEmptyValue: true
+  _epoch_no:
+    deprecated: false
+    name: _epoch_no
+    description: Epoch Number to fetch details for
+    schema:
+      type: string
+    example: "##_epoch_no_param##"
+    in: query
+    required: false
+    allowEmptyValue: true
+  _stake_address:
+    deprecated: false
+    name: _stake_address
+    description: Cardano staking address (reward account) in bech32 format
+    schema:
+      type: string
+    example: "##_stake_address_param##"
+    in: query
+    required: true
+    allowEmptyValue: false
+  _tx_hash:
+    deprecated: false
+    name: _tx_hash
+    description: Transaction Hash in hexadecimal format (hex)
+    example: "##_tx_hash_param##"
+    schema:
+      type: string
+    in: query
+    required: true
+    allowEmptyValue: false
+  _asset_policy:
+    deprecated: false
+    name: _asset_policy
+    description: Asset Policy ID in hexadecimal format (hex)
+    schema:
+      type: string
+    example: "##_asset_policy_param##"
+    in: query
+    required: true
+    allowEmptyValue: false
+  _asset_name:
+    deprecated: false
+    name: _asset_name
+    description: Asset Name in hexadecimal format (hex), empty asset name returns royalties
+    schema:
+      type: string
+    example: "##_asset_name_param##"
+    in: query
+    required: false
+    allowEmptyValue: true
+  _asset_policy_nft:
+    deprecated: false
+    name: _asset_policy
+    description: NFT Policy ID in hexadecimal format (hex)
+    schema:
+      type: string
+    example: "##_asset_policy_nft_param##"
+    in: query
+    required: true
+    allowEmptyValue: false
+  _asset_name_nft:
+    deprecated: false
+    name: _asset_name
+    description: NFT Name in hexadecimal format (hex)
+    schema:
+      type: string
+    example: "##_asset_name_nft_param##"
+    in: query
+    required: false
+    allowEmptyValue: true
+  _voter_id:
+    deprecated: false
+    name: _voter_id
+    description: Voter ID (Drep, SPO, Committee Member) in Bech32 format (CIP-5 | CIP-129)
+    schema:
+      type: string
+    example: "##_drep_id_param##"
+    in: query
+    required: false
+    allowEmptyValue: true
+  _drep_id:
+    deprecated: false
+    name: _drep_id
+    description: DRep ID in bech32 format
+    schema:
+      type: string
+    example: "##_drep_id_param##"
+    in: query
+    required: true
+    allowEmptyValue: false
+  _drep_id_optional:
+    deprecated: false
+    name: _drep_id
+    description: DRep ID in bech32 format
+    schema:
+      type: string
+    example: "##_drep_id_param##"
+    in: query
+    required: false
+    allowEmptyValue: true
+  _cc_hot_id:
+    deprecated: false
+    name: _cc_hot_id
+    description: Committee member hot key ID in Bech32 format (CIP-5 | CIP-129)
+    schema:
+      type: string
+    example: "##_cc_hot_id_param##"
+    in: query
+    required: false
+    allowEmptyValue: true
+  _extended:
+    deprecated: false
+    name: _extended
+    description: Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call
+    schema:
+      type: boolean
+    example: false
+    in: query
+    required: false
+    allowEmptyValue: true
+  _history:
+    deprecated: false
+    name: _history
+    description: Include all historical transactions, setting to false includes only the non-empty ones
+    schema:
+      type: boolean
+    example: false
+    in: query
+    required: false
+    allowEmptyValue: false
+  _include_next_epoch:
+    deprecated: false
+    name: _include_next_epoch
+    description: Include information about nearing but not yet started epoch, to get access to active stake snapshot information if available
+    schema:
+      type: boolean
+    example: false
+    in: query
+    required: false
+    allowEmptyValue: true
+  _pool_bech32:
+    deprecated: false
+    name: _pool_bech32
+    description: Pool ID in bech32 format
+    schema:
+      type: string
+    example: "##_pool_bech32_param##"
+    in: query
+    required: true
+    allowEmptyValue: false
+  _pool_bech32_optional:
+    deprecated: false
+    name: _pool_bech32
+    description: Pool ID in bech32 format (optional)
+    schema:
+      type: string
+    example: "##_pool_bech32_optional_param##"
+    in: query
+    required: false
+    allowEmptyValue: true
+  _pool_epoch_no:
+    deprecated: false
+    name: _epoch_no
+    description: Epoch Number to fetch details for
+    schema:
+      type: string
+    example: "##_pool_epoch_no_param##"
+    in: query
+    required: false
+    allowEmptyValue: true
+  _script_hash:
+    deprecated: false
+    name: _script_hash
+    description: Script hash in hexadecimal format (hex)
+    schema:
+      type: string
+    example: "##_script_hash_param##"
+    in: query
+    required: true
+    allowEmptyValue: false
+  _proposal_id:
+    deprecated: false
+    name: _proposal_id
+    description: Government proposal ID in CIP-129 Bech32 format
+    example: "##_proposal_id_param##"
+    schema:
+      type: string
+    in: query
+    required: true
+    allowEmptyValue: false
