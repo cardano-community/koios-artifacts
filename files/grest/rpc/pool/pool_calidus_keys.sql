@@ -8,7 +8,9 @@ RETURNS TABLE (
   tx_hash text,
   epoch_no word31type,
   block_height word31type,
-  block_time integer
+  block_time integer,
+  registered boolean,
+  bytes text
 )
 LANGUAGE sql STABLE
 AS $$
@@ -21,7 +23,9 @@ AS $$
     x.tx_hash,
     x.epoch_no,
     x.block_height,
-    x.block_time
+    x.block_time,
+    x.calidus_key != '0000000000000000000000000000000000000000000000000000000000000000' AS registered,
+    x.bytes
   FROM (
     SELECT
       cardano.bech32_encode('pool', DECODE(SUBSTRING((tm.json->'1'->'1'->>1) FROM 3),'hex')) AS pool_id_bech32,
@@ -32,7 +36,8 @@ AS $$
       ENCODE(tx.hash, 'hex') AS tx_hash,
       b.epoch_no AS epoch_no,
       b.block_no AS block_height,
-      EXTRACT(EPOCH FROM b.time)::integer AS block_time
+      EXTRACT(EPOCH FROM b.time)::integer AS block_time,
+      ENCODE(tm.bytes::bytea, 'hex') AS bytes
     FROM public.tx_metadata AS tm
       LEFT JOIN public.pool_hash AS ph ON ph.hash_raw = DECODE(SUBSTRING((tm.json->'1'->'1'->>1) FROM 3),'hex')
       LEFT JOIN grest.pool_info_cache AS pic ON pic.pool_hash_id = ph.id
@@ -45,8 +50,7 @@ AS $$
     ORDER BY tm.id DESC
   ) AS x
   WHERE is_valid=true
-    AND length(calidus_key)=64
-    AND calidus_key!='0000000000000000000000000000000000000000000000000000000000000000' -- De-registered key
+    AND length(x.calidus_key)=64
   ORDER BY x.pool_id_bech32, x.calidus_nonce DESC;
 $$;
 
