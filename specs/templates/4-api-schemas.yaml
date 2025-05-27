@@ -2343,7 +2343,7 @@ schemas:
           description: True if the UTXO has been spent
           example: true
   tx_treasury_donations_epoch:
-    description: List of treasury donation transactions for requested epoch
+    description: List of treasury donation transactions for requested epoch (current if NULL)
     type: array
     items:
       type: object
