@@ -1,11 +1,12 @@
 {
   "public": [
-      { "name": "old-rdlrt", "addr": "207.244.252.116", "port": 8453},
-      { "name": "rdlrt", "addr": "194.36.145.157", "port": 8053 },
-      { "name": "dostrelith", "addr": "koios-mainnet.garden-pool.com", "port":8053},
-      { "name": "homer-redoracle", "addr": "167.114.101.14", "port": 8053},
-      { "name": "huthus0lo1", "addr": "koios-mainnet.themorphium.io", "port": 8053},
-      { "name": "reqlez", "addr": "192.234.196.168", "port": 8053},
-      { "name": "DCOne Crypto", "addr": "161.97.167.41", "port": 8053}
+      {"name": "old-rdlrt", "addr": "207.244.252.116", "port": 8453},
+      {"name": "rdlrt", "addr": "194.36.145.157", "port": 8053 },
+      {"name": "dostrelith", "addr": "koios-mainnet.garden-pool.com", "port":8053},
+      {"name": "homer-redoracle", "addr": "167.114.101.14", "port": 8053},
+      {"name": "huthus0lo1", "addr": "koios-mainnet.themorphium.io", "port": 8053},
+      {"name": "reqlez", "addr": "192.234.196.168", "port": 8053},
+      {"name": "DCOne Crypto", "addr": "161.97.167.41", "port": 8053},
+      {"name": "HAPPY Staking 🥳", "addr": "koios.happystaking.io", "port": 8453, "ssl": true}
   ]
 }
