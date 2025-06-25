@@ -47,15 +47,17 @@ AS $$
     ocvd.language,
     ocvd.is_valid,
     CASE
-      WHEN tw.id IS NULL THEN NULL
+      WHEN NOT EXISTS (SELECT NULL FROM public.treasury_withdrawal tw WHERE tw.gov_action_proposal_id = gap.id) THEN NULL
       ELSE
-        JSONB_BUILD_OBJECT(
-          'stake_address', (
+        (SELECT JSON_AGG(JSON_BUILD_OBJECT(
+        'stake_address', (
             SELECT grest.cip5_hex_to_stake_addr(sa2.hash_raw)::text
             FROM stake_address AS sa2
             WHERE sa2.id = tw.stake_address_id
           ),
-          'amount', tw.amount::text
+        'amount', tw.amount::text
+        ))
+        FROM public.treasury_withdrawal tw WHERE tw.gov_action_proposal_id = gap.id
         )
     END AS withdrawal,
     CASE
@@ -66,7 +68,6 @@ AS $$
     INNER JOIN public.tx ON gap.tx_id = tx.id
     INNER JOIN public.block AS b ON tx.block_id = b.id
     INNER JOIN public.stake_address AS sa ON gap.return_address = sa.id
-    LEFT JOIN public.treasury_withdrawal AS tw ON gap.id = tw.gov_action_proposal_id
     LEFT JOIN public.param_proposal AS pp ON gap.param_proposal = pp.id
     LEFT JOIN public.cost_model AS cm ON cm.id = pp.cost_model_id
     LEFT JOIN public.voting_anchor AS va ON gap.voting_anchor_id = va.id
