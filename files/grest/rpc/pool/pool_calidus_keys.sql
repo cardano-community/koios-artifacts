@@ -37,7 +37,8 @@ AS $$
       b.epoch_no AS epoch_no,
       b.block_no AS block_height,
       EXTRACT(EPOCH FROM b.time)::integer AS block_time,
-      ENCODE(tm.bytes::bytea, 'hex') AS bytes
+      ENCODE(tm.bytes::bytea, 'hex') AS bytes,
+      tx.id as tx_id
     FROM public.tx_metadata AS tm
       LEFT JOIN public.pool_hash AS ph ON ph.hash_raw = DECODE(SUBSTRING((tm.json->'1'->'1'->>1) FROM 3),'hex')
       LEFT JOIN grest.pool_info_cache AS pic ON pic.pool_hash_id = ph.id
@@ -51,7 +52,7 @@ AS $$
   ) AS x
   WHERE is_valid=true
     AND length(x.calidus_key)=64
-  ORDER BY x.pool_id_bech32, x.calidus_nonce DESC;
+  ORDER BY x.pool_id_bech32, x.calidus_nonce DESC, x.tx_id ASC;
 $$;
 
 COMMENT ON FUNCTION grest.pool_calidus_keys IS 'List of valid calidus keys for all pools'; --noqa: LT01
