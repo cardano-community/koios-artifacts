@@ -51,7 +51,7 @@ AS $$
   ) AS x
   WHERE is_valid=true
     AND length(x.calidus_key)=64
-  ORDER BY x.pool_id_bech32, x.calidus_nonce DESC;
+  ORDER BY x.pool_id_bech32, x.calidus_nonce DESC, x.block_time ASC;
 $$;
 
 COMMENT ON FUNCTION grest.pool_calidus_keys IS 'List of valid calidus keys for all pools'; --noqa: LT01
