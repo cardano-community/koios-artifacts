@@ -3044,25 +3044,25 @@ schemas:
           anyOf:
             - type: number
             - type: "null"
-          description: If not null, then this proposal has been ratified at the specfied epoch.
+          description: If not null, then this proposal has been ratified at the specified epoch.
           example: 670
         enacted_epoch:
           anyOf:
             - type: number
             - type: "null"
-          description: If not null, then this proposal has been enacted at the specfied epoch.
+          description: If not null, then this proposal has been enacted at the specified epoch.
           example: 675
         dropped_epoch:
           anyOf:
             - type: number
             - type: "null"
-          description: If not null, then this proposal has been dropped (expired/enacted) at the specfied epoch.
+          description: If not null, then this proposal has been dropped (expired/enacted) at the specified epoch.
           example: 680
         expired_epoch:
           anyOf:
             - type: number
             - type: "null"
-          description: If not null, then this proposal has been expired at the specfied epoch.
+          description: If not null, then this proposal has been expired at the specified epoch.
           example: 680
         expiration:
           anyOf:
@@ -3083,15 +3083,16 @@ schemas:
           $ref: "#/components/schemas/drep_metadata/items/properties/is_valid"
         withdrawal:
           anyOf:
-            - type: object
+            - type: array
             - type: "null"
-          description: If not null, the amount withdrawn from treasury into stake address by this this proposal
-          properties:
-            stake_address:
-              $ref: "#/components/schemas/account_history/items/properties/stake_address"
-            amount:
-              type: string
-              example: "31235800000"
+          description: If not null, the array of amounts withdrawn from treasury into specified stake addresses by this proposal
+          items:
+            properties:
+              stake_address:
+                $ref: "#/components/schemas/account_history/items/properties/stake_address"
+              amount:
+                type: string
+                example: "31235800000"
         param_proposal:
           description: If not null, the proposed new parameter set
           anyOf:
