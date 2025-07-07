@@ -893,7 +893,7 @@ BEGIN
                     ),
                     'amount', tw.amount::text
                   ))::jsonb, '[]'::jsonb)
-                  FROM public.treasury_withdrawal tw where tw.gov_action_proposal_id = gap.id),
+                  FROM public.treasury_withdrawal tw WHERE tw.gov_action_proposal_id = gap.id),
               'param_proposal', CASE
                 WHEN pp.id IS NULL THEN NULL
                 ELSE ( SELECT JSONB_STRIP_NULLS(TO_JSONB(pp.*)) - array['id','registered_tx_id','epoch_no'] )
