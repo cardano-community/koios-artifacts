@@ -31,6 +31,15 @@ AS $$
       ) 
     END
   )
+  AND e.no <= (
+    CASE
+      -- when most recent drep update is de-registration, use it's epoch no, otherwise use current epoch
+      WHEN ((SELECT deposit FROM drep_registration dr WHERE dr.drep_hash_id = dh.id ORDER BY id DESC LIMIT 1) < 0)
+      THEN (SELECT b.epoch_no FROM block b INNER JOIN tx t ON b.id = t.block_id and t.id = 
+        (SELECT tx_id FROM drep_registration dr WHERE dr.drep_hash_id = dh.id ORDER BY id DESC LIMIT 1))
+      ELSE (SELECT MAX(no) FROM epoch)
+    END
+  )
   -- previously was doing INNER JOIN of drep_distr with drep_hash but if zero voting power drep_distr not created
   LEFT OUTER JOIN public.drep_distr AS dd on dh.id = dd.hash_id AND e.no = dd.epoch_no
   WHERE (CASE
