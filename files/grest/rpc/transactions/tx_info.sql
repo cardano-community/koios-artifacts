@@ -884,18 +884,16 @@ BEGIN
               'expiration', gap.expiration,
               'meta_url', va.url,
               'meta_hash', ENCODE(va.data_hash, 'hex'),
-              'withdrawal', CASE
-                WHEN tw.id IS NULL THEN NULL
-                ELSE
-                  JSONB_BUILD_OBJECT(
+              'withdrawal', 
+                  (SELECT COALESCE(JSON_AGG(JSONB_BUILD_OBJECT(
                     'stake_address', (
                       SELECT grest.cip5_hex_to_stake_addr(sa2.hash_raw)
                       FROM stake_address AS sa2
                       WHERE sa2.id = tw.stake_address_id
                     ),
                     'amount', tw.amount::text
-                  )
-              END,
+                  ))::jsonb, '[]'::jsonb)
+                  FROM public.treasury_withdrawal tw where tw.gov_action_proposal_id = gap.id),
               'param_proposal', CASE
                 WHEN pp.id IS NULL THEN NULL
                 ELSE ( SELECT JSONB_STRIP_NULLS(TO_JSONB(pp.*)) - array['id','registered_tx_id','epoch_no'] )
@@ -903,7 +901,6 @@ BEGIN
             ) AS data
           FROM gov_action_proposal AS gap
           INNER JOIN public.stake_address AS sa ON gap.return_address = sa.id
-          LEFT JOIN public.treasury_withdrawal AS tw ON gap.id = tw.gov_action_proposal_id
           LEFT JOIN public.param_proposal AS pp ON gap.param_proposal = pp.id
           LEFT JOIN public.cost_model AS cm ON cm.id = pp.cost_model_id
           LEFT JOIN public.voting_anchor AS va ON gap.voting_anchor_id = va.id
