@@ -3082,10 +3082,8 @@ schemas:
         meta_is_valid:
           $ref: "#/components/schemas/drep_metadata/items/properties/is_valid"
         withdrawal:
-          anyOf:
-            - type: array
-            - type: "null"
-          description: If not null, the array of amounts withdrawn from treasury into specified stake addresses by this proposal
+          type: array
+          description: The array of amounts withdrawn from treasury into specified stake addresses by this proposal
           items:
             properties:
               stake_address:
