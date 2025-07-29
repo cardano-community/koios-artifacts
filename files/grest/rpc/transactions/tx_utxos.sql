@@ -146,4 +146,4 @@ BEGIN
 END;
 $$;
 
-COMMENT ON FUNCTION grest.tx_utxos IS 'Get UTXO set (inputs/outputs) of transactions.'; -- noqa: LT01
+COMMENT ON FUNCTION grest.tx_utxos IS 'Get UTxO set (inputs/outputs) of transactions.'; -- noqa: LT01
