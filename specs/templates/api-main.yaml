@@ -2152,6 +2152,7 @@ paths:
       operationId: reference_script_utxos
   /script_utxos: #RPC
     get:
+      deprecated: true
       tags:
         - Script
       parameters:
