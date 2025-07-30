@@ -2300,7 +2300,7 @@ schemas:
                 example: "1"
         is_spent:
           type: boolean
-          description: True if the UTXO has been spent
+          description: True if the UTxO has been spent
           example: true
   tx_outs_epoch:
     description: List of transaction outputs with basic details for requested epoch
@@ -2340,7 +2340,7 @@ schemas:
           $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_hash"
         is_spent:
           type: boolean
-          description: True if the UTXO has been spent
+          description: True if the UTxO has been spent
           example: true
   tx_treasury_donations_epoch:
     description: List of treasury donation transactions for requested epoch (current if NULL)
@@ -3448,6 +3448,17 @@ schemas:
                 example: 5a595ce795815e81d22a1a522cf3987d546dc5bb016de61b002edd63a5413ec4
               datum_value:
                 $ref: "#/components/schemas/script_info/items/properties/value"
+  script_utxos:
+    description: List of all unspent utxos with a reference script matching given script hashes
+    type: array
+    items:
+      properties:
+        script_hash:
+          $ref: "#/components/schemas/script_info/items/properties/script_hash"
+        tx_hash:
+          $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+        tx_index:
+          $ref: "#/components/schemas/utxo_infos/items/properties/tx_index"
   datum_info:
     description: Array of datum information for given datum hashes
     type: array

@@ -118,4 +118,4 @@ BEGIN
 END;
 $$;
 
-COMMENT ON FUNCTION grest.address_info IS 'Get bulk address info - balance, associated stake address (if any) and UTXO set'; -- noqa: LT01
+COMMENT ON FUNCTION grest.address_info IS 'Get bulk address info - balance, associated stake address (if any) and UTxO set'; -- noqa: LT01

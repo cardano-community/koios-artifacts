@@ -597,7 +597,7 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
-      summary: Address UTXOs
+      summary: Address UTxOs
       description: Get UTxO set for given addresses
       operationId: address_utxos
   /address_outputs: #RPC
@@ -1114,8 +1114,8 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
-      summary: Asset UTXOs
-      description: Get the UTXO information of a list of assets including
+      summary: Asset UTxOs
+      description: Get the UTxO information of a list of assets including
       operationId: asset_utxos
   /asset_history: #RPC
     get:
@@ -2128,8 +2128,31 @@ paths:
       summary: Script Redeemers
       description: List of all redeemers for a given script hash
       operationId: script_redeemers
+  /reference_script_utxos: #RPC
+    post:
+      tags:
+        - Script
+      requestBody:
+        $ref: "#/components/requestBodies/script_hashes"
+      responses:
+        "200":
+          description: Array of information for scripts requested
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/script_utxos"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Reference Script UTxOs
+      description: List of all unspent UTxOs with a reference script matching given script hashes
+      operationId: reference_script_utxos
   /script_utxos: #RPC
     get:
+      deprecated: true
       tags:
         - Script
       parameters:
@@ -2137,7 +2160,7 @@ paths:
         - $ref: "#/components/parameters/_extended"
       responses:
         "200":
-          description: List of UTXOs for a given script hash
+          description: List of UTxOs for a given script hash
           content:
             application/json:
               schema:
@@ -2148,8 +2171,8 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
-      summary: Script UTXOs
-      description: List of all UTXOs for a given script hash
+      summary: Script UTxOs
+      description: List of all UTxOs for a given script hash
       operationId: script_utxos
   /datum_info: #RPC
     post:
