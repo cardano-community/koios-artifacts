@@ -3449,11 +3449,12 @@ schemas:
               datum_value:
                 $ref: "#/components/schemas/script_info/items/properties/value"
   script_utxos:
-    description: Array of all unspent utxos with a reference script matching given script hashes
+    description: List of all unspent utxos with a reference script matching given script hashes
     type: array
     items:
-      type: object
       properties:
+        script_hash:
+          $ref: "#/components/schemas/script_info/items/properties/script_hash"
         tx_hash:
           $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
         tx_index:

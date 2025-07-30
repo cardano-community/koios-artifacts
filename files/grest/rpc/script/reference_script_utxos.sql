@@ -1,7 +1,8 @@
 CREATE OR REPLACE FUNCTION grest.reference_script_utxos(_script_hashes text[])
 RETURNS TABLE (
   script_hash text,
-  tx_hashes jsonb
+  tx_hash text,
+  tx_index smallint
 )
 LANGUAGE plpgsql
 AS $$
@@ -18,18 +19,13 @@ BEGIN
   RETURN QUERY (
     SELECT
       ENCODE(script.hash, 'hex'),
-      JSONB_AGG(
-        JSONB_BUILD_OBJECT(
-          'tx_hash', ENCODE(tx.hash, 'hex'),
-          'tx_index', tx_out.index
-        )
-      ) AS tx_hashes
+      ENCODE(tx.hash, 'hex'),
+      tx_out.index::smallint
     FROM script
     INNER JOIN tx_out ON tx_out.reference_script_id = script.id
     INNER JOIN tx ON tx.id = tx_out.tx_id
     WHERE script.hash = ANY(_script_hashes_bytea)
       AND tx_out.consumed_by_tx_id IS NULL
-    GROUP BY script.hash
   );
 
 END;
