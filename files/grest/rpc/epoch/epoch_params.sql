@@ -1,6 +1,7 @@
 CREATE OR REPLACE FUNCTION grest.epoch_params(_epoch_no numeric DEFAULT NULL)
 RETURNS TABLE (
   epoch_no word31type,
+  era varchar,
   min_fee_a word31type,
   min_fee_b word31type,
   max_block_size word31type,
@@ -61,6 +62,7 @@ BEGIN
   RETURN QUERY
     SELECT
       ep.epoch_no,
+      em.era,
       ep.min_fee_a AS min_fee_a,
       ep.min_fee_b AS min_fee_b,
       ep.max_block_size AS max_block_size,
@@ -114,16 +116,15 @@ BEGIN
       ep.drep_activity,
       ep.pvtpp_security_group,
       ep.min_fee_ref_script_cost_per_byte
-    FROM epoch_param AS ep
+    FROM public.epoch_param AS ep
+    LEFT JOIN grest.era_map AS em ON ep.protocol_major::text = em.protocol_major::text AND ep.protocol_minor::text = em.protocol_minor::text
     LEFT JOIN grest.epoch_info_cache AS ei ON ei.epoch_no = ep.epoch_no
-    LEFT JOIN cost_model AS cm ON cm.id = ep.cost_model_id
+    LEFT JOIN public.cost_model AS cm ON cm.id = ep.cost_model_id
     WHERE 
       CASE
-        WHEN _epoch_no IS NULL THEN
-          ep.epoch_no <= (SELECT MAX(epoch.no) FROM public.epoch)
-        ELSE
-          ep.epoch_no = _epoch_no
-        END
+        WHEN _epoch_no IS NULL THEN ep.epoch_no <= (SELECT MAX(epoch.no) FROM public.epoch)
+        ELSE ep.epoch_no = _epoch_no
+      END
     ORDER BY
       ei.epoch_no DESC;
 END;
