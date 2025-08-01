@@ -1,6 +1,7 @@
 CREATE OR REPLACE FUNCTION grest.epoch_info(_epoch_no numeric DEFAULT NULL, _include_next_epoch boolean DEFAULT FALSE)
 RETURNS TABLE (
   epoch_no word31type,
+  era varchar,
   out_sum text,
   fees text,
   tx_count word31type,
@@ -23,6 +24,7 @@ BEGIN
   RETURN QUERY
   SELECT
     ei.epoch_no,
+    em.era,
     ei.i_out_sum::text AS tx_output_sum,
     ei.i_fees::text AS tx_fees_sum,
     ei.i_tx_count AS tx_count,
@@ -45,12 +47,13 @@ BEGIN
     ei.i_total_rewards::text AS total_rewards,
     ei.i_avg_blk_reward::text AS avg_blk_reward
   FROM grest.epoch_info_cache AS ei
+  LEFT JOIN epoch_param AS ep ON ep.epoch_no = ei.epoch_no
+  LEFT JOIN grest.era_map AS em ON ep.protocol_major::text = em.protocol_major::text AND ep.protocol_minor::text = em.protocol_minor::text
   LEFT JOIN grest.epoch_active_stake_cache AS eas ON eas.epoch_no = ei.epoch_no
   WHERE
-    CASE WHEN _epoch_no IS NULL THEN
-      ei.epoch_no <= (SELECT MAX(epoch.no) FROM public.epoch)
-    ELSE
-      ei.epoch_no = _epoch_no
+    CASE
+      WHEN _epoch_no IS NULL THEN ei.epoch_no <= (SELECT MAX(epoch.no) FROM public.epoch)
+      ELSE ei.epoch_no = _epoch_no
     END
     AND
     (_include_next_epoch OR ei.i_first_block_time::integer IS NOT NULL);
