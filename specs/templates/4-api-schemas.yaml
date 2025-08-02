@@ -1562,35 +1562,6 @@ schemas:
           type: string
           description: Total proposal refund for this account
           example: "0"
-  account_rewards:
-    description: Array of reward history information
-    type: array
-    items:
-      type: object
-      properties:
-        stake_address:
-          $ref: "#/components/schemas/account_history/items/properties/stake_address"
-        rewards:
-          type: array
-          items:
-            type: object
-            properties:
-              earned_epoch:
-                $ref: "#/components/schemas/reserve_withdrawals/items/properties/earned_epoch"
-              spendable_epoch:
-                $ref: "#/components/schemas/reserve_withdrawals/items/properties/spendable_epoch"
-              amount:
-                type: string
-                description: Amount of rewards earned (in number)
-              type:
-                type: string
-                description: The source of the rewards
-                enum: [member, leader, treasury, reserves, refund]
-                example: member
-              pool_id:
-                anyOf:
-                  - $ref: "#/components/schemas/pool_list/items/properties/pool_id_bech32"
-                  - type: "null"
   account_reward_history:
     description: Array of reward history information
     type: array

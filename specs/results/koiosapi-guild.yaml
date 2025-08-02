@@ -464,32 +464,6 @@ paths:
       summary: Block Transactions (Raw CBOR)
       description: Get raw CBOR data for all transaction(s) within requested blocks
       operationId: block_tx_cbor
-  /block_tx_info: #RPC
-    post:
-      deprecated: true
-      tags:
-        - Block
-      requestBody:
-        $ref: "#/components/requestBodies/block_tx_info"
-      responses:
-        "200":
-          description: Success!!
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/block_tx_info"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      summary: Block Transactions (Detailed Info)
-      description: Get detailed information about transaction(s) for requested blocks
-      operationId: block_tx_info
-      x-badges:
-        - color: red
-          label: "Deprecated"
 
   /utxo_info: #RPC
     post:
@@ -674,32 +648,6 @@ paths:
       summary: Transaction outputs by epoch
       description: Get a list of all transaction outputs for requested epoch
       operationId: tx_outs_epoch
-  /tx_utxos: #RPC
-    post:
-      tags:
-        - Transactions
-      deprecated: true
-      requestBody:
-        $ref: "#/components/requestBodies/tx_ids"
-      responses:
-        "200":
-          description: Success!!
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/tx_utxos"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      summary: Transaction UTxOs
-      description: Get UTxO set (inputs/outputs) of transactions [DEPRECATED - Use /utxo_info instead].
-      operationId: tx_utxos
-      x-badges:
-        - color: red
-          label: "Deprecated"
 
   /address_info: #RPC
     post:
@@ -965,33 +913,6 @@ paths:
       summary: Account Txs
       description: Get a list of all Txs for a given stake address (account)
       operationId: account_txs
-  /account_rewards: #RPC
-    post:
-      deprecated: true
-      tags:
-        - Stake Account
-      requestBody:
-        $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
-      responses:
-        "200":
-          description: Success!!
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/account_rewards"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      summary: Account Rewards
-      description: >-
-        Get the full rewards history (including MIR) for given stake addresses
-      operationId: account_rewards
-      x-badges:
-        - color: red
-          label: "Deprecated"
   /account_reward_history: #RPC
     post:
       tags:
@@ -1107,32 +1028,6 @@ paths:
       summary: Account Assets
       description: Get the native asset balance for a given stake address
       operationId: account_assets
-  /account_history: #RPC
-    post:
-      deprecated: true
-      tags:
-        - Stake Account
-      requestBody:
-        $ref: "#/components/requestBodies/stake_addresses"
-      responses:
-        "200":
-          description: Success!!
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/account_history"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      summary: Account History
-      description: Get the staking history of given stake addresses (accounts)
-      operationId: account_history
-      x-badges:
-        - color: red
-          label: "Deprecated"
   /account_stake_history: #RPC
     post:
       tags:
@@ -1561,33 +1456,6 @@ paths:
       summary: DReps Updates
       description: List of updates for requested (or all) delegated representatives (DReps)
       operationId: drep_updates
-  /drep_history: #RPC
-    get:
-      deprecated: true
-      tags:
-        - Governance
-      parameters:
-        - $ref: "#/components/parameters/_epoch_no"
-        - $ref: "#/components/parameters/_drep_id_optional"
-      responses:
-        "200":
-          description: Success!!
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/drep_voting_power_history"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      summary: DReps Voting Power History
-      description: History of DReps voting power against each (or requested) epoch
-      operationId: drep_history
-      x-badges:
-        - color: red
-          label: "Deprecated"
   /drep_voting_power_history: #RPC
     get:
       tags:
@@ -1611,32 +1479,6 @@ paths:
       summary: DReps Voting Power History
       description: History of DReps voting power against each (or requested) epoch
       operationId: drep_voting_power_history
-  /drep_votes: #RPC
-    get:
-      deprecated: true
-      tags:
-        - Governance
-      parameters:
-        - $ref: "#/components/parameters/_drep_id"
-      responses:
-        "200":
-          description: Success!!
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/drep_votes"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      summary: DReps Votes
-      description: List of all votes casted by requested delegated representative (DRep)
-      operationId: drep_votes
-      x-badges:
-        - color: red
-          label: "Deprecated"
   /drep_delegators: #RPC
     get:
       tags:
@@ -2099,33 +1941,6 @@ paths:
       summary: Pool's Voting Power History
       description: History of Pool voting power against each (or requested) epoch
       operationId: pool_voting_power_history
-  /pool_votes: #RPC
-    get:
-      deprecated: true
-      tags:
-        - Governance
-      parameters:
-        - $ref: "#/components/parameters/_pool_bech32"
-      responses:
-        "200":
-          description: Success!!
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/pool_votes"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-      summary: Pool Votes
-      description: List of all votes casted by a pool
-      operationId: pool_votes
-      x-badges:
-        - color: red
-          label: "Deprecated"
-
   /pool_groups: #RPC
     get:
       tags:
@@ -4768,35 +4583,6 @@ components:
             type: string
             description: Total proposal refund for this account
             example: "0"
-    account_rewards:
-      description: Array of reward history information
-      type: array
-      items:
-        type: object
-        properties:
-          stake_address:
-            $ref: "#/components/schemas/account_history/items/properties/stake_address"
-          rewards:
-            type: array
-            items:
-              type: object
-              properties:
-                earned_epoch:
-                  $ref: "#/components/schemas/reserve_withdrawals/items/properties/earned_epoch"
-                spendable_epoch:
-                  $ref: "#/components/schemas/reserve_withdrawals/items/properties/spendable_epoch"
-                amount:
-                  type: string
-                  description: Amount of rewards earned (in number)
-                type:
-                  type: string
-                  description: The source of the rewards
-                  enum: [member, leader, treasury, reserves, refund]
-                  example: member
-                pool_id:
-                  anyOf:
-                    - $ref: "#/components/schemas/pool_list/items/properties/pool_id_bech32"
-                    - type: "null"
     account_reward_history:
       description: Array of reward history information
       type: array
@@ -6655,11 +6441,12 @@ components:
                 datum_value:
                   $ref: "#/components/schemas/script_info/items/properties/value"
     script_utxos:
-      description: Array of all unspent utxos with a reference script matching given script hashes
+      description: List of all unspent utxos with a reference script matching given script hashes
       type: array
       items:
-        type: object
         properties:
+          script_hash:
+            $ref: "#/components/schemas/script_info/items/properties/script_hash"
           tx_hash:
             $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
           tx_index:
