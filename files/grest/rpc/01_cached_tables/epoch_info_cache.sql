@@ -229,7 +229,7 @@ BEGIN
   FROM (
     SELECT
       reward_pot.amount,
-      ROUND(reward_pot.amount /  e.blk_count) AS avg_blk_reward
+      ROUND(reward_pot.amount / e.blk_count) AS avg_blk_reward
     FROM (
       SELECT
         r.earned_epoch,
