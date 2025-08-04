@@ -2,6 +2,7 @@ CREATE OR REPLACE FUNCTION grest.epoch_block_protocols(_epoch_no numeric DEFAULT
 RETURNS TABLE (
   proto_major word31type,
   proto_minor word31type,
+  era varchar,
   blocks bigint
 )
 LANGUAGE plpgsql
@@ -12,11 +13,12 @@ BEGIN
       SELECT
         b.proto_major,
         b.proto_minor,
+        em.era,
         count(b.*)
-      FROM
-        block b
-      WHERE
-        b.epoch_no = _epoch_no::word31type
+      FROM public.block AS b
+        LEFT JOIN public.epoch_param AS ep ON ep.epoch_no = b.epoch_no
+        LEFT JOIN grest.era_map AS em ON ep.protocol_major::text = em.protocol_major::text AND ep.protocol_minor::text = em.protocol_minor::text
+      WHERE b.epoch_no = _epoch_no::word31type
       GROUP BY
         b.proto_major, b.proto_minor;
   ELSE
@@ -24,11 +26,12 @@ BEGIN
       SELECT
         b.proto_major,
         b.proto_minor,
+        em.era,
         count(b.*)
-      FROM
-        block AS b
-      WHERE
-        b.epoch_no = (SELECT MAX(no) FROM epoch)
+      FROM public.block AS b
+        LEFT JOIN public.epoch_param AS ep ON ep.epoch_no = b.epoch_no
+        LEFT JOIN grest.era_map AS em ON ep.protocol_major::text = em.protocol_major::text AND ep.protocol_minor::text = em.protocol_minor::text
+      WHERE b.epoch_no = (SELECT MAX(no) FROM epoch)
       GROUP BY
         b.proto_major, b.proto_minor;
   END IF;

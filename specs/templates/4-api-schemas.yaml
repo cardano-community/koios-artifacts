@@ -6,6 +6,8 @@ schemas:
       properties:
         hash:
           $ref: "#/components/schemas/blocks/items/properties/hash"
+        era:
+          $ref: "#/components/schemas/era_summaries/items/properties/era"
         epoch_no:
           $ref: "#/components/schemas/blocks/items/properties/epoch_no"
         abs_slot:
@@ -19,6 +21,37 @@ schemas:
           example: 1794506
         block_time:
           $ref: "#/components/schemas/blocks/items/properties/block_time"
+  era_summaries:
+    description: Information about each era on the network alongwith it's start epoch
+    type: array
+    items:
+      properties:
+        era:
+          type: string
+          example: Conway
+          description: Cardano Era
+        protocol_major:
+          $ref: "#/components/schemas/epoch_params/items/properties/protocol_major"
+        protocol_minor:
+          $ref: "#/components/schemas/epoch_params/items/properties/protocol_minor"
+        ledger_protocol:
+          type: string
+          example: Praos
+          description: Protocol name that denotes  collection of features sitting between consensus and ledger layer
+        consensus_mechanism:
+          type: string
+          example: Ouroboros Genesis/Praos
+          description: Consensus name that denotes  collection of consensus features introduced at a hard fork
+        notes:
+          type: string
+          example: Plomin HF
+          description: Additional information about when this protocol update was pushed (eg: if there is a fork name associated)
+        epoch_no:
+          $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+        first_block_time:
+          $ref: "#/components/schemas/epoch_info/items/properties/first_block_time"
+        first_block_hash:
+          $ref: "#/components/schemas/epoch_params/items/properties/block_hash"
   genesis:
     description: Array of genesis parameters used to start each era on chain
     type: array
@@ -766,6 +799,8 @@ schemas:
           type: number
           description: Epoch number
           example: 294
+        era:
+          $ref: "#/components/schemas/era_summaries/items/properties/era"
         out_sum:
           type: string
           description: Total output value across all transactions in epoch
@@ -825,6 +860,8 @@ schemas:
           type: number
           description: Epoch number
           example: 294
+        era:
+          $ref: "#/components/schemas/era_summaries/items/properties/era"
         min_fee_a:
           anyOf:
             - type: number
@@ -918,7 +955,7 @@ schemas:
             - type: number
             - type: "null"
           description: The protocol major version
-          example: 5
+          example: 10
         protocol_minor:
           anyOf:
             - type: number
@@ -1160,6 +1197,8 @@ schemas:
           type: number
           description: Protocol major version
           example: 2
+        era:
+          $ref: "#/components/schemas/era_summaries/items/properties/era"
         blocks:
           type: number
           description: Amount of blocks with specified major and protocol combination
@@ -1235,6 +1274,8 @@ schemas:
           $ref: "#/components/schemas/blocks/items/properties/hash"
         epoch_no:
           $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+        era:
+          $ref: "#/components/schemas/era_summaries/items/properties/era"
         abs_slot:
           $ref: "#/components/schemas/blocks/items/properties/abs_slot"
         epoch_slot:
