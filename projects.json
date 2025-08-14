@@ -46,6 +46,11 @@
       "text": "Laravel PHP Client",
       "link": "https://github.com/cardano-blockhouse/cardano-koios-api"
     }
+    {
+      "text": "Rust SDK",
+      "link": "https://github.com/justmert/koios.rs"
+    },
+
   ],
   "Community Projects/Tools": [
     {
