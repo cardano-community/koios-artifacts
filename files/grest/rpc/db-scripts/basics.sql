@@ -80,6 +80,36 @@ CREATE TABLE grest.genesis (
   alonzogenesis varchar
 );
 
+-- Era mapping TABLE --
+DROP TABLE IF EXISTS grest.era_map;
+
+-- This table is populated as per https://github.com/cardano-foundation/CIPs/blob/master/CIP-0059/feature-table.md
+-- Since this is a static source that should be updated pre-fork on testnets, and there isnt a programmatic source,
+-- the changes from that table are replicated below and to be kept up-to-date
+CREATE TABLE grest.era_map (
+  phase varchar,
+  era varchar,
+  protocol_major word31type,
+  protocol_minor word31type,
+  ledger_protocol varchar,
+  consensus_mechanism varchar,
+  notes varchar
+);
+
+INSERT INTO grest.era_map
+  VALUES
+    ('Byron','Byron',0,0,NULL,'Ouroboros Classic',NULL),
+    ('Byron','Byron',1,0,NULL,'Ouroboros BFT',NULL),
+    ('Shelley','Shelley',2,0,'TPraos','Ouroboros Praos',NULL),
+    ('Goguen','Allegra',3,0,'TPraos','Ouroboros Praos',NULL),
+    ('Goguen','Mary',4,0,'TPraos','Ouroboros Praos',NULL),
+    ('Goguen','Alonzo',5,0,'TPraos','Ouroboros Praos',NULL),
+    ('Goguen','Alonzo',6,0,'TPraos','Ouroboros Praos','intra-era hardfork'),
+    ('Goguen','Babbage',7,0,'Praos','Ouroboros Praos','Vasil HF'),
+    ('Goguen','Babbage',8,0,'Praos','Ouroboros Praos','Valentine HF'),
+    ('Voltaire','Conway',9,0,'Praos','Ouroboros Genesis/Praos','Chang HF'),
+    ('Voltaire','Conway',10,0,'Praos','Ouroboros Genesis/Praos','Plomin HF');
+
 -- POOL_GROUPS TABLE --
 DROP TABLE IF EXISTS grest.pool_groups;
 CREATE TABLE grest.pool_groups (

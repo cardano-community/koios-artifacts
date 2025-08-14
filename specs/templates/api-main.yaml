@@ -32,6 +32,26 @@ paths:
       summary: Query Chain Tip
       description: Get the tip info about the latest block seen by chain
       operationId: tip
+  /era_summaries: #RPC
+    get:
+      tags:
+        - Network
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/era_summaries"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+      summary: Get Era Summaries
+      description: Get some information about each era on the network alongwith it's start epoch
+      operationId: era_summaries
   /genesis: #RPC
     get:
       tags:

@@ -2,6 +2,7 @@ CREATE OR REPLACE FUNCTION grest.block_info(_block_hashes text [])
 RETURNS TABLE (
   hash text,
   epoch_no word31type,
+  era varchar,
   abs_slot word63type,
   epoch_slot word31type,
   block_height word31type,
@@ -28,7 +29,7 @@ DECLARE
   _curr_block_no        word31type;
 BEGIN
   SELECT MAX(block_no) INTO _curr_block_no
-  FROM block AS b;
+  FROM public.block AS b;
 
   -- convert input _block_hashes array into bytea array
   SELECT INTO _block_hashes_bytea ARRAY_AGG(hashes_bytea)
@@ -42,14 +43,15 @@ BEGIN
   SELECT INTO _block_id_list ARRAY_AGG(id)
   FROM (
     SELECT id
-    FROM block
+    FROM public.block
     WHERE block.hash = ANY(_block_hashes_bytea)
   ) AS tmp;
 
   RETURN QUERY
   SELECT
     ENCODE(b.hash, 'hex') AS hash,
-    b.epoch_no AS epoch,
+    b.epoch_no,
+    em.era,
     b.slot_no AS abs_slot,
     b.epoch_slot_no AS epoch_slot,
     b.block_no AS block_height,
@@ -76,25 +78,24 @@ BEGIN
       WHERE previous_id = b.id
     ) AS child_hash
   FROM
-    block AS b
-    LEFT JOIN slot_leader AS sl ON sl.id = b.slot_leader_id
-    LEFT JOIN pool_hash AS ph ON ph.id = sl.pool_hash_id
+    public.block AS b
+    LEFT JOIN public.epoch_param AS ep ON ep.epoch_no = b.epoch_no
+    LEFT JOIN grest.era_map AS em ON ep.protocol_major::text = em.protocol_major::text AND ep.protocol_minor::text = em.protocol_minor::text
+    LEFT JOIN public.slot_leader AS sl ON sl.id = b.slot_leader_id
+    LEFT JOIN public.pool_hash AS ph ON ph.id = sl.pool_hash_id
     LEFT JOIN LATERAL (
       SELECT
         SUM(tx_data.total_output) AS total_output,
         SUM(tx.fee) AS total_fees
-      FROM
-        tx
+      FROM public.tx
         JOIN LATERAL (
           SELECT SUM(tx_out.value) AS total_output
-          FROM tx_out
+          FROM public.tx_out
           WHERE tx_out.tx_id = tx.id
         ) tx_data ON TRUE
-      WHERE
-        tx.block_id = b.id
+      WHERE tx.block_id = b.id
     ) block_data ON TRUE
-  WHERE
-    b.id = ANY(_block_id_list);
+  WHERE b.id = ANY(_block_id_list);
 END;
 $$;
 
