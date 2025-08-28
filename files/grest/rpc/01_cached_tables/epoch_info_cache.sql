@@ -119,7 +119,7 @@ BEGIN
         ELSE NULL
       END AS i_total_rewards,
       CASE -- populated in epoch n + 2
-        WHEN e.no <= _curr_epoch THEN ROUND(reward_pot.amount / e.blk_count)
+        WHEN e.no <= _curr_epoch - 2 THEN ROUND(reward_pot.amount / e.blk_count)
         ELSE NULL
       END AS i_avg_blk_reward,
       (
