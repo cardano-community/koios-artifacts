@@ -13,8 +13,8 @@ LANGUAGE sql STABLE
 AS $$
   SELECT
     ENCODE(b.hash::bytea, 'hex') AS block_hash,
-    b.epoch_no AS epoch_no,
     em.era,
+    b.epoch_no AS epoch_no,
     b.slot_no AS abs_slot,
     b.epoch_slot_no AS epoch_slot,
     b.block_no AS block_height,
