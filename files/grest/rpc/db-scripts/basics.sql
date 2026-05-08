@@ -108,7 +108,8 @@ VALUES
 ('Goguen', 'Babbage', 7, 0, 'Praos', 'Ouroboros Praos', 'Vasil HF'),
 ('Goguen', 'Babbage', 8, 0, 'Praos', 'Ouroboros Praos', 'Valentine HF'),
 ('Voltaire', 'Conway', 9, 0, 'Praos', 'Ouroboros Genesis/Praos', 'Chang HF'),
-('Voltaire', 'Conway', 10, 0, 'Praos', 'Ouroboros Genesis/Praos', 'Plomin HF');
+('Voltaire', 'Conway', 10, 0, 'Praos', 'Ouroboros Genesis/Praos', 'Plomin HF'),
+('Voltaire', 'Conway', 11, 0, 'Praos', 'Ouroboros Genesis/Praos', 'Van Rossem HF');
 
 -- POOL_GROUPS TABLE --
 DROP TABLE IF EXISTS grest.pool_groups;
