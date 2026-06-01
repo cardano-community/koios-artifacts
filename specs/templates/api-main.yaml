@@ -3,8 +3,6 @@ openapi: 3.1.0
 servers:
   - url: https://api.koios.rest/api/v1
     description: Mainnet
-  - url: https://guild.koios.rest/api/v1
-    description: Guildnet
   - url: https://preview.koios.rest/api/v1
     description: Preview Network
   - url: https://preprod.koios.rest/api/v1
