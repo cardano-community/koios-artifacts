@@ -1,0 +1,93 @@
+openapi: 3.1.0
+#!info!#
+servers:
+  - url: https://api.koios.rest/api/v1
+    description: Mainnet
+  - url: https://preview.koios.rest/api/v1
+    description: Preview Network
+  - url: https://preprod.koios.rest/api/v1
+    description: Preprod Network
+paths:
+#!paths!#
+
+components:
+  #!parameters!#
+  #!requestBodies!#
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT Bearer Auth token generated via https://koios.rest Profile page. Using this token value allows consumers to use higher limits than public unauthenticated requests.
+  #!schemas!#
+  headers: {}
+  responses:
+    NotFound:
+      description: The server does not recognise the combination of endpoint and parameters provided
+    Unauthorized:
+      description: Access token is missing or invalid
+    BadRequest:
+      description: The server cannot process the request due to invalid input
+tags:
+  - name: Network
+    description: Query information about the network
+    x-tag-expanded: false
+  - name: Epoch
+    description: Query epoch-specific details
+    x-tag-expanded: false
+  - name: Block
+    description: Query information about particular block on chain
+    x-tag-expanded: false
+  - name: Transactions
+    description: Query blockchain transaction details
+    x-tag-expanded: false
+  - name: Stake Account
+    description: Query details about specific stake account addresses
+    x-tag-expanded: false
+  - name: Address
+    description: Query information about specific address(es)
+    x-tag-expanded: false
+  - name: Asset
+    description: Query Asset related informations
+    x-tag-expanded: false
+  - name: Governance
+    description: Query information about governance for network
+    x-tag-expanded: false
+  - name: Pool
+    description: Query information about specific pools
+    x-tag-expanded: false
+  - name: Script
+    description: Query information about specific scripts (Smart Contracts)
+    x-tag-expanded: false
+  - name: Ogmios
+    description: |
+      Various stateless queries against Ogmios v6 instance. Please note that ogmios follows JSON-RPC 2.0 method, the example spec on koios.rest is *ONLY* for `queryNetwork/tip`,
+      but all the methods listed below are all accepted. Instead of duplicating specs, we would refer you directly to Ogmios documentation [here](https://ogmios.dev/api) for complete specs.
+
+        <br>
+        <div style="background-color: #222; padding: 12px 0px 12px 12px;border-left: 5px solid  rgb(173, 44, 44);font-size: var(--font-size-regular);">
+        Note that for queries to be stateless across instances on the globe, we cannot acquire local state as successive calls will be across different instances. Additionally, `queryLedgerState/utxo` method is removed to avoid DDoS impacts.
+        Thus, we only expose the following methods from monitoring servers, instance providers can expose entire ogmios endpoints if desirable:
+        </div>
+
+
+        ### Network
+        - [queryNetwork/blockHeight](https://ogmios.dev/api/#operation-publish-/?QueryNetworkBlockHeight)
+        - [queryNetwork/genesisConfiguration](https://ogmios.dev/api/#operation-publish-/?QueryNetworkGenesisConfiguration)
+        - [queryNetwork/startTime](https://ogmios.dev/api/#operation-publish-/?QueryNetworkStartTime)
+        - [queryNetwork/tip](https://ogmios.dev/api/#operation-publish-/?QueryNetworkTip)
+        ### Ledger-State
+        - [queryLedgerState/epoch](https://ogmios.dev/api/#operation-publish-/?QueryLedgerStateEpoch)
+        - [queryLedgerState/eraStart](https://ogmios.dev/api/#operation-publish-/?QueryLedgerStateEraStart)
+        - [queryLedgerState/eraSummaries](https://ogmios.dev/api/#operation-publish-/?QueryLedgerStateEraSummaries)
+        - [queryLedgerState/liveStakeDistribution](https://ogmios.dev/api/#operation-publish-/?QueryLedgerStateLiveStakeDistribution)
+        - [queryLedgerState/protocolParameters](https://ogmios.dev/api/#operation-publish-/?QueryLedgerStateProtocolParameters)
+        - [queryLedgerState/proposedProtocolParameters](https://ogmios.dev/api/#operation-publish-/?QueryLedgerStateProposedProtocolParameters)
+        - [queryLedgerState/stakePools](https://ogmios.dev/api/#operation-publish-/?QueryLedgerStateStakePools)
+        ### Transactions
+        - [submitTransaction](https://ogmios.dev/mini-protocols/local-tx-submission/#submitting-transactions)
+        - [evaluateTransaction](https://ogmios.dev/mini-protocols/local-tx-submission/#evaluating-transactions)
+    x-tag-expanded: true
+security:
+  - {}
+  - bearerAuth: []

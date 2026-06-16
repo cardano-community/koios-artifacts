@@ -1,0 +1,129 @@
+/tip: #RPC
+    get:
+      tags:
+        - Network
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tip"
+        #!macro:koios_errors!#
+      summary: Query Chain Tip
+      description: Get the tip info about the latest block seen by chain
+      operationId: tip
+/era_summaries: #RPC
+    get:
+      tags:
+        - Network
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/era_summaries"
+        #!macro:koios_errors!#
+      summary: Get Era Summaries
+      description: Get some information about each era on the network alongwith it's start epoch
+      operationId: era_summaries
+/genesis: #RPC
+    get:
+      tags:
+        - Network
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/genesis"
+        #!macro:koios_errors!#
+      summary: Get Genesis info
+      description: Get the Genesis parameters used to start specific era on chain
+      operationId: genesis
+/totals: #RPC
+    get:
+      tags:
+        - Network
+      parameters:
+        - $ref: "#/components/parameters/_epoch_no"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/totals"
+        #!macro:koios_errors!#
+      summary: Get historical tokenomic stats
+      description: >-
+        Get the circulating utxo, treasury, rewards, supply and reserves in
+        lovelace for specified epoch, all epochs if empty
+      operationId: totals
+/param_updates: #RPC
+    get:
+      tags:
+        - Network
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/param_updates"
+        #!macro:koios_errors!#
+      summary: Param Update Proposals
+      description: Get all parameter update proposals submitted to the chain starting Shelley era
+      operationId: param_updates
+/cli_protocol_params: #RPC
+    get:
+      tags:
+        - Network
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/cli_protocol_params"
+        #!macro:koios_errors!#
+      summary: CLI Protocol Parameters
+      description: >-
+        Get Current Protocol Parameters as published by cardano-cli. Note that
+        the output schema of this command is unfortunately fluid on cardano-node
+        and may vary between CLI versions/era. Accordingly, the returned output for
+        this endpoint is left as raw JSON (single row) and any filtering to output should
+        be done on client-side
+      operationId: cli_protocol_params
+/reserve_withdrawals: #RPC
+    get:
+      tags:
+        - Network
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/reserve_withdrawals"
+        #!macro:koios_errors!#
+      summary: Reserve Withdrawals
+      description: List of all withdrawals from reserves against stake accounts
+      operationId: reserve_withdrawals
+/treasury_withdrawals: #RPC
+    get:
+      tags:
+        - Network
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/reserve_withdrawals"
+        #!macro:koios_errors!#
+      summary: Treasury Withdrawals
+      description: List of all withdrawals from treasury against stake accounts
+      operationId: treasury_withdrawals

@@ -1,0 +1,219 @@
+  blocks:
+    description: Array of block information
+    type: array
+    items:
+      type: object
+      properties:
+        hash:
+          type: string
+          description: Hash of the block
+          example: 2fa5178c5be950c7f40d6c74efe9b3dd12c4836dc3f3dd052cd1c2a12edd477f
+        epoch_no:
+          type: number
+          description: Epoch number of the block
+          example: 117
+        abs_slot:
+          type: number
+          description: Absolute slot number of the block
+          example: 49073930
+        epoch_slot:
+          type: number
+          description: Slot number of the block in epoch
+          example: 171530
+        block_height:
+          type: number
+          description: Block height
+          example: 1794506
+        block_size:
+          type: number
+          description: Block size in bytes
+          example: 2433
+        block_time:
+          type: number
+          description: UNIX timestamp of the block
+          example: 1704757130
+        tx_count:
+          type: number
+          description: Number of transactions in the block
+          example: 2
+        vrf_key:
+          type: string
+          description: VRF key of the block producer
+          example: "vrf_vk1400ju08429se790upcvurdyqrhl8rhm7spm2jxg0lfnedqeaexfq7jsf2x"
+        pool:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Pool ID in bech32 format (null for pre-Shelley blocks)
+          example: pool13m26ky08vz205232k20u8ft5nrg8u68klhn0xfsk9m4gsqsc44v
+        op_cert_counter:
+          type: number
+          description: Counter value of the operational certificate used to create this block
+          example: 5
+        proto_major:
+          $ref: "#/components/schemas/epoch_params/items/properties/protocol_major"
+        proto_minor:
+          $ref: "#/components/schemas/epoch_params/items/properties/protocol_minor"
+        parent_hash:
+          type: string
+          description: Previous Hash of the current block
+          example: 7eb8d62f9d6a5e7cf2d9635f0b531d2693fef55a717894e3a97baf6183b8d189
+  block_info:
+    description: Array of detailed block information
+    type: array
+    items:
+      type: object
+      properties:
+        hash:
+          $ref: "#/components/schemas/blocks/items/properties/hash"
+        epoch_no:
+          $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+        era:
+          $ref: "#/components/schemas/era_summaries/items/properties/era"
+        abs_slot:
+          $ref: "#/components/schemas/blocks/items/properties/abs_slot"
+        epoch_slot:
+          $ref: "#/components/schemas/blocks/items/properties/epoch_slot"
+        block_height:
+          $ref: "#/components/schemas/blocks/items/properties/block_height"
+        block_size:
+          $ref: "#/components/schemas/blocks/items/properties/block_size"
+        block_time:
+          $ref: "#/components/schemas/blocks/items/properties/block_time"
+        tx_count:
+          $ref: "#/components/schemas/blocks/items/properties/tx_count"
+        vrf_key:
+          $ref: "#/components/schemas/blocks/items/properties/vrf_key"
+        op_cert:
+          type: string
+          description: Hash of the block producers' operational certificate
+          example: "16bfc28a7127d11805fe02df67f8c3909ab7e2e2cd81b6954d90eeff1938614c"
+        op_cert_counter:
+          $ref: "#/components/schemas/blocks/items/properties/op_cert_counter"
+        pool:
+          $ref: "#/components/schemas/blocks/items/properties/pool"
+        proto_major:
+          $ref: "#/components/schemas/epoch_params/items/properties/protocol_major"
+        proto_minor:
+          $ref: "#/components/schemas/epoch_params/items/properties/protocol_minor"
+        total_output:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Total output of the block (in number)
+          example: "92384672389"
+        total_fees:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Total fees of the block (in number)
+          example: "2346834"
+        num_confirmations:
+          type: number
+          description: Number of confirmations for the block
+          example: 664275
+        parent_hash:
+          type: string
+          description: Hash of the parent of this block
+          example: "16bfc28a7127d11805fe02df67f8c3909ab7e2e2cd81b6954d90eeff1938614c"
+        child_hash:
+          type: string
+          description: Hash of the child of this block (if present)
+          example: "a3b525ba0747ce9daa928fa28fbc680f95e6927943a1fbd6fa5394d96c9dc2fa"
+  block_txs:
+    description: Array of transactions hashes
+    type: array
+    items:
+      type: object
+      properties:
+        block_hash:
+          $ref: "#/components/schemas/blocks/items/properties/hash"
+        tx_hash:
+          $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+        epoch_no:
+          $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+        block_height:
+          $ref: "#/components/schemas/blocks/items/properties/block_height"
+        block_time:
+          $ref: "#/components/schemas/blocks/items/properties/block_time"
+  block_tx_cbor:
+    description: Array of raw transaction(s) in CBOR format
+    type: array
+    items:
+      type: object
+      properties:
+        tx_hash:
+          $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+        block_hash:
+          $ref: "#/components/schemas/blocks/items/properties/hash"
+        block_height:
+          $ref: "#/components/schemas/blocks/items/properties/block_height"
+        epoch_no:
+          $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+        absolute_slot:
+          $ref: "#/components/schemas/blocks/items/properties/abs_slot"
+        tx_timestamp:
+          $ref: "#/components/schemas/tx_info/items/properties/tx_timestamp"
+        cbor:
+          $ref: "#/components/schemas/tx_cbor/items/properties/cbor"
+  block_tx_info:
+    description: Array of detailed information about transaction(s)
+    type: array
+    items:
+      type: object
+      properties:
+        tx_hash:
+          $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+        block_hash:
+          $ref: "#/components/schemas/blocks/items/properties/hash"
+        block_height:
+          $ref: "#/components/schemas/blocks/items/properties/block_height"
+        epoch_no:
+          $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+        epoch_slot:
+          $ref: "#/components/schemas/blocks/items/properties/epoch_slot"
+        absolute_slot:
+          $ref: "#/components/schemas/blocks/items/properties/abs_slot"
+        tx_timestamp:
+          $ref: "#/components/schemas/tx_info/items/properties/tx_timestamp"
+        tx_block_index:
+          $ref: "#/components/schemas/tx_info/items/properties/tx_block_index"
+        tx_size:
+          $ref: "#/components/schemas/tx_info/items/properties/tx_size"
+        total_output:
+          $ref: "#/components/schemas/tx_info/items/properties/total_output"
+        fee:
+          $ref: "#/components/schemas/tx_info/items/properties/fee"
+        treasury_donation:
+          $ref: "#/components/schemas/tx_info/items/properties/treasury_donation"
+        deposit:
+          $ref: "#/components/schemas/tx_info/items/properties/deposit"
+        invalid_before:
+          $ref: "#/components/schemas/tx_info/items/properties/invalid_before"
+        invalid_after:
+          $ref: "#/components/schemas/tx_info/items/properties/invalid_after"
+        collateral_inputs:
+          $ref: "#/components/schemas/tx_info/items/properties/collateral_inputs"
+        collateral_output:
+          $ref: "#/components/schemas/tx_info/items/properties/collateral_output"
+        reference_inputs:
+          $ref: "#/components/schemas/tx_info/items/properties/reference_inputs"
+        inputs:
+          description: An array of UTxO inputs spent in the transaction
+          anyOf:
+            - $ref: "#/components/schemas/tx_info/items/properties/outputs"
+            - type: "null"
+        outputs:
+          $ref: "#/components/schemas/tx_info/items/properties/outputs"
+        withdrawals:
+          $ref: "#/components/schemas/tx_info/items/properties/withdrawals"
+        assets_minted:
+          $ref: "#/components/schemas/tx_info/items/properties/assets_minted"
+        metadata:
+          $ref: "#/components/schemas/tx_metadata/items/properties/metadata"
+        certificates:
+          $ref: "#/components/schemas/tx_info/items/properties/certificates"
+        native_scripts:
+          $ref: "#/components/schemas/tx_info/items/properties/native_scripts"
+        plutus_contracts:
+          $ref: "#/components/schemas/tx_info/items/properties/plutus_contracts"

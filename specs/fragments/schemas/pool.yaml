@@ -1,0 +1,565 @@
+  pool_list:
+    description: Array of pool IDs and tickers
+    type: array
+    items:
+      properties:
+        pool_id_bech32:
+          $ref: "#/components/schemas/pool_info/items/properties/pool_id_bech32"
+        pool_id_hex:
+          $ref: "#/components/schemas/pool_info/items/properties/pool_id_hex"
+        active_epoch_no:
+          $ref: "#/components/schemas/pool_info/items/properties/active_epoch_no"
+        margin:
+          $ref: "#/components/schemas/pool_info/items/properties/margin"
+        fixed_cost:
+          $ref: "#/components/schemas/pool_info/items/properties/fixed_cost"
+        pledge:
+          $ref: "#/components/schemas/pool_info/items/properties/pledge"
+        deposit:
+          $ref: "#/components/schemas/pool_info/items/properties/deposit"
+        reward_addr:
+          $ref: "#/components/schemas/pool_info/items/properties/reward_addr"
+        owners:
+          $ref: "#/components/schemas/pool_info/items/properties/owners"
+        relays:
+          $ref: "#/components/schemas/pool_info/items/properties/relays"
+        ticker:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Pool ticker
+          example: AHL
+        pool_group:
+          $ref: "#/components/schemas/pool_groups/items/properties/pool_group"
+        meta_url:
+          $ref: "#/components/schemas/pool_info/items/properties/meta_url"
+        meta_hash:
+          $ref: "#/components/schemas/pool_info/items/properties/meta_hash"
+        pool_status:
+          $ref: "#/components/schemas/pool_info/items/properties/pool_status"
+        active_stake:
+          $ref: "#/components/schemas/pool_info/items/properties/active_stake"
+        retiring_epoch:
+          $ref: "#/components/schemas/pool_info/items/properties/retiring_epoch"
+  pool_history_info:
+    description: Array of pool history information
+    type: array
+    items:
+      type: object
+      properties:
+        epoch_no:
+          type: number
+          description: Epoch for which the pool history data is shown
+          example: 312
+        active_stake:
+          $ref: "#/components/schemas/pool_info/items/properties/active_stake"
+        active_stake_pct:
+          anyOf:
+            - type: number
+            - type: "null"
+          description: Active stake for the pool, expressed as a percentage of total active stake on network
+          example: 13.512182543475783
+        saturation_pct:
+          type: number
+          description: Saturation percentage of a pool at the time of snapshot (2 decimals)
+          example: 45.32
+        block_cnt:
+          anyOf:
+            - type: number
+            - type: "null"
+          description: Number of blocks pool created in that epoch
+          example: 14
+        delegator_cnt:
+          type: number
+          description: Number of delegators to the pool for that epoch snapshot
+          example: 1432
+        margin:
+          type: number
+          description: Margin (decimal format)
+          example: 0.125
+        fixed_cost:
+          type: string
+          description: Pool fixed cost per epoch (in numbers)
+          example: "340000000"
+        pool_fees:
+          type: string
+          description: Total amount of fees earned by pool owners in that epoch (in numbers)
+          example: "123327382"
+        deleg_rewards:
+          type: string
+          description: Total amount of rewards earned by delegators in that epoch (in numbers)
+          example: "123456789123"
+        member_rewards:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Total amount of rewards earned by members (delegator - owner) in that epoch (in numbers)
+          example: "123456780123"
+        epoch_ros:
+          type: number
+          description: Annualized ROS (return on staking) for delegators for this epoch
+          example: 3.000340466
+  pool_owner_history:
+    description: Array of pool owner's stake history
+    type: array
+    items:
+      type: object
+      properties:
+        pool_id_bech32:
+          $ref: "#/components/schemas/pool_info/items/properties/pool_id_bech32"
+        stake_address:
+          type: string
+          description: Individual Stake account registered as (one of the) pool owner(s)
+          example: stake1uy6yzwsxxc28lfms0qmpxvyz9a7y770rtcqx9y96m42cttqwvp4m5
+        declared_pledge:
+          $ref: "#/components/schemas/pool_info/items/properties/pledge"
+        epoch:
+          $ref: "#/components/schemas/pool_history_info/items/properties/epoch_no"
+        active_stake:
+          $ref: "#/components/schemas/pool_info/items/properties/active_stake"
+  pool_info:
+    description: Array of pool information
+    type: array
+    items:
+      type: object
+      properties:
+        pool_id_bech32:
+          type: string
+          description: Pool ID (bech32 format)
+          example: pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc
+        pool_id_hex:
+          type: string
+          description: Pool ID (Hex format)
+          example: a532904ca60e13e88437b58e7c6ff66b8d5e7ec8d3f4b9e4be7820ec
+        active_epoch_no:
+          $ref: "#/components/schemas/pool_updates/items/properties/active_epoch_no"
+        vrf_key_hash:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Pool VRF key hash
+          example: 25efdad1bc12944d38e4e3c26c43565bec84973a812737b163b289e87d0d5ed3
+        margin:
+          anyOf:
+            - type: number
+            - type: "null"
+          description: Margin (decimal format)
+          example: 0.1
+        fixed_cost:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Pool fixed cost per epoch
+          example: "500000000"
+        pledge:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Pool pledge in number
+          example: "64000000000000"
+        deposit:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Pool's registration deposit in number
+          example: "500000000"
+        reward_addr:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Pool reward address
+          example: stake1uy6yzwsxxc28lfms0qmpxvyz9a7y770rtcqx9y96m42cttqwvp4m5
+        reward_addr_delegated_drep:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Reward address' current delegation status to DRep ID in CIP-129 Bech32 format
+          example: drep1yfhyq6tztjksqqpd5lglc3zr2tn8vylgjh9xzz7n2p4l4lgk3qam3
+        owners:
+          anyOf:
+            - type: array
+            - type: "null"
+          items:
+            type: string
+            description: Pool (co)owner address
+            example: stake1u8088wvudd7dp3rxl0v9xgng8r3j50s65ge3l3jvgd94keqfm3nv3
+        relays:
+          type: array
+          items:
+            type: object
+            properties:
+              dns:
+                anyOf:
+                  - type: string
+                  - type: "null"
+                description: DNS name of the relay (nullable)
+                example: relays-new.cardano-mainnet.iohk.io
+              srv:
+                anyOf:
+                  - type: string
+                  - type: "null"
+                description: DNS service name of the relay (nullable)
+                example: biostakingpool3.hopto.org
+              ipv4:
+                anyOf:
+                  - type: string
+                  - type: "null"
+                description: IPv4 address of the relay (nullable)
+                example: "54.220.20.40"
+              ipv6:
+                anyOf:
+                  - type: string
+                  - type: "null"
+                description: IPv6 address of the relay (nullable)
+                example: 2604:ed40:1000:1711:6082:78ff:fe0c:ebf
+              port:
+                anyOf:
+                  - type: number
+                  - type: "null"
+                description: Port number of the relay (nullable)
+                example: 6000
+        meta_url:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Pool metadata URL
+          example: https://pools.iohk.io/IOGP.json
+        meta_hash:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Pool metadata hash
+          example: 37eb004c0dd8a221ac3598ca1c6d6257fb5207ae9857b7c163ae0f39259d6cc0
+        meta_json:
+          anyOf:
+            - type: object
+            - type: "null"
+          properties:
+            name:
+              type: string
+              description: Pool name
+              example: Input Output Global (IOHK) - Private
+            ticker:
+              type: string
+              description: Pool ticker
+              example: IOGP
+            homepage:
+              type: string
+              description: Pool homepage URL
+              example: https://iohk.io
+            description:
+              type: string
+              description: Pool description
+              example: Our mission is to provide economic identity to the billions of people who lack it. IOHK will not use the IOHK ticker.
+        pool_status:
+          type: string
+          description: Pool status
+          enum: ["registered", "retiring", "retired"]
+          example: registered
+        retiring_epoch:
+          anyOf:
+            - type: number
+            - type: "null"
+          description: Announced retiring epoch (nullable)
+          example: null
+        op_cert:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Pool latest operational certificate hash
+          example: 37eb004c0dd8a221ac3598ca1c6d6257fb5207ae9857b7c163ae0f39259d6cc0
+        op_cert_counter:
+          anyOf:
+            - type: number
+            - type: "null"
+          description: Pool latest operational certificate counter value
+          example: 8
+        active_stake:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Amount of delegated stake to this pool at the time of epoch snapshot
+          example: "64328627680963"
+        sigma:
+          anyOf:
+            - type: number
+            - type: "null"
+          description: Pool relative active stake share
+          example: 0.0034839235
+        block_count:
+          anyOf:
+            - type: number
+            - type: "null"
+          description: Total pool blocks on chain
+          example: 4509
+        live_pledge:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Summary of account balance for all pool owner's
+          example: "64328594406327"
+        live_stake:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Pool live stake
+          example: "64328627680963"
+        live_delegators:
+          type: number
+          description: Pool live delegator count
+          example: 5
+        live_saturation:
+          anyOf:
+            - type: number
+            - type: "null"
+          description: Pool live saturation (decimal format)
+          example: 94.52
+        voting_power:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Current voting power (lovelaces) of this stake pool
+          example: "123456789"
+  pool_snapshot:
+    type: array
+    items:
+      description: Array of pool stake information for 3 snapshots
+      type: object
+      properties:
+        snapshot:
+          type: string
+          description: Type of snapshot ("Mark", "Set" or "Go")
+          example: "Mark"
+        epoch_no:
+          type: number
+          description: Epoch number for the snapshot entry
+          example: 324
+        nonce:
+          $ref: "#/components/schemas/epoch_params/items/properties/nonce"
+        pool_stake:
+          type: string
+          description: Pool's Active Stake for the given epoch
+          example: "100000000000"
+        active_stake:
+          type: string
+          description: Total Active Stake for the given epoch
+          example: "103703246364020"
+  pool_delegators:
+    description: Array of live pool delegators
+    type: array
+    items:
+      type: object
+      properties:
+        stake_address:
+          $ref: "#/components/schemas/account_history/items/properties/stake_address"
+        amount:
+          type: string
+          description: Current delegator live stake (in number)
+          example: "64328591517480"
+        active_epoch_no:
+          type: number
+          description: Epoch number in which the delegation becomes active
+          example: 324
+        latest_delegation_tx_hash:
+          type: string
+          description: Latest transaction hash used for delegation by the account
+          example: 368d08fe86804d637649341d3aec4a9baa7dffa6d00f16de2ba9dba814f1c948
+  pool_registrations:
+    description: Array of pool registrations/retirements
+    type: array
+    items:
+      type: object
+      properties:
+        pool_id_bech32:
+          $ref: "#/components/schemas/pool_info/items/properties/pool_id_bech32"
+        tx_hash:
+          $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+        block_hash:
+          $ref: "#/components/schemas/blocks/items/properties/hash"
+        block_height:
+          $ref: "#/components/schemas/blocks/items/properties/block_height"
+        epoch_no:
+          $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+        epoch_slot:
+          $ref: "#/components/schemas/blocks/items/properties/epoch_slot"
+        active_epoch_no:
+          $ref: "#/components/schemas/pool_updates/items/properties/active_epoch_no"
+  pool_delegators_history:
+    description: Array of pool delegators (historical)
+    anyOf:
+      - type: array
+      - type: "null"
+    items:
+      type: object
+      properties:
+        stake_address:
+          $ref: "#/components/schemas/account_history/items/properties/stake_address"
+        amount:
+          $ref: "#/components/schemas/pool_delegators/items/properties/amount"
+        epoch_no:
+          type: number
+          description: Epoch number for the delegation history
+          example: 324
+  pool_invalid_delegators:
+    description: Array of pool delegators that are invalid for the specified epoch
+    type: array
+    items:
+      type: object
+      properties:
+        stake_address:
+          $ref: "#/components/schemas/account_history/items/properties/stake_address"
+        epoch_no:
+          $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+  pool_blocks:
+    description: Array of blocks created by pool
+    type: array
+    items:
+      type: object
+      properties:
+        epoch_no:
+          $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+        epoch_slot:
+          $ref: "#/components/schemas/blocks/items/properties/epoch_slot"
+        abs_slot:
+          $ref: "#/components/schemas/blocks/items/properties/abs_slot"
+        block_height:
+          $ref: "#/components/schemas/blocks/items/properties/block_height"
+        block_hash:
+          $ref: "#/components/schemas/blocks/items/properties/hash"
+        block_time:
+          $ref: "#/components/schemas/blocks/items/properties/block_time"
+  pool_updates:
+    description: Array of historical pool updates
+    type: array
+    items:
+      type: object
+      properties:
+        tx_hash:
+          $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+        block_time:
+          $ref: "#/components/schemas/blocks/items/properties/block_time"
+        pool_id_bech32:
+          $ref: "#/components/schemas/pool_info/items/properties/pool_id_bech32"
+        pool_id_hex:
+          $ref: "#/components/schemas/pool_info/items/properties/pool_id_hex"
+        active_epoch_no:
+          anyOf:
+            - type: number
+            - type: "null"
+          description: Epoch number in which the update becomes active
+          example: 324
+        vrf_key_hash:
+          $ref: "#/components/schemas/pool_info/items/properties/vrf_key_hash"
+        margin:
+          $ref: "#/components/schemas/pool_info/items/properties/margin"
+        fixed_cost:
+          $ref: "#/components/schemas/pool_info/items/properties/fixed_cost"
+        pledge:
+          $ref: "#/components/schemas/pool_info/items/properties/pledge"
+        reward_addr:
+          $ref: "#/components/schemas/pool_info/items/properties/reward_addr"
+        owners:
+          $ref: "#/components/schemas/pool_info/items/properties/owners"
+        relays:
+          $ref: "#/components/schemas/pool_info/items/properties/relays"
+        meta_url:
+          $ref: "#/components/schemas/pool_info/items/properties/meta_url"
+        meta_hash:
+          $ref: "#/components/schemas/pool_info/items/properties/meta_hash"
+        meta_json:
+          $ref: "#/components/schemas/pool_info/items/properties/meta_json"
+        update_type:
+          type: string
+          description: Type of update task
+          enum: ["registration", "deregistration"]
+          example: registration
+        retiring_epoch:
+          $ref: "#/components/schemas/pool_info/items/properties/retiring_epoch"
+  pool_relays:
+    description: Array of pool relay information
+    type: array
+    items:
+      type: object
+      properties:
+        pool_id_bech32:
+          $ref: "#/components/schemas/pool_info/items/properties/pool_id_bech32"
+        relays:
+          $ref: "#/components/schemas/pool_info/items/properties/relays"
+  pool_metadata:
+    description: Array of pool metadata
+    type: array
+    items:
+      type: object
+      properties:
+        pool_id_bech32:
+          $ref: "#/components/schemas/pool_info/items/properties/pool_id_bech32"
+        meta_url:
+          $ref: "#/components/schemas/pool_info/items/properties/meta_url"
+        meta_hash:
+          $ref: "#/components/schemas/pool_info/items/properties/meta_hash"
+        meta_json:
+          $ref: "#/components/schemas/pool_info/items/properties/meta_json"
+  pool_calidus_keys:
+    description: Array of valid calidus keys for all pools
+    type: array
+    items:
+      properties:
+        pool_id_bech32:
+          $ref: "#/components/schemas/pool_info/items/properties/pool_id_bech32"
+        pool_status:
+          $ref: "#/components/schemas/pool_info/items/properties/pool_status"
+        calidus_nonce:
+          type: number
+          description: Unique nonce for pool's calidus key registration as per CIP-88
+          example: 150720822
+        calidus_pub_key:
+          type: string
+          description: Calidus public key as per CIP-88
+          example: "dea2d81424a285f7fd2846beb39320543ba1df27b890789b2c152b64a352e2df"
+        calidus_id_bech32:
+          type: string
+          description: Calidus key in bech32 format as per CIP-88
+          example: "calidus158w8ft8k4endw5q6m0rx2myl2ldvw5f5d8xmwyem6529fcgn575zh"
+        tx_hash:
+          $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+        epoch_no:
+          $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+        block_height:
+          $ref: "#/components/schemas/blocks/items/properties/block_height"
+        block_time:
+          $ref: "#/components/schemas/blocks/items/properties/block_time"
+        registered:
+          type: boolean
+          description: Flag to show if the pool has active calidus key as registered
+          example: true
+        bytes:
+          type: string
+          description: Raw Transaction metadata in hex
+          example: 19029a324512
+  pool_groups:
+    description: Array of pools with their corresponding group information
+    type: array
+    items:
+      properties:
+        pool_id_bech32:
+          $ref: "#/components/schemas/pool_info/items/properties/pool_id_bech32"
+        pool_group:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: A group that the pool was identified to be associated with
+          example: IOG
+        ticker:
+          $ref: "#/components/schemas/pool_info/items/properties/meta_json/properties/ticker"
+        adastat_group:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: The pool's group identification as per adastat.net
+          example: iohk.io
+        balanceanalytics_group:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: The pool's group identification as per balanceanalytics.io
+          example: IOG

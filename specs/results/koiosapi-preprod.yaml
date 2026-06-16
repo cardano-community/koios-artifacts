@@ -152,8 +152,6 @@ servers:
     description: Preview Network
   - url: https://preprod.koios.rest/api/v1
     description: Preprod Network
-  - url: https://sancho.koios.rest/api/v1
-    description: Sanchonet Network
 paths:
   /tip: #RPC
     get:

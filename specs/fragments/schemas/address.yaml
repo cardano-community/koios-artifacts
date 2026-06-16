@@ -1,0 +1,125 @@
+  address_list:
+    description: Array of information for address(es)
+    type: array
+    items:
+      type: object
+      properties:
+        address:
+          $ref: "#/components/schemas/utxo_infos/items/properties/address"
+        address_hex:
+          type: string
+          description: Cardano address in hex format
+          example: 60f879af535c02e37bf77fb3b5f51d017229fe47995c37b9aca9e0091c
+        has_script:
+          $ref: "#/components/schemas/drep_info/items/properties/has_script"
+        payment_cred:
+          $ref: "#/components/schemas/utxo_infos/items/properties/payment_cred"
+        stake_address:
+          anyOf:
+            - $ref: "#/components/schemas/account_history/items/properties/stake_address"
+            - type: "null"
+        stake_address_hex:
+          anyOf:
+            - $ref: "#/components/schemas/account_list/items/properties/stake_address_hex"
+            - type: "null"
+  address_info:
+    description: Array of information for address(es)
+    type: array
+    items:
+      type: object
+      properties:
+        address:
+          $ref: "#/components/schemas/utxo_infos/items/properties/address"
+        balance:
+          type: string
+          description: Sum of all UTxO values beloning to address
+          example: "10723473983"
+        stake_address:
+          anyOf:
+            - $ref: "#/components/schemas/account_history/items/properties/stake_address"
+            - type: "null"
+        script_address:
+          type: boolean
+          description: Signifies whether the address is a script address
+          example: true
+        utxo_set:
+          type: array
+          items:
+            type: object
+            properties:
+              tx_hash:
+                $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+              tx_index:
+                $ref: "#/components/schemas/utxo_infos/items/properties/tx_index"
+              block_height:
+                $ref: "#/components/schemas/blocks/items/properties/block_height"
+              block_time:
+                $ref: "#/components/schemas/blocks/items/properties/block_time"
+              value:
+                $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/value"
+              datum_hash:
+                $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_hash"
+              inline_datum:
+                $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/inline_datum"
+              reference_script:
+                $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/reference_script"
+              asset_list:
+                $ref: "#/components/schemas/utxo_infos/items/properties/asset_list"
+  address_txs:
+    description: Array of transaction hashes
+    type: array
+    items:
+      type: object
+      properties:
+        tx_hash:
+          $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+        epoch_no:
+          $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+        block_height:
+          $ref: "#/components/schemas/blocks/items/properties/block_height"
+        block_time:
+          $ref: "#/components/schemas/blocks/items/properties/block_time"
+  address_outputs:
+    description: Array of basic transaction output information
+    type: array
+    items:
+      type: object
+      properties:
+        address:
+          $ref: "#/components/schemas/utxo_infos/items/properties/address"
+        tx_hash:
+          $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+        tx_index:
+          $ref: "#/components/schemas/utxo_infos/items/properties/tx_index"
+        value:
+          $ref: "#/components/schemas/utxo_infos/items/properties/value"
+        stake_address:
+          $ref: "#/components/schemas/utxo_infos/items/properties/stake_address"
+        payment_cred:
+          $ref: "#/components/schemas/utxo_infos/items/properties/payment_cred"
+        epoch_no:
+          $ref: "#/components/schemas/utxo_infos/items/properties/epoch_no"
+        block_height:
+          $ref: "#/components/schemas/utxo_infos/items/properties/block_height"
+        block_time:
+          $ref: "#/components/schemas/utxo_infos/items/properties/block_time"
+        is_spent:
+          $ref: "#/components/schemas/utxo_infos/items/properties/is_spent"
+  address_assets:
+    description: Array of address-owned assets
+    type: array
+    items:
+      type: object
+      properties:
+        address:
+          $ref: "#/components/schemas/utxo_infos/items/properties/address"
+        policy_id:
+          $ref: "#/components/schemas/asset_info/items/properties/policy_id"
+        asset_name:
+          $ref: "#/components/schemas/asset_info/items/properties/asset_name"
+        fingerprint:
+          $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
+        decimals:
+          $ref: "#/components/schemas/asset_info/items/properties/token_registry_metadata/properties/decimals"
+        quantity:
+          $ref: "#/components/schemas/asset_addresses/items/properties/quantity"

@@ -1,0 +1,55 @@
+/epoch_info: #RPC
+    get:
+      tags:
+        - Epoch
+      parameters:
+        - $ref: "#/components/parameters/_epoch_no"
+        - $ref: "#/components/parameters/_include_next_epoch"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/epoch_info"
+        #!macro:koios_errors!#
+      summary: Epoch Information
+      description: Get the epoch information, all epochs if no epoch specified
+      operationId: epoch_info
+/epoch_params: #RPC
+    get:
+      tags:
+        - Epoch
+      parameters:
+        - $ref: "#/components/parameters/_epoch_no"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/epoch_params"
+        #!macro:koios_errors!#
+      summary: Epoch's Protocol Parameters
+      description: >-
+        Get the protocol parameters for specific epoch, returns information
+        about all epochs if no epoch specified
+      operationId: epoch_params
+/epoch_block_protocols: #RPC
+    get:
+      tags:
+        - Epoch
+      parameters:
+        - $ref: "#/components/parameters/_epoch_no"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/epoch_block_protocols"
+        #!macro:koios_errors!#
+      summary: Epoch's Block Protocols
+      description: >-
+        Get the information about block protocol distribution in epoch
+      operationId: epoch_block_protocols

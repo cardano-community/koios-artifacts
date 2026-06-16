@@ -1,0 +1,117 @@
+/script_info: #RPC
+    post:
+      tags:
+        - Script
+      requestBody:
+        $ref: "#/components/requestBodies/script_hashes"
+      responses:
+        "200":
+          description: Array of information for scripts requested
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/script_info"
+        #!macro:koios_errors!#
+      summary: Script Information
+      description: List of script information for given script hashes
+      operationId: script_info
+/native_script_list: #RPC
+    get:
+      tags:
+        - Script
+      responses:
+        "200":
+          description: List of native script and creation tx hash pairs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/script_list"
+        #!macro:koios_errors!#
+      summary: Native Script List
+      description: List of all existing native script hashes along with their creation transaction hashes
+      operationId: native_script_list
+/plutus_script_list: #RPC
+    get:
+      tags:
+        - Script
+      responses:
+        "200":
+          description: List of Plutus script and creation tx hash pairs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/script_list"
+        #!macro:koios_errors!#
+      summary: Plutus Script List
+      description: List of all existing Plutus script hashes along with their creation transaction hashes
+      operationId: plutus_script_list
+/script_redeemers: #RPC
+    get:
+      tags:
+        - Script
+      parameters:
+        - $ref: "#/components/parameters/_script_hash"
+      responses:
+        "200":
+          description: Array of all redeemers for a given script hash
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/script_redeemers"
+        #!macro:koios_errors!#
+      summary: Script Redeemers
+      description: List of all redeemers for a given script hash
+      operationId: script_redeemers
+/reference_script_utxos: #RPC
+    post:
+      tags:
+        - Script
+      requestBody:
+        $ref: "#/components/requestBodies/script_hashes"
+      responses:
+        "200":
+          description: Array of information for scripts requested
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/script_utxos"
+        #!macro:koios_errors!#
+      summary: Reference Script UTxOs
+      description: List of all unspent UTxOs with a reference script matching given script hashes
+      operationId: reference_script_utxos
+/script_utxos: #RPC
+    get:
+      deprecated: true
+      tags:
+        - Script
+      parameters:
+        - $ref: "#/components/parameters/_script_hash"
+        - $ref: "#/components/parameters/_extended"
+      responses:
+        "200":
+          description: List of UTxOs for a given script hash
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/utxo_infos"
+        #!macro:koios_errors!#
+      summary: Script UTxOs
+      description: List of all UTxOs for a given script hash
+      operationId: script_utxos
+/datum_info: #RPC
+    post:
+      tags:
+        - Script
+      requestBody:
+        $ref: "#/components/requestBodies/datum_hashes"
+      responses:
+        "200":
+          description: Array of datum information for given datum hashes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/datum_info"
+        #!macro:koios_errors!#
+      summary: Datum Information
+      description: List of datum information for given datum hashes
+      operationId: datum_info
