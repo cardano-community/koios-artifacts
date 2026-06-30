@@ -306,6 +306,7 @@ BEGIN
         WHEN y.proposal_type IN ('TreasuryWithdrawals', 'NewConstitution') THEN 0
         WHEN y.proposal_type IN ('NoConfidence') THEN ROUND((y.pool_yes_vote_power + y.pool_passive_always_no_confidence_vote_power) * 100 / y.pool_non_abstain_total, 2)
         WHEN y.proposal_type in ('ParameterChange') AND NOT grest.has_security_param(y.description) THEN 0
+        WHEN y.proposal_type in ('HardForkInitiation') THEN ROUND(y.pool_yes_vote_power * 100 / (y.tot_pool_power - y.pool_abstain_vote_power), 2)
         ELSE ROUND(y.pool_yes_vote_power * 100 / y.pool_non_abstain_total, 2)
       END) AS pool_yes_pct,
       (CASE
@@ -318,12 +319,14 @@ BEGIN
         WHEN y.proposal_type IN ('TreasuryWithdrawals', 'NewConstitution') THEN 0
         WHEN y.proposal_type IN ('NoConfidence') THEN (y.pool_non_abstain_total - y.pool_yes_vote_power - y.pool_passive_always_no_confidence_vote_power)
         WHEN y.proposal_type in ('ParameterChange') AND NOT grest.has_security_param(y.description) THEN 0
+        WHEN y.proposal_type in ('HardForkInitiation') THEN (y.tot_pool_power - y.pool_abstain_vote_power - y.pool_yes_vote_power)
         ELSE (y.pool_non_abstain_total - y.pool_yes_vote_power)
       END)::text AS pool_no_vote_power,
       (CASE
         WHEN y.proposal_type IN ('TreasuryWithdrawals', 'NewConstitution') THEN 0
         WHEN y.proposal_type IN ('NoConfidence') THEN  ROUND((y.pool_non_abstain_total - y.pool_yes_vote_power - y.pool_passive_always_no_confidence_vote_power) * 100 / y.pool_non_abstain_total, 2)
         WHEN y.proposal_type in ('ParameterChange') AND NOT grest.has_security_param(y.description) THEN 0
+        WHEN y.proposal_type in ('HardForkInitiation') THEN ROUND((y.tot_pool_power - y.pool_abstain_vote_power - y.pool_yes_vote_power) * 100 / (y.tot_pool_power - y.pool_abstain_vote_power), 2)
         ELSE ROUND((y.pool_non_abstain_total - y.pool_yes_vote_power) * 100 / y.pool_non_abstain_total, 2)
       END) AS pool_no_pct,
       (SELECT COALESCE(SUM(pool_votes_cast), 0)::integer FROM active_prop_pool_votes WHERE vote = 'Abstain') AS pool_abstain_votes_cast,
