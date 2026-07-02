@@ -243,7 +243,7 @@ BEGIN
       tot_committee_size AS (
         SELECT 
           ped.gov_action_proposal_id,
-          count(cm.id) AS committee_size
+          count(distinct cm.id) AS committee_size
         FROM epoch_state AS epstate
           CROSS JOIN last_tx_id_of_interest
           INNER JOIN proposal_epoch_data AS ped on epstate.epoch_no = ped.epoch_of_interest
