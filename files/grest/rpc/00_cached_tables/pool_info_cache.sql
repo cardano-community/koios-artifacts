@@ -222,17 +222,17 @@ BEGIN
   UPDATE grest.pool_info_cache
   SET pool_status = 'retired'
   WHERE pool_status = 'retiring'
-    AND retiring_epoch <= new.no;
+    AND retiring_epoch <= new.epoch_no;
   RETURN NULL;
 END;
 $$;
 
 COMMENT ON FUNCTION grest.pool_info_retire_status IS 'Internal function to update pool_info_cache with new retire status based ON epoch switch'; -- noqa: LT01
 
-DROP TRIGGER IF EXISTS pool_info_retire_status_trigger ON public.epoch;
+DROP TRIGGER IF EXISTS pool_info_retire_status_trigger ON public.epoch_state;
 
 CREATE TRIGGER pool_info_retire_status_trigger
-AFTER INSERT ON public.epoch
+AFTER INSERT ON public.epoch_state
 FOR EACH ROW EXECUTE FUNCTION grest.pool_info_retire_status();
 
 
