@@ -31,6 +31,7 @@ DECLARE
   _current_epoch_no word31type;
   _pool_info_cache_last_block_height bigint;
   _pool_info_cache_last_tx_id bigint;
+  _updated_count bigint;
 BEGIN
   SELECT MAX(block_no) FROM public.block
     WHERE block_no IS NOT NULL INTO _current_block_height;
@@ -150,6 +151,28 @@ BEGIN
           pool_status = EXCLUDED.pool_status,
           retiring_epoch = EXCLUDED.retiring_epoch;
 
+    -- following is needed because simple retirement cert submission doesn't seem to generate new pool_update row in latest db syncs
+    WITH latest_scheduled_retirements AS (
+          SELECT DISTINCT ON (pr.hash_id)
+            pr.hash_id,
+            pr.retiring_epoch
+          FROM public.pool_retire AS pr
+          WHERE pr.announced_tx_id > _pool_info_cache_last_tx_id
+          -- only looking at pool_retirement requests not followed by update or that are part of update
+          AND NOT EXISTS 
+            ( SELECT null 
+              FROM public.pool_update pu 
+              WHERE pu.hash_id = pr.hash_id AND pu.registered_tx_id >= pr.announced_tx_id )
+          ORDER BY hash_id, announced_tx_id DESC, cert_index DESC
+    )
+    UPDATE grest.pool_info_cache
+    SET pool_status = 'retiring', retiring_epoch = latest_scheduled_retirements.retiring_epoch
+    FROM latest_scheduled_retirements
+    WHERE grest.pool_info_cache.pool_hash_id = latest_scheduled_retirements.hash_id;
+
+    GET DIAGNOSTICS _updated_count = ROW_COUNT;
+    RAISE NOTICE 'Updated % records for scheduled retirement', _updated_count;
+
     INSERT INTO grest.control_table (key, last_value)
       VALUES (
           'pool_info_cache_last_block_height',
@@ -222,17 +245,17 @@ BEGIN
   UPDATE grest.pool_info_cache
   SET pool_status = 'retired'
   WHERE pool_status = 'retiring'
-    AND retiring_epoch <= new.no;
+    AND retiring_epoch <= new.epoch_no;
   RETURN NULL;
 END;
 $$;
 
 COMMENT ON FUNCTION grest.pool_info_retire_status IS 'Internal function to update pool_info_cache with new retire status based ON epoch switch'; -- noqa: LT01
 
-DROP TRIGGER IF EXISTS pool_info_retire_status_trigger ON public.epoch;
+DROP TRIGGER IF EXISTS pool_info_retire_status_trigger ON public.epoch_state;
 
 CREATE TRIGGER pool_info_retire_status_trigger
-AFTER INSERT ON public.epoch
+AFTER INSERT ON public.epoch_state
 FOR EACH ROW EXECUTE FUNCTION grest.pool_info_retire_status();
 
 
