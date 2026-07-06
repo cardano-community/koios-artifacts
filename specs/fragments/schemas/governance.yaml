@@ -366,6 +366,12 @@
           type: object
           description: Description for Proposal Action
           example: '{"tag": "InfoAction"}'
+        previous_gov_action_proposal_id:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: If not null, the CIP-129 formatted governance action ID of the previous governance action in a chain of actions (e.g. for NewConstitution or HardForkInitiation)
+          example: "gov_action17m93skslaxyd45gpr6ernkdzs852h564wsterr8l6lheu7hu7kvsqecyqdh"
         deposit:
           $ref: "#/components/schemas/drep_info/items/properties/deposit"
         return_address:

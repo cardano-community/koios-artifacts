@@ -6,6 +6,7 @@ RETURNS TABLE (
   proposal_index integer,
   proposal_type text,
   proposal_description jsonb,
+  previous_gov_action_proposal_id text,
   deposit text,
   return_address text,
   proposed_epoch integer,
@@ -32,6 +33,10 @@ AS $$
     gap.index,
     gap.type,
     gap.description,
+    CASE
+      WHEN gap.prev_gov_action_proposal IS NULL THEN NULL
+      ELSE grest.cip129_to_gov_action_id(prev_tx.hash, prev_gap.index)
+    END AS previous_gov_action_proposal_id,
     gap.deposit::text,
     grest.cip5_hex_to_stake_addr(sa.hash_raw)::text,
     b.epoch_no,
@@ -68,6 +73,8 @@ AS $$
     LEFT JOIN public.cost_model AS cm ON cm.id = pp.cost_model_id
     LEFT JOIN public.voting_anchor AS va ON gap.voting_anchor_id = va.id
     LEFT JOIN public.off_chain_vote_data AS ocvd ON va.id = ocvd.voting_anchor_id
+    LEFT JOIN public.gov_action_proposal AS prev_gap ON gap.prev_gov_action_proposal = prev_gap.id
+    LEFT JOIN public.tx AS prev_tx ON prev_gap.tx_id = prev_tx.id
   ORDER BY
     b.time DESC;
 $$;
