@@ -158,6 +158,7 @@ BEGIN
             pr.retiring_epoch
           FROM public.pool_retire AS pr
           WHERE pr.announced_tx_id > _pool_info_cache_last_tx_id
+          AND pr.retiring_epoch > _current_epoch_no -- this is needed to cater for cache rebuilds
           -- only looking at pool_retirement requests not followed by update or that are part of update
           AND NOT EXISTS 
             ( SELECT null 
