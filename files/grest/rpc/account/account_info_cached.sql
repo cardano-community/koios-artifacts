@@ -115,7 +115,7 @@ BEGIN
         WHERE r.addr_id = ANY(sa_id_list)
           AND r.type = 'reserves'
           AND r.spendable_epoch <= (
-            SELECT MAX(epoch_no)
+            SELECT MAX(epoch_param.epoch_no)
             FROM public.epoch_param
           )
         GROUP BY
@@ -129,7 +129,7 @@ BEGIN
         WHERE t.addr_id = ANY(sa_id_list)
           AND t.type = 'treasury'
           AND t.spendable_epoch <= (
-            SELECT MAX(epoch_no)
+            SELECT MAX(epoch_param.epoch_no)
             FROM public.epoch_param
           )
         GROUP BY
@@ -143,7 +143,7 @@ BEGIN
         WHERE pr.addr_id = ANY(sa_id_list)
           AND pr.type = 'treasury'
           AND pr.spendable_epoch <= (
-            SELECT MAX(epoch_no)
+            SELECT MAX(epoch_param.epoch_no)
             FROM public.epoch_param
           )
         GROUP BY

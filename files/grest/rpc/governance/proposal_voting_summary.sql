@@ -68,13 +68,13 @@ BEGIN
           expired_epoch,
           ratified_epoch,
           dropped_epoch,
-          (coalesce(ratified_epoch, expired_epoch, dropped_epoch, ( SELECT MAX(epoch_no) FROM public.epoch_param))) AS epoch_of_interest
+          (coalesce(ratified_epoch, expired_epoch, dropped_epoch, ( SELECT MAX(epoch_param.epoch_no) FROM public.epoch_param))) AS epoch_of_interest
         FROM gov_action_proposal AS gap 
         WHERE proposal_id = gap.id
       ),
       last_tx_id_of_interest AS (
         SELECT CASE
-          WHEN (SELECT MAX(epoch_no) FROM public.epoch_param) = ped.epoch_of_interest THEN
+          WHEN (SELECT MAX(epoch_param.epoch_no) FROM public.epoch_param) = ped.epoch_of_interest THEN
             (SELECT t.id FROM tx AS t ORDER BY id DESC LIMIT 1) 
           ELSE
             (SELECT MAX(i_last_tx_id) FROM grest.epoch_info_cache AS eic WHERE eic.epoch_no <= ped.epoch_of_interest)
@@ -121,7 +121,7 @@ BEGIN
                   SELECT i_last_tx_id 
                   FROM grest.epoch_info_cache AS eic
                   WHERE eic.epoch_no = 
-                    (coalesce(ped.ratified_epoch, ped.expired_epoch, ped.dropped_epoch, (SELECT MAX(epoch_no) + 1 FROM public.epoch_param)) - 1)
+                    (coalesce(ped.ratified_epoch, ped.expired_epoch, ped.dropped_epoch, (SELECT MAX(epoch_param.epoch_no) + 1 FROM public.epoch_param)) - 1)
                 )
           )
         GROUP BY ped.gov_action_proposal_id, vote

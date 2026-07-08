@@ -214,7 +214,7 @@ BEGIN
   END IF;
 
   SELECT COALESCE(MAX(epoch_no), 0) INTO _latest_epoch_no_in_cache FROM grest.pool_history_cache;
-  SELECT MAX(epoch_no) INTO _curr_epoch FROM public.epoch_param;
+  SELECT MAX(epoch_param.epoch_no) INTO _curr_epoch FROM public.epoch_param;
 
   IF _epoch_no_to_insert_from IS NULL THEN
     IF _latest_epoch_no_in_cache = 0 THEN

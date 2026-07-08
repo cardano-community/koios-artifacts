@@ -4,7 +4,7 @@ LANGUAGE plpgsql
 AS $$
 DECLARE
   curr_epoch_record record := null;
-  latest_epoch bigint = (SELECT MAX(epoch_no) FROM public.epoch_param);
+  latest_epoch bigint = (SELECT MAX(epoch_param.epoch_no) FROM public.epoch_param);
   last_epoch_checked bigint = coalesce((SELECT last_value::bigint FROM grest.control_table WHERE key = 'last_epoch_summary_data_checked'), -1);
 BEGIN
   RAISE NOTICE 'Last validated epoch was %', last_epoch_checked;

@@ -28,7 +28,7 @@ BEGIN
   SELECT (eic.i_last_tx_id) INTO _last_account_tx_id
     FROM grest.epoch_info_cache AS eic
     WHERE eic.epoch_no = _active_stake_epoch;
-  SELECT MAX(epoch_no) INTO _latest_epoch FROM public.epoch_param WHERE epoch_no IS NOT NULL;
+  SELECT MAX(epoch_param.epoch_no) INTO _latest_epoch FROM public.epoch_param WHERE epoch_param.epoch_no IS NOT NULL;
 
   WITH
     dangling_delegations AS (
@@ -316,14 +316,14 @@ BEGIN
     FROM grest.control_table
     WHERE key = 'last_active_stake_validated_epoch'
     ) OR (
-      SELECT ((SELECT MAX(epoch_no) FROM public.epoch_param) - COALESCE((last_value::integer - 2)::integer, 0 ))  > 2
+      SELECT ((SELECT MAX(epoch_param.epoch_no) FROM public.epoch_param) - COALESCE((last_value::integer - 2)::integer, 0 ))  > 2
       FROM grest.control_table
       WHERE key = 'last_active_stake_validated_epoch'
     ) THEN
     RAISE EXCEPTION 'Active Stake cache too far, skipping...';
   ELSIF (
     SELECT
-      ((SELECT MAX(epoch_no) FROM public.epoch_param) - (SELECT MAX(epoch_no)::integer FROM grest.epoch_info_cache))::integer > 0
+      ((SELECT MAX(epoch_param.epoch_no) FROM public.epoch_param) - (SELECT MAX(epoch_no)::integer FROM grest.epoch_info_cache))::integer > 0
     ) THEN
     RAISE EXCEPTION 'Epoch Info cache wasnt run yet, skipping...';
   END IF;

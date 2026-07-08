@@ -31,7 +31,7 @@ BEGIN
       FROM public.block AS b
         LEFT JOIN public.epoch_param AS ep ON ep.epoch_no = b.epoch_no
         LEFT JOIN grest.era_map AS em ON ep.protocol_major::text = em.protocol_major::text AND ep.protocol_minor::text = em.protocol_minor::text
-      WHERE b.epoch_no = (SELECT MAX(epoch_no) FROM public.epoch_param)
+      WHERE b.epoch_no = (SELECT MAX(epoch_param.epoch_no) FROM public.epoch_param)
       GROUP BY
         b.proto_major, b.proto_minor, em.era;
   END IF;

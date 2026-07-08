@@ -23,7 +23,7 @@ AS $$
 DECLARE
   _current_epoch_no word31type;
 BEGIN
-  SELECT COALESCE(MAX(epoch_no), 0) INTO _current_epoch_no FROM public.epoch_param;
+  SELECT COALESCE(MAX(epoch_param.epoch_no), 0) INTO _current_epoch_no FROM public.epoch_param;
   RETURN QUERY
   WITH
     pool_reg AS (
