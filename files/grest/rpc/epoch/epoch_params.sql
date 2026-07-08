@@ -122,7 +122,7 @@ BEGIN
     LEFT JOIN public.cost_model AS cm ON cm.id = ep.cost_model_id
     WHERE 
       CASE
-        WHEN _epoch_no IS NULL THEN ep.epoch_no <= (SELECT MAX(epoch.no) FROM public.epoch)
+        WHEN _epoch_no IS NULL THEN ep.epoch_no <= (SELECT MAX(epoch_param.epoch_no) FROM public.epoch_param)
         ELSE ep.epoch_no = _epoch_no
       END
     ORDER BY
