@@ -1,7 +1,7 @@
 CREATE OR REPLACE FUNCTION grest.proposal_voting_summary(_proposal_id text)
 RETURNS TABLE (
   proposal_type text,
-  epoch_no bigint,
+  epoch_no integer,
   drep_yes_votes_cast integer,
   drep_active_yes_vote_power text,
   drep_yes_vote_power text,
