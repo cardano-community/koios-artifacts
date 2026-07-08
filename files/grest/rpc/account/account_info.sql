@@ -142,8 +142,8 @@ BEGIN
         FROM reward
         WHERE reward.addr_id = ANY(sa_id_list)
           AND reward.spendable_epoch <= (
-            SELECT MAX(no)
-            FROM epoch
+            SELECT MAX(epoch_no)
+            FROM public.epoch_param
           )
         GROUP BY
           reward.addr_id
@@ -165,8 +165,8 @@ BEGIN
         WHERE r.addr_id = ANY(sa_id_list)
           AND r.type = 'reserves'
           AND r.spendable_epoch <= (
-            SELECT MAX(no)
-            FROM epoch
+            SELECT MAX(epoch_no)
+            FROM public.epoch_param
           )
         GROUP BY
           r.addr_id
@@ -179,8 +179,8 @@ BEGIN
         WHERE t.addr_id = ANY(sa_id_list)
           AND t.type = 'treasury'
           AND t.spendable_epoch <= (
-            SELECT MAX(no)
-            FROM epoch
+            SELECT MAX(epoch_no)
+            FROM public.epoch_param
           )
         GROUP BY
           t.addr_id
@@ -193,8 +193,8 @@ BEGIN
         WHERE pr.addr_id = ANY(sa_id_list)
           AND pr.type = 'proposal_refund'
           AND pr.spendable_epoch <= (
-            SELECT MAX(no)
-            FROM epoch
+            SELECT MAX(epoch_no)
+            FROM public.epoch_param
           )
         GROUP BY
           pr.addr_id

@@ -20,7 +20,7 @@ DECLARE
   _curr_epoch word31type;
 BEGIN
 
-  SELECT MAX(no) INTO _curr_epoch FROM epoch;
+  SELECT MAX(epoch_no) INTO _curr_epoch FROM public.epoch_param;
 
   RETURN QUERY
     SELECT x.*
