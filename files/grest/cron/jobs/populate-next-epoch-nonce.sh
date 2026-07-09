@@ -9,7 +9,7 @@ export CARDANO_NODE_SOCKET_PATH=
 echo "$(date +%F_%H:%M:%S) Running next epoch nonce calculation..."
 
 # TODO possibly initialize EPOCH_LENGTH from database as well
-PROTO_MAJ=$(psql ${DB_NAME} -c "select protocol_major from epoch_param where epoch_no = (select max(no) from epoch);" -t)
+PROTO_MAJ=$(psql ${DB_NAME} -c "select protocol_major from epoch_param where epoch_no = (select max(epoch_no) from public.epoch_param);" -t)
 SECURITY_PARAM=$(psql ${DB_NAME} -c "select securityparam from grest.genesis;" -t)
 ACTIVE_SLOT_COEFF=$(psql ${DB_NAME} -c "select activeslotcoeff from grest.genesis;" -t)
 WINDOW_SIZE=2

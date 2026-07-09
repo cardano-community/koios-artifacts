@@ -35,7 +35,7 @@ DECLARE
   _epoch_no bigint;
   _saturation_limit bigint;
 BEGIN
-  SELECT MAX(epoch.no) INTO _epoch_no FROM public.epoch;
+  SELECT MAX(epoch_param.epoch_no) INTO _epoch_no FROM public.epoch_param;
   SELECT FLOOR(supply::bigint / (
       SELECT ep.optimal_pool_count
       FROM epoch_param AS ep

@@ -19,7 +19,7 @@ DECLARE
   drep_activity word64type;
 BEGIN
 
-  SELECT INTO curr_epoch MAX(epoch_no) FROM public.block;
+  SELECT INTO curr_epoch MAX(epoch_param.epoch_no) FROM public.epoch_param;
 
   SELECT INTO drep_activity ep.drep_activity FROM public.epoch_param AS ep WHERE ep.epoch_no = curr_epoch;
 

@@ -52,7 +52,7 @@ BEGIN
   LEFT JOIN grest.epoch_active_stake_cache AS eas ON eas.epoch_no = ei.epoch_no
   WHERE
     CASE
-      WHEN _epoch_no IS NULL THEN ei.epoch_no <= (SELECT MAX(epoch.no) FROM public.epoch)
+      WHEN _epoch_no IS NULL THEN ei.epoch_no <= (SELECT MAX(epoch_param.epoch_no) FROM public.epoch_param)
       ELSE ei.epoch_no = _epoch_no
     END
     AND

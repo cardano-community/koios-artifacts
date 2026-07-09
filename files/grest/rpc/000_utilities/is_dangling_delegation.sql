@@ -8,7 +8,7 @@ DECLARE
 
 BEGIN
 
-  SELECT INTO curr_epoch MAX(no) FROM epoch;
+  SELECT INTO curr_epoch MAX(epoch_param.epoch_no) FROM public.epoch_param;
   -- revised logic: 
   -- check for any pool retirement record exists for the pool corresponding to given delegation
   -- pool retiring epoch is current or in the past (future scheduled retirements don't count)

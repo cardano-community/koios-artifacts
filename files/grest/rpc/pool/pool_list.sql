@@ -56,7 +56,7 @@ AS $$
   FROM grest.pool_info_cache AS pic
     INNER JOIN public.pool_hash AS ph ON ph.id = pic.pool_hash_id
     LEFT JOIN grest.pool_groups AS pgrp ON pgrp.pool_id_bech32 = ph.view
-    LEFT JOIN pool_stat AS pstat ON pstat.pool_hash_id = pic.pool_hash_id AND pstat.epoch_no < (select max(no) from epoch) AND pstat.epoch_no > (select max(no) - 3 from epoch)
+    LEFT JOIN pool_stat AS pstat ON pstat.pool_hash_id = pic.pool_hash_id AND pstat.epoch_no < (select max(epoch_no) from public.epoch_param) AND pstat.epoch_no > (select max(epoch_no) - 3 from public.epoch_param)
     LEFT JOIN public.pool_update AS pu ON pu.id = pic.update_id
     LEFT JOIN public.stake_address AS sa ON pu.reward_addr_id = sa.id
     LEFT JOIN public.pool_metadata_ref AS pmr ON pmr.id = pic.meta_id
