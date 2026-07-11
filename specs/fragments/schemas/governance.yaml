@@ -55,6 +55,10 @@
             - type: "null"
           description: A hash of the contents of the metadata URL
           example: dc208474e195442d07a5b6d42af19bb2db02229427dfb53ab23122e6b0e2487d
+        live_delegator_count:
+          type: number
+          description: Number of delegators whose last voting power delegation was to this DRep
+          example: 55
   drep_epoch_summary:
     description: Summary of voting power and DRep count for each epoch
     type: array
