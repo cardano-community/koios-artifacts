@@ -37,8 +37,8 @@ BEGIN
         RAISE EXCEPTION 'Previous epoch_info_cache_update query still running but should have completed! Exiting...';
   END IF;
 
-  SELECT MAX(no) INTO _curr_epoch
-  FROM public.epoch;
+  SELECT MAX(epoch_no) INTO _curr_epoch
+  FROM public.epoch_param;
 
   IF _epoch_no_to_insert_from IS NULL THEN
     SELECT COALESCE(MAX(epoch_no), 0) INTO _latest_epoch_no_in_cache
@@ -47,7 +47,7 @@ BEGIN
 
     IF _latest_epoch_no_in_cache = 0 THEN
       RAISE NOTICE 'Epoch info cache table is empty, starting initial population...';
-      PERFORM grest.epoch_summary_corrections_update();
+      -- commenting out for now, epoch is now view and hopefully bugs have been fixed: PERFORM grest.epoch_summary_corrections_update();
       PERFORM grest.epoch_info_cache_update(0);
       RETURN;
     END IF;

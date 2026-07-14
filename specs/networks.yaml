@@ -1,0 +1,10 @@
+networks:
+  mainnet:
+    key: m
+    output: results/koiosapi-mainnet.yaml
+  preview:
+    key: pv
+    output: results/koiosapi-preview.yaml
+  preprod:
+    key: pp
+    output: results/koiosapi-preprod.yaml

@@ -1,0 +1,313 @@
+/pool_list: #RPC
+    get:
+      tags:
+        - Pool
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_list"
+        #!macro:koios_errors!#
+      summary: Pool List
+      description: List of brief info for all pools
+      operationId: pool_list
+/pool_info: #RPC
+    post:
+      tags:
+        - Pool
+      requestBody:
+        $ref: "#/components/requestBodies/pool_ids"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_info"
+        #!macro:koios_errors!#
+      summary: Pool Information
+      description: Current pool statuses and details for a specified list of pool ids
+      operationId: pool_info
+/pool_stake_snapshot: #RPC
+    get:
+      tags:
+        - Pool
+      parameters:
+        - $ref: "#/components/parameters/_pool_bech32"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_snapshot"
+        #!macro:koios_errors!#
+      summary: Pool Stake Snapshot
+      description: Returns Mark, Set and Go stake snapshots for the selected pool, useful for leaderlog calculation
+      operationId: pool_stake_snapshot
+/pool_delegators: #RPC
+    get:
+      tags:
+        - Pool
+      parameters:
+        - $ref: "#/components/parameters/_pool_bech32"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_delegators"
+        #!macro:koios_errors!#
+      summary: Pool Delegators List
+      description: Return information about live delegators for a given pool.
+      operationId: pool_delegators
+/pool_delegators_history: #RPC
+    get:
+      tags:
+        - Pool
+      parameters:
+        - $ref: "#/components/parameters/_pool_bech32"
+        - $ref: "#/components/parameters/_epoch_no"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_delegators_history"
+        #!macro:koios_errors!#
+      summary: Pool Delegators History
+      description: Return information about active delegators (incl. history) for a given pool and epoch number (all epochs if not specified).
+      operationId: pool_delegators_history
+/pool_invalid_delegators: #RPC
+    get:
+      tags:
+        - Pool
+      parameters:
+        - $ref: "#/components/parameters/_pool_bech32"
+        - $ref: "#/components/parameters/_epoch_no"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_invalid_delegators"
+        #!macro:koios_errors!#
+      summary: Pool Invalid Delegators
+      description: Return information about delegators for a given pool that are invalid for the specified epoch.
+      operationId: pool_invalid_delegators
+/pool_blocks: #RPC
+    get:
+      tags:
+        - Pool
+      parameters:
+        - $ref: "#/components/parameters/_pool_bech32"
+        - $ref: "#/components/parameters/_epoch_no"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_blocks"
+        #!macro:koios_errors!#
+      summary: Pool Blocks
+      description: >-
+        Return information about blocks minted by a given pool for all epochs
+        (or _epoch_no if provided)
+      operationId: pool_blocks
+/pool_owner_history: #RPC
+    post:
+      tags:
+        - Pool
+      requestBody:
+        $ref: "#/components/requestBodies/pool_ids"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_owner_history"
+        #!macro:koios_errors!#
+      summary: Pool Owner History
+      description: >-
+        Return information about pool owner's historical stake and their promised pledge to their pools
+      operationId: pool_owner_history
+/pool_history: #RPC
+    get:
+      tags:
+        - Pool
+      parameters:
+        - $ref: "#/components/parameters/_pool_bech32"
+        - $ref: "#/components/parameters/_epoch_no"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_history_info"
+        #!macro:koios_errors!#
+      summary: Pool Stake, Block and Reward History
+      description: >-
+        Return information about pool stake, block and reward history in a given epoch _epoch_no
+        (or all epochs that pool existed for, in descending order if no _epoch_no was provided)
+      operationId: pool_history
+/pool_updates: #RPC
+    get:
+      tags:
+        - Pool
+      parameters:
+        - $ref: "#/components/parameters/_pool_bech32_optional"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_updates"
+        #!macro:koios_errors!#
+      summary: Pool Updates (History)
+      description: Return all pool updates for all pools or only updates for specific pool if specified
+      operationId: pool_updates
+/pool_registrations: #RPC
+    get:
+      tags:
+        - Pool
+      parameters:
+        - $ref: "#/components/parameters/_pool_epoch_no"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_registrations"
+        #!macro:koios_errors!#
+      summary: Pool Registrations
+      description: Return all pool registrations initiated in the requested epoch
+      operationId: pool_registrations
+/pool_retirements: #RPC
+    get:
+      tags:
+        - Pool
+      parameters:
+        - $ref: "#/components/parameters/_epoch_no"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_registrations"
+        #!macro:koios_errors!#
+      summary: Pool Retirements
+      description: Return all pool retirements initiated in the requested epoch
+      operationId: pool_retirements
+/pool_relays: #RPC
+    get:
+      tags:
+        - Pool
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_relays"
+        #!macro:koios_errors!#
+      summary: Pool Relays
+      description: A list of registered relays for all pools
+      operationId: pool_relays
+/pool_voting_power_history: #RPC
+    get:
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_epoch_no"
+        - $ref: "#/components/parameters/_pool_bech32_optional"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_voting_power_history"
+        #!macro:koios_errors!#
+      summary: Pool's Voting Power History
+      description: History of Pool voting power against each (or requested) epoch
+      operationId: pool_voting_power_history
+/pool_votes: #RPC
+    get:
+      deprecated: true
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_pool_bech32"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_votes"
+        #!macro:koios_errors!#
+      summary: Pool Votes
+      description: List of all votes casted by a pool
+      operationId: pool_votes
+      x-badges:
+        - color: red
+          label: "Deprecated"
+
+/pool_groups: #RPC
+    get:
+      tags:
+        - Pool
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_groups"
+        #!macro:koios_errors!#
+      summary: Pool Groups
+      description: List of all registered pool and their groups across sources from [pool_groups](https://github.com/cardano-community/pool_groups) repository. This is only relevant for mainnet
+      operationId: pool_groups
+/pool_metadata: #RPC
+    post:
+      tags:
+        - Pool
+      requestBody:
+        $ref: "#/components/requestBodies/pool_ids_optional"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_metadata"
+        #!macro:koios_errors!#
+      summary: Pool Metadata
+      description: Metadata (on & off-chain) for all pools
+      operationId: pool_metadata
+/pool_calidus_keys: #RPC
+    get:
+      tags:
+        - Pool
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_calidus_keys"
+        #!macro:koios_errors!#
+      summary: Pool Calidus Keys
+      description: List of valid calidus keys for all pools
+      operationId: pool_calidus_keys

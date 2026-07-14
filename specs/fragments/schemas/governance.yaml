@@ -1,0 +1,698 @@
+  drep_info:
+    description: Get detailed information about requested delegated representatives (DReps)
+    type: array
+    items:
+      properties:
+        drep_id:
+          type: string
+          description: DRep ID in CIP-129 bech32 format
+          example: drep1yfhyq6tztjksqqpd5lglc3zr2tn8vylgjh9xzz7n2p4l4lgk3qam3
+        hex:
+          type: string
+          description: DRep ID in hex format
+          example: 6e4069625cad00002da7d1fc444352e67613e895ca610bd3506bfafd
+        has_script:
+          type: boolean
+          description: Flag which shows if this credential is a script hash
+          example: false
+        drep_status:
+          type: string
+          enum:
+            - registered
+            - deregistered
+            - not_registered
+          description: DRep's current registration status
+          example: registered
+        deposit:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: DRep's registration deposit  in number
+          example: "500000000"
+        active:
+          type: boolean
+          description: Flag to show if the DRep is  (i.e. not expired)
+          example: true
+        expires_epoch_no:
+          anyOf:
+            - type: number
+            - type: "null"
+          description: After which epoch DRep is considered inactive.
+          example: 410
+        amount:
+          type: string
+          description: The total amount of voting power this DRep is delegated.
+          example: "599496769641"
+        meta_url:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: A URL to a JSON payload of metadata
+          example: "https://hornan7.github.io/Vote_Context.jsonld"
+        meta_hash:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: A hash of the contents of the metadata URL
+          example: dc208474e195442d07a5b6d42af19bb2db02229427dfb53ab23122e6b0e2487d
+        live_delegator_count:
+          type: number
+          description: Number of delegators whose last voting power delegation was to this DRep
+          example: 55
+  drep_epoch_summary:
+    description: Summary of voting power and DRep count for each epoch
+    type: array
+    items:
+      properties:
+        epoch_no:
+          $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+        amount:
+          type: string
+          description: The total amount of voting power between all DReps including pre-defined roles for the epoch.
+          example: "599496769641"
+        dreps:
+          type: number
+          description: The total number of DReps with vote power for the epoch.
+          example: 324
+  drep_list:
+    description: List of all active delegated representatives (DReps)
+    type: array
+    items:
+      properties:
+        drep_id:
+          $ref: "#/components/schemas/drep_info/items/properties/drep_id"
+        hex:
+          $ref: "#/components/schemas/drep_info/items/properties/hex"
+        has_script:
+          $ref: "#/components/schemas/drep_info/items/properties/has_script"
+        drep_status:
+          $ref: "#/components/schemas/drep_info/items/properties/drep_status"
+  drep_delegators:
+    description: List of all delegators by requested delegated representative (DRep)
+    type: array
+    items:
+      properties:
+        stake_address:
+          $ref: "#/components/schemas/account_list/items/properties/stake_address"
+        stake_address_hex:
+          $ref: "#/components/schemas/account_list/items/properties/stake_address_hex"
+        script_hash:
+          $ref: "#/components/schemas/account_list/items/properties/script_hash"
+        epoch_no:
+          description: Epoch when vote delegation was made
+          allOf:
+            - $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+        amount:
+          $ref: "#/components/schemas/account_info/items/properties/total_balance"
+  drep_metadata:
+    description: List metadata for requested delegated representatives (DReps)
+    type: array
+    items:
+      properties:
+        drep_id:
+          $ref: "#/components/schemas/drep_info/items/properties/drep_id"
+        hex:
+          $ref: "#/components/schemas/drep_info/items/properties/hex"
+        has_script:
+          $ref: "#/components/schemas/drep_info/items/properties/has_script"
+        meta_url:
+          $ref: "#/components/schemas/drep_info/items/properties/meta_url"
+        meta_hash:
+          $ref: "#/components/schemas/drep_info/items/properties/meta_hash"
+        meta_json:
+          anyOf:
+            - type: object
+            - type: "null"
+          description: The payload as JSON
+          example:
+            {
+              "body":
+                {
+                  "title": "...",
+                  "...": "...",
+                  "references":
+                    [
+                      {
+                        "uri": "...",
+                        "@type": "Other",
+                        "label": "Hardfork to PV10",
+                      },
+                    ],
+                },
+              "authors":
+                [
+                  {
+                    "name": "...",
+                    "witness":
+                      {
+                        "publicKey": "...",
+                        "signature": "...",
+                        "witnessAlgorithm": "ed25519",
+                      },
+                  },
+                ],
+              "@context":
+                {
+                  "body":
+                    {
+                      "@id": "CIP108:body",
+                      "@context":
+                        {
+                          "title": "CIP108:title",
+                          "abstract": "CIP108:abstract",
+                          "rationale": "CIP108:rationale",
+                          "motivation": "CIP108:motivation",
+                          "references":
+                            {
+                              "@id": "CIP108:references",
+                              "@context":
+                                {
+                                  "uri": "CIP100:reference-uri",
+                                  "Other": "CIP100:OtherReference",
+                                  "label": "CIP100:reference-label",
+                                  "referenceHash":
+                                    {
+                                      "@id": "CIP108:referenceHash",
+                                      "@context":
+                                        {
+                                          "hashDigest": "CIP108:hashDigest",
+                                          "hashAlgorithm": "CIP100:hashAlgorithm",
+                                        },
+                                    },
+                                  "GovernanceMetadata": "CIP100:GovernanceMetadataReference",
+                                },
+                              "@container": "@set",
+                            },
+                        },
+                    },
+                  "CIP100": "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0100/README.md#",
+                  "CIP108": "https://github.com/cardano-foundation/CIPs/blob/master/CIP-0108/README.md#",
+                  "authors":
+                    {
+                      "@id": "CIP100:authors",
+                      "@context":
+                        {
+                          "name": "http://xmlns.com/foaf/0.1/name",
+                          "witness":
+                            {
+                              "@id": "CIP100:witness",
+                              "@context":
+                                {
+                                  "publicKey": "CIP100:publicKey",
+                                  "signature": "CIP100:signature",
+                                  "witnessAlgorithm": "CIP100:witnessAlgorithm",
+                                },
+                            },
+                        },
+                      "@container": "@set",
+                    },
+                  "@language": "en-us",
+                  "hashAlgorithm": "CIP100:hashAlgorithm",
+                },
+              "hashAlgorithm": "blake2b-256",
+            }
+        bytes:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: The raw bytes of the payload
+          example: 7b0a20202240636f6e74657874223a207b0a2020202022406c616e6775616765223a2022656e2d7573222c0a2020202022434950313030223a202268747470733a2f2f6769746875622e636f6d2f63617264616e6f2d666f756e646174696f6e2f434950732f626c6f622f6d61737465722f4349502d303130302f524541444d452e6d6423222c0a2020202022434950313038223a202268747470733a2f2f6769746875622e636f6d2f63617264616e6f2d666f756e646174696f6e2f434950732f626c6f622f6d61737465722f4349502d303130382f524541444d452e6d6423222c0a202020202268617368416c676f726974686d223a20224349503130303a68617368416c676f726974686d222c0a2020202022626f6479223a207b0a20202020202022406964223a20224349503130383a626f6479222c0a2020202020202240636f6e74657874223a207b0a2020202020202020227265666572656e636573223a207b0a2020202020202020202022406964223a20224349503130383a7265666572656e636573222c0a202020202020202020202240636f6e7461696e6572223a202240736574222c0a202020202020202020202240636f6e74657874223a207b0a20202020202020202020202022476f7665726e616e63654d65746164617461223a20224349503130303a476f7665726e616e63654d657461646174615265666572656e6365222c0a202020202020202020202020224f74686572223a20224349503130303a4f746865725265666572656e6365222c0a202020202020202020202020226c6162656c223a20224349503130303a7265666572656e63652d6c6162656c222c0a20202020202020202020202022757269223a20224349503130303a7265666572656e63652d757269222c0a202020202020202020202020227265666572656e636548617368223a207b0a202020202020202020202020202022406964223a20224349503130383a7265666572656e636548617368222c0a20202020202020202020202020202240636f6e74657874223a207b0a202020202020202020202020202020202268617368446967657374223a20224349503130383a68617368446967657374222c0a202020202020202020202020202020202268617368416c676f726974686d223a20224349503130303a68617368416c676f726974686d220a20202020202020202020202020207d0a2020202020202020202020207d0a202020202020202020207d0a20202020202020207d2c0a2020202020202020227469746c65223a20224349503130383a7469746c65222c0a2020202020202020226162737472616374223a20224349503130383a6162737472616374222c0a2020202020202020226d6f7469766174696f6e223a20224349503130383a6d6f7469766174696f6e222c0a202020202020202022726174696f6e616c65223a20224349503130383a726174696f6e616c65220a2020202020207d0a202020207d2c0a2020202022617574686f7273223a207b0a20202020202022406964223a20224349503130303a617574686f7273222c0a2020202020202240636f6e7461696e6572223a202240736574222c0a2020202020202240636f6e74657874223a207b0a2020202020202020226e616d65223a2022687474703a2f2f786d6c6e732e636f6d2f666f61662f302e312f6e616d65222c0a2020202020202020227769746e657373223a207b0a2020202020202020202022406964223a20224349503130303a7769746e657373222c0a202020202020202020202240636f6e74657874223a207b0a202020202020202020202020227769746e657373416c676f726974686d223a20224349503130303a7769746e657373416c676f726974686d222c0a202020202020202020202020227075626c69634b6579223a20224349503130303a7075626c69634b6579222c0a202020202020202020202020227369676e6174757265223a20224349503130303a7369676e6174757265220a202020202020202020207d0a20202020202020207d0a2020202020207d0a202020207d0a20207d2c0a20202268617368416c676f726974686d223a2022626c616b6532622d323536222c0a202022626f6479223a207b0a20202020227469746c65223a202248617264666f726b20746f2050726f746f636f6c2076657273696f6e203130222c0a20202020226162737472616374223a20224c6574277320686176652073616e63686f4e657420696e2066756c6c20676f7665726e616e636520617320736f6f6e20617320706f737369626c65222c0a20202020226d6f7469766174696f6e223a2022505639206973206e6f742061732066756e2061732050563130222c0a2020202022726174696f6e616c65223a20224c65742773206b6565702074657374696e67207374756666222c0a20202020227265666572656e636573223a205b0a2020202020207b0a2020202020202020224074797065223a20224f74686572222c0a2020202020202020226c6162656c223a202248617264666f726b20746f2050563130222c0a202020202020202022757269223a2022220a2020202020207d0a202020205d0a20207d2c0a202022617574686f7273223a205b0a202020207b0a202020202020226e616d65223a20224361726c6f73222c0a202020202020227769746e657373223a207b0a2020202020202020227769746e657373416c676f726974686d223a202265643235353139222c0a2020202020202020227075626c69634b6579223a202237656130396133346165626231336339383431633731333937623163616266656335646466393530343035323933646565343936636163326634333734383061222c0a2020202020202020227369676e6174757265223a20226134373639383562346363306434353766323437373937363131373939613666366138306663386362376563396463623561383232333838386430363138653330646531363566336438363963346130643931303764386135623631326164376335653432343431393037663562393137393666306437313837643634613031220a2020202020207d0a202020207d0a20205d0a7d
+        warning:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: A warning that occured while validating the metadata
+        language:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: The language described in the context of the metadata as per CIP-100
+          example: en-us
+        comment:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Comment attached to the metadata
+        is_valid:
+          anyOf:
+            - type: boolean
+            - type: "null"
+          description: Indicate whether data is invalid
+          example: null
+  drep_updates:
+    description: List of updates for requested (or all) delegated representatives (DReps)
+    type: array
+    items:
+      properties:
+        drep_id:
+          $ref: "#/components/schemas/drep_info/items/properties/drep_id"
+        hex:
+          $ref: "#/components/schemas/drep_info/items/properties/hex"
+        has_script:
+          $ref: "#/components/schemas/drep_info/items/properties/has_script"
+        update_tx_hash:
+          $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+        cert_index:
+          type: number
+          description: The index of this certificate within the the transaction.
+          example: 1
+        block_time:
+          $ref: "#/components/schemas/blocks/items/properties/block_time"
+        action:
+          type: string
+          description: Effective action for this DRep Update certificate
+          enum: ["updated", "registered", "deregistered"]
+          example: registered
+        deposit:
+          $ref: "#/components/schemas/drep_info/items/properties/deposit"
+        meta_url:
+          $ref: "#/components/schemas/drep_metadata/items/properties/meta_url"
+        meta_hash:
+          $ref: "#/components/schemas/drep_metadata/items/properties/meta_hash"
+        meta_json:
+          $ref: "#/components/schemas/drep_metadata/items/properties/meta_json"
+  drep_voting_power_history:
+    description: History of DReps voting power against each (or requested) epoch
+    type: array
+    items:
+      properties:
+        drep_id:
+          $ref: "#/components/schemas/drep_info/items/properties/drep_id"
+        epoch_no:
+          $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+        amount:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: The voting power for the DRep
+          example: "14231445553"
+  drep_votes:
+    description: List of all votes casted by requested delegated representative (DRep)
+    type: array
+    items:
+      properties:
+        proposal_id:
+          $ref: "#/components/schemas/proposal_list/items/properties/proposal_id"
+        proposal_tx_hash:
+          $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+        proposal_index:
+          $ref: "#/components/schemas/proposal_list/items/properties/proposal_index"
+        vote_tx_hash:
+          $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+        block_time:
+          $ref: "#/components/schemas/blocks/items/properties/block_time"
+        vote:
+          type: string
+          enum: ["Yes", "No", "Abstain"]
+          description: Actual Vote casted
+          example: "Yes"
+        meta_url:
+          $ref: "#/components/schemas/drep_metadata/items/properties/meta_url"
+        meta_hash:
+          $ref: "#/components/schemas/drep_metadata/items/properties/meta_hash"
+  pool_voting_power_history:
+    description: History of Pool's voting power against each (or requested) epoch
+    type: array
+    items:
+      properties:
+        pool_id_bech32:
+          $ref: "#/components/schemas/pool_info/items/properties/pool_id_bech32"
+        epoch_no:
+          $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+        amount:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: The voting power for the pool for the epoch
+          example: "11231445553"
+  pool_votes:
+    description: List of all votes casted by requested pool
+    type: array
+    items:
+      $ref: "#/components/schemas/drep_votes/items"
+  committee_votes:
+    description: List of all votes casted by requested delegated representative (DRep)
+    type: array
+    items:
+      $ref: "#/components/schemas/drep_votes/items"
+  proposal_list:
+    description: List of all governance action proposals
+    type: array
+    items:
+      properties:
+        block_time:
+          $ref: "#/components/schemas/blocks/items/properties/block_time"
+        proposal_id:
+          type: string
+          description: Proposal Action ID in accordance with CIP-129 format
+          example: "gov_action17m93skslaxyd45gpr6ernkdzs852h564wsterr8l6lheu7hu7kvsqecyqdh"
+        proposal_tx_hash:
+          $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+        proposal_index:
+          type: number
+          description: Index of governance proposal in transaction
+          example: 0
+        proposal_type:
+          type: string
+          enum:
+            [
+              "ParameterChange",
+              "HardForkInitiation",
+              "TreasuryWithdrawals",
+              "NoConfidence",
+              "NewCommittee",
+              "NewConstitution",
+              "InfoAction",
+            ]
+          description: Proposal Action Type
+          example: ParameterChange
+        proposal_description:
+          type: object
+          description: Description for Proposal Action
+          example: '{"tag": "InfoAction"}'
+        previous_gov_action_proposal_id:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: If not null, the CIP-129 formatted governance action ID of the previous governance action in a chain of actions (e.g. for NewConstitution or HardForkInitiation)
+          example: "gov_action17m93skslaxyd45gpr6ernkdzs852h564wsterr8l6lheu7hu7kvsqecyqdh"
+        deposit:
+          $ref: "#/components/schemas/drep_info/items/properties/deposit"
+        return_address:
+          type: string
+          description: The StakeAddress index of the reward address to receive the deposit when it is repaid.
+          example: stake1uy6yzwsxxc28lfms0qmpxvyz9a7y770rtcqx9y96m42cttqwvp4m5
+        proposed_epoch:
+          type: number
+          description: Shows the epoch at which this governance action was proposed.
+          example: 660
+        ratified_epoch:
+          anyOf:
+            - type: number
+            - type: "null"
+          description: If not null, then this proposal has been ratified at the specified epoch.
+          example: 670
+        enacted_epoch:
+          anyOf:
+            - type: number
+            - type: "null"
+          description: If not null, then this proposal has been enacted at the specified epoch.
+          example: 675
+        dropped_epoch:
+          anyOf:
+            - type: number
+            - type: "null"
+          description: If not null, then this proposal has been dropped (expired/enacted) at the specified epoch.
+          example: 680
+        expired_epoch:
+          anyOf:
+            - type: number
+            - type: "null"
+          description: If not null, then this proposal has been expired at the specified epoch.
+          example: 680
+        expiration:
+          anyOf:
+            - type: number
+            - type: "null"
+          description: Shows the epoch at which this governance action is expected to expire.
+        meta_url:
+          $ref: "#/components/schemas/drep_metadata/items/properties/meta_url"
+        meta_hash:
+          $ref: "#/components/schemas/drep_metadata/items/properties/meta_hash"
+        meta_json:
+          $ref: "#/components/schemas/drep_metadata/items/properties/meta_json"
+        meta_comment:
+          $ref: "#/components/schemas/drep_metadata/items/properties/comment"
+        meta_language:
+          $ref: "#/components/schemas/drep_metadata/items/properties/language"
+        meta_is_valid:
+          $ref: "#/components/schemas/drep_metadata/items/properties/is_valid"
+        withdrawal:
+          type: array
+          description: The array of amounts withdrawn from treasury into specified stake addresses by this proposal
+          items:
+            properties:
+              stake_address:
+                $ref: "#/components/schemas/account_history/items/properties/stake_address"
+              amount:
+                type: string
+                example: "31235800000"
+        param_proposal:
+          description: If not null, the proposed new parameter set
+          anyOf:
+            - type: object
+            - type: "null"
+          example: { "key_deposit": 1000000 }
+  voter_proposal_list:
+    description: List of all governance action proposals where specified credential(DRep, SPO or Committee member) has cast a vote
+    type: array
+    items:
+      $ref: "#/components/schemas/proposal_list/items"
+  proposal_voting_summary:
+    description: Summary of votes for given proposal
+    type: array
+    items:
+      properties:
+        proposal_type:
+          $ref: "#/components/schemas/proposal_list/items/properties/proposal_type"
+        epoch_no:
+          type: number
+          description: Epoch for which data was collated
+          example: 441
+        drep_yes_votes_cast:
+          type: number
+          description: Number of 'yes' votes casted by dreps
+          example: 7
+        drep_active_yes_vote_power:
+          type: string
+          description: Power of 'yes' votes that were explicitly cast
+          example: "31231231231"
+        drep_yes_vote_power:
+          type: string
+          description: Power of 'yes' votes from dreps (includes explicit yes and inferred via other means)
+          example: "31146839512742"
+        drep_yes_pct:
+          type: number
+          description: Percentage of 'yes' votes from dreps
+          example: 60.72
+        drep_no_votes_cast:
+          type: number
+          description: Number of 'no' votes casted by dreps
+          example: 0
+        drep_active_no_vote_power:
+          type: string
+          description: Power of 'no' votes that were explicitly cast
+          example: "2012312393392"
+        drep_no_vote_power:
+          type: string
+          description: Power of 'no' votes from dreps (includes explicit no and inferred via other means)
+          example: "20148194577715"
+        drep_no_pct:
+          type: number
+          description: Percentage of 'no' votes from dreps
+          example: 39.28
+        drep_abstain_votes_cast:
+          type: number
+          description: Number of active 'abstain' votes from dreps
+          example: 5
+        drep_active_abstain_vote_power:
+          type: string
+          description: Power of 'abstain' votes that were explicitly cast
+          example: "123321123321"
+        drep_always_no_confidence_vote_power:
+          type: string
+          description: Power of votes delegated to 'always_no_confidence' predefined drep
+          example: "9999"
+        drep_always_abstain_vote_power:
+          type: string
+          description: Power of votes delegated to 'always_abstain' predefined drep
+          example: "87654321"
+        pool_yes_votes_cast:
+          type: number
+          description: Number of 'yes' votes casted by pools
+          example: 1
+        pool_active_yes_vote_power:
+          type: string
+          description: Power of 'yes' pool votes that were explicitly cast
+          example: "123123123"
+        pool_yes_vote_power:
+          type: string
+          description: Power of 'yes' votes from pools (includes explicit yes and inferred via other means)
+          example: "5234000000"
+        pool_yes_pct:
+          type: number
+          description: Percentage of 'yes' votes from pools
+          example: 13.12
+        pool_no_votes_cast:
+          type: number
+          description: Number of 'no' votes casted by pools
+          example: 0
+        pool_active_no_vote_power:
+          type: string
+          description: Power of 'no' pool votes that were explicitly cast
+          example: "0"
+        pool_no_vote_power:
+          type: string
+          description: Power of 'no' votes from pools (includes explicit no and inferred via other means)
+          example: "0"
+        pool_no_pct:
+          type: number
+          description: Percentage of 'no' votes from pools
+          example: 0
+        pool_abstain_votes_cast:
+          type: number
+          description: Percentage of 'abstain' votes from pools
+          example: 0
+        pool_active_abstain_vote_power:
+          type: string
+          description: Power of 'abstain' pool votes that were explicitly cast
+          example: "12312312312"
+        pool_passive_always_abstain_votes_assigned:
+          type: number
+          description: Number of non-voting SPO pool reward addresses delegating to 'always_abstain' drep
+          example: 1
+        pool_passive_always_abstain_vote_power:
+          type: string
+          description: Combined power of non-voting SPO pool votes where reward addresses delegate to 'always_abstain'
+          example: "12312312"
+        pool_passive_always_no_confidence_votes_assigned:
+          type: number
+          description: Number of non-voting SPO pool reward addresses delegating to 'always_no_confidence' drep
+          example: 10
+        pool_passive_always_no_confidence_vote_power:
+          type: string
+          description: Combined power of non-voting SPO pool votes where reward addresses delegate to 'always_no_confidence'
+          example: "321321"
+        committee_yes_votes_cast:
+          type: number
+          description: Number of 'yes' votes casted by committee
+          example: 5
+        committee_yes_pct:
+          type: number
+          description: Percentage of 'yes' votes from committee
+          example: 71.43
+        committee_no_votes_cast:
+          type: number
+          description: Number of 'no' votes casted by committee
+          example: 1
+        committee_no_pct:
+          type: number
+          description: Percentage of 'no' votes from committee
+          example: 28.57
+        committee_abstain_votes_cast:
+          type: number
+          description: Percentage of 'abstain' votes from committee
+  proposal_votes:
+    type: array
+    description: List of all votes cast on specified governance action
+    items:
+      properties:
+        block_time:
+          $ref: "#/components/schemas/blocks/items/properties/block_time"
+        voter_role:
+          type: string
+          description: The role of the voter
+          enum: ["ConstitutionalCommittee", "DRep", "SPO"]
+          example: DRep
+        voter_id:
+          type: string
+          description: Voter's DRep ID (CIP-129 bech32 format), pool ID (bech32 format) or committee hot ID (CIP-129 bech32 format)
+          example: drep1yfhyq6tztjksqqpd5lglc3zr2tn8vylgjh9xzz7n2p4l4lgk3qam3
+        voter_hex:
+          type: string
+          description: Voter's DRep ID , pool ID or committee hash in hex format
+          example: 6e4069625cad00002da7d1fc444352e67613e895ca610bd3506bfafd
+        voter_has_script:
+          $ref: "#/components/schemas/drep_info/items/properties/has_script"
+        vote:
+          $ref: "#/components/schemas/drep_votes/items/properties/vote"
+        meta_url:
+          $ref: "#/components/schemas/drep_metadata/items/properties/meta_url"
+        meta_hash:
+          $ref: "#/components/schemas/drep_metadata/items/properties/meta_hash"
+  vote_list:
+    type: array
+    description: List of all votes cast on specified governance action
+    items:
+      properties:
+        vote_tx_hash:
+          type: string
+          description: The transaction hash where-in vote was posted
+          example: e239058473ab5ab1f5829b9058a93cbd0daaf72f9252cc16b34925cd87b37d35
+        voter_role:
+          $ref: "#/components/schemas/proposal_votes/items/properties/voter_role"
+        voter_id:
+          $ref: "#/components/schemas/proposal_votes/items/properties/voter_id"
+        proposal_id:
+          $ref: "#/components/schemas/proposal_list/items/properties/proposal_id"
+        proposal_tx_hash:
+          $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+        proposal_index:
+          $ref: "#/components/schemas/proposal_list/items/properties/proposal_index"
+        proposal_type:
+          $ref: "#/components/schemas/proposal_list/items/properties/proposal_type"
+        epoch_no:
+          $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+        block_height:
+          $ref: "#/components/schemas/blocks/items/properties/block_height"
+        block_time:
+          $ref: "#/components/schemas/blocks/items/properties/block_time"
+        vote:
+          $ref: "#/components/schemas/drep_votes/items/properties/vote"
+        meta_url:
+          $ref: "#/components/schemas/drep_metadata/items/properties/meta_url"
+        meta_hash:
+          $ref: "#/components/schemas/drep_metadata/items/properties/meta_hash"
+        meta_json:
+          $ref: "#/components/schemas/drep_metadata/items/properties/meta_json"
+  committee_info:
+    description: Current governance committee
+    type: object
+    properties:
+      proposal_id:
+        $ref: "#/components/schemas/proposal_list/items/properties/proposal_id"
+      proposal_tx_hash:
+        $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+      proposal_index:
+        $ref: "#/components/schemas/proposal_list/items/properties/proposal_index"
+      quorum_numerator:
+        type: number
+        example: 67
+      quorum_denominator:
+        type: number
+        example: 100
+      members:
+        description: Array of all members part of active governance committee
+        type: array
+        items:
+          type: object
+          properties:
+            status:
+              type: string
+              description: Member authentication status
+              enum: ["authorized", "not_authorized", "resigned"]
+              example: authorized
+            cc_cold_hex:
+              type: string
+              description: Committee member cold key hash in hex format
+              example: 6095e643ea6f1cccb6e463ec34349026b3a48621aac5d512655ab1bf
+            cc_cold_has_script:
+              type: boolean
+              description: Flag which shows if this credential is a script hash
+              example: false
+            cc_hot_hex:
+              anyOf:
+                - type: string
+                - type: "null"
+              description: Committee member key hash from last valid hot key authorization certificate in hex format
+              example: 65d497b875c56ab213586a4006d4f6658970573ea8e2398893857472
+            cc_hot_has_script:
+              anyOf:
+                - type: boolean
+                - type: "null"
+              description: Flag which shows if this credential is a script hash
+              example: false
+            expiration_epoch:
+              type: number
+              description: Epoch number in which the committee member vote rights expire
+              example: 324

@@ -1,0 +1,622 @@
+  tx_info:
+    description: Array of detailed information about transaction(s)
+    type: array
+    items:
+      type: object
+      properties:
+        tx_hash:
+          $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+        block_hash:
+          $ref: "#/components/schemas/blocks/items/properties/hash"
+        block_height:
+          $ref: "#/components/schemas/blocks/items/properties/block_height"
+        epoch_no:
+          $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+        epoch_slot:
+          $ref: "#/components/schemas/blocks/items/properties/epoch_slot"
+        absolute_slot:
+          $ref: "#/components/schemas/blocks/items/properties/abs_slot"
+        tx_timestamp:
+          type: number
+          description: UNIX timestamp of the transaction
+          example: 1506635091
+        tx_block_index:
+          type: number
+          description: Index of transaction within block
+          example: 6
+        tx_size:
+          type: number
+          description: Size in bytes of transaction
+          example: 391
+        total_output:
+          type: string
+          description: Total sum of all transaction outputs (in numbers)
+          example: "157832856"
+        fee:
+          type: string
+          description: Total Transaction fee (in numbers)
+          example: "172761"
+        treasury_donation:
+          type: string
+          description: Total Donation to on-chain treasury (in numbers)
+          example: "0"
+        deposit:
+          type: string
+          description: Total Deposits included in transaction (for example, if it is registering a pool/key)
+          example: "0"
+        invalid_before:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Slot before which transaction cannot be validated (if supplied, else null)
+          example: "42331172"
+        invalid_after:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Slot after which transaction cannot be validated
+          example: "42332172"
+        collateral_inputs:
+          description: An array of collateral inputs needed for smart contracts in case of contract failure
+          anyOf:
+            - $ref: "#/components/schemas/tx_info/items/properties/outputs"
+            - type: "null"
+        collateral_output:
+          description: A collateral output for change if the smart contract fails to execute and collateral inputs are spent. (CIP-40)
+          anyOf:
+            - type: array
+            - type: "null"
+          items:
+            properties:
+              payment_addr:
+                $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/payment_addr"
+              stake_addr:
+                $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/stake_addr"
+              tx_hash:
+                $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/tx_hash"
+              tx_index:
+                $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/tx_index"
+              value:
+                $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/value"
+              datum_hash:
+                $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/datum_hash"
+              inline_datum:
+                $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/inline_datum"
+              reference_script:
+                $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/reference_script"
+              asset_list:
+                type: array
+                description: Brief asset description from ledger
+        reference_inputs:
+          description: An array of reference inputs. A reference input allows looking at an output without spending it. (CIP-31)
+          anyOf:
+            - $ref: "#/components/schemas/tx_info/items/properties/outputs"
+            - type: "null"
+        inputs:
+          $ref: "#/components/schemas/tx_info/items/properties/outputs"
+          #description: An array of UTxO inputs spent in the transaction
+        outputs:
+          type: array
+          description: An array of UTxO outputs created by the transaction
+          items:
+            type: object
+            properties:
+              payment_addr:
+                type: object
+                properties:
+                  bech32:
+                    $ref: "#/components/schemas/utxo_infos/items/properties/address"
+                  cred:
+                    type: string
+                    description: Payment credential
+                    example: de3c1c527e8826b9cd2030f88f75fc44cd4ce519b9ded9eb794b3794
+              stake_addr:
+                $ref: "#/components/schemas/address_info/items/properties/stake_address"
+              tx_hash:
+                $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+              tx_index:
+                $ref: "#/components/schemas/utxo_infos/items/properties/tx_index"
+              value:
+                type: string
+                description: Total sum of ADA on the UTxO
+                example: "157832856"
+              datum_hash:
+                anyOf:
+                  - type: string
+                  - type: "null"
+                description: Hash of datum (if any) connected to UTxO
+                example: 30c16dd243324cf9d90ffcf211b9e0f2117a7dc28d17e85927dfe2af3328e5c9
+              inline_datum:
+                anyOf:
+                  - type: object
+                  - type: "null"
+                description: Allows datums to be attached to UTxO (CIP-32)
+                properties:
+                  bytes:
+                    type: string
+                    description: Datum bytes (hex)
+                    example: 19029a
+                  value:
+                    type: object
+                    description: Value (json)
+                    example: { "int": 666 }
+              reference_script:
+                anyOf:
+                  - type: object
+                  - type: "null"
+                description: Allow reference scripts to be used to satisfy script requirements during validation, rather than requiring the spending transaction to do so. (CIP-33)
+                properties:
+                  hash:
+                    type: string
+                    description: Hash of referenced script
+                    example: 67f33146617a5e61936081db3b2117cbf59bd2123748f58ac9678656
+                  size:
+                    type: number
+                    description: Size in bytes
+                    example: 14
+                  type:
+                    type: string
+                    description: Type of script
+                    example: plutusV1
+                  bytes:
+                    type: string
+                    description: Script bytes (hex)
+                    example: 4e4d01000033222220051200120011
+                  value:
+                    anyOf:
+                      - type: object
+                      - type: "null"
+                    description: Value (json)
+                    example: null
+              asset_list:
+                $ref: "#/components/schemas/utxo_infos/items/properties/asset_list"
+        withdrawals:
+          anyOf:
+            - type: array
+            - type: "null"
+          description: Array of withdrawals with-in a transaction
+          items:
+            type: object
+            properties:
+              amount:
+                type: string
+                description: Withdrawal amount (in numbers)
+                example: "9845162"
+              stake_addr:
+                type: string
+                description: A Cardano staking address (reward account, bech32 encoded)
+                example: stake1uxggf4shfvpghcangm67ky0q4zlc3xn7gezy0auhxczu3pslm9wrj
+        assets_minted:
+          anyOf:
+            - type: array
+            - type: "null"
+          description: Array of minted assets with-in a transaction
+          items:
+            properties:
+              policy_id:
+                $ref: "#/components/schemas/asset_info/items/properties/policy_id"
+              asset_name:
+                $ref: "#/components/schemas/asset_info/items/properties/asset_name"
+              fingerprint:
+                $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
+              decimals:
+                $ref: "#/components/schemas/asset_info/items/properties/token_registry_metadata/properties/decimals"
+              quantity:
+                type: string
+                description: Quantity of minted assets (negative on burn)
+                example: "1"
+        metadata:
+          $ref: "#/components/schemas/tx_metadata/items/properties/metadata"
+        certificates:
+          anyOf:
+            - type: array
+            - type: "null"
+          description: Certificates present with-in a transaction (if any)
+          items:
+            properties:
+              index:
+                anyOf:
+                  - type: number
+                  - type: "null"
+                description: Certificate index
+                example: 0
+              type:
+                type: string
+                description: Type of certificate (could be delegation, stake_registration, stake_deregistraion, pool_update, pool_retire, param_proposal, reserve_MIR, treasury_MIR)
+                example: delegation
+              info:
+                anyOf:
+                  - type: object
+                  - type: "null"
+                description: A JSON array containing information from the certificate
+                example:
+                  {
+                    "stake_address": "stake1uxggf4shfvpghcangm67ky0q4zlc3xn7gezy0auhxczu3pslm9wrj",
+                    "pool": "pool1k53pf4wzn263c08e3wr3gttndfecm9f4uzekgctcx947vt7fh2p",
+                  }
+        native_scripts:
+          anyOf:
+            - type: array
+            - type: "null"
+          description: Native scripts present in a transaction (if any)
+          items:
+            properties:
+              script_hash:
+                $ref: "#/components/schemas/script_info/items/properties/script_hash"
+              script_json:
+                type: object
+                description: JSON representation of the timelock script (null for other script types)
+                example:
+                  {
+                    "type": "all",
+                    "scripts":
+                      [
+                        {
+                          "type": "sig",
+                          "keyHash": "a96da581c39549aeda81f539ac3940ac0cb53657e774ca7e68f15ed9",
+                        },
+                        {
+                          "type": "sig",
+                          "keyHash": "ccfcb3fed004562be1354c837a4a4b9f4b1c2b6705229efeedd12d4d",
+                        },
+                        {
+                          "type": "sig",
+                          "keyHash": "74fcd61aecebe36aa6b6cd4314027282fa4b41c3ce8af17d9b77d0d1",
+                        },
+                      ],
+                  }
+        plutus_contracts:
+          anyOf:
+            - type: array
+            - type: "null"
+          description: Plutus contracts present in transaction (if any)
+          items:
+            properties:
+              address:
+                anyOf:
+                  - type: string
+                  - type: "null"
+                description: Plutus script address
+                example: addr1w999n67e86jn6xal07pzxtrmqynspgx0fwmcmpua4wc6yzsxpljz3
+              spends_input:
+                anyOf:
+                  - type: object
+                  - type: "null"
+                properties:
+                  tx_hash:
+                    $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+                  tx_index:
+                    $ref: "#/components/schemas/utxo_infos/items/properties/tx_index"
+                description: Input utxo this contract spends
+              script_hash:
+                $ref: "#/components/schemas/script_info/items/properties/script_hash"
+              bytecode:
+                $ref: "#/components/schemas/script_info/items/properties/bytes"
+              size:
+                $ref: "#/components/schemas/script_info/items/properties/size"
+              valid_contract:
+                type: boolean
+                description: True if the contract is valid or there is no contract
+                example: true
+              input:
+                type: object
+                properties:
+                  redeemer:
+                    type: object
+                    properties:
+                      purpose:
+                        $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/purpose"
+                      fee:
+                        $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/fee"
+                      unit:
+                        type: object
+                        properties:
+                          steps:
+                            $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/unit_steps"
+                          mem:
+                            $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/unit_mem"
+                      datum:
+                        type: object
+                        properties:
+                          hash:
+                            $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_hash"
+                          value:
+                            $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_value"
+                  datum:
+                    type: object
+                    properties:
+                      hash:
+                        $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_hash"
+                      value:
+                        $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_value"
+        voting_procedures:
+          anyOf:
+            - type: array
+            - type: "null"
+          description: Governance votes in a transaction (if any)
+          items:
+            properties:
+              proposal_tx_hash:
+                $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+              proposal_index:
+                $ref: "#/components/schemas/proposal_list/items/properties/proposal_index"
+              voter_role:
+                $ref: "#/components/schemas/proposal_votes/items/properties/voter_role"
+              voter:
+                $ref: "#/components/schemas/proposal_votes/items/properties/voter_id"
+              voter_hex:
+                $ref: "#/components/schemas/proposal_votes/items/properties/voter_hex"
+              vote:
+                $ref: "#/components/schemas/drep_votes/items/properties/vote"
+        proposal_procedures:
+          anyOf:
+            - type: array
+            - type: "null"
+          description: Governance proposals in a transaction (if any)
+          items:
+            properties:
+              index:
+                $ref: "#/components/schemas/proposal_list/items/properties/proposal_index"
+              type:
+                $ref: "#/components/schemas/proposal_list/items/properties/proposal_type"
+              description:
+                $ref: "#/components/schemas/proposal_list/items/properties/proposal_description"
+              deposit:
+                $ref: "#/components/schemas/drep_info/items/properties/deposit"
+              return_address:
+                $ref: "#/components/schemas/proposal_list/items/properties/return_address"
+              expiration:
+                $ref: "#/components/schemas/proposal_list/items/properties/expiration"
+              meta_url:
+                $ref: "#/components/schemas/drep_metadata/items/properties/meta_url"
+              meta_hash:
+                $ref: "#/components/schemas/drep_metadata/items/properties/meta_hash"
+              withdrawal:
+                $ref: "#/components/schemas/proposal_list/items/properties/withdrawal"
+              param_proposal:
+                $ref: "#/components/schemas/proposal_list/items/properties/param_proposal"
+  tx_cbor:
+    description: Raw Transaction(s) in CBOR format
+    items:
+      properties:
+        tx_hash:
+          $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+        block_hash:
+          $ref: "#/components/schemas/blocks/items/properties/hash"
+        block_height:
+          $ref: "#/components/schemas/blocks/items/properties/block_height"
+        epoch_no:
+          $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+        absolute_slot:
+          $ref: "#/components/schemas/blocks/items/properties/abs_slot"
+        tx_timestamp:
+          $ref: "#/components/schemas/tx_info/items/properties/tx_timestamp"
+        cbor:
+          type: string
+          description: CBOR encoded raw transaction.
+  tx_utxos:
+    description: Array of inputs and outputs for given transaction(s)
+    type: array
+    items:
+      properties:
+        tx_hash:
+          $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+        inputs:
+          type: array
+          description: An array of UTxO inputs used by the transaction
+          items:
+            type: object
+            properties:
+              payment_addr:
+                type: object
+                properties:
+                  bech32:
+                    type: string
+                    description: A Cardano payment/base address (bech32 encoded) where funds were sent or change to be returned
+                    example: addr1q80rc8zj06yzdwwdyqc03rm4l3zv6n89rxuaak0t099n09yssntpwjcz303mx3h4avg7p29l3zd8u3jyglmewds9ezrqad9mkw
+                  cred:
+                    type: string
+                    description: Payment credential
+                    example: de3c1c527e8826b9cd2030f88f75fc44cd4ce519b9ded9eb794b3794
+              stake_addr:
+                $ref: "#/components/schemas/address_info/items/properties/stake_address"
+              tx_hash:
+                $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+              tx_index:
+                $ref: "#/components/schemas/utxo_infos/items/properties/tx_index"
+              value:
+                type: string
+                description: Total sum of ADA on the UTxO
+                example: 157832856
+        outputs:
+          description: An array of UTxO outputs created by the transaction
+          allOf:
+            - $ref: "#/components/schemas/tx_utxos/items/properties/inputs"
+  tx_metadata:
+    description: Array of metadata information present in each of the transactions queried
+    anyOf:
+      - type: array
+      - type: "null"
+    items:
+      properties:
+        tx_hash:
+          $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+        metadata:
+          anyOf:
+            - type: object
+            - type: "null"
+          description: A JSON array containing details about metadata within transaction
+          example:
+            {
+              "721":
+                {
+                  "version": 1,
+                  "copyright": "...",
+                  "publisher": ["p...o"],
+                  "4bf184e01e0f163296ab253edd60774e2d34367d0e7b6cbc689b567d":
+                    {},
+                },
+            }
+  tx_status:
+    description: Array of transaction confirmation counts
+    type: array
+    items:
+      properties:
+        tx_hash:
+          $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+        num_confirmations:
+          anyOf:
+            - type: number
+            - type: "null"
+          description: Number of block confirmations
+          example: 17
+  tx_metalabels:
+    description: Array of known metadata labels
+    type: array
+    items:
+      properties:
+        key:
+          type: string
+          description: A distinct known metalabel
+          example: "721"
+  tx_by_metalabel:
+    description: Array of transactions containing the queried metadata label
+    type: array
+    items:
+      type: object
+      properties:
+        tx_hash:
+          $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+        block_hash:
+          $ref: "#/components/schemas/blocks/items/properties/hash"
+        block_height:
+          $ref: "#/components/schemas/blocks/items/properties/block_height"
+        epoch_no:
+          $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+        absolute_slot:
+          $ref: "#/components/schemas/blocks/items/properties/abs_slot"
+        tx_timestamp:
+          $ref: "#/components/schemas/blocks/items/properties/block_time"
+  utxo_infos:
+    description: Array of complete UTxO information
+    type: array
+    items:
+      type: object
+      properties:
+        tx_hash:
+          type: string
+          description: Hash identifier of the transaction
+          example: f144a8264acf4bdfe2e1241170969c930d64ab6b0996a4a45237b623f1dd670e
+        tx_index:
+          type: number
+          description: Index of UTxO in the transaction
+          example: 0
+        address:
+          type: string
+          description: A Cardano payment/base address (bech32 encoded)
+          example: addr1qxkfe8s6m8qt5436lec3f0320hrmpppwqgs2gah4360krvyssntpwjcz303mx3h4avg7p29l3zd8u3jyglmewds9ezrqdc3cxp
+        value:
+          $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/value"
+        stake_address:
+          $ref: "#/components/schemas/address_info/items/properties/stake_address"
+        payment_cred:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Payment credential
+          example: de3c1c527e8826b9cd2030f88f75fc44cd4ce519b9ded9eb794b3794
+        epoch_no:
+          $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+        block_height:
+          $ref: "#/components/schemas/blocks/items/properties/block_height"
+        block_time:
+          $ref: "#/components/schemas/blocks/items/properties/block_time"
+        datum_hash:
+          $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_hash"
+        inline_datum:
+          $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/inline_datum"
+        reference_script:
+          $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/reference_script"
+        asset_list:
+          anyOf:
+            - type: array
+            - type: "null"
+          description: An array of assets on the UTxO
+          items:
+            properties:
+              policy_id:
+                $ref: "#/components/schemas/asset_info/items/properties/policy_id"
+              asset_name:
+                $ref: "#/components/schemas/asset_info/items/properties/asset_name"
+              fingerprint:
+                $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
+              decimals:
+                $ref: "#/components/schemas/asset_info/items/properties/token_registry_metadata/properties/decimals"
+              quantity:
+                type: string
+                description: Quantity of assets on the UTxO
+                example: "1"
+        is_spent:
+          type: boolean
+          description: True if the UTxO has been spent
+          example: true
+  tx_outs_epoch:
+    description: List of transaction outputs with basic details for requested epoch
+    type: array
+    items:
+      type: object
+      properties:
+        tx_hash:
+          type: string
+          description: Hash identifier of the transaction
+          example: f144a8264acf4bdfe2e1241170969c930d64ab6b0996a4a45237b623f1dd670e
+        tx_index:
+          type: number
+          description: Index of UTxO in the transaction
+          example: 0
+        address:
+          type: string
+          description: A Cardano payment/base address (bech32 encoded)
+          example: addr1qxkfe8s6m8qt5436lec3f0320hrmpppwqgs2gah4360krvyssntpwjcz303mx3h4avg7p29l3zd8u3jyglmewds9ezrqdc3cxp
+        stake_address:
+          $ref: "#/components/schemas/address_info/items/properties/stake_address"
+        payment_cred:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Payment credential
+          example: de3c1c527e8826b9cd2030f88f75fc44cd4ce519b9ded9eb794b3794
+        epoch_no:
+          $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+        block_height:
+          $ref: "#/components/schemas/blocks/items/properties/block_height"
+        block_time:
+          $ref: "#/components/schemas/blocks/items/properties/block_time"
+        value:
+          $ref: "#/components/schemas/tx_info/items/properties/outputs/items/properties/value"
+        datum_hash:
+          $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_hash"
+        is_spent:
+          type: boolean
+          description: True if the UTxO has been spent
+          example: true
+  tx_treasury_donations_epoch:
+    description: List of treasury donation transactions for requested epoch (current if NULL)
+    type: array
+    items:
+      type: object
+      properties:
+        epoch_no:
+          $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+        tx_hash:
+          $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+        block_hash:
+          $ref: "#/components/schemas/blocks/items/properties/hash"
+        tx_block_index:
+          $ref: "#/components/schemas/tx_info/items/properties/tx_block_index"
+        block_height:
+          $ref: "#/components/schemas/blocks/items/properties/block_height"
+        block_time:
+          $ref: "#/components/schemas/blocks/items/properties/block_time"
+        treasury_donation:
+          $ref: "#/components/schemas/tx_info/items/properties/treasury_donation"

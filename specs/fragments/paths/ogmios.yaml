@@ -1,0 +1,24 @@
+/ogmios: #ogmios-api
+    post:
+      tags:
+        - Ogmios
+      requestBody:
+        $ref: "#/components/requestBodies/ogmios"
+      responses:
+        "200":
+          description: Current tip of the chain, identified by a slot and a block header hash.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ogmiostip"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+      summary: Query Example
+      description: |
+        Query the current tip of the Network.
+
+        <br>
+        <div style="background-color: #222; padding: 12px 0px 12px 12px;border-left: 5px solid  rgb(173, 44, 44);font-size: var(--font-size-regular);">
+        We do support transparent forwarding for various methods from Ogmios, you can read about those <a href="#tag--Ogmios">here</a>.
+        </div>
+      operationId: ogmios

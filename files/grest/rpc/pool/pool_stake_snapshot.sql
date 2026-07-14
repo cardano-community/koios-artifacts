@@ -14,7 +14,7 @@ DECLARE
   _set      bigint;
   _go       bigint;
 BEGIN
-  SELECT MAX(epoch.no) INTO _epoch_no FROM public.epoch;
+  SELECT MAX(epoch_param.epoch_no) INTO _epoch_no FROM public.epoch_param;
   _mark := (_epoch_no+1);
   _set  := (_epoch_no);
   _go   := (_epoch_no-1);

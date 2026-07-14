@@ -1,0 +1,87 @@
+/blocks: #RPC
+    get:
+      tags:
+        - Block
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/blocks"
+        #!macro:koios_errors!#
+      summary: Block List
+      description: Get summarised details about all blocks (paginated - latest first)
+      operationId: blocks
+/block_info: #RPC
+    post:
+      tags:
+        - Block
+      requestBody:
+        $ref: "#/components/requestBodies/block_hashes"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/block_info"
+        #!macro:koios_errors!#
+      summary: Block Information
+      description: Get detailed information about a specific block
+      operationId: block_info
+/block_txs: #RPC
+    post:
+      tags:
+        - Block
+      requestBody:
+        $ref: "#/components/requestBodies/block_hashes"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/block_txs"
+        #!macro:koios_errors!#
+      summary: Block Transactions
+      description: Get a list of all transactions included in provided blocks
+      operationId: block_txs
+/block_tx_cbor: #RPC
+    post:
+      tags:
+        - Block
+      requestBody:
+        $ref: "#/components/requestBodies/block_hashes"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/block_tx_cbor"
+        #!macro:koios_errors!#
+      summary: Block Transactions (Raw CBOR)
+      description: Get raw CBOR data for all transaction(s) within requested blocks
+      operationId: block_tx_cbor
+/block_tx_info: #RPC
+    post:
+      deprecated: true
+      tags:
+        - Block
+      requestBody:
+        $ref: "#/components/requestBodies/block_tx_info"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/block_tx_info"
+        #!macro:koios_errors!#
+      summary: Block Transactions (Detailed Info)
+      description: Get detailed information about transaction(s) for requested blocks
+      operationId: block_tx_info
+      x-badges:
+        - color: red
+          label: "Deprecated"

@@ -68,10 +68,19 @@ BEGIN
           expired_epoch,
           ratified_epoch,
           dropped_epoch,
-          (coalesce(ratified_epoch, expired_epoch, dropped_epoch, ( SELECT MAX(no) FROM epoch))) AS epoch_of_interest
+          (coalesce(ratified_epoch, expired_epoch, dropped_epoch, ( SELECT MAX(epoch_param.epoch_no) FROM public.epoch_param))) AS epoch_of_interest
         FROM gov_action_proposal AS gap 
         WHERE proposal_id = gap.id
       ),
+      last_tx_id_of_interest AS (
+        SELECT CASE
+          WHEN (SELECT MAX(epoch_param.epoch_no) FROM public.epoch_param) = ped.epoch_of_interest THEN
+            (SELECT t.id FROM tx AS t ORDER BY id DESC LIMIT 1) 
+          ELSE
+            (SELECT MAX(i_last_tx_id) FROM grest.epoch_info_cache AS eic WHERE eic.epoch_no <= ped.epoch_of_interest)
+        END AS tx_id
+        FROM proposal_epoch_data ped
+      ), 
       tot_drep_power AS (
         SELECT ped.gov_action_proposal_id, SUM(amount) AS tot_drep_power 
         FROM drep_distr AS dd 
@@ -112,7 +121,7 @@ BEGIN
                   SELECT i_last_tx_id 
                   FROM grest.epoch_info_cache AS eic
                   WHERE eic.epoch_no = 
-                    (coalesce(ped.ratified_epoch, ped.expired_epoch, ped.dropped_epoch, (SELECT MAX(no) + 1 FROM epoch)) - 1)
+                    (coalesce(ped.ratified_epoch, ped.expired_epoch, ped.dropped_epoch, (SELECT MAX(epoch_param.epoch_no) + 1 FROM public.epoch_param)) - 1)
                 )
           )
         GROUP BY ped.gov_action_proposal_id, vote
@@ -183,18 +192,13 @@ BEGIN
         SUM(pstat.voting_power) passive_pool_vote_total,
         COUNT(*) AS pool_votes_cast
         FROM _all_non_voted_pool_info AS api
+        CROSS JOIN last_tx_id_of_interest
         INNER JOIN proposal_epoch_data AS ped ON true
         INNER JOIN public.pool_update AS pu ON pu.id = api.update_id
         INNER JOIN public.stake_address AS sa ON pu.reward_addr_id = sa.id
         INNER JOIN delegation_vote AS dv on dv.addr_id = sa.id
           AND dv.tx_id = (SELECT MAX(tx_id) FROM delegation_vote dv2 WHERE dv2.addr_id = sa.id -- get the details of most recent vote delegation for this addr before last tx of epoch-of-interest
-          AND tx_id <= -- TODO - maybe calculate these once off in the early CTE and use it from there
-            (CASE
-              WHEN (SELECT MAX(no) FROM epoch) = ped.epoch_of_interest THEN 
-                (SELECT t.id FROM tx AS t ORDER BY id DESC LIMIT 1) 
-              ELSE
-                (SELECT MAX(i_last_tx_id) FROM grest.epoch_info_cache AS eic WHERE eic.epoch_no <= ped.epoch_of_interest)
-            END)
+          AND tx_id <= last_tx_id_of_interest.tx_id
       )
 	    INNER JOIN drep_hash AS dh on dh.id = dv.drep_hash_id
 	        and dh.view like 'drep_always%'
@@ -211,7 +215,13 @@ BEGIN
           INNER JOIN latest_votes AS vp ON vp.voter_role = 'ConstitutionalCommittee'
           -- TODO: add logic to only count valid committee member votes, need a way to get committee ids for a given epoch...
 
-          INNER JOIN committee_registration cr ON cr.hot_key_id = vp.committee_voter 
+          INNER JOIN LATERAL ( 
+            -- avoid joining on multiple rows if committee member had multiple registrations
+            SELECT * FROM committee_registration
+            WHERE hot_key_id = vp.committee_voter
+            ORDER BY id DESC
+            LIMIT 1
+          ) cr on true
           INNER JOIN committee_member cm ON cr.cold_key_id = cm.committee_hash_id 
           INNER JOIN committee c ON c.id = cm.committee_id 
             AND c.id = (SELECT id FROM committee 
@@ -233,11 +243,21 @@ BEGIN
       tot_committee_size AS (
         SELECT 
           ped.gov_action_proposal_id,
-          count(cm.id) AS committee_size
+          count(distinct cm.id) AS committee_size
         FROM epoch_state AS epstate
+          CROSS JOIN last_tx_id_of_interest
           INNER JOIN proposal_epoch_data AS ped on epstate.epoch_no = ped.epoch_of_interest
           LEFT OUTER JOIN committee AS c on epstate.committee_id = c.id
           LEFT OUTER JOIN committee_member AS cm on cm.committee_id = c.id
+          LEFT OUTER JOIN public.committee_hash AS ch_cold ON ch_cold.id = cm.committee_hash_id
+            -- check that committee member hasn't deregistered since last registration, before cutoff epoch's end
+          WHERE NOT EXISTS (
+            SELECT true 
+            FROM committee_de_registration AS cdr
+             WHERE cdr.cold_key_id = ch_cold.id 
+                AND cdr.tx_id <= last_tx_id_of_interest.tx_id
+                AND cdr.tx_id > (SELECT MAX(tx_id) FROM public.committee_registration WHERE cold_key_id = ch_cold.id and tx_id <= last_tx_id_of_interest.tx_id)
+          )
         GROUP BY ped.gov_action_proposal_id
       ),
       combined_data AS (
@@ -306,6 +326,7 @@ BEGIN
         WHEN y.proposal_type IN ('TreasuryWithdrawals', 'NewConstitution') THEN 0
         WHEN y.proposal_type IN ('NoConfidence') THEN ROUND((y.pool_yes_vote_power + y.pool_passive_always_no_confidence_vote_power) * 100 / y.pool_non_abstain_total, 2)
         WHEN y.proposal_type in ('ParameterChange') AND NOT grest.has_security_param(y.description) THEN 0
+        WHEN y.proposal_type in ('HardForkInitiation') THEN ROUND(y.pool_yes_vote_power * 100 / (y.tot_pool_power - y.pool_abstain_vote_power), 2)
         ELSE ROUND(y.pool_yes_vote_power * 100 / y.pool_non_abstain_total, 2)
       END) AS pool_yes_pct,
       (CASE
@@ -318,12 +339,14 @@ BEGIN
         WHEN y.proposal_type IN ('TreasuryWithdrawals', 'NewConstitution') THEN 0
         WHEN y.proposal_type IN ('NoConfidence') THEN (y.pool_non_abstain_total - y.pool_yes_vote_power - y.pool_passive_always_no_confidence_vote_power)
         WHEN y.proposal_type in ('ParameterChange') AND NOT grest.has_security_param(y.description) THEN 0
+        WHEN y.proposal_type in ('HardForkInitiation') THEN (y.tot_pool_power - y.pool_abstain_vote_power - y.pool_yes_vote_power)
         ELSE (y.pool_non_abstain_total - y.pool_yes_vote_power)
       END)::text AS pool_no_vote_power,
       (CASE
         WHEN y.proposal_type IN ('TreasuryWithdrawals', 'NewConstitution') THEN 0
         WHEN y.proposal_type IN ('NoConfidence') THEN  ROUND((y.pool_non_abstain_total - y.pool_yes_vote_power - y.pool_passive_always_no_confidence_vote_power) * 100 / y.pool_non_abstain_total, 2)
         WHEN y.proposal_type in ('ParameterChange') AND NOT grest.has_security_param(y.description) THEN 0
+        WHEN y.proposal_type in ('HardForkInitiation') THEN ROUND((y.tot_pool_power - y.pool_abstain_vote_power - y.pool_yes_vote_power) * 100 / (y.tot_pool_power - y.pool_abstain_vote_power), 2)
         ELSE ROUND((y.pool_non_abstain_total - y.pool_yes_vote_power) * 100 / y.pool_non_abstain_total, 2)
       END) AS pool_no_pct,
       (SELECT COALESCE(SUM(pool_votes_cast), 0)::integer FROM active_prop_pool_votes WHERE vote = 'Abstain') AS pool_abstain_votes_cast,

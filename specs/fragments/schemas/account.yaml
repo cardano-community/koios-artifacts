@@ -1,0 +1,272 @@
+  account_list:
+    description: Array of account (stake address) IDs
+    type: array
+    items:
+      type: object
+      properties:
+        stake_address:
+          $ref: "#/components/schemas/account_history/items/properties/stake_address"
+        stake_address_hex:
+          type: string
+          description: Cardano staking address (reward account) in hex format
+          example: e1c865f10d66a2e375242b5ef9f05abc8840d413421982f62c35ce4fbf
+        script_hash:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Script hash in case the stake address is locked by a script
+          example: bf357f5de69e4aad71954bebd64357a4813ea5233df12fce4a9de582
+  account_info:
+    description: Array of stake account information
+    type: array
+    items:
+      type: object
+      properties:
+        stake_address:
+          $ref: "#/components/schemas/account_history/items/properties/stake_address"
+        status:
+          type: string
+          description: Stake address status
+          enum: ["registered", "not registered"]
+          example: registered
+        delegated_drep:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Account's current delegation status to DRep ID in CIP-129 Bech32 format
+          example: drep1yfhyq6tztjksqqpd5lglc3zr2tn8vylgjh9xzz7n2p4l4lgk3qam3
+        delegated_pool:
+          anyOf:
+            - $ref: "#/components/schemas/pool_list/items/properties/pool_id_bech32"
+            - type: "null"
+        total_balance:
+          type: string
+          description: Total balance of the account including UTxO, rewards and MIRs (in number)
+          example: "207116800428"
+        utxo:
+          type: string
+          description: Total UTxO balance of the account
+          example: "162764177131"
+        rewards:
+          type: string
+          description: Total rewards earned by the account
+          example: "56457728047"
+        withdrawals:
+          type: string
+          description: Total rewards withdrawn by the account
+          example: "12105104750"
+        rewards_available:
+          type: string
+          description: Total rewards available for withdrawal
+          example: "44352623297"
+        deposit:
+          type: string
+          description: Total deposit available for withdrawal
+          example: "2000000"
+        reserves:
+          type: string
+          description: Total reserves MIR value of the account
+          example: "0"
+        treasury:
+          type: string
+          description: Total treasury MIR value of the account
+          example: "0"
+        proposal-refund:
+          type: string
+          description: Total proposal refund for this account
+          example: "0"
+  account_rewards:
+    description: Array of reward history information
+    type: array
+    items:
+      type: object
+      properties:
+        stake_address:
+          $ref: "#/components/schemas/account_history/items/properties/stake_address"
+        rewards:
+          type: array
+          items:
+            type: object
+            properties:
+              earned_epoch:
+                $ref: "#/components/schemas/reserve_withdrawals/items/properties/earned_epoch"
+              spendable_epoch:
+                $ref: "#/components/schemas/reserve_withdrawals/items/properties/spendable_epoch"
+              amount:
+                type: string
+                description: Amount of rewards earned (in number)
+              type:
+                type: string
+                description: The source of the rewards
+                enum: [member, leader, treasury, reserves, refund]
+                example: member
+              pool_id:
+                anyOf:
+                  - $ref: "#/components/schemas/pool_list/items/properties/pool_id_bech32"
+                  - type: "null"
+  account_reward_history:
+    description: Array of reward history information
+    type: array
+    items:
+      type: object
+      properties:
+        stake_address:
+          $ref: "#/components/schemas/account_history/items/properties/stake_address"
+        earned_epoch:
+          $ref: "#/components/schemas/reserve_withdrawals/items/properties/earned_epoch"
+        spendable_epoch:
+          $ref: "#/components/schemas/reserve_withdrawals/items/properties/spendable_epoch"
+        amount:
+          type: string
+          description: Amount of rewards earned (in number)
+        type:
+          type: string
+          description: The source of the rewards
+          enum: [member, leader, treasury, reserves, refund]
+          example: member
+        pool_id_bech32:
+          anyOf:
+            - $ref: "#/components/schemas/pool_list/items/properties/pool_id_bech32"
+            - type: "null"
+  account_updates:
+    description: Array of account updates information
+    type: array
+    items:
+      type: object
+      properties:
+        stake_address:
+          $ref: "#/components/schemas/account_history/items/properties/stake_address"
+        updates:
+          type: array
+          items:
+            type: object
+            properties:
+              action_type:
+                type: string
+                description: Type of certificate submitted
+                enum:
+                  [
+                    "registration",
+                    "delegation_pool",
+                    "delegation_drep",
+                    "withdrawal",
+                    "deregistration",
+                  ]
+                example: "registration"
+              tx_hash:
+                $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+              epoch_no:
+                $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+              epoch_slot:
+                $ref: "#/components/schemas/blocks/items/properties/epoch_slot"
+              absolute_slot:
+                $ref: "#/components/schemas/blocks/items/properties/abs_slot"
+              block_time:
+                $ref: "#/components/schemas/blocks/items/properties/block_time"
+  account_update_history:
+    description: Array of account update history information
+    type: array
+    items:
+      type: object
+      properties:
+        stake_address:
+          $ref: "#/components/schemas/account_history/items/properties/stake_address"
+        action_type:
+          type: string
+          description: Type of certificate submitted
+          enum:
+            [
+              "registration",
+              "delegation_pool",
+              "delegation_drep",
+              "withdrawal",
+              "deregistration",
+            ]
+          example: "registration"
+        tx_hash:
+          $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+        epoch_no:
+          $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+        epoch_slot:
+          $ref: "#/components/schemas/blocks/items/properties/epoch_slot"
+        absolute_slot:
+          $ref: "#/components/schemas/blocks/items/properties/abs_slot"
+        block_time:
+          $ref: "#/components/schemas/blocks/items/properties/block_time"
+  account_addresses:
+    description: Array of payment addresses
+    type: array
+    items:
+      type: object
+      properties:
+        stake_address:
+          $ref: "#/components/schemas/account_history/items/properties/stake_address"
+        addresses:
+          type: array
+          items:
+            $ref: "#/components/schemas/utxo_infos/items/properties/address"
+  account_assets:
+    description: Array of assets owned by account
+    type: array
+    items:
+      type: object
+      properties:
+        stake_address:
+          $ref: "#/components/schemas/account_history/items/properties/stake_address"
+        policy_id:
+          $ref: "#/components/schemas/asset_info/items/properties/policy_id"
+        asset_name:
+          $ref: "#/components/schemas/asset_info/items/properties/asset_name"
+        fingerprint:
+          $ref: "#/components/schemas/asset_info/items/properties/fingerprint"
+        decimals:
+          $ref: "#/components/schemas/asset_info/items/properties/token_registry_metadata/properties/decimals"
+        quantity:
+          $ref: "#/components/schemas/asset_addresses/items/properties/quantity"
+  account_history:
+    description: Array of active stake values per epoch
+    type: array
+    items:
+      properties:
+        stake_address:
+          type: string
+          description: Cardano staking address (reward account) in bech32 format
+          example: stake1u8yxtugdv63wxafy9d00nuz6hjyyp4qnggvc9a3vxh8yl0ckml2uz
+        history:
+          type: array
+          items:
+            type: object
+            properties:
+              pool_id:
+                type: string
+                description: Bech32 representation of pool ID
+                example: pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt
+              epoch_no:
+                type: number
+                description: Epoch number
+                example: 301
+              active_stake:
+                type: string
+                description: Active stake amount (in numbers)
+                example: 682334162
+  account_stake_history:
+    description: Array of active stake values per epoch
+    type: array
+    items:
+      properties:
+        stake_address:
+          type: string
+          description: Cardano staking address (reward account) in bech32 format
+          example: stake1u8yxtugdv63wxafy9d00nuz6hjyyp4qnggvc9a3vxh8yl0ckml2uz
+        pool_id_bech32:
+          type: string
+          description: Bech32 representation of pool ID
+          example: pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt
+        epoch_no:
+          type: number
+          description: Epoch number
+          example: 301
+        active_stake:
+          type: string
+          description: Active stake amount (in numbers)
+          example: 682334162

@@ -9,7 +9,8 @@ RETURNS TABLE (
   expires_epoch_no numeric,
   amount text,
   meta_url varchar,
-  meta_hash text
+  meta_hash text,
+  live_delegator_count bigint
 )
 LANGUAGE plpgsql
 AS $$
@@ -19,7 +20,7 @@ DECLARE
   drep_activity word64type;
 BEGIN
 
-  SELECT INTO curr_epoch MAX(epoch_no) FROM public.block;
+  SELECT INTO curr_epoch MAX(epoch_param.epoch_no) FROM public.epoch_param;
 
   SELECT INTO drep_activity ep.drep_activity FROM public.epoch_param AS ep WHERE ep.epoch_no = curr_epoch;
 
@@ -115,6 +116,33 @@ BEGIN
         ) AS drep_state
         INNER JOIN tx on drep_state.last_tx_id = tx.id
         INNER JOIN block AS b ON tx.block_id = b.id
+      ),
+
+      _latest_deleg AS ( -- global latest delegation per addr, computed once
+      SELECT DISTINCT ON (dv.addr_id)
+        dv.addr_id, dv.tx_id, dv.drep_hash_id
+      FROM public.delegation_vote AS dv
+      ORDER BY dv.addr_id, dv.tx_id DESC
+      ),
+
+      _all_delegations AS (
+        SELECT latest.addr_id, latest.tx_id, latest.drep_hash_id
+        FROM _latest_deleg AS latest
+        -- only interested in delegations since last registration for normal
+        -- dreps, and all latest delegations for predefined ones
+        LEFT JOIN _last_registration lr ON lr.drep = latest.drep_hash_id
+        WHERE latest.drep_hash_id = ANY(drep_list)
+          AND (lr.tx_id IS NULL OR latest.tx_id >= lr.tx_id)
+          AND NOT EXISTS (
+            SELECT 1 FROM public.stake_deregistration sd
+            WHERE sd.addr_id = latest.addr_id AND sd.tx_id > latest.tx_id
+          )
+      ),
+
+      _deleg_counts AS ( -- one row per drep, computed once
+        SELECT drep_hash_id, count(*) AS live_delegator_count
+        FROM _all_delegations
+        GROUP BY drep_hash_id
       )
 
     SELECT DISTINCT ON (dh.view)
@@ -132,16 +160,18 @@ BEGIN
         ELSE 'registered'
       END) AS drep_status,
       (CASE WHEN (dr.deposit < 0) OR starts_with(dh.view,'drep_always') THEN NULL ELSE ds.deposit END)::text AS deposit,
-      (CASE WHEN starts_with(dh.view,'drep_always') THEN TRUE ELSE COALESCE(dr.deposit, 0) >= 0 AND (ds.active OR COALESCE(dd.active_until, 0) > curr_epoch) END) AS active,
+      COALESCE(starts_with(dh.view,'drep_always') OR (COALESCE(dr.deposit, 0) >= 0 AND (ds.active OR COALESCE(dd.active_until, 0) > curr_epoch)), FALSE) AS active,
       (CASE WHEN COALESCE(dr.deposit, 0) >= 0 THEN GREATEST(ds.expires_epoch_no, COALESCE(dd.active_until, 0)) ELSE NULL END) AS expires_epoch_no,
       COALESCE(dd.amount, 0)::text AS amount,
       va.url AS meta_url,
-      ENCODE(va.data_hash, 'hex') AS meta_hash
+      ENCODE(va.data_hash, 'hex') AS meta_hash,
+      COALESCE(dc.live_delegator_count, 0) AS live_delegator_count
     FROM public.drep_hash AS dh
       LEFT JOIN public.drep_registration AS dr ON dh.id = dr.drep_hash_id
       LEFT JOIN public.voting_anchor AS va ON dr.voting_anchor_id = va.id
       LEFT JOIN public.drep_distr AS dd ON dh.id = dd.hash_id AND dd.epoch_no = curr_epoch
       LEFT JOIN _drep_state AS ds ON dh.id = ds.drep
+      LEFT JOIN _deleg_counts AS dc ON dc.drep_hash_id = dh.id
     WHERE dh.id = ANY(drep_list)
     ORDER BY
       dh.view, dr.tx_id DESC

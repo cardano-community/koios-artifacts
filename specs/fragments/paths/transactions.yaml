@@ -1,0 +1,187 @@
+/utxo_info: #RPC
+    post:
+      tags:
+        - Transactions
+      requestBody:
+        $ref: "#/components/requestBodies/utxo_refs_with_extended"
+      responses:
+        "200":
+          description: Success!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/utxo_infos"
+        #!macro:koios_errors!#
+      summary: UTxO Info
+      description: Get UTxO set for requested UTxO references
+      operationId: utxo_info
+/tx_cbor: #RPC
+    post:
+      tags:
+        - Transactions
+      requestBody:
+        $ref: "#/components/requestBodies/tx_ids"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tx_cbor"
+        #!macro:koios_errors!#
+      summary: Raw Transaction (CBOR)
+      description: Get raw transaction(s) in CBOR format
+      operationId: tx_cbor
+/tx_info: #RPC
+    post:
+      tags:
+        - Transactions
+      requestBody:
+        $ref: "#/components/requestBodies/tx_info"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tx_info"
+        #!macro:koios_errors!#
+      summary: Transaction Information
+      description: Get detailed information about transaction(s)
+      operationId: tx_info
+/tx_metadata: #RPC
+    post:
+      tags:
+        - Transactions
+      requestBody:
+        $ref: "#/components/requestBodies/tx_ids"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tx_metadata"
+        #!macro:koios_errors!#
+      summary: Transaction Metadata
+      description: Get metadata information (if any) for given transaction(s)
+      operationId: tx_metadata
+/tx_metalabels: #RPC
+    get:
+      tags:
+        - Transactions
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tx_metalabels"
+        #!macro:koios_errors!#
+      summary: Transaction Metadata Labels
+      description: Get a list of all transaction metalabels
+      operationId: tx_metalabels
+/tx_by_metalabel: #RPC
+    get:
+      tags:
+        - Transactions
+      parameters:
+        - $ref: "#/components/parameters/_label"
+        - $ref: "#/components/parameters/_after_block_height"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tx_by_metalabel"
+        #!macro:koios_errors!#
+      summary: Transactions by Metadata Label
+      description: Get a list of all transactions that include a specific metadata label (key)
+      operationId: tx_by_metalabel
+/submittx: #submit-api
+    post:
+      tags:
+        - Transactions
+      requestBody:
+        $ref: "#/components/requestBodies/txbin"
+      x-code-samples:
+        - lang: "Shell"
+          source: |
+            # Assuming ${data} is a raw binary serialized transaction on the file-system.
+            # If using a CLI-generated tx file, please ensure to deserialise (using `xxd -p -r <<< $(jq .cborHex ${tx.signed}) > ${data}`) first before submitting.
+            curl -X POST \
+                --header "Content-Type: application/cbor" \
+                --data-binary @${data} https://api.koios.rest/api/v1/submittx
+      responses:
+        "202":
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: The transaction id.
+                type: string
+                format: hex
+                minLength: 64
+                maxLength: 64
+              example: 92bcd06b25dfbd89b578d536b4d3b7dd269b7c2aa206ed518012cffe0444d67f
+        "400":
+          description: An error occured while submitting transaction.
+      summary: Submit Transaction
+      description: Submit an already serialized transaction to the network.
+      operationId: submittx
+/tx_status: #RPC
+    post:
+      tags:
+        - Transactions
+      requestBody:
+        $ref: "#/components/requestBodies/tx_ids"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tx_status"
+        #!macro:koios_errors!#
+      summary: Transaction Status
+      description: Get the number of block confirmations for a given transaction hash list
+      operationId: tx_status
+/tx_outs_epoch: #RPC
+    get:
+      tags:
+        - Transactions
+      parameters:
+        - $ref: "#/components/parameters/_epoch_no_reqd"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tx_outs_epoch"
+        #!macro:koios_errors!#
+      summary: Transaction outputs by epoch
+      description: Get a list of all transaction outputs for requested epoch
+      operationId: tx_outs_epoch
+/tx_utxos: #RPC
+    post:
+      deprecated: true
+      tags:
+        - Transactions
+      requestBody:
+        $ref: "#/components/requestBodies/tx_ids"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tx_utxos"
+        #!macro:koios_errors!#
+      summary: Transaction UTxOs
+      description: Get UTxO set (inputs/outputs) of transactions [DEPRECATED - Use /utxo_info instead].
+      operationId: tx_utxos
+      x-badges:
+        - color: red
+          label: "Deprecated"

@@ -1,0 +1,235 @@
+/account_list: #RPC
+    get:
+      tags:
+        - Stake Account
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account_list"
+        #!macro:koios_errors!#
+      summary: Account List
+      description: Get a list of all stake addresses that have atleast 1 transaction
+      operationId: account_list
+/account_info: #RPC
+    post:
+      tags:
+        - Stake Account
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account_info"
+        #!macro:koios_errors!#
+      summary: Account Information
+      description: Get the account information for given stake addresses
+      operationId: account_info
+/account_info_cached: #RPC
+    post:
+      tags:
+        - Stake Account
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account_info"
+        #!macro:koios_errors!#
+      summary: Account Information (Cached)
+      description: Get the cached account information for given stake addresses (effective for performance query against registered accounts)
+      operationId: account_info_cached
+/account_utxos: #RPC
+    post:
+      tags:
+        - Stake Account
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses_with_extended"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/utxo_infos"
+        #!macro:koios_errors!#
+      summary: UTxOs for stake addresses (accounts)
+      description: Get a list of all UTxOs for given stake addresses (account)s
+      operationId: account_utxos
+/account_txs: #RPC
+    get:
+      tags:
+        - Stake Account
+      parameters:
+        - $ref: "#/components/parameters/_stake_address"
+        - $ref: "#/components/parameters/_after_block_height"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/address_txs"
+        #!macro:koios_errors!#
+      summary: Account Txs
+      description: Get a list of all Txs for a given stake address (account)
+      operationId: account_txs
+/account_rewards: #RPC
+    post:
+      deprecated: true
+      tags:
+        - Stake Account
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account_rewards"
+        #!macro:koios_errors!#
+      summary: Account Rewards
+      description: >-
+        Get the full rewards history (including MIR) for given stake addresses
+      operationId: account_rewards
+      x-badges:
+        - color: red
+          label: "Deprecated"
+/account_reward_history: #RPC
+    post:
+      tags:
+        - Stake Account
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses_with_epoch_no"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account_reward_history"
+        #!macro:koios_errors!#
+      summary: Account Reward History
+      description: >-
+        Get the full rewards history (including MIR) for given stake addresses
+      operationId: account_reward_history
+/account_updates: #RPC
+    post:
+      deprecated: true
+      tags:
+        - Stake Account
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account_updates"
+        #!macro:koios_errors!#
+      summary: Account Updates
+      description: >-
+        Get the account updates (registration, deregistration, delegation and
+        withdrawals) for given stake addresses
+      operationId: account_updates
+/account_update_history: #RPC
+    post:
+      tags:
+        - Stake Account
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account_update_history"
+        #!macro:koios_errors!#
+      summary: Account Update History
+      description: >-
+        Get the account updates (registration, deregistration, delegation and
+        withdrawals) for given stake addresses
+      operationId: account_update_history
+/account_addresses: #RPC
+    post:
+      tags:
+        - Stake Account
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses_with_first_only_and_empty"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account_addresses"
+        #!macro:koios_errors!#
+      summary: Account Addresses
+      description: Get all addresses associated with given staking accounts
+      operationId: account_addresses
+/account_assets: #RPC
+    post:
+      tags:
+        - Stake Account
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account_assets"
+        #!macro:koios_errors!#
+      summary: Account Assets
+      description: Get the native asset balance for a given stake address
+      operationId: account_assets
+/account_history: #RPC
+    post:
+      deprecated: true
+      tags:
+        - Stake Account
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account_history"
+        #!macro:koios_errors!#
+      summary: Account History
+      description: Get the staking history of given stake addresses (accounts)
+      operationId: account_history
+      x-badges:
+        - color: red
+          label: "Deprecated"
+/account_stake_history: #RPC
+    post:
+      tags:
+        - Stake Account
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account_stake_history"
+        #!macro:koios_errors!#
+      summary: Account Stake History
+      description: Get the staking history of given stake addresses (accounts)
+      operationId: account_stake_history

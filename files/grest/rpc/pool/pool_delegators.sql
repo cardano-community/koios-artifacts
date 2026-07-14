@@ -13,7 +13,7 @@ DECLARE
   _current_epoch bigint;
 BEGIN
   SELECT id INTO _pool_id FROM pool_hash WHERE pool_hash.hash_raw = cardano.bech32_decode_data(_pool_bech32);
-  SELECT MAX(no) INTO _current_epoch FROM epoch;
+  SELECT MAX(epoch_param.epoch_no) INTO _current_epoch FROM public.epoch_param;
 
   RETURN QUERY
     WITH
@@ -83,7 +83,7 @@ DECLARE
   _current_epoch bigint;
 BEGIN
   SELECT id INTO _pool_id FROM pool_hash WHERE pool_hash.hash_raw = cardano.bech32_decode_data(_pool_bech32);
-  SELECT MAX(no) INTO _current_epoch FROM epoch;
+  SELECT MAX(epoch_param.epoch_no) INTO _current_epoch FROM public.epoch_param;
 
   RETURN QUERY
     WITH

@@ -1,0 +1,274 @@
+/drep_epoch_summary: #RPC
+    get:
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_epoch_no"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/drep_epoch_summary"
+        #!macro:koios_errors!#
+      summary: DReps Epoch Summary
+      description: Summary of voting power and DRep count for each epoch
+      operationId: drep_epoch_summary
+/drep_list: #RPC
+    get:
+      tags:
+        - Governance
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/drep_list"
+        #!macro:koios_errors!#
+      summary: DReps List
+      description: List of all active delegated representatives (DReps)
+      operationId: drep_list
+/drep_info: #RPC
+    post:
+      tags:
+        - Governance
+      requestBody:
+        $ref: "#/components/requestBodies/drep_id_bulk"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/drep_info"
+        #!macro:koios_errors!#
+      summary: DReps Info
+      description: Get detailed information about requested delegated representatives (DReps)
+      operationId: drep_info
+/drep_metadata: #RPC
+    post:
+      tags:
+        - Governance
+      requestBody:
+        $ref: "#/components/requestBodies/drep_id_bulk"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/drep_metadata"
+        #!macro:koios_errors!#
+      summary: DReps Metadata
+      description: List metadata for requested delegated representatives (DReps)
+      operationId: drep_metadata
+/drep_updates: #RPC
+    get:
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_drep_id_optional"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/drep_updates"
+        #!macro:koios_errors!#
+      summary: DReps Updates
+      description: List of updates for requested (or all) delegated representatives (DReps)
+      operationId: drep_updates
+/drep_history: #RPC
+    get:
+      deprecated: true
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_epoch_no"
+        - $ref: "#/components/parameters/_drep_id_optional"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/drep_voting_power_history"
+        #!macro:koios_errors!#
+      summary: DReps Voting Power History
+      description: History of DReps voting power against each (or requested) epoch
+      operationId: drep_history
+      x-badges:
+        - color: red
+          label: "Deprecated"
+/drep_voting_power_history: #RPC
+    get:
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_epoch_no"
+        - $ref: "#/components/parameters/_drep_id_optional"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/drep_voting_power_history"
+        #!macro:koios_errors!#
+      summary: DReps Voting Power History
+      description: History of DReps voting power against each (or requested) epoch
+      operationId: drep_voting_power_history
+/drep_votes: #RPC
+    get:
+      deprecated: true
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_drep_id"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/drep_votes"
+        #!macro:koios_errors!#
+      summary: DReps Votes
+      description: List of all votes casted by requested delegated representative (DRep)
+      operationId: drep_votes
+      x-badges:
+        - color: red
+          label: "Deprecated"
+/drep_delegators: #RPC
+    get:
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_drep_id"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/drep_delegators"
+        #!macro:koios_errors!#
+      summary: DReps Delegators
+      description: List of all delegators to requested delegated representative (DRep).
+      operationId: drep_delegators
+/committee_info: #RPC
+    get:
+      tags:
+        - Governance
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/committee_info"
+        #!macro:koios_errors!#
+      summary: Committee Information
+      description: Information about active committee and its members
+      operationId: committee_info
+/committee_votes: #RPC
+    get:
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_cc_hot_id"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/committee_votes"
+        #!macro:koios_errors!#
+      summary: Committee Votes
+      description: List of all votes casted by given committee member or collective
+      operationId: committee_votes
+/proposal_list: #RPC
+    get:
+      tags:
+        - Governance
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/proposal_list"
+        #!macro:koios_errors!#
+      summary: Proposals List
+      description: List of all governance proposals
+      operationId: proposal_list
+/voter_proposal_list: #RPC
+    get:
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_voter_id"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/proposal_list"
+        #!macro:koios_errors!#
+      summary: Voter's Proposal List
+      description: List of all governance proposals for specified DRep, SPO or Committee credential
+      operationId: voter_proposal_list
+/proposal_voting_summary: #RPC
+    get:
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_proposal_id"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/proposal_voting_summary"
+        #!macro:koios_errors!#
+      summary: Proposal Voting Summary
+      description: Summary of votes for given proposal
+      operationId: proposal_voting_summary
+/proposal_votes: #RPC
+    get:
+      tags:
+        - Governance
+      parameters:
+        - $ref: "#/components/parameters/_proposal_id"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/proposal_votes"
+        #!macro:koios_errors!#
+      summary: Proposal Votes
+      description: List of all votes cast on specified governance action
+      operationId: proposal_votes
+/vote_list: #RPC
+    get:
+      tags:
+        - Governance
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/vote_list"
+        #!macro:koios_errors!#
+      summary: Vote List
+      description: List of all votes posted on-chain
+      operationId: vote_list

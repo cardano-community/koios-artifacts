@@ -1,0 +1,233 @@
+  tip:
+    description: Current tip of the chain
+    type: array
+    items:
+      properties:
+        hash:
+          $ref: "#/components/schemas/blocks/items/properties/hash"
+        era:
+          $ref: "#/components/schemas/era_summaries/items/properties/era"
+        epoch_no:
+          $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+        abs_slot:
+          $ref: "#/components/schemas/blocks/items/properties/abs_slot"
+        epoch_slot:
+          $ref: "#/components/schemas/blocks/items/properties/epoch_slot"
+        block_no:
+          deprecated: true
+          type: number
+          description: DEPRECATED!! Use Block height instead
+          example: 1794506
+        block_time:
+          $ref: "#/components/schemas/blocks/items/properties/block_time"
+  era_summaries:
+    description: Information about each era on the network alongwith it's start epoch
+    type: array
+    items:
+      properties:
+        era:
+          type: string
+          example: Conway
+          description: Cardano Era
+        protocol_major:
+          $ref: "#/components/schemas/epoch_params/items/properties/protocol_major"
+        protocol_minor:
+          $ref: "#/components/schemas/epoch_params/items/properties/protocol_minor"
+        ledger_protocol:
+          type: string
+          example: Praos
+          description: Protocol name that denotes  collection of features sitting between consensus and ledger layer
+        consensus_mechanism:
+          type: string
+          example: Ouroboros Genesis/Praos
+          description: Consensus name that denotes  collection of consensus features introduced at a hard fork
+        notes:
+          type: string
+          example: Plomin HF
+          description: Additional information about when this protocol update was pushed (if there is a fork name associated)
+        epoch_no:
+          $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+        first_block_time:
+          $ref: "#/components/schemas/epoch_info/items/properties/first_block_time"
+        first_block_hash:
+          $ref: "#/components/schemas/epoch_params/items/properties/block_hash"
+  genesis:
+    description: Array of genesis parameters used to start each era on chain
+    type: array
+    items:
+      properties:
+        networkmagic:
+          type: string
+          example: 764824073
+          description: Unique network identifier for chain
+        networkid:
+          type: string
+          example: Mainnet
+          description: Network ID used at various CLI identification to distinguish between Mainnet and other networks
+        epochlength:
+          type: string
+          example: 432000
+          description: Number of slots in an epoch
+        slotlength:
+          type: string
+          example: 1
+          description: Duration of a single slot (in seconds)
+        maxlovelacesupply:
+          type: string
+          example: 45000000000000000
+          description: Maximum smallest units (lovelaces) supply for the blockchain
+        systemstart:
+          type: number
+          description: UNIX timestamp of the first block (genesis) on chain
+          example: 1506203091
+        activeslotcoeff:
+          type: string
+          example: 0.05
+          description: "Active Slot Co-Efficient (f) - determines the _probability_ of number of slots in epoch that are expected to have blocks (so mainnet, this would be: 432000 * 0.05 = 21600 estimated blocks)"
+        slotsperkesperiod:
+          type: string
+          example: 129600
+          description: Number of slots that represent a single KES period (a unit used for validation of KES key evolutions)
+        maxkesrevolutions:
+          type: string
+          example: 62
+          description: Number of KES key evolutions that will automatically occur before a KES (hot) key is expired. This parameter is for security of a pool, in case an operator had access to his hot(online) machine compromised
+        securityparam:
+          type: string
+          example: 2160
+          description: A unit (k) used to divide epochs to determine stability window (used in security checks like ensuring atleast 1 block was created in 3*k/f period, or to finalize next epoch's nonce at 4*k/f slots before end of epoch)
+        updatequorum:
+          type: string
+          example: 5
+          description: Number of BFT members that need to approve (via vote) a Protocol Update Proposal
+        alonzogenesis:
+          type: string
+          example: '{\"lovelacePerUTxOWord\":34482,\"executionPrices\":{\"prSteps\":{\"numerator\":721,\"denominator\":10000000},...'
+          description: A JSON dump of Alonzo Genesis
+  totals:
+    description: Array of supply/reserves/utxo/fees/treasury stats
+    type: array
+    items:
+      properties:
+        epoch_no:
+          type: number
+          description: Epoch number
+          example: 294
+        circulation:
+          type: string
+          description: Circulating UTxOs for given epoch (in numbers)
+          example: 32081169442642320
+        treasury:
+          type: string
+          description: Funds in treasury for given epoch (in numbers)
+          example: 637024173474141
+        reward:
+          type: string
+          description: Rewards accumulated as of given epoch (in numbers)
+          example: 506871250479840
+        supply:
+          type: string
+          description: Total Active Supply (sum of treasury funds, rewards, UTxOs, deposits and fees) for given epoch (in numbers)
+          example: 33228495612391330
+        reserves:
+          type: string
+          description: Total Reserves yet to be unlocked on chain
+          example: 11771504387608670
+        fees:
+          type: string
+          description: The amount (in Lovelace) in the fee pot.
+          example: 92010214941
+        deposits_stake:
+          type: string
+          description: The amount (in Lovelace) in the obligation pot coming from stake key and pool deposits.
+          example: 3338702000000
+        deposits_drep:
+          type: string
+          description: The amount (in Lovelace) in the obligation pot coming from drep registrations deposits.
+          example: 0
+        deposits_proposal:
+          type: string
+          description: The amount (in Lovelace) in the obligation pot coming from governance proposal deposits.
+          example: 0
+        treasury_donation:
+          type: string
+          description: The amount (in Lovelace) donated to the treasury.
+          example: 0
+        treasury_withdrawal:
+          type: string
+          description: The amount (in Lovelace) withdrawn from the treasury.
+          example: 0
+        reserves_withdrawal:
+          type: string
+          description: The amount (in Lovelace) withdrawn from reserves.
+          example: 0
+  param_updates:
+    description: Array of unique param update proposals submitted on chain
+    type: array
+    items:
+      properties:
+        tx_hash:
+          $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+        block_height:
+          $ref: "#/components/schemas/blocks/items/properties/block_height"
+        block_time:
+          $ref: "#/components/schemas/blocks/items/properties/block_time"
+        epoch_no:
+          $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+        data:
+          type: string
+          description: JSON encoded data with details about the parameter update
+          example: { "decentralisation": 0.9 }
+  cli_protocol_params:
+    description: Get Current Protocol Parameters from node as published by cardano-cli in JSON format
+    type: object
+    example:
+      {
+        "collateralPercentage": 150,
+        "maxBlockBodySize": 90112,
+        "maxBlockHeaderSize": 1100,
+        "maxCollateralInputs": 3,
+        "maxTxSize": 16384,
+        "maxValueSize": 5000,
+        "minPoolCost": 170000000,
+        "minUTxOValue": null,
+        "monetaryExpansion": 3.0e-3,
+        "poolPledgeInfluence": 0.3,
+        "poolRetireMaxEpoch": 18,
+        "protocolVersion": { "major": 8, "minor": 0 },
+        "...": "...",
+        "stakeAddressDeposit": 2000000,
+        "stakePoolDeposit": 500000000,
+        "stakePoolTargetNum": 500,
+        "treasuryCut": 0.2,
+        "txFeeFixed": 155381,
+        "txFeePerByte": 44,
+        "utxoCostPerByte": 4310,
+      }
+  reserve_withdrawals:
+    description: Array of withdrawals from reserves/treasury against stake accounts
+    type: array
+    items:
+      properties:
+        epoch_no:
+          $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+        epoch_slot:
+          $ref: "#/components/schemas/blocks/items/properties/epoch_slot"
+        tx_hash:
+          $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+        block_hash:
+          $ref: "#/components/schemas/blocks/items/properties/hash"
+        block_height:
+          $ref: "#/components/schemas/blocks/items/properties/block_height"
+        amount:
+          $ref: "#/components/schemas/pool_delegators/items/properties/amount"
+        stake_address:
+          $ref: "#/components/schemas/account_history/items/properties/stake_address"
+        earned_epoch:
+          description: Epoch where amount is earned
+          allOf:
+            - $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+        spendable_epoch:
+          description: Epoch where the earned amount can be spent
+          allOf:
+            - $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
