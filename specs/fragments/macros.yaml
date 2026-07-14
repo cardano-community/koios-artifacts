@@ -5,3 +5,7 @@ koios_errors: |
     $ref: "#/components/responses/Unauthorized"
   "404":
     $ref: "#/components/responses/NotFound"
+  "429":
+    $ref: "#/components/responses/TooManyRequests"
+  "413":
+    $ref: "#/components/responses/PayloadTooLarge"

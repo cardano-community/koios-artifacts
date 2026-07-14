@@ -28,6 +28,10 @@ components:
       description: Access token is missing or invalid
     BadRequest:
       description: The server cannot process the request due to invalid input
+    TooManyRequests:
+      description: Too many requests were sent in a short period, the tier-based cap can be referred to at https://koios.rest/tiers.html
+    PayloadTooLarge:
+      description: The payload attached to your request is too large, please ensure your request packet is less than 5kb.
 tags:
   - name: Network
     description: Query information about the network
