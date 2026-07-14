@@ -165,7 +165,7 @@ BEGIN
       COALESCE(dd.amount, 0)::text AS amount,
       va.url AS meta_url,
       ENCODE(va.data_hash, 'hex') AS meta_hash,
-      COALESCE(dc.live_deleg_count, 0) AS live_delegator_count
+      COALESCE(dc.live_delegator_count, 0) AS live_delegator_count
     FROM public.drep_hash AS dh
       LEFT JOIN public.drep_registration AS dr ON dh.id = dr.drep_hash_id
       LEFT JOIN public.voting_anchor AS va ON dr.voting_anchor_id = va.id
