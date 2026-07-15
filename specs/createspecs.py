@@ -190,7 +190,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Generate Koios OpenAPI specs from fragments.")
     parser.add_argument(
         "--network",
-        choices=["mainnet", "preview", "preprod", "guild"],
+        choices=["mainnet", "preview", "preprod"],
         help="Generate a single network spec (default: all)",
     )
     parser.add_argument(

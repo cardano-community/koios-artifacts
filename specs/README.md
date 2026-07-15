@@ -7,7 +7,7 @@ This folder contains the source templates and build script for network-specific 
 ```
 specs/
 ├── createspecs.py          # Build script
-├── networks.yaml           # Network registry (mainnet, preview, preprod, guild)
+├── networks.yaml           # Network registry (mainnet, preview, preprod)
 ├── template.yaml           # OpenAPI skeleton (servers, components shell, tags)
 ├── examples/
 │   └── fixtures.yaml       # Per-network example values for parameters and request bodies
@@ -34,7 +34,7 @@ python3 createspecs.py
 Generate a single network:
 
 ```bash
-python3 createspecs.py --network guild
+python3 createspecs.py --network preview
 ```
 
 Verify that `results/` matches what the generator would produce:

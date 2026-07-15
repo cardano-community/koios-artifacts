@@ -18,7 +18,7 @@ cat <<-EOF
 
 	To run the data validations tests, use the below (WIP - skip for now):
 
-	  pytest --local-url http://127.0.0.1:8053/api/v1 --compare-url https://guild.koios.rest/api/v1 --api-schema-file ../specs/results/koiosapi-guild.yaml -x -v
+	  pytest --local-url http://127.0.0.1:8053/api/v1 --compare-url https://preview.koios.rest/api/v1 --api-schema-file ../specs/results/koiosapi-preview.yaml -x -v
 
 	  Arguments:
 	      local-run		:	URL of instance you want to test"

@@ -8,12 +8,12 @@ def pytest_addoption(parser):
         "--local-url", action="store", default="http://127.0.0.1:8053/api/v1"
     )
     parser.addoption(
-        "--compare-url", action="store", default="https://guild.koios.rest/api/v1"
+        "--compare-url", action="store", default="https://preview.koios.rest/api/v1"
     )
     parser.addoption(
         "--api-schema-file",
         action="store",
-        default="../specs/results/koiosapi-guild.yaml",
+        default="../specs/results/koiosapi-preview.yaml",
     )
 
 
