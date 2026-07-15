@@ -12,7 +12,7 @@
         #!macro:koios_errors!#
       summary: Address List
       description: Get a list of all used address on blockchain
-      operationId: account_list
+      operationId: address_list
 /address_info: #RPC
     post:
       tags:
