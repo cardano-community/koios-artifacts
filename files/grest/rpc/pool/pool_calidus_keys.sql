@@ -32,7 +32,7 @@ AS $$
       (tm.json->'1'->>'4')::bigint AS calidus_nonce,
       SUBSTRING((tm.json->'1'->>'7') FROM 3) AS calidus_key,
       COALESCE(pic.pool_status,'unregistered') AS pool_status,
-      cardano.tools_verify_cip88_pool_key_registration(tm.bytes) AS is_valid,
+      grest.safe_verify_cip88_pool_key_registration(tm.bytes) AS is_valid,
       ENCODE(tx.hash, 'hex') AS tx_hash,
       b.epoch_no AS epoch_no,
       b.block_no AS block_height,
