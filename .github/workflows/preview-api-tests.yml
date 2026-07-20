@@ -1,0 +1,91 @@
+name: Preview API Tests
+
+on:
+  repository_dispatch:
+    types:
+      - preview-deployed
+  workflow_dispatch:
+    inputs:
+      reference_commit:
+        description: Deployed commit from main
+        required: true
+        type: string
+      profile:
+        description: Test profile
+        required: true
+        default: baseline
+        type: choice
+        options:
+          - baseline
+          - deep
+
+permissions:
+  contents: read
+
+env:
+  REFERENCE_COMMIT: ${{ github.event.client_payload.reference_commit || inputs.reference_commit }}
+  TEST_PROFILE: ${{ github.event.client_payload.profile || inputs.profile || 'baseline' }}
+
+jobs:
+  preview-api:
+    if: github.event_name == 'workflow_dispatch' || github.event.client_payload.environment == 'preview'
+    runs-on: ubuntu-latest
+    environment: preview
+    concurrency:
+      group: preview-api-${{ github.event.client_payload.reference_commit || inputs.reference_commit }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Verify deployed reference
+        run: |
+          test -n "$REFERENCE_COMMIT"
+          git fetch origin main
+          git merge-base --is-ancestor "$REFERENCE_COMMIT" origin/main
+          git checkout --detach "$REFERENCE_COMMIT"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: api-tests/requirements.txt
+
+      - name: Install API test dependencies
+        run: python -m pip install --requirement api-tests/requirements.txt
+
+      - name: Run offline runner tests
+        run: PYTHONPATH=api-tests python -m pytest -q api-tests/tests
+
+      - name: Wait for Preview API
+        run: |
+          for attempt in $(seq 1 12); do
+            if curl --fail --silent --show-error --max-time 30 https://preview.koios.rest/api/v1/tip >/dev/null; then
+              exit 0
+            fi
+            sleep 10
+          done
+          exit 1
+
+      - name: Run Preview API tests
+        env:
+          KOIOS_API_TOKEN: ${{ secrets.KOIOS_API_TOKEN }}
+        run: |
+          python api-tests/run.py \
+            --spec specs/results/koiosapi-preview.yaml \
+            --cases api-tests/cases/preview.yaml \
+            --fixtures specs/examples/fixtures.yaml \
+            --base-url https://preview.koios.rest/api/v1 \
+            --profile "$TEST_PROFILE" \
+            --reference-commit "$REFERENCE_COMMIT" \
+            --report-dir api-test-report
+
+      - name: Upload API test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: preview-api-${{ env.REFERENCE_COMMIT }}
+          path: api-test-report/
+          if-no-files-found: warn

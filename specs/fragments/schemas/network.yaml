@@ -34,7 +34,9 @@
         protocol_minor:
           $ref: "#/components/schemas/epoch_params/items/properties/protocol_minor"
         ledger_protocol:
-          type: string
+          anyOf:
+            - type: string
+            - type: "null"
           example: Praos
           description: Protocol name that denotes  collection of features sitting between consensus and ledger layer
         consensus_mechanism:
@@ -42,15 +44,23 @@
           example: Ouroboros Genesis/Praos
           description: Consensus name that denotes  collection of consensus features introduced at a hard fork
         notes:
-          type: string
+          anyOf:
+            - type: string
+            - type: "null"
           example: Plomin HF
           description: Additional information about when this protocol update was pushed (if there is a fork name associated)
         epoch_no:
-          $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+          anyOf:
+            - $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+            - type: "null"
         first_block_time:
-          $ref: "#/components/schemas/epoch_info/items/properties/first_block_time"
+          anyOf:
+            - $ref: "#/components/schemas/epoch_info/items/properties/first_block_time"
+            - type: "null"
         first_block_hash:
-          $ref: "#/components/schemas/epoch_params/items/properties/block_hash"
+          anyOf:
+            - $ref: "#/components/schemas/epoch_params/items/properties/block_hash"
+            - type: "null"
   genesis:
     description: Array of genesis parameters used to start each era on chain
     type: array
@@ -175,7 +185,7 @@
         epoch_no:
           $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
         data:
-          type: string
+          type: object
           description: JSON encoded data with details about the parameter update
           example: { "decentralisation": 0.9 }
   cli_protocol_params:

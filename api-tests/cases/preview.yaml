@@ -1,0 +1,138 @@
+version: 1
+
+target:
+  network: preview
+  base_url: https://preview.koios.rest/api/v1
+  spec: specs/results/koiosapi-preview.yaml
+  fixtures: specs/examples/fixtures.yaml
+
+defaults:
+  request_source: openapi
+  timeout_seconds: 60
+  retries: 2
+  rate_limit: 30/m
+  deep_defaults:
+    - id: limit-one
+      source: openapi
+      request:
+        query:
+          limit: 1
+      expected_status: 200
+      checks:
+        - response_schema
+        - semantic_invariants
+      quality:
+        mode: not_applicable
+      semantic:
+        - kind: max_items
+          value: 1
+  baseline:
+    source: openapi
+    expected_status: 200
+    checks:
+      - response_schema
+      - response_quality
+      - native_error
+    quality:
+      mode: non_empty
+
+parameter_bindings:
+  _after_block_height: fixture:address_txs_after_block_height
+
+operations:
+  reserve_withdrawals:
+    baseline:
+      quality:
+        mode: allow_empty
+        reason: Preview has no reserve withdrawals in the current chain history
+
+  treasury_withdrawals:
+    baseline:
+      quality:
+        mode: allow_empty
+        reason: Preview has no treasury withdrawals in the current chain history
+
+  committee_votes:
+    baseline:
+      quality:
+        mode: allow_empty
+        reason: The supplied Preview committee member has no votes
+
+  pool_groups:
+    baseline:
+      quality:
+        mode: allow_empty
+        reason: Pool groups are only populated for mainnet
+
+  reference_script_utxos:
+    baseline:
+      quality:
+        mode: allow_empty
+        reason: The supplied Preview scripts have no reference-script UTxOs
+
+  tip:
+    baseline:
+      quality:
+        required_paths:
+          - /0/hash
+          - /0/block_height
+
+  epoch_info:
+    baseline:
+      quality:
+        required_paths:
+          - /0/epoch_no
+    deep:
+      - id: fixture-epoch
+        source: explicit
+        request:
+          query:
+            _epoch_no: fixture:_epoch_no
+        expected_status: 200
+        checks:
+          - response_schema
+          - response_quality
+        quality:
+          mode: non_empty
+          required_paths:
+            - /0/epoch_no
+
+  totals:
+    deep:
+      - id: fixture-epoch
+        source: explicit
+        request:
+          query:
+            _epoch_no: fixture:_epoch_no
+        expected_status: 200
+        checks:
+          - response_schema
+          - response_quality
+        quality:
+          mode: non_empty
+
+  ogmios:
+    baseline:
+      source: named_openapi_example
+      example: tip
+      expected_status: 200
+      checks:
+        - response_schema
+        - response_quality
+        - native_error
+      quality:
+        mode: non_empty
+
+  submittx:
+    baseline:
+      source: explicit
+      request:
+        media_type: application/cbor
+        body_hex: "00"
+      expected_status: 400
+      validate_request: false
+      request_validation_reason: Binary negative case is intentionally invalid at the protocol layer
+      checks:
+        - native_error
+      quality:
+        mode: not_applicable
