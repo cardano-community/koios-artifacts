@@ -25,6 +25,7 @@ RETURNS TABLE (
   deposit text,
   invalid_before text,
   invalid_after text,
+  valid_contract boolean,
   collateral_inputs jsonb,
   collateral_output jsonb,
   reference_inputs jsonb,
@@ -79,7 +80,8 @@ BEGIN
           tx.treasury_donation,
           tx.deposit,
           tx.invalid_before,
-          tx.invalid_hereafter  AS invalid_after
+          tx.invalid_hereafter  AS invalid_after,
+          tx.valid_contract
         FROM tx
           INNER JOIN block AS b ON tx.block_id = b.id
         WHERE tx.id = ANY(_tx_id_list)
@@ -926,6 +928,7 @@ BEGIN
       atx.deposit::text,
       atx.invalid_before::text,
       atx.invalid_after::text,
+      atx.valid_contract,
       COALESCE((
         SELECT JSONB_AGG(tx_collateral_inputs)
         FROM (

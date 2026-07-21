@@ -56,6 +56,9 @@
             - type: "null"
           description: Slot after which transaction cannot be validated
           example: "42332172"
+        valid_contract:
+          description: True if the contract is valid or there is no contract
+          example: true
         collateral_inputs:
           description: An array of collateral inputs needed for smart contracts in case of contract failure
           anyOf:
@@ -394,6 +397,10 @@
         cbor:
           type: string
           description: CBOR encoded raw transaction.
+        valid_contract:
+          type: boolean
+          description: Whether contract is valid (or if there is no contract)
+          example: true
   tx_utxos:
     description: Array of inputs and outputs for given transaction(s)
     type: array

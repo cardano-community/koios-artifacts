@@ -156,6 +156,8 @@
           $ref: "#/components/schemas/tx_info/items/properties/tx_timestamp"
         cbor:
           $ref: "#/components/schemas/tx_cbor/items/properties/cbor"
+        valid_contract:
+          $ref: "#/components/schemas/tx_cbor/items/properties/valid_contract"
   block_tx_info:
     description: Array of detailed information about transaction(s)
     type: array

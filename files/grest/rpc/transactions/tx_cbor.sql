@@ -6,7 +6,8 @@ RETURNS TABLE (
   epoch_no word31type,
   absolute_slot word63type,
   tx_timestamp integer,
-  cbor text
+  cbor text,
+  valid_contract boolean
 )
 LANGUAGE sql STABLE
 AS $$
@@ -17,7 +18,8 @@ AS $$
     block.epoch_no,
     block.slot_no,
     EXTRACT(EPOCH FROM block.time)::integer,
-    ENCODE(tx_cbor.bytes::bytea, 'hex')
+    ENCODE(tx_cbor.bytes::bytea, 'hex'),
+    tx.valid_contract
   FROM public.tx
     INNER JOIN block ON block.id = tx.block_id
     LEFT JOIN public.tx_cbor ON tx.id = tx_cbor.tx_id
@@ -40,7 +42,8 @@ RETURNS TABLE (
   epoch_no word31type,
   absolute_slot word63type,
   tx_timestamp integer,
-  cbor text
+  cbor text,
+  valid_contract boolean
 )
 LANGUAGE sql STABLE
 AS $$

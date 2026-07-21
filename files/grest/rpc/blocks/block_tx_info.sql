@@ -25,6 +25,7 @@ RETURNS TABLE (
   deposit text,
   invalid_before text,
   invalid_after text,
+  valid_contract boolean,
   collateral_inputs jsonb,
   collateral_output jsonb,
   reference_inputs jsonb,
