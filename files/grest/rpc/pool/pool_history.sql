@@ -57,7 +57,7 @@ BEGIN
         epoch_ros 
       FROM grest.get_pool_history_data_bulk(_curr_epoch - 2, ARRAY[_pool_bech32], _curr_epoch - 1) -- do not care about current or future epochs for history endpoint
     ) x 
-    WHERE (_epoch_no is null or x.epoch_no = _epoch_no) 
+    WHERE (_epoch_no is null or x.epoch_no = _epoch_no::word31type) 
     ORDER by x.epoch_no desc;
 
 END;

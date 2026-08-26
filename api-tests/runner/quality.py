@@ -54,8 +54,10 @@ def meaningful(value: Any) -> bool:
         return False
     if isinstance(value, (str, bytes)):
         return bool(value)
-    if isinstance(value, (list, dict)):
-        return bool(value)
+    if isinstance(value, list):
+        return any(meaningful(item) for item in value)
+    if isinstance(value, dict):
+        return any(meaningful(v) for v in value.values())
     return True
 
 
@@ -79,6 +81,21 @@ def native_error(value: Any) -> bool:
         return False
     keys = {str(key).lower() for key in value}
     return "message" in keys and ("code" in keys or "details" in keys or "hint" in keys)
+
+
+def jsonrpc_error(value: Any) -> bool:
+    """Detect a JSON-RPC 2.0 error envelope (top-level `error` member)."""
+    if not isinstance(value, dict):
+        return False
+    if "error" not in value:
+        return False
+    err = value["error"]
+    if isinstance(err, str):
+        return bool(err)
+    if isinstance(err, dict):
+        keys = {str(k).lower() for k in err}
+        return "message" in keys and "code" in keys
+    return False
 
 
 def native_error_text(value: Any) -> bool:
@@ -122,7 +139,11 @@ def content_type_check(response: Any, expected_media_types: tuple[str, ...]) -> 
 
 def native_error_check(response: Any, expected: tuple[int, ...], body: Any) -> CheckResult:
     status = int(response.status_code)
-    detected = native_error(body) or native_error_text(getattr(response, "text", ""))
+    detected = (
+        native_error(body)
+        or jsonrpc_error(body)
+        or native_error_text(getattr(response, "text", ""))
+    )
     if 200 <= status < 300 and detected:
         return CheckResult("native_error", False, "2xx response contains a native error envelope")
     if status >= 500:

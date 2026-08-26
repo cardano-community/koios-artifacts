@@ -39,6 +39,22 @@ BEGIN
       INNER JOIN tx ON tx.id = tx_out.tx_id
       WHERE tx_out.consumed_by_tx_id IS NULL
         AND a.address = ANY(_addresses)
+    ),
+    _assets_per_txo AS (
+      SELECT mtx.tx_out_id, JSONB_AGG(
+        JSONB_BUILD_OBJECT(
+          'policy_id', ENCODE(ma.policy, 'hex'),
+          'asset_name', ENCODE(ma.name, 'hex'),
+          'fingerprint', ma.fingerprint,
+          'decimals', COALESCE(aic.decimals, 0),
+          'quantity', mtx.quantity::text
+        )
+      ) AS asset_list
+      FROM ma_tx_out AS mtx
+      INNER JOIN multi_asset AS ma ON ma.id = mtx.ident
+      LEFT JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
+      WHERE mtx.tx_out_id IN (SELECT txo_id FROM _all_utxos)
+      GROUP BY mtx.tx_out_id
     )
 
     SELECT
@@ -83,23 +99,7 @@ BEGIN
                     )
                 END
               ),
-              'asset_list', COALESCE(
-                (
-                  SELECT
-                    JSONB_AGG(JSONB_BUILD_OBJECT(
-                      'policy_id', ENCODE(ma.policy, 'hex'),
-                      'asset_name', ENCODE(ma.name, 'hex'),
-                      'fingerprint', ma.fingerprint,
-                      'decimals', COALESCE(aic.decimals, 0),
-                      'quantity', mtx.quantity::text
-                    ))
-                  FROM ma_tx_out AS mtx
-                  INNER JOIN multi_asset AS ma ON ma.id = mtx.ident
-                  LEFT JOIN grest.asset_info_cache AS aic ON aic.asset_id = ma.id
-                  WHERE mtx.tx_out_id = au.txo_id
-                ),
-                JSONB_BUILD_ARRAY()
-              )
+              'asset_list', COALESCE(apt.asset_list, JSONB_BUILD_ARRAY())
             )
           )
         ELSE
@@ -107,6 +107,7 @@ BEGIN
         END AS utxo_set
       FROM _known_addresses AS ka
       LEFT OUTER JOIN _all_utxos AS au ON au.address = ka.address
+      LEFT JOIN _assets_per_txo AS apt ON apt.tx_out_id = au.txo_id
       LEFT JOIN public.block ON block.id = au.block_id
       LEFT JOIN datum ON datum.id = au.inline_datum_id
       LEFT JOIN script ON script.id = au.reference_script_id

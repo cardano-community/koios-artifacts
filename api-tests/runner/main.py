@@ -294,21 +294,29 @@ def execute(args: argparse.Namespace) -> int:
         return 0
     ledger = Ledger(cases)
     token = os.getenv(args.token_env)
-    for case in cases:
-        run_case(case, document, contract, transport, ledger, token)
-        row = ledger.row(case)
-        print(f"{row.state:24} {row.key}")
     target = manifest.get("target", {})
     base_url = args.base_url or str(target.get("base_url"))
-    write_reports(
-        report_dir=args.report_dir,
-        ledger=ledger,
-        target=str(target.get("network", "preview")),
-        base_url=str(base_url),
-        reference_commit=args.reference_commit,
-        profile=args.profile,
-        static_findings=findings,
-    )
+    target_name = str(target.get("network", "preview"))
+    # Checkpoint reports after every case so that a transport-induced hang or
+    # job cancellation still produces a partial report for upload.
+    for case in cases:
+        try:
+            run_case(case, document, contract, transport, ledger, token)
+        finally:
+            row = ledger.row(case)
+            print(f"{row.state:24} {row.key}")
+            try:
+                write_reports(
+                    report_dir=args.report_dir,
+                    ledger=ledger,
+                    target=target_name,
+                    base_url=str(base_url),
+                    reference_commit=args.reference_commit,
+                    profile=args.profile,
+                    static_findings=findings,
+                )
+            except OSError as exc:
+                print(f"Failed to checkpoint report: {exc}", file=sys.stderr)
     print(json.dumps({"states": ledger.summary(), "report_dir": str(args.report_dir)}, sort_keys=True))
     return 0 if ledger.finalize() else 1
 

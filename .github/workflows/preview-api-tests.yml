@@ -28,13 +28,34 @@ env:
 
 jobs:
   preview-api:
-    if: github.event_name == 'workflow_dispatch' || github.event.client_payload.environment == 'preview'
     runs-on: ubuntu-latest
     environment: preview
+    # Bound runaway runs; with 60s/case + 2 retries per case the deep profile (~200 cases)
+    # could otherwise hang for many hours on transport failures. The runner checkpoints
+    # the report after every case so partial progress is preserved when this triggers.
+    timeout-minutes: 75
     concurrency:
-      group: preview-api-${{ github.event.client_payload.reference_commit || inputs.reference_commit }}
-      cancel-in-progress: false
+      # Preview is a single mutable deployment target; serialize across all runs so that
+      # two concurrent deployments can't interleave tests against mixed revisions.
+      group: preview-api
+      cancel-in-progress: true
     steps:
+      - name: Validate deployment event
+        # A malformed `preview-deployed` payload (missing or misspelled `environment`) must
+        # fail explicitly rather than silently skipping the job (which GitHub reports as
+        # successful). workflow_dispatch has no environment constraint.
+        # Avoid passing untrusted payload value into the shell, as per
+        # https://docs.github.com/en/actions/concepts/security/script-injections.
+        if: github.event_name == 'repository_dispatch'
+        env:
+          DEPLOY_ENV: ${{ github.event.client_payload.environment }}
+          EXPECTED_ENV: preview
+        run: |
+          if [ "$DEPLOY_ENV" != "$EXPECTED_ENV" ]; then
+            echo "::error::Invalid client_payload.environment: expected '$EXPECTED_ENV'"
+            exit 1
+          fi
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -70,6 +91,7 @@ jobs:
           exit 1
 
       - name: Run Preview API tests
+        timeout-minutes: 60
         env:
           KOIOS_API_TOKEN: ${{ secrets.KOIOS_API_TOKEN }}
         run: |

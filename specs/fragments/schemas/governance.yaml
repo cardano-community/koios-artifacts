@@ -674,6 +674,10 @@
                 description: Member authentication status
                 enum: ["authorized", "not_authorized", "resigned"]
                 example: authorized
+              cc_cold_id:
+                type: string
+                description: Committee member cold key ID in Bech32 format (CIP-129)
+                example: cc_cold1zd4qek2k8yyxjfrqgylq30hjdmdqye0vywrgl52kp4wdgtc7h4max
               cc_cold_hex:
                 type: string
                 description: Committee member cold key hash in hex format
@@ -682,6 +686,12 @@
                 type: boolean
                 description: Flag which shows if this credential is a script hash
                 example: false
+              cc_hot_id:
+                anyOf:
+                  - type: string
+                  - type: "null"
+                description: Committee member hot key ID in Bech32 format (CIP-129); null when the member has no current hot key (e.g. resigned)
+                example: cc_hot1qvlv6tkpnr6q46enfrxa0dkvfxrt3ylfn4qfse3hdruj7as2x8xlw
               cc_hot_hex:
                 anyOf:
                   - type: string

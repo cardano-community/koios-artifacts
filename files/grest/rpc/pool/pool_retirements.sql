@@ -22,7 +22,7 @@ AS $$
     LEFT JOIN tx ON pr.announced_tx_id = tx.id
     INNER JOIN block AS b ON tx.block_id = b.id
     LEFT JOIN pool_hash AS ph ON ph.id = pr.hash_id
-  WHERE b.epoch_no = _epoch_no;
+  WHERE b.epoch_no = _epoch_no::word31type;
 $$;
 
 COMMENT ON FUNCTION grest.pool_retirements IS 'A list of all pool retirements initiated in the requested epoch'; --noqa: LT01
