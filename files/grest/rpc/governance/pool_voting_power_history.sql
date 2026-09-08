@@ -12,7 +12,7 @@ AS $$
     ps.voting_power::text AS amount
   FROM public.pool_hash AS ph
     INNER JOIN public.pool_stat AS ps ON ph.id = ps.pool_hash_id
-  WHERE (CASE WHEN _epoch_no IS NULL THEN TRUE ELSE ps.epoch_no = _epoch_no END)
+  WHERE (CASE WHEN _epoch_no IS NULL THEN TRUE ELSE ps.epoch_no = _epoch_no::word31type END)
     AND (CASE
         WHEN _pool_bech32 IS NULL THEN TRUE
         ELSE ph.hash_raw = cardano.bech32_decode_data(_pool_bech32)

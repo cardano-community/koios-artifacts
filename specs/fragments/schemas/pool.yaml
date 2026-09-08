@@ -254,7 +254,7 @@
         pool_status:
           type: string
           description: Pool status
-          enum: ["registered", "retiring", "retired"]
+          enum: ["registered", "retiring", "retired", "unregistered"]
           example: registered
         retiring_epoch:
           anyOf:

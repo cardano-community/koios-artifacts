@@ -38,10 +38,15 @@ BEGIN
   SELECT MAX(epoch_param.epoch_no) FROM public.epoch_param into _current_epoch_no;
   SELECT COALESCE(last_value::bigint, 0) INTO _pool_info_cache_last_block_height FROM grest.control_table
     WHERE key = 'pool_info_cache_last_block_height';
+  -- Find the latest block at or before the last cached height, then max(tx.id) for that range.
+  -- Avoids parallel hash join over 4.6M blocks + 6.8M tx;
   SELECT COALESCE(MAX(tx.id), 0) INTO _pool_info_cache_last_tx_id
     FROM public.tx
-    INNER JOIN public.block ON block.id = tx.block_id
-    WHERE block.block_no <= _pool_info_cache_last_block_height;
+    WHERE tx.block_id <= (
+      SELECT id FROM public.block
+      WHERE block_no IS NOT NULL AND block_no <= _pool_info_cache_last_block_height
+      ORDER BY block_no DESC LIMIT 1
+    );
 
   WITH
     latest_pool_updates AS (
@@ -160,9 +165,9 @@ BEGIN
           WHERE pr.announced_tx_id > _pool_info_cache_last_tx_id
           AND pr.retiring_epoch > _current_epoch_no -- this is needed to cater for cache rebuilds
           -- only looking at pool_retirement requests not followed by update or that are part of update
-          AND NOT EXISTS 
-            ( SELECT null 
-              FROM public.pool_update pu 
+          AND NOT EXISTS
+            ( SELECT null
+              FROM public.pool_update pu
               WHERE pu.hash_id = pr.hash_id AND pu.registered_tx_id >= pr.announced_tx_id )
           ORDER BY hash_id, announced_tx_id DESC, cert_index DESC
     )
@@ -205,7 +210,7 @@ BEGIN
     )
   THEN RAISE EXCEPTION 'Previous query still running but should have completed! Exiting...';
   END IF;
-  
+
   SELECT COALESCE(
       (
         SELECT last_value::bigint

@@ -22,7 +22,7 @@ BEGIN
       AND (
         CASE
           WHEN _epoch_no IS NULL THEN TRUE
-          ELSE es.epoch_no = _epoch_no
+          ELSE es.epoch_no = _epoch_no::word31type
         END
       )
     ORDER BY es.epoch_no DESC;

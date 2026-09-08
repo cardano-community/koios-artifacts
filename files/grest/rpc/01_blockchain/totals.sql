@@ -16,19 +16,45 @@ RETURNS TABLE (
 )
 LANGUAGE sql STABLE
 AS $$
-  WITH treasury_reserve_withdrawals AS (
+  WITH
+    epoch_bounds AS (
       SELECT
-        b.epoch_no,
-        COALESCE(SUM(tx.treasury_donation), 0)::text AS treasury_donation,
-        COALESCE(SUM(r.amount), 0)::text AS reserve_withdrawal,
-        COALESCE(SUM(t.amount), 0)::text AS treasury_withdrawal
-      FROM public.tx AS tx
-        INNER JOIN public.block AS b ON b.id = tx.block_id
-        LEFT JOIN public.reserve AS r ON r.tx_id = tx.id
-        LEFT JOIN public.treasury AS t ON t.tx_id = tx.id
-      WHERE b.epoch_no = _epoch_no::word31type
-      GROUP BY b.epoch_no
-  )
+        CASE
+          WHEN _epoch_no IS NULL THEN NULL
+          WHEN (SELECT MAX(epoch_param.epoch_no) FROM public.epoch_param) = _epoch_no::word31type
+            THEN (SELECT MAX(id) FROM public.tx)
+          ELSE
+            (SELECT i_last_tx_id FROM grest.epoch_info_cache WHERE epoch_no = _epoch_no::word31type)
+        END AS upper_tx_id,
+        CASE
+          WHEN _epoch_no IS NULL THEN NULL
+          ELSE COALESCE(
+            (SELECT i_last_tx_id FROM grest.epoch_info_cache WHERE epoch_no = _epoch_no::word31type - 1),
+            (SELECT MAX(i_last_tx_id) FROM grest.epoch_info_cache WHERE epoch_no < _epoch_no::word31type),
+            (SELECT MAX(tx.id) FROM public.tx JOIN public.block b ON tx.block_id = b.id WHERE b.epoch_no < _epoch_no::word31type)
+          )
+        END AS lower_tx_id
+    ),
+    treasury_reserve_withdrawals AS (
+      SELECT
+        _epoch_no::word31type AS epoch_no,
+        COALESCE((
+          SELECT SUM(treasury_donation) FROM public.tx
+          WHERE tx.id > (SELECT lower_tx_id FROM epoch_bounds)
+            AND tx.id <= (SELECT upper_tx_id FROM epoch_bounds)
+        ), 0)::text AS treasury_donation,
+        COALESCE((
+          SELECT SUM(r.amount) FROM public.reserve r
+          WHERE r.tx_id > (SELECT lower_tx_id FROM epoch_bounds)
+            AND r.tx_id <= (SELECT upper_tx_id FROM epoch_bounds)
+        ), 0)::text AS reserve_withdrawal,
+        COALESCE((
+          SELECT SUM(t.amount) FROM public.treasury t
+          WHERE t.tx_id > (SELECT lower_tx_id FROM epoch_bounds)
+            AND t.tx_id <= (SELECT upper_tx_id FROM epoch_bounds)
+        ), 0)::text AS treasury_withdrawal
+      WHERE _epoch_no IS NOT NULL
+    )
   SELECT
     ap.epoch_no,
     ap.utxo::text,
@@ -45,7 +71,7 @@ AS $$
     trw.reserve_withdrawal::text
   FROM public.ada_pots AS ap
     LEFT JOIN treasury_reserve_withdrawals trw ON TRUE
-  WHERE (_epoch_no IS NOT NULL AND ap.epoch_no = _epoch_no)
+  WHERE (_epoch_no IS NOT NULL AND ap.epoch_no = _epoch_no::word31type)
     OR (_epoch_no IS NULL)
   ORDER BY ap.epoch_no DESC;
 $$;

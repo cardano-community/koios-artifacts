@@ -86,11 +86,11 @@ BEGIN
 
   -- cutoff epoch is the last epoch with at least one tx referenced in cache table
   SELECT COALESCE((
-      SELECT MIN(eic.epoch_no) 
+      SELECT MIN(eic.epoch_no)
       FROM grest.epoch_info_cache eic
-      WHERE eic.i_last_tx_id = 
-        (SELECT MAX(i_last_tx_id) 
-        FROM grest.epoch_info_cache eic2 
+      WHERE eic.i_last_tx_id =
+        (SELECT MAX(i_last_tx_id)
+        FROM grest.epoch_info_cache eic2
         WHERE i_last_tx_id is not null
         )
       ), 0)
@@ -164,11 +164,11 @@ BEGIN
 
   -- cutoff epoch is the last epoch with at least one tx referenced in cache table
   SELECT COALESCE((
-      SELECT MIN(eic.epoch_no) 
+      SELECT MIN(eic.epoch_no)
       FROM grest.epoch_info_cache eic
-      WHERE eic.i_last_tx_id = 
-        (SELECT MAX(i_last_tx_id) 
-        FROM grest.epoch_info_cache eic2 
+      WHERE eic.i_last_tx_id =
+        (SELECT MAX(i_last_tx_id)
+        FROM grest.epoch_info_cache eic2
         WHERE i_last_tx_id is not null
         )
       ), 0)
@@ -191,24 +191,39 @@ BEGIN
     WHERE epoch_no = _epoch_no_to_update;
   END IF;
 
+  -- Bypass the `epoch` view (which is a UNION of epoch_finalized and epoch_current views)
+  -- to avoid 600ms+ overhead from the epoch_sync_enabled subquery. Use base tables directly
+  -- with a small conditional aggregation when the epoch is not yet finalized.
+  -- The UNION ALL CTE returns at most 2 rows: one from epoch_finalized (if present) and one
+  -- from the inline block+tx aggregation (only if the epoch is currently being synced). We pick
+  -- whichever comes first via LIMIT 1.
+  WITH data AS (
+    SELECT out_sum, fees, tx_count, blk_count, EXTRACT(EPOCH FROM end_time)::numeric AS last_block_time
+    FROM epoch_finalized WHERE no = _epoch_no_to_update
+    UNION ALL
+    SELECT
+      COALESCE(SUM(tx.out_sum), 0)::numeric AS out_sum,
+      COALESCE(SUM(tx.fee), 0)::numeric AS fees,
+      COUNT(tx.id) AS tx_count,
+      COUNT(DISTINCT b.id) AS blk_count,
+      EXTRACT(EPOCH FROM MAX(b.time))::numeric AS last_block_time
+    FROM block b LEFT JOIN tx ON tx.block_id = b.id
+    WHERE b.epoch_no = _epoch_no_to_update
+      AND (SELECT enabled FROM epoch_sync_enabled WHERE singleton = true)
+  )
   UPDATE grest.epoch_info_cache
   SET
-    i_out_sum = update_table.out_sum,
-    i_fees = update_table.fees,
-    i_tx_count = update_table.tx_count,
-    i_blk_count = update_table.blk_count,
-    i_last_block_time = EXTRACT(EPOCH FROM update_table.end_time)
-  FROM (
-    SELECT
-      e.out_sum,
-      e.fees,
-      e.tx_count,
-      e.blk_count,
-      e.end_time
-    FROM epoch AS e
-    WHERE e.no = _epoch_no_to_update
-  ) AS update_table
-  WHERE epoch_no = _epoch_no_to_update;
+    i_out_sum = d.out_sum,
+    i_fees = d.fees,
+    i_tx_count = d.tx_count,
+    i_blk_count = d.blk_count,
+    i_last_block_time = d.last_block_time
+  FROM (SELECT * FROM data LIMIT 1) d
+  WHERE epoch_no = _epoch_no_to_update
+    AND (
+      (SELECT enabled FROM epoch_sync_enabled WHERE singleton = true)
+      OR EXISTS (SELECT 1 FROM epoch_finalized WHERE no = _epoch_no_to_update)
+    );
 END;
 $$;
 
