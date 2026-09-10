@@ -1,6 +1,7 @@
 tests/**/__pycache__
 api-tests/**/__pycache__
 api-tests/**/*.pyc
+api-test-report/**
 tests/**/.*
 .vscode
 .swp
