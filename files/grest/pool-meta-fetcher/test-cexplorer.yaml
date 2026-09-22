@@ -1,0 +1,67 @@
+# Smoke test config — points at the real cexplorer DB; uses gresttmp schema.
+# libpq keyword form for unix-socket connections
+database_url: "host=/var/run/postgresql dbname=cexplorer user=postgres"
+network_name: preview
+schema_name: gresttmp
+
+fetch:
+  enabled: true
+  poll:
+    poll_interval_seconds: 3600        # don't actually poll during smoke
+    min_poll_interval_seconds: 60
+    failed_pool_retry_seconds: 60   # failed pools re-attempted on this faster cadence
+  work_queue:
+    concurrency: 4
+    batch_size: 50
+    max_inflight: 8
+    write_batch_size: 25
+    pool_id_allow_list: []
+    pool_id_deny_list: []
+    expose_debug_endpoint: true
+  http:
+    timeout_seconds: 15
+    connect_timeout_seconds: 5
+    max_redirects: 3
+    user_agent: "koios-pool-meta-fetcher/smoke/0.1"
+    skip_tls_verify: false
+    tls_min_version: "1.2"
+    http2: true
+  validation:
+    min_body_bytes: 16
+    max_body_bytes: 65536
+    allowed_content_types: ["application/json","application/ld+json","text/plain"]
+    allow_text_html_with_brace: true
+    json:
+      required_fields: []
+      max_depth: 8
+      max_string_length: 4096
+      max_keys_per_object: 32
+      max_array_length: 64
+    hash:
+      algorithm: blake2b-256
+      log_mismatches: true
+  private_ip_policy: block
+  private_ip_allow_list: []
+  retry:
+    max_attempts: 3
+    backoff_initial_seconds: 5
+    backoff_max_seconds: 60
+    backoff_multiplier_seconds: 5
+  pools_overrides: []
+
+database:
+  pool_max_conns: 4
+  pool_min_conns: 1
+  pool_max_conn_lifetime: 30m
+  pool_max_conn_idle_time: 5m
+  statement_timeout_ms: 30000
+
+health:
+  listen_addr: "127.0.0.1"
+  listen_port: 18082
+  readyz_db_grace_seconds: 30
+
+logging:
+  level: debug
+  format: text
+  add_source: true

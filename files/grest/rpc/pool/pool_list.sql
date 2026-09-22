@@ -46,7 +46,7 @@ AS $$
       FROM public.pool_relay AS pr
       WHERE pr.update_id = pic.update_id
     ) AS relays,
-    ocpd.ticker_name,
+    pom.meta_json->>'ticker',
     pgrp.pool_group,
     pmr.url AS meta_url,
     pmr.hash AS meta_hash,
@@ -60,7 +60,7 @@ AS $$
     LEFT JOIN public.pool_update AS pu ON pu.id = pic.update_id
     LEFT JOIN public.stake_address AS sa ON pu.reward_addr_id = sa.id
     LEFT JOIN public.pool_metadata_ref AS pmr ON pmr.id = pic.meta_id
-    LEFT JOIN public.off_chain_pool_data AS ocpd ON ocpd.pmr_id = pic.meta_id
+    LEFT JOIN grest.pool_offchain_metadata AS pom ON pom.pool_id = pic.pool_hash_id
   ORDER BY
     pic.pool_hash_id,
     pstat.epoch_no DESC
@@ -115,7 +115,7 @@ AS $$
       FROM public.pool_relay AS pr
       WHERE pr.update_id = pic.update_id
     ) AS relays,
-    ocpd.ticker_name,
+    pom.meta_json->>'ticker',
     pgrp.pool_group,
     pmr.url AS meta_url,
     pmr.hash AS meta_hash,
@@ -129,7 +129,7 @@ AS $$
     LEFT JOIN public.pool_update AS pu ON pu.id = pic.update_id
     LEFT JOIN public.stake_address AS sa ON pu.reward_addr_id = sa.id
     LEFT JOIN public.pool_metadata_ref AS pmr ON pmr.id = pic.meta_id
-    LEFT JOIN public.off_chain_pool_data AS ocpd ON ocpd.pmr_id = pic.meta_id
+    LEFT JOIN grest.pool_offchain_metadata AS pom ON pom.pool_id = pic.pool_hash_id
   ORDER BY
     pic.pool_hash_id,
     pstat.epoch_no DESC

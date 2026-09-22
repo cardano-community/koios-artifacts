@@ -32,6 +32,18 @@ EXCEPTION
 END;
 $$;
 
+-- GREST_OWNER ROLE --
+-- Least-privilege role used by the koios-pool-meta-fetcher Go daemon to write to
+-- grest-owned tables (e.g. grest.pool_offchain_metadata). Does NOT log in.
+DO $$
+BEGIN
+  CREATE ROLE grest_owner NOLOGIN;
+EXCEPTION
+  WHEN DUPLICATE_OBJECT THEN
+    RAISE NOTICE 'grest_owner exists, skipping...';
+END
+$$;
+
 GRANT USAGE ON SCHEMA public TO authenticator, web_anon;
 GRANT USAGE ON SCHEMA grest TO authenticator, web_anon;
 GRANT USAGE ON SCHEMA grestv0 TO authenticator, web_anon;
@@ -168,6 +180,8 @@ BEGIN
   END LOOP;
 END
 $$;
+
+GRANT USAGE ON SCHEMA grest TO grest_owner;
 
 -- HELPER FUNCTIONS --
 CREATE FUNCTION grest.get_query_pids_partial_match(_query text)

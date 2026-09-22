@@ -14,10 +14,16 @@ BEGIN
     cardano.bech32_encode('pool', ph.hash_raw)::varchar AS pool_id_bech32,
     pmr.url AS meta_url,
     ENCODE(pmr.hash, 'hex') AS meta_hash,
-    ocpd.json AS meta_json
+    pom.meta_json AS meta_json
   FROM public.pool_hash AS ph
-  LEFT JOIN public.off_chain_pool_data AS ocpd ON ocpd.pool_id = ph.id
-  LEFT JOIN public.pool_metadata_ref AS pmr ON pmr.id = ocpd.pmr_id
+  LEFT JOIN grest.pool_offchain_metadata AS pom ON pom.pool_id = ph.id
+  LEFT JOIN public.pool_metadata_ref AS pmr ON pmr.id = (
+    SELECT pu.meta_id
+    FROM public.pool_update pu
+    WHERE pu.hash_id = ph.id
+    ORDER BY pu.registered_tx_id DESC, pu.cert_index DESC
+    LIMIT 1
+  )
   WHERE
     CASE
       WHEN _pool_bech32_ids IS NULL THEN TRUE

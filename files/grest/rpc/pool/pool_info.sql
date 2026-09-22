@@ -89,7 +89,7 @@ BEGIN
       ) AS relays,
       pmr.url AS meta_url,
       ENCODE(pmr.hash,'hex') AS meta_hash,
-      ocpd.json,
+      pom.meta_json,
       api.pool_status,
       api.retiring_epoch,
       ENCODE(block_data.op_cert::bytea, 'hex'),
@@ -111,7 +111,7 @@ BEGIN
 	  LEFT JOIN drep_hash AS dh ON dh.id = dv.drep_hash_id
 	        -- could add this condition too since delegations elsewhere are meaningless: and dh.view like 'drep_always%'
     LEFT JOIN public.pool_metadata_ref AS pmr ON pmr.id = api.meta_id
-    LEFT JOIN public.off_chain_pool_data AS ocpd ON api.meta_id = ocpd.pmr_id
+    LEFT JOIN grest.pool_offchain_metadata AS pom ON pom.pool_id = api.pool_hash_id
     LEFT JOIN public.pool_stat AS pst ON pst.pool_hash_id = api.pool_hash_id AND pst.epoch_no = _epoch_no
     LEFT JOIN LATERAL (
       SELECT

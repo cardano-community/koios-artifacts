@@ -1,0 +1,46 @@
+# TEMPLATE
+# Locally (not under systemd), run:
+#   pool-meta-fetcher --config "$CNODE_HOME/priv/pool-meta-fetcher.yaml"
+# with CNODE_HOME exported in the current shell.
+#
+[Unit]
+Description=Koios pool metadata fetcher
+Documentation=https://github.com/cardano-community/koios-artifacts
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=koios
+Group=koios
+
+# Inherit the cnode common env (CNODE_HOME, etc.). The helper script deploys
+# the .env file at this path; the leading "-" keeps systemd happy if the
+# file is absent during local testing.
+EnvironmentFile=-$CNODE_HOME/priv/.env
+
+ExecStart=/usr/local/bin/pool-meta-fetcher --config $CNODE_HOME/priv/pool-meta-fetcher.yaml
+Restart=on-failure
+RestartSec=10
+LimitNOFILE=65536
+
+# Allow live reload via SIGHUP
+ExecReload=/bin/kill -HUP $MAINPID
+
+# Hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateDevices=true
+PrivateTmp=true
+ReadWritePaths=/var/lib/koios
+AmbientCapabilities=
+CapabilityBoundingSet=
+
+# Logs go to journald by default; the daemon writes JSON to stdout
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=koios-pool-meta-fetcher
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,77 @@
+# Minimal working configuration for koios-pool-meta-fetcher.
+# See ../../openspec/specs/pool-meta-fetcher-config/spec.md for every knob.
+
+database_url: postgres://grest_owner:CHANGE_ME@localhost:5432/cexplorer
+network_name: mainnet
+schema_name: grest  # override to e.g. 'gresttmp' for non-production testing
+
+fetch:
+  enabled: true
+  poll:
+    poll_interval_seconds: 432000   # 5 days; matches Cardano mainnet epoch cadence
+    min_poll_interval_seconds: 60
+    failed_pool_retry_seconds: 60   # failed pools re-attempted on this faster cadence
+  work_queue:
+    concurrency: 16
+    batch_size: 100
+    max_inflight: 200
+    write_batch_size: 50
+    pool_id_allow_list: []
+    pool_id_deny_list: []
+    expose_debug_endpoint: false
+  http:
+    timeout_seconds: 30
+    connect_timeout_seconds: 10
+    max_redirects: 3
+    user_agent: "koios-pool-meta-fetcher/1.0 (+https://koios.rest)"
+    skip_tls_verify: false
+    tls_min_version: "1.2"
+    http2: true
+    proxy_url: ""
+    extra_headers: {}
+  validation:
+    min_body_bytes: 16
+    max_body_bytes: 524288      # 512 KiB
+    allowed_content_types:
+      - "application/json"
+      - "application/ld+json"
+      - "text/plain"
+      - "application/octet-stream"
+      - "binary/octet-stream"
+      - "application/binary"
+    allow_text_html_with_brace: true
+    follow_cross_host_redirects: false
+    json:
+      required_fields: ["name", "description", "ticker", "homepage"]
+      max_depth: 8
+      max_string_length: 8192
+      max_keys_per_object: 128
+      max_array_length: 256
+      allow_additional_fields: true
+    hash:
+      algorithm: blake2b-256
+      log_mismatches: true
+  private_ip_policy: block
+  private_ip_allow_list: []
+  retry:
+    max_attempts: 10       # in-memory cap; excludes a pool once consecutive_failures >= max_attempts
+    persist_state: false   # v1: retry state lives in the grest.pool_offchain_metadata row
+  pools_overrides: []
+  pools_overrides_match_style: exact
+
+database:
+  pool_max_conns: 10
+  pool_min_conns: 1
+  pool_max_conn_lifetime: 1h
+  pool_max_conn_idle_time: 30m
+  statement_timeout_ms: 60000
+
+health:
+  listen_addr: "127.0.0.1"
+  listen_port: 8081
+  readyz_db_grace_seconds: 60
+
+logging:
+  level: info
+  format: json
+  add_source: false

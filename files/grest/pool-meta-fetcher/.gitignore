@@ -1,0 +1,16 @@
+# Build artifacts
+/pool-meta-fetcher
+/pool-meta-fetcher-*
+
+# Test artifacts
+*.test
+*.out
+
+# Coverage
+coverage.out
+coverage.html
+
+# Local dev
+.env
+.env.local
+*.local.yaml

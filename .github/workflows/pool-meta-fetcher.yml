@@ -1,0 +1,115 @@
+name: pool-meta-fetcher
+
+on:
+  push:
+    paths:
+      - 'files/grest/pool-meta-fetcher/**'
+      - 'openspec/specs/pool-offchain-fetcher/**'
+      - 'openspec/specs/pool-meta-fetcher-config/**'
+      - '.github/workflows/pool-meta-fetcher.yml'
+  pull_request:
+    paths:
+      - 'files/grest/pool-meta-fetcher/**'
+
+jobs:
+  unit:
+    name: unit build & test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: files/grest/pool-meta-fetcher
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+
+      - name: Cache modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Download modules
+        run: go mod download
+
+      - name: go vet
+        run: go vet ./...
+
+      - name: go build
+        run: |
+          mkdir -p bin
+          go build -trimpath -ldflags "-s -w -X main.version=$(echo ${GITHUB_SHA} | cut -c1-7)" -o bin/pool-meta-fetcher ./cmd/pool-meta-fetcher
+
+      - name: go test -race
+        run: go test -race -count=1 ./...
+
+      - name: go test (no race, fast)
+        run: go test -count=1 ./...
+
+      - name: Upload binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: pool-meta-fetcher-${{ github.sha }}
+          path: files/grest/pool-meta-fetcher/bin/pool-meta-fetcher
+          retention-days: 14
+
+  integration:
+    name: integration tests (postgres + httptest)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: files/grest/pool-meta-fetcher
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: tester
+          POSTGRES_PASSWORD: testpw
+          POSTGRES_DB: pooltest
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U tester -d pooltest"
+          --health-interval=5s
+          --health-timeout=3s
+          --health-retries=10
+    env:
+      KOIOS_PG_TEST_DSN: postgres://tester:testpw@127.0.0.1:5432/pooltest?sslmode=disable
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+
+      - name: Cache modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Wait for Postgres
+        run: |
+          for i in $(seq 1 30); do
+            pg_isready -h 127.0.0.1 -U tester -d pooltest && break || sleep 2
+          done
+
+      - name: Run integration tests
+        run: go test -race -count=1 -timeout 4m ./...
+
+      - name: Docker build (cache)
+        run: |
+          docker build --build-arg VERSION=$(echo ${GITHUB_SHA} | cut -c1-7) \
+            -t koios-pool-meta-fetcher:ci .
