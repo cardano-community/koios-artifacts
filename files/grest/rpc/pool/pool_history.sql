@@ -18,9 +18,15 @@ AS $$
 #variable_conflict use_column
 DECLARE
   _curr_epoch word31type;
+  _pool_id bigint;
+  _live_from_epoch word31type;
 BEGIN
 
   SELECT MAX(epoch_param.epoch_no) INTO _curr_epoch FROM public.epoch_param;
+  SELECT id INTO _pool_id FROM pool_hash WHERE hash_raw = cardano.bech32_decode_data(_pool_bech32);
+  SELECT LEAST(_curr_epoch - 2, COALESCE(MAX(phc.epoch_no) + 1, 0)) INTO _live_from_epoch
+  FROM grest.pool_history_cache AS phc
+  WHERE phc.pool_id = _pool_id;
 
   RETURN QUERY
     SELECT x.*
@@ -39,7 +45,7 @@ BEGIN
         member_rewards::text,
         COALESCE(epoch_ros, 0)
       FROM grest.pool_history_cache AS phc
-      WHERE phc.pool_id = (SELECT id FROM pool_hash AS ph WHERE ph.hash_raw = cardano.bech32_decode_data(_pool_bech32))
+      WHERE phc.pool_id = _pool_id
           AND phc.epoch_no < (_curr_epoch - 2) -- temporary condition for testing, until cache table population fixed, then can be removed
       UNION 
       SELECT
@@ -55,7 +61,7 @@ BEGIN
         deleg_rewards::text,
         member_rewards::text,
         epoch_ros 
-      FROM grest.get_pool_history_data_bulk(_curr_epoch - 2, ARRAY[_pool_bech32], _curr_epoch - 1) -- do not care about current or future epochs for history endpoint
+      FROM grest.get_pool_history_data_bulk(_live_from_epoch, ARRAY[_pool_bech32], _curr_epoch - 1) -- do not care about current or future epochs for history endpoint
     ) x 
     WHERE (_epoch_no is null or x.epoch_no = _epoch_no::word31type) 
     ORDER by x.epoch_no desc;
