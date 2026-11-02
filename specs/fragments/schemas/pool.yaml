@@ -458,6 +458,27 @@
           $ref: "#/components/schemas/pool_info/items/properties/pledge"
         reward_addr:
           $ref: "#/components/schemas/pool_info/items/properties/reward_addr"
+        deposit:
+          anyOf:
+            - type: string
+            - type: "null"
+          type: string
+          description: Pool Deposit (if registering) associated with this pool Update
+          example: "500000000"
+        bls_key:
+          anyOf:
+            - type: string
+            - type: "null"
+          type: string
+          description: BLS Verification key associated with pool registration, if present
+          example: "null"
+        bls_key_pop:
+          anyOf:
+            - type: string
+            - type: "null"
+          type: string
+          description: Proof of BLS Verification key ownership already verified by ledger
+          example: "null"
         owners:
           $ref: "#/components/schemas/pool_info/items/properties/owners"
         relays:

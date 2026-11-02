@@ -67,7 +67,7 @@ BEGIN
       pu.margin,
       pu.fixed_cost::text,
       pu.pledge::text,
-      pu.deposit::text,
+      pool_reg_data.deposit::text,
       grest.cip5_hex_to_stake_addr(sa.hash_raw)::varchar AS reward_addr,
       COALESCE(grest.cip129_hex_to_drep_id(dh.raw, dh.has_script), dh.view::text) AS reward_addr_delegated_drep,
       ARRAY(
@@ -105,6 +105,15 @@ BEGIN
     FROM _all_pool_info AS api
     LEFT JOIN public.pool_hash AS ph ON ph.id = api.pool_hash_id
     LEFT JOIN public.pool_update AS pu ON pu.id = api.update_id
+    LEFT JOIN LATERAL (
+      SELECT pu_reg.deposit
+        FROM public.pool_update AS pu_reg
+        WHERE pu_reg.hash_id = api.pool_hash_id
+          AND pu_reg.deposit IS NOT NULL
+          AND pu_reg.id <= api.update_id
+        ORDER BY pu_reg.id DESC
+        LIMIT 1
+    ) AS pool_reg_data ON TRUE
     LEFT JOIN public.stake_address AS sa ON pu.reward_addr_id = sa.id
     LEFT JOIN delegation_vote AS dv on dv.addr_id = sa.id
 	    AND NOT EXISTS (SELECT 1 FROM delegation_vote dv2 WHERE dv2.addr_id = sa.id AND dv2.tx_id > dv.tx_id)
