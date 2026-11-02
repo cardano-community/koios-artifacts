@@ -5,11 +5,12 @@ RETURNS TABLE (
   delegated_pool varchar,
   delegated_drep text,
   total_balance text,
+  withdrawable_balance text,
   utxo text,
   rewards text,
   withdrawals text,
-  rewards_available text,
   deposit text,
+  direct_deposit text,
   reserves text,
   treasury text,
   proposal_refund text
@@ -28,7 +29,7 @@ BEGIN
   );
 
   RETURN QUERY
-  
+
     SELECT
       grest.cip5_hex_to_stake_addr(status_t.hash_raw)::varchar AS stake_address,
       CASE WHEN status_t.registered = TRUE THEN
@@ -38,12 +39,13 @@ BEGIN
       END AS status,
       pool_t.delegated_pool,
       vote_t.delegated_drep,
-      (COALESCE(utxo_t.utxo, 0) + COALESCE(rewards_t.rewards, 0) + COALESCE(reserves_t.reserves, 0) + COALESCE(treasury_t.treasury, 0) - COALESCE(withdrawals_t.withdrawals, 0))::text AS total_balance,
+      (COALESCE(utxo_t.utxo, 0) + COALESCE(dir_deposit.deposit,0) + COALESCE(rewards_t.rewards, 0) + COALESCE(reserves_t.reserves, 0) + COALESCE(treasury_t.treasury, 0) - COALESCE(withdrawals_t.withdrawals, 0))::text AS total_balance,
+      (COALESCE(rewards_t.rewards, 0) + COALESCE(dir_deposit.deposit,0) + COALESCE(reserves_t.reserves, 0) + COALESCE(treasury_t.treasury, 0) + COALESCE(proposal_refund_t.proposal_refund, 0) - COALESCE(withdrawals_t.withdrawals, 0))::text AS withdrawable_balance,
       COALESCE(utxo_t.utxo, 0)::text AS utxo,
       COALESCE(rewards_t.rewards, 0)::text AS rewards,
       COALESCE(withdrawals_t.withdrawals, 0)::text AS withdrawals,
-      (COALESCE(rewards_t.rewards, 0) + COALESCE(reserves_t.reserves, 0) + COALESCE(treasury_t.treasury, 0) + COALESCE(proposal_refund_t.proposal_refund, 0) - COALESCE(withdrawals_t.withdrawals, 0))::text AS rewards_available,
       COALESCE(status_t.deposit,0)::text AS deposit,
+      COALESCE(dir_deposit.deposit,0)::text AS direct_deposit,
       COALESCE(reserves_t.reserves, 0)::text AS reserves,
       COALESCE(treasury_t.treasury, 0)::text AS treasury,
       COALESCE(proposal_refund_t.proposal_refund, 0)::text AS proposal_refund
@@ -106,6 +108,14 @@ BEGIN
               AND drep_registration.deposit < 0
             LIMIT 1)
       ) AS vote_t ON vote_t.addr_id = status_t.id
+    LEFT JOIN (
+      SELECT
+        dd.addr_id,
+        COALESCE(SUM(dd.amount), 0) AS deposit
+      FROM direct_deposit AS dd
+      WHERE dd.addr_id = ANY(sa_id_list)
+      GROUP BY dd.addr_id
+    ) AS dir_deposit ON dir_deposit.addr_id = status_t.id
     LEFT JOIN (
         SELECT
           delegation.addr_id,

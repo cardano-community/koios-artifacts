@@ -5331,6 +5331,10 @@ components:
             type: string
             description: Total balance of the account including UTxO, rewards and MIRs (in number)
             example: "207116800428"
+          withdrawable_balance:
+            type: string
+            description: Balance stake available for withdrawal
+            example: "44352623297"
           utxo:
             type: string
             description: Total UTxO balance of the account
@@ -5343,14 +5347,14 @@ components:
             type: string
             description: Total rewards withdrawn by the account
             example: "12105104750"
-          rewards_available:
-            type: string
-            description: Total rewards available for withdrawal
-            example: "44352623297"
           deposit:
             type: string
-            description: Total deposit available for withdrawal
+            description: Stake Registration deposit for the account
             example: "2000000"
+          direct_deposit:
+            type: string
+            description: Total direct deposit made against account
+            example: "1000000000"
           reserves:
             type: string
             description: Total reserves MIR value of the account
