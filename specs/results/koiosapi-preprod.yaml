@@ -7246,7 +7246,7 @@ components:
           type:
             type: string
             description: Type of the script
-            enum: ["plutusV1", "plutusV2", "timelock", "multisig"]
+            enum: ["plutusV1", "plutusV2", "plutusV3", "plutusV4", "timelock", "multisig"]
             example: plutusV1
           value:
             anyOf:

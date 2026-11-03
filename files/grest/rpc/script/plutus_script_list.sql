@@ -14,7 +14,7 @@ AS $$
     s.serialised_size AS size
   FROM script AS s
     INNER JOIN tx ON tx.id = s.tx_id
-  WHERE s.type IN ('plutusV1', 'plutusV2');
+  WHERE s.type::text ILIKE ('plutus%');
 $$;
 
 COMMENT ON FUNCTION grest.plutus_script_list IS 'Get a list of all plutus script hashes with creation tx hash.'; --noqa: LT01

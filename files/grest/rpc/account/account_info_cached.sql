@@ -153,7 +153,7 @@ BEGIN
 
     UNION ALL
 
-    SELECT 
+    SELECT
       z.stake_address,
       ai.status,
       ai.delegated_pool AS pool_id,
@@ -162,7 +162,7 @@ BEGIN
       ai.utxo::text,
       ai.rewards::text,
       ai.withdrawals::text,
-      ai.rewards_available::text,
+      ai.withdrawable_balance::text,
       ai.deposit,
       ai.reserves,
       ai.treasury,
@@ -172,7 +172,7 @@ BEGIN
           SELECT
             grest.cip5_hex_to_stake_addr(sa.hash_raw)::varchar AS stake_address,
             sa.id AS addr_id
-          FROM stake_address AS sa 
+          FROM stake_address AS sa
           WHERE sa.id = ANY(sa_id_list)
            AND NOT EXISTS (SELECT null FROM grest.stake_distribution_cache AS sdc WHERE sdc.stake_address_id = sa.id)
         ) AS z
