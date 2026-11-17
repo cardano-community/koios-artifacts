@@ -5329,7 +5329,7 @@ components:
               - type: "null"
           total_balance:
             type: string
-            description: Total balance of the account including UTxO, rewards and MIRs (in number)
+            description: Total balance of the account including UTxO, rewards, MIRs and proposal refunds (in number)
             example: "207116800428"
           utxo:
             type: string
