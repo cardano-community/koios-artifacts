@@ -5627,8 +5627,10 @@ components:
             description: Total Donation to on-chain treasury (in numbers)
             example: "0"
           deposit:
-            type: string
-            description: Total Deposits included in transaction (for example, if it is registering a pool/key)
+            anyOf:
+              - type: string
+              - type: "null"
+            description: Total Deposits included in transaction (for example, if it is registering a pool/key). Null for a Dijkstra sub-transaction, because the deposit for the whole batch is recorded on its top-level transaction
             example: "0"
           invalid_before:
             anyOf:
@@ -7317,7 +7319,7 @@ components:
                 purpose:
                   type: string
                   description: What kind of validation this redeemer is used for
-                  enum: ["spend", "mint", "cert", "reward"]
+                  enum: ["spend", "mint", "cert", "reward", "vote", "propose", "guard"]
                   example: spend
                 datum_hash:
                   anyOf:

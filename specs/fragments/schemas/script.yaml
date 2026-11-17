@@ -87,7 +87,7 @@
               purpose:
                 type: string
                 description: What kind of validation this redeemer is used for
-                enum: ["spend", "mint", "cert", "reward"]
+                enum: ["spend", "mint", "cert", "reward", "vote", "propose", "guard"]
                 example: spend
               datum_hash:
                 anyOf:
