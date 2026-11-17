@@ -51,9 +51,13 @@
           description: Counter value of the operational certificate used to create this block
           example: 5
         proto_major:
-          $ref: "#/components/schemas/epoch_params/items/properties/protocol_major"
+          type: number
+          description: Protocol major version in the block header, as advertised by the node that produced the block
+          example: 10
         proto_minor:
-          $ref: "#/components/schemas/epoch_params/items/properties/protocol_minor"
+          type: number
+          description: Protocol minor version in the block header, as advertised by the node that produced the block. It can differ between blocks in the same epoch and is not the network's protocol version, which /epoch_params returns
+          example: 0
         parent_hash:
           type: string
           description: Previous Hash of the current block
@@ -93,9 +97,9 @@
         pool:
           $ref: "#/components/schemas/blocks/items/properties/pool"
         proto_major:
-          $ref: "#/components/schemas/epoch_params/items/properties/protocol_major"
+          $ref: "#/components/schemas/blocks/items/properties/proto_major"
         proto_minor:
-          $ref: "#/components/schemas/epoch_params/items/properties/protocol_minor"
+          $ref: "#/components/schemas/blocks/items/properties/proto_minor"
         total_output:
           anyOf:
             - type: string
