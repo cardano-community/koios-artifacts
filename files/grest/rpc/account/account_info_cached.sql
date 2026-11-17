@@ -141,7 +141,7 @@ BEGIN
           COALESCE(SUM(pr.amount), 0) AS proposal_refund
         FROM reward_rest AS pr
         WHERE pr.addr_id = ANY(sa_id_list)
-          AND pr.type = 'treasury'
+          AND pr.type = 'proposal_refund'
           AND pr.spendable_epoch <= (
             SELECT MAX(epoch_param.epoch_no)
             FROM public.epoch_param
