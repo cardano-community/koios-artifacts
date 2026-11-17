@@ -29,7 +29,7 @@ BEGIN
 
   SELECT INTO _stake_address_id id FROM stake_address WHERE hash_raw = (SELECT cardano.bech32_decode_data(_stake_address));
 
-  -- all tx_out & tx_in tx ids
+  -- all tx_out, tx_in & withdrawal tx ids
   SELECT INTO _tx_id_list ARRAY_AGG(tx_id)
   FROM (
     SELECT tx_id
@@ -44,6 +44,13 @@ BEGIN
     WHERE tx_out.consumed_by_tx_id IS NOT NULL
       AND tx_out.stake_address_id = _stake_address_id
       AND tx_out.consumed_by_tx_id >= _tx_id_min
+    --
+    UNION
+    --
+    SELECT tx_id
+    FROM withdrawal
+    WHERE addr_id = _stake_address_id
+      AND tx_id >= _tx_id_min
   ) AS tmp;
 
   RETURN QUERY
