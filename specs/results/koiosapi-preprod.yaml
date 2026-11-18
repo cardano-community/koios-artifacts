@@ -5359,7 +5359,7 @@ components:
             type: string
             description: Total treasury MIR value of the account
             example: "0"
-          proposal-refund:
+          proposal_refund:
             type: string
             description: Total proposal refund for this account
             example: "0"
