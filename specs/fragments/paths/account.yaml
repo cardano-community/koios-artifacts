@@ -158,9 +158,28 @@
         #!macro:koios_errors!#
       summary: Account Update History
       description: >-
-        Get the account updates (registration, deregistration, delegation and
-        withdrawals) for given stake addresses
+        Get the account updates (registration, deregistration, delegation,
+        withdrawals and direct deposits) for given stake addresses
       operationId: account_update_history
+/account_direct_deposits: #RPC
+    post:
+      tags:
+        - Stake Account
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account_direct_deposits"
+        #!macro:koios_errors!#
+      summary: Account Direct Deposits
+      description: >-
+        Get the direct deposits (Dijkstra, CIP-159) paid into given stake addresses, newest first.
+        A deposit made in a sub-transaction also gives the batch's top-level transaction
+      operationId: account_direct_deposits
 /account_addresses: #RPC
     post:
       tags:
