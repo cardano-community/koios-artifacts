@@ -203,6 +203,52 @@
                 type: string
                 description: A Cardano staking address (reward account, bech32 encoded)
                 example: stake1uxggf4shfvpghcangm67ky0q4zlc3xn7gezy0auhxczu3pslm9wrj
+        direct_deposits:
+          anyOf:
+            - type: array
+            - type: "null"
+          description: Array of Dijkstra direct deposits (CIP-159), which pay lovelace straight into a registered stake account without an output
+          items:
+            type: object
+            properties:
+              amount:
+                type: string
+                description: Deposited amount (in numbers)
+                example: "1000000000"
+              stake_addr:
+                $ref: "#/components/schemas/tx_info/items/properties/withdrawals/items/properties/stake_addr"
+        account_balance_intervals:
+          anyOf:
+            - type: array
+            - type: "null"
+          description: Array of Dijkstra account balance assertions (CIP-159). The transaction is only valid if each account balance is in its range, so every row held when the block was applied. These are conditions, not balances
+          items:
+            type: object
+            properties:
+              stake_addr:
+                $ref: "#/components/schemas/tx_info/items/properties/withdrawals/items/properties/stake_addr"
+              starting:
+                type: boolean
+                description: True if the range was checked against the balance before the whole batch, false if against the balance at the point this body applies
+                example: false
+              lower_bound:
+                anyOf:
+                  - type: string
+                  - type: "null"
+                description: Inclusive lower bound (in numbers), or null for none
+                example: "5000000"
+              upper_bound:
+                anyOf:
+                  - type: string
+                  - type: "null"
+                description: Exclusive upper bound (in numbers), or null for none
+                example: null
+              exact_value:
+                anyOf:
+                  - type: string
+                  - type: "null"
+                description: Exact balance required (in numbers), set only when both bounds are null
+                example: null
         assets_minted:
           anyOf:
             - type: array
@@ -346,6 +392,50 @@
                         $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_hash"
                       value:
                         $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_value"
+        guards:
+          anyOf:
+            - type: array
+            - type: "null"
+          description: Array of Dijkstra guards (CIP-112), the credentials that authorise this transaction body. They replace required signers, and can be key hashes or scripts
+          items:
+            type: object
+            properties:
+              index:
+                type: number
+                description: Position in the body's ordered guard set, counting key and script credentials. A Plutus guard's redeemer uses this index
+                example: 0
+              credential:
+                type: string
+                description: Key hash or script hash, in hex
+                example: bf357f5de69e4aad71954bebd64357a4813ea5233df12fce4a9de582
+              has_script:
+                type: boolean
+                description: True if the credential is a script hash
+                example: true
+              redeemer:
+                anyOf:
+                  - type: object
+                  - type: "null"
+                description: The redeemer that ran a Plutus guard script (fee, execution units and datum), or null for a key or native script guard
+                example: null
+        required_guards:
+          anyOf:
+            - type: array
+            - type: "null"
+          description: Array of credentials this body requires among the guards of its top-level transaction (Dijkstra, CIP-112). A sub-transaction uses this to demand another party's approval of the whole batch
+          items:
+            type: object
+            properties:
+              credential:
+                $ref: "#/components/schemas/tx_info/items/properties/guards/items/properties/credential"
+              has_script:
+                $ref: "#/components/schemas/tx_info/items/properties/guards/items/properties/has_script"
+              datum:
+                anyOf:
+                  - type: object
+                  - type: "null"
+                description: Datum supplied for a Plutus credential (hash and value), or null for a key or native script credential
+                example: null
         voting_procedures:
           anyOf:
             - type: array

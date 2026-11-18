@@ -34,11 +34,15 @@ RETURNS TABLE (
   inputs jsonb,
   outputs jsonb,
   withdrawals jsonb,
+  direct_deposits jsonb,
+  account_balance_intervals jsonb,
   assets_minted jsonb,
   metadata jsonb,
   certificates jsonb,
   native_scripts jsonb,
   plutus_contracts jsonb,
+  guards jsonb,
+  required_guards jsonb,
   voting_procedures jsonb,
   proposal_procedures jsonb
 )

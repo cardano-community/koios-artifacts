@@ -217,6 +217,10 @@
           $ref: "#/components/schemas/tx_info/items/properties/outputs"
         withdrawals:
           $ref: "#/components/schemas/tx_info/items/properties/withdrawals"
+        direct_deposits:
+          $ref: "#/components/schemas/tx_info/items/properties/direct_deposits"
+        account_balance_intervals:
+          $ref: "#/components/schemas/tx_info/items/properties/account_balance_intervals"
         assets_minted:
           $ref: "#/components/schemas/tx_info/items/properties/assets_minted"
         metadata:
@@ -227,3 +231,7 @@
           $ref: "#/components/schemas/tx_info/items/properties/native_scripts"
         plutus_contracts:
           $ref: "#/components/schemas/tx_info/items/properties/plutus_contracts"
+        guards:
+          $ref: "#/components/schemas/tx_info/items/properties/guards"
+        required_guards:
+          $ref: "#/components/schemas/tx_info/items/properties/required_guards"

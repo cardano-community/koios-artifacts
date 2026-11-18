@@ -34,11 +34,15 @@ RETURNS TABLE (
   inputs jsonb,
   outputs jsonb,
   withdrawals jsonb,
+  direct_deposits jsonb,
+  account_balance_intervals jsonb,
   assets_minted jsonb,
   metadata jsonb,
   certificates jsonb,
   native_scripts jsonb,
   plutus_contracts jsonb,
+  guards jsonb,
+  required_guards jsonb,
   voting_procedures jsonb,
   proposal_procedures jsonb
 )
@@ -368,6 +372,49 @@ BEGIN
         GROUP BY tx_id
       ),
 
+      -- Dijkstra (CIP-159): lovelace paid straight into an account, with no output
+      _all_direct_deposits AS (
+        SELECT
+          tx_id,
+          JSONB_AGG(data) AS list
+        FROM (
+          SELECT
+            dd.tx_id,
+            JSONB_BUILD_OBJECT(
+              'amount', dd.amount::text,
+              'stake_addr', grest.cip5_hex_to_stake_addr(sa.hash_raw)
+            ) AS data
+          FROM direct_deposit AS dd
+            INNER JOIN stake_address AS sa ON dd.addr_id = sa.id
+          WHERE _withdrawals IS TRUE
+            AND dd.tx_id = ANY(_tx_id_list)
+        ) AS tmp
+        GROUP BY tx_id
+      ),
+
+      -- Dijkstra (CIP-159): balance ranges an account had to be in for the transaction to be valid
+      _all_account_balance_intervals AS (
+        SELECT
+          tx_id,
+          JSONB_AGG(data) AS list
+        FROM (
+          SELECT
+            abi.tx_id,
+            JSONB_BUILD_OBJECT(
+              'stake_addr', grest.cip5_hex_to_stake_addr(sa.hash_raw),
+              'starting', abi.starting,
+              'lower_bound', abi.lower_bound::text,
+              'upper_bound', abi.upper_bound::text,
+              'exact_value', abi.exact_value::text
+            ) AS data
+          FROM tx_account_balance_interval AS abi
+            INNER JOIN stake_address AS sa ON abi.addr_id = sa.id
+          WHERE _withdrawals IS TRUE
+            AND abi.tx_id = ANY(_tx_id_list)
+        ) AS tmp
+        GROUP BY tx_id
+      ),
+
       _all_mints AS (
         SELECT
           tx_id,
@@ -567,7 +614,9 @@ BEGIN
                   'port', pr.port
                 )),
                 'meta_url', pmr.url,
-                'meta_hash', ENCODE(pmr.hash, 'hex')
+                'meta_hash', ENCODE(pmr.hash, 'hex'),
+                'bls_key', ENCODE(pu.bls_key, 'hex'),
+                'bls_key_pop', ENCODE(pu.bls_key_pop, 'hex')
               )
             ) AS data
           FROM public.pool_update AS pu
@@ -582,7 +631,7 @@ BEGIN
             LEFT JOIN public.pool_metadata_ref AS pmr ON pu.meta_id = pmr.id
           WHERE _certs IS TRUE
             AND pu.registered_tx_id = ANY(_tx_id_list)
-          GROUP BY pu.registered_tx_id, pu.cert_index, ph.hash_raw, pu.active_epoch_no, pu.vrf_key_hash, pu.margin, pu.fixed_cost, pu.pledge, sa.hash_raw, pmr.url, pmr.hash
+          GROUP BY pu.registered_tx_id, pu.cert_index, ph.hash_raw, pu.active_epoch_no, pu.vrf_key_hash, pu.margin, pu.fixed_cost, pu.pledge, sa.hash_raw, pmr.url, pmr.hash, pu.bls_key, pu.bls_key_pop
           --
           UNION ALL
           --
@@ -848,6 +897,70 @@ BEGIN
         GROUP BY tx_id
       ),
 
+      -- Dijkstra (CIP-112): credentials that authorised this body, with the redeemer of a Plutus guard
+      _all_guards AS (
+        SELECT
+          tx_id,
+          JSONB_AGG(data ORDER BY guard_index) AS list
+        FROM (
+          SELECT
+            g.tx_id,
+            g.index AS guard_index,
+            JSONB_BUILD_OBJECT(
+              'index', g.index,
+              'credential', ENCODE(g.credential, 'hex'),
+              'has_script', g.has_script,
+              'redeemer', CASE WHEN r.id IS NULL THEN NULL
+                ELSE JSONB_BUILD_OBJECT(
+                  'fee', r.fee::text,
+                  'unit', JSONB_BUILD_OBJECT(
+                    'steps', r.unit_steps::text,
+                    'mem', r.unit_mem::text
+                  ),
+                  'datum', JSONB_BUILD_OBJECT(
+                    'hash', ENCODE(rd.hash, 'hex'),
+                    'value', rd.value
+                  )
+                )
+              END
+            ) AS data
+          FROM tx_guard AS g
+            LEFT JOIN redeemer AS r ON r.tx_id = g.tx_id
+              AND r.purpose::text = 'guard'
+              AND r.index = g.index
+            LEFT JOIN redeemer_data AS rd ON rd.id = r.redeemer_data_id
+          WHERE _scripts IS TRUE
+            AND g.tx_id = ANY(_tx_id_list)
+        ) AS tmp
+        GROUP BY tx_id
+      ),
+
+      -- Dijkstra (CIP-112): credentials this body requires among the top-level transaction's guards
+      _all_required_guards AS (
+        SELECT
+          tx_id,
+          JSONB_AGG(data) AS list
+        FROM (
+          SELECT
+            rg.tx_id,
+            JSONB_BUILD_OBJECT(
+              'credential', ENCODE(rg.credential, 'hex'),
+              'has_script', rg.has_script,
+              'datum', CASE WHEN d.id IS NULL THEN NULL
+                ELSE JSONB_BUILD_OBJECT(
+                  'hash', ENCODE(d.hash, 'hex'),
+                  'value', d.value
+                )
+              END
+            ) AS data
+          FROM tx_required_guard AS rg
+            LEFT JOIN datum AS d ON d.id = rg.data_id
+          WHERE _scripts IS TRUE
+            AND rg.tx_id = ANY(_tx_id_list)
+        ) AS tmp
+        GROUP BY tx_id
+      ),
+
       _all_voting_procedures AS (
         SELECT
           tx_id,
@@ -1051,11 +1164,15 @@ BEGIN
         ) AS tmp
       ), JSONB_BUILD_ARRAY()),
       COALESCE((SELECT aw.list FROM _all_withdrawals AS aw WHERE _withdrawals IS TRUE AND aw.tx_id = atx.id), JSONB_BUILD_ARRAY()),
+      COALESCE((SELECT adep.list FROM _all_direct_deposits AS adep WHERE _withdrawals IS TRUE AND adep.tx_id = atx.id), JSONB_BUILD_ARRAY()),
+      COALESCE((SELECT aabi.list FROM _all_account_balance_intervals AS aabi WHERE _withdrawals IS TRUE AND aabi.tx_id = atx.id), JSONB_BUILD_ARRAY()),
       COALESCE((SELECT ami.list FROM _all_mints AS ami WHERE _assets IS TRUE AND ami.tx_id = atx.id), JSONB_BUILD_ARRAY()),
       COALESCE((SELECT ame.list FROM _all_metadata AS ame WHERE _metadata IS TRUE AND ame.tx_id = atx.id), NULL),
       COALESCE((SELECT ac.list FROM _all_certs AS ac WHERE _certs IS TRUE AND ac.tx_id = atx.id), JSONB_BUILD_ARRAY()),
       COALESCE((SELECT ans.list FROM _all_native_scripts AS ans WHERE _scripts IS TRUE AND ans.tx_id = atx.id), JSONB_BUILD_ARRAY()),
       COALESCE((SELECT apc.list FROM _all_plutus_contracts AS apc WHERE _scripts IS TRUE AND apc.tx_id = atx.id), JSONB_BUILD_ARRAY()),
+      COALESCE((SELECT ag.list FROM _all_guards AS ag WHERE _scripts IS TRUE AND ag.tx_id = atx.id), JSONB_BUILD_ARRAY()),
+      COALESCE((SELECT arg.list FROM _all_required_guards AS arg WHERE _scripts IS TRUE AND arg.tx_id = atx.id), JSONB_BUILD_ARRAY()),
       COALESCE((SELECT avp.list FROM _all_voting_procedures AS avp WHERE _governance IS TRUE AND avp.tx_id = atx.id), JSONB_BUILD_ARRAY()),
       COALESCE((SELECT app.list FROM _all_proposal_procedures AS app WHERE _governance IS TRUE AND app.tx_id = atx.id), JSONB_BUILD_ARRAY())
     FROM _all_tx AS atx
