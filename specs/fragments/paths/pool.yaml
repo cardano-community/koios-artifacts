@@ -175,6 +175,27 @@
       summary: Pool Updates (History)
       description: Return all pool updates for all pools or only updates for specific pool if specified
       operationId: pool_updates
+/pool_bls_coverage: #RPC
+    get:
+      tags:
+        - Pool
+      parameters:
+        - $ref: "#/components/parameters/_epoch_no"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_bls_coverage"
+        #!macro:koios_errors!#
+      summary: Pool BLS Key Coverage
+      description: >-
+        Shows how much of an epoch's active stake is held by pools whose registration declares a BLS key,
+        overall and within the estimated Leios voting committee. Leios certificates only count stake from
+        committee seats with a usable key, so keyed stake below the quorum threshold means no certificate
+        can pass. Defaults to the current epoch
+      operationId: pool_bls_coverage
 /pool_registrations: #RPC
     get:
       tags:

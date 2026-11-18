@@ -380,6 +380,7 @@ Stake pool queries.
 | Function | Description |
 |----------|-------------|
 | `grest.pool_blocks()` | Get blocks minted by pool |
+| `grest.pool_bls_coverage()` | Get the share of active stake held by pools with a BLS key (Leios) |
 | `grest.pool_calidus_keys()` | List valid Calidus keys |
 | `grest.pool_delegators()` | Get current delegators |
 | `grest.pool_delegators_list()` | Get delegator list (brief) |
