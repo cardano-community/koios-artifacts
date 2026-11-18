@@ -4681,7 +4681,7 @@ components:
             example: "74325855210"
           tx_count:
             type: number
-            description: Number of transactions submitted in epoch
+            description: Number of transactions submitted in epoch, counting each Dijkstra sub-transaction (CIP-118) as its own transaction
             example: 357919
           blk_count:
             type: number
@@ -5254,8 +5254,12 @@ components:
             example: 1704757130
           tx_count:
             type: number
-            description: Number of transactions in the block
+            description: Number of top-level transactions in the block. Dijkstra sub-transactions (CIP-118) are not counted, see sub_tx_count on /block_info
             example: 2
+          has_leios_cert:
+            type: boolean
+            description: True if the block body carries a Leios certificate, which certifies an endorser block. Always false until Leios is active
+            example: false
           vrf_key:
             type: string
             description: VRF key of the block producer
@@ -5302,6 +5306,12 @@ components:
             $ref: "#/components/schemas/blocks/items/properties/block_time"
           tx_count:
             $ref: "#/components/schemas/blocks/items/properties/tx_count"
+          sub_tx_count:
+            type: number
+            description: Number of Dijkstra sub-transactions (CIP-118) carried by the block's transactions. The block holds tx_count plus sub_tx_count transaction rows
+            example: 0
+          has_leios_cert:
+            $ref: "#/components/schemas/blocks/items/properties/has_leios_cert"
           vrf_key:
             $ref: "#/components/schemas/blocks/items/properties/vrf_key"
           op_cert:

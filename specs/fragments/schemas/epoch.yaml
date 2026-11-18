@@ -20,7 +20,7 @@
           example: "74325855210"
         tx_count:
           type: number
-          description: Number of transactions submitted in epoch
+          description: Number of transactions submitted in epoch, counting each Dijkstra sub-transaction (CIP-118) as its own transaction
           example: 357919
         blk_count:
           type: number
