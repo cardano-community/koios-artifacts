@@ -77,7 +77,8 @@ CREATE TABLE grest.genesis (
   slotlength varchar,
   maxkesrevolutions varchar,
   securityparam varchar,
-  alonzogenesis varchar
+  alonzogenesis varchar,
+  conwaygenesis varchar
 );
 
 -- Era mapping TABLE --
