@@ -5350,11 +5350,11 @@ components:
               - type: "null"
           total_balance:
             type: string
-            description: Total balance of the account including UTxO, rewards and MIRs (in number)
+            description: Total balance of the account including UTxO, rewards, MIRs and direct deposits (in number)
             example: "207116800428"
           withdrawable_balance:
             type: string
-            description: Balance stake available for withdrawal
+            description: Amount the account can withdraw now, which is its rewards, MIRs, proposal refunds and direct deposits less its withdrawals
             example: "44352623297"
           utxo:
             type: string
@@ -5368,13 +5368,18 @@ components:
             type: string
             description: Total rewards withdrawn by the account
             example: "12105104750"
+          rewards_available:
+            type: string
+            deprecated: true
+            description: Deprecated, use withdrawable_balance, which holds the same figure. This field will be removed in a later release
+            example: "44352623297"
           deposit:
             type: string
             description: Stake Registration deposit for the account
             example: "2000000"
           direct_deposit:
             type: string
-            description: Total direct deposit made against account
+            description: Total lovelace paid straight into the account by direct deposits (CIP-159)
             example: "1000000000"
           reserves:
             type: string

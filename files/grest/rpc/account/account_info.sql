@@ -9,6 +9,7 @@ RETURNS TABLE (
   utxo text,
   rewards text,
   withdrawals text,
+  rewards_available text,
   deposit text,
   direct_deposit text,
   reserves text,
@@ -44,6 +45,8 @@ BEGIN
       COALESCE(utxo_t.utxo, 0)::text AS utxo,
       COALESCE(rewards_t.rewards, 0)::text AS rewards,
       COALESCE(withdrawals_t.withdrawals, 0)::text AS withdrawals,
+      -- Deprecated: the same figure as withdrawable_balance, kept for one release so existing clients keep working
+      (COALESCE(rewards_t.rewards, 0) + COALESCE(dir_deposit.deposit,0) + COALESCE(reserves_t.reserves, 0) + COALESCE(treasury_t.treasury, 0) + COALESCE(proposal_refund_t.proposal_refund, 0) - COALESCE(withdrawals_t.withdrawals, 0))::text AS rewards_available,
       COALESCE(status_t.deposit,0)::text AS deposit,
       COALESCE(dir_deposit.deposit,0)::text AS direct_deposit,
       COALESCE(reserves_t.reserves, 0)::text AS reserves,

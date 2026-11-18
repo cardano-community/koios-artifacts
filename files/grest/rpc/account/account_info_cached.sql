@@ -5,11 +5,13 @@ RETURNS TABLE (
   delegated_pool varchar,
   delegated_drep text,
   total_balance text,
+  withdrawable_balance text,
   utxo text,
   rewards text,
   withdrawals text,
   rewards_available text,
   deposit text,
+  direct_deposit text,
   reserves text,
   treasury text,
   proposal_refund text
@@ -41,11 +43,14 @@ BEGIN
       cardano.bech32_encode('pool', ph.hash_raw)::varchar AS delegated_pool,
       vote_t.delegated_drep,
       sdc.total_balance::text,
+      sdc.withdrawable_balance::text,
       sdc.utxo::text,
       sdc.rewards::text,
       sdc.withdrawals::text,
-      sdc.rewards_available::text,
+      -- Deprecated: the same figure as withdrawable_balance, kept for one release
+      sdc.withdrawable_balance::text AS rewards_available,
       COALESCE(status_t.deposit,0)::text AS deposit,
+      COALESCE(dir_deposit.deposit, 0)::text AS direct_deposit,
       COALESCE(reserves_t.reserves, 0)::text AS reserves,
       COALESCE(treasury_t.treasury, 0)::text AS treasury,
       COALESCE(proposal_refund_t.proposal_refund, 0)::text AS proposal_refund
@@ -109,6 +114,14 @@ BEGIN
       ) AS vote_t ON vote_t.addr_id = status_t.id
       LEFT JOIN (
         SELECT
+          dd.addr_id,
+          COALESCE(SUM(dd.amount), 0) AS deposit
+        FROM direct_deposit AS dd
+        WHERE dd.addr_id = ANY(sa_id_list)
+        GROUP BY dd.addr_id
+      ) AS dir_deposit ON dir_deposit.addr_id = status_t.id
+      LEFT JOIN (
+        SELECT
           r.addr_id,
           COALESCE(SUM(r.amount), 0) AS reserves
         FROM reward_rest AS r
@@ -159,11 +172,13 @@ BEGIN
       ai.delegated_pool AS pool_id,
       ai.delegated_drep,
       ai.total_balance::text,
+      ai.withdrawable_balance::text,
       ai.utxo::text,
       ai.rewards::text,
       ai.withdrawals::text,
-      ai.withdrawable_balance::text,
+      ai.rewards_available::text,
       ai.deposit,
+      ai.direct_deposit,
       ai.reserves,
       ai.treasury,
       ai.proposal_refund

@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS grest.stake_distribution_cache (
   utxo numeric,
   rewards numeric,
   withdrawals numeric,
-  rewards_available numeric
+  withdrawable_balance numeric
 );
 
 CREATE OR REPLACE PROCEDURE grest.update_stake_distribution_cache()
@@ -159,6 +159,18 @@ BEGIN
       GROUP BY accounts_with_delegated_pools.stake_address_id
     ),
 
+    -- Dijkstra (CIP-159) pays lovelace straight into an account. The snapshot already holds
+    -- deposits made before it, so total_balance only adds the later ones.
+    account_delta_direct_deposits AS (
+      SELECT
+        awdp.stake_address_id,
+        COALESCE(SUM(dd.amount), 0) AS amount
+      FROM direct_deposit AS dd
+      INNER JOIN accounts_with_delegated_pools AS awdp ON awdp.stake_address_id = dd.addr_id
+      WHERE dd.tx_id > _last_account_tx_id
+      GROUP BY awdp.stake_address_id
+    ),
+
     account_total_rewards AS (
       SELECT
         accounts_with_delegated_pools.stake_address_id,
@@ -186,6 +198,15 @@ BEGIN
       INNER JOIN accounts_with_delegated_pools AS awdp ON awdp.stake_address_id = ir.addr_id
       WHERE ir.spendable_epoch <= _latest_epoch
       GROUP BY awdp.stake_address_id
+    ),
+
+    account_total_direct_deposits AS (
+      SELECT
+        awdp.stake_address_id,
+        COALESCE(SUM(dd.amount), 0) AS amount
+      FROM direct_deposit AS dd
+      INNER JOIN accounts_with_delegated_pools AS awdp ON awdp.stake_address_id = dd.addr_id
+      GROUP BY awdp.stake_address_id
     )
 
   -- INSERT QUERY START
@@ -193,22 +214,24 @@ BEGIN
     SELECT
       awdp.stake_address_id,
       pi.pool_id,
-      COALESCE(aas.amount, 0) + COALESCE(ado.amount, 0) - COALESCE(adi.amount, 0) + COALESCE(adr.rewards, 0) + COALESCE(adir.amount, 0) - COALESCE(adw.withdrawals, 0) AS total_balance,
-      COALESCE(aas.amount, 0) + COALESCE(ado.amount, 0) - COALESCE(adi.amount, 0) + COALESCE(adr.rewards, 0) + COALESCE(adir.amount, 0) - COALESCE(adw.withdrawals, 0) - COALESCE(atrew.rewards, 0) - COALESCE(atir.amount, 0) + COALESCE(atw.withdrawals, 0) AS utxo,
+      COALESCE(aas.amount, 0) + COALESCE(ado.amount, 0) - COALESCE(adi.amount, 0) + COALESCE(adr.rewards, 0) + COALESCE(adir.amount, 0) + COALESCE(addd.amount, 0) - COALESCE(adw.withdrawals, 0) AS total_balance,
+      COALESCE(aas.amount, 0) + COALESCE(ado.amount, 0) - COALESCE(adi.amount, 0) + COALESCE(adr.rewards, 0) + COALESCE(adir.amount, 0) + COALESCE(addd.amount, 0) - COALESCE(adw.withdrawals, 0) - COALESCE(atrew.rewards, 0) - COALESCE(atir.amount, 0) - COALESCE(atdd.amount, 0) + COALESCE(atw.withdrawals, 0) AS utxo,
       COALESCE(atrew.rewards, 0) AS rewards,
       COALESCE(atw.withdrawals, 0) AS withdrawals,
-      COALESCE(atrew.rewards, 0) + COALESCE(atir.amount, 0) - COALESCE(atw.withdrawals, 0) AS rewards_available
+      COALESCE(atrew.rewards, 0) + COALESCE(atir.amount, 0) + COALESCE(atdd.amount, 0) - COALESCE(atw.withdrawals, 0) AS withdrawable_balance
     FROM accounts_with_delegated_pools AS awdp
     INNER JOIN pool_ids AS pi ON pi.stake_address_id = awdp.stake_address_id
     LEFT JOIN account_active_stake AS aas ON aas.stake_address_id = awdp.stake_address_id
     LEFT JOIN account_total_rewards AS atrew ON atrew.stake_address_id = awdp.stake_address_id
     LEFT JOIN account_total_withdrawals AS atw ON atw.stake_address_id = awdp.stake_address_id
     LEFT JOIN account_total_instant_rewards AS atir ON atir.stake_address_id = awdp.stake_address_id
+    LEFT JOIN account_total_direct_deposits AS atdd ON atdd.stake_address_id = awdp.stake_address_id
     LEFT JOIN account_delta_input AS adi ON adi.stake_address_id = awdp.stake_address_id
     LEFT JOIN account_delta_output AS ado ON ado.stake_address_id = awdp.stake_address_id
     LEFT JOIN account_delta_rewards AS adr ON adr.stake_address_id = awdp.stake_address_id
     LEFT JOIN account_delta_instant_rewards AS adir ON adir.stake_address_id = awdp.stake_address_id
     LEFT JOIN account_delta_withdrawals AS adw ON adw.stake_address_id = awdp.stake_address_id
+    LEFT JOIN account_delta_direct_deposits AS addd ON addd.stake_address_id = awdp.stake_address_id
     ON CONFLICT (stake_address_id) DO
       UPDATE
         SET pool_id = excluded.pool_id,
@@ -216,7 +239,7 @@ BEGIN
           utxo = excluded.utxo,
           rewards = excluded.rewards,
           withdrawals = excluded.withdrawals,
-          rewards_available = excluded.rewards_available
+          withdrawable_balance = excluded.withdrawable_balance
   ;
 
   INSERT INTO grest.control_table (key, last_value)
