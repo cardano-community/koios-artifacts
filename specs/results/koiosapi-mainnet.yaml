@@ -134,6 +134,17 @@ info:
 
     Yet, there may be cases where the above restrictions may need exceptions (for example, an explorer or a wallet might need more connections than above - going beyond the Burst Limit). For such cases, it is best to approach the team and we can work towards a solution.
 
+    ## Dijkstra sub-transactions
+
+    From the Dijkstra era, a transaction can carry sub-transactions (CIP-118), which succeed or fail together with it as one batch. Koios returns each sub-transaction as a transaction of its own, which affects how results read:
+
+      - Any transaction hash can be a sub-transaction. Its `parent_tx_hash` gives the top-level transaction, and `sub_tx_hashes` on `/tx_info` lists the sub-transactions a top-level transaction carries.
+      - A sub-transaction has a `fee` of 0 and a null `deposit`, because both are recorded once on the top-level transaction. It shares that transaction's `tx_block_index`, so the index is no longer unique within a block.
+      - The `tx_size` of a top-level transaction includes its sub-transactions, so adding the sizes of both counts them twice.
+      - A block's `tx_count` counts only top-level transactions, while an epoch's `tx_count` counts sub-transactions too. `/block_info` gives the difference as `sub_tx_count`.
+      - Only a top-level transaction can be submitted again. The CBOR of a sub-transaction is already part of its parent's.
+      - When a batch fails script validation, only the top-level transaction is stored, so `/tx_status` never finds its sub-transactions.
+
     # Authentication
 
     While Koios public tier remains unauthenticated and allows queries without any authentication, it has low limits to prevent actions against an erroraneous query/loop from a consumer. There is also a Free tier which requires setting up Bearer Auth token that is linked to the owner's wallet account (which can be connected to via [Koios website](https://koios.rest/pricing/Pricing.html) ).
@@ -781,7 +792,9 @@ paths:
         "413":
           $ref: "#/components/responses/PayloadTooLarge"
       summary: Transaction Status
-      description: Get the number of block confirmations for a given transaction hash list
+      description: >-
+        Get the number of block confirmations for a given transaction hash list.
+        A Dijkstra sub-transaction from a batch that failed script validation is never found, because only its top-level transaction is stored
       operationId: tx_status
   /tx_outs_epoch: #RPC
     get:
@@ -6435,7 +6448,7 @@ components:
             $ref: "#/components/schemas/tx_info/items/properties/tx_timestamp"
           cbor:
             type: string
-            description: CBOR encoded raw transaction.
+            description: CBOR encoded raw transaction. For a Dijkstra sub-transaction this is only its own part of the top-level transaction, which cannot be submitted alone
           valid_contract:
             type: boolean
             description: Whether contract is valid (or if there is no contract)

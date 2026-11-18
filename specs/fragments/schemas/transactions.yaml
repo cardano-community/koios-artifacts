@@ -502,7 +502,7 @@
           $ref: "#/components/schemas/tx_info/items/properties/tx_timestamp"
         cbor:
           type: string
-          description: CBOR encoded raw transaction.
+          description: CBOR encoded raw transaction. For a Dijkstra sub-transaction this is only its own part of the top-level transaction, which cannot be submitted alone
         valid_contract:
           type: boolean
           description: Whether contract is valid (or if there is no contract)
