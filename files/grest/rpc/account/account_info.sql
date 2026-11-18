@@ -40,7 +40,7 @@ BEGIN
       END AS status,
       pool_t.delegated_pool,
       vote_t.delegated_drep,
-      (COALESCE(utxo_t.utxo, 0) + COALESCE(dir_deposit.deposit,0) + COALESCE(rewards_t.rewards, 0) + COALESCE(reserves_t.reserves, 0) + COALESCE(treasury_t.treasury, 0) - COALESCE(withdrawals_t.withdrawals, 0))::text AS total_balance,
+      (COALESCE(utxo_t.utxo, 0) + COALESCE(dir_deposit.deposit,0) + COALESCE(rewards_t.rewards, 0) + COALESCE(reserves_t.reserves, 0) + COALESCE(treasury_t.treasury, 0) + COALESCE(proposal_refund_t.proposal_refund, 0) - COALESCE(withdrawals_t.withdrawals, 0))::text AS total_balance,
       (COALESCE(rewards_t.rewards, 0) + COALESCE(dir_deposit.deposit,0) + COALESCE(reserves_t.reserves, 0) + COALESCE(treasury_t.treasury, 0) + COALESCE(proposal_refund_t.proposal_refund, 0) - COALESCE(withdrawals_t.withdrawals, 0))::text AS withdrawable_balance,
       COALESCE(utxo_t.utxo, 0)::text AS utxo,
       COALESCE(rewards_t.rewards, 0)::text AS rewards,

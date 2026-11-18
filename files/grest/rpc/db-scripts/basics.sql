@@ -78,6 +78,7 @@ CREATE TABLE grest.genesis (
   maxkesrevolutions varchar,
   securityparam varchar,
   alonzogenesis varchar,
+  conwaygenesis varchar,
   dijkstragenesis varchar
 );
 

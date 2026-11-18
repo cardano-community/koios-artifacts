@@ -3900,6 +3900,12 @@ components:
             type: string
             example: '{\"lovelacePerUTxOWord\":34482,\"executionPrices\":{\"prSteps\":{\"numerator\":721,\"denominator\":10000000},...'
             description: A JSON dump of Alonzo Genesis
+          conwaygenesis:
+            anyOf:
+              - type: string
+              - type: "null"
+            example: '{\"poolVotingThresholds\":{\"committeeNormal\":0.51,...},\"govActionLifetime\":6,\"dRepDeposit\":500000000,...}'
+            description: A JSON dump of Conway Genesis. Null on an instance whose setup script predates it
           dijkstragenesis:
             anyOf:
               - type: string
@@ -5251,13 +5257,9 @@ components:
       items:
         properties:
           proto_major:
-            type: number
-            description: Protocol major version
-            example: 6
+            $ref: "#/components/schemas/blocks/items/properties/proto_major"
           proto_minor:
-            type: number
-            description: Protocol major version
-            example: 2
+            $ref: "#/components/schemas/blocks/items/properties/proto_minor"
           era:
             $ref: "#/components/schemas/era_summaries/items/properties/era"
           blocks:
@@ -5322,9 +5324,13 @@ components:
             description: Counter value of the operational certificate used to create this block
             example: 5
           proto_major:
-            $ref: "#/components/schemas/epoch_params/items/properties/protocol_major"
+            type: number
+            description: Protocol major version in the block header, as advertised by the node that produced the block
+            example: 10
           proto_minor:
-            $ref: "#/components/schemas/epoch_params/items/properties/protocol_minor"
+            type: number
+            description: Protocol minor version in the block header, as advertised by the node that produced the block. It can differ between blocks in the same epoch and is not the network's protocol version, which /epoch_params returns
+            example: 0
           parent_hash:
             type: string
             description: Previous Hash of the current block
@@ -5370,9 +5376,9 @@ components:
           pool:
             $ref: "#/components/schemas/blocks/items/properties/pool"
           proto_major:
-            $ref: "#/components/schemas/epoch_params/items/properties/protocol_major"
+            $ref: "#/components/schemas/blocks/items/properties/proto_major"
           proto_minor:
-            $ref: "#/components/schemas/epoch_params/items/properties/protocol_minor"
+            $ref: "#/components/schemas/blocks/items/properties/proto_minor"
           total_output:
             anyOf:
               - type: string
@@ -5682,7 +5688,7 @@ components:
               - type: "null"
           total_balance:
             type: string
-            description: Total balance of the account including UTxO, rewards, MIRs and direct deposits (in number)
+            description: Total balance of the account including UTxO, rewards, MIRs, proposal refunds and direct deposits (in number)
             example: "207116800428"
           withdrawable_balance:
             type: string
@@ -5721,7 +5727,7 @@ components:
             type: string
             description: Total treasury MIR value of the account
             example: "0"
-          proposal-refund:
+          proposal_refund:
             type: string
             description: Total proposal refund for this account
             example: "0"

@@ -261,7 +261,7 @@ COMMENT ON FUNCTION grest.pool_info_retire_status IS 'Internal function to updat
 DROP TRIGGER IF EXISTS pool_info_retire_status_trigger ON public.epoch_state;
 
 CREATE TRIGGER pool_info_retire_status_trigger
-AFTER INSERT ON public.epoch_state
+AFTER INSERT OR UPDATE ON public.epoch_state
 FOR EACH ROW EXECUTE FUNCTION grest.pool_info_retire_status();
 
 

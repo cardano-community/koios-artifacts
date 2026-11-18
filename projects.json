@@ -197,6 +197,14 @@
       }
     },
     {
+      "text": "Super Cardano",
+      "link": "https://supercardano.com",
+      "logo": {
+        "dark": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/super-cardano.png",
+        "light": "https://raw.githubusercontent.com/cardano-community/koios-artifacts/main/images/projects/super-cardano.png"
+      }
+    },
+    {
       "text": "Tabulali",
       "link": "https://eddex.github.io/tabulali/",
       "logo": {
