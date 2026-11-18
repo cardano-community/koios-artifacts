@@ -43,6 +43,30 @@ AS $$
         'collateral_percent', pp.collateral_percent,
         'max_collateral_inputs', pp.max_collateral_inputs,
         'coins_per_utxo_size', pp.coins_per_utxo_size
+      -- Conway parameters, in a second object because JSONB_BUILD_OBJECT takes at most 100 arguments
+      ) || JSONB_BUILD_OBJECT(
+        'pvt_motion_no_confidence', pp.pvt_motion_no_confidence,
+        'pvt_committee_normal', pp.pvt_committee_normal,
+        'pvt_committee_no_confidence', pp.pvt_committee_no_confidence,
+        'pvt_hard_fork_initiation', pp.pvt_hard_fork_initiation,
+        'pvtpp_security_group', pp.pvtpp_security_group,
+        'dvt_motion_no_confidence', pp.dvt_motion_no_confidence,
+        'dvt_committee_normal', pp.dvt_committee_normal,
+        'dvt_committee_no_confidence', pp.dvt_committee_no_confidence,
+        'dvt_update_to_constitution', pp.dvt_update_to_constitution,
+        'dvt_hard_fork_initiation', pp.dvt_hard_fork_initiation,
+        'dvt_p_p_network_group', pp.dvt_p_p_network_group,
+        'dvt_p_p_economic_group', pp.dvt_p_p_economic_group,
+        'dvt_p_p_technical_group', pp.dvt_p_p_technical_group,
+        'dvt_p_p_gov_group', pp.dvt_p_p_gov_group,
+        'dvt_treasury_withdrawal', pp.dvt_treasury_withdrawal,
+        'committee_min_size', pp.committee_min_size,
+        'committee_max_term_length', pp.committee_max_term_length,
+        'gov_action_lifetime', pp.gov_action_lifetime,
+        'gov_action_deposit', pp.gov_action_deposit,
+        'drep_deposit', pp.drep_deposit,
+        'drep_activity', pp.drep_activity,
+        'min_fee_ref_script_cost_per_byte', pp.min_fee_ref_script_cost_per_byte
       )) AS data
   FROM public.param_proposal pp
     INNER JOIN tx t ON t.id = pp.registered_tx_id
