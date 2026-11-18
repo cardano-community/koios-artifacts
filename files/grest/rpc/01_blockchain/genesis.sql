@@ -11,7 +11,8 @@ RETURNS TABLE (
   slotlength varchar,
   maxkesrevolutions varchar,
   securityparam varchar,
-  alonzogenesis varchar
+  alonzogenesis varchar,
+  dijkstragenesis varchar
 )
 LANGUAGE sql STABLE
 AS $$
@@ -27,6 +28,7 @@ AS $$
     g.slotlength,
     g.maxkesrevolutions,
     g.securityparam,
-    g.alonzogenesis
+    g.alonzogenesis,
+    g.dijkstragenesis
   FROM grest.genesis AS g;
 $$;

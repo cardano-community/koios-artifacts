@@ -3887,6 +3887,12 @@ components:
             type: string
             example: '{\"lovelacePerUTxOWord\":34482,\"executionPrices\":{\"prSteps\":{\"numerator\":721,\"denominator\":10000000},...'
             description: A JSON dump of Alonzo Genesis
+          dijkstragenesis:
+            anyOf:
+              - type: string
+              - type: "null"
+            example: '{\"leiosCommitteeSize\":900,\"minPoolMargin\":0.015,\"perasCertBoost\":15,...}'
+            description: A JSON dump of Dijkstra Genesis, which sets the initial values of the Dijkstra protocol parameters. Null when the node configuration has no Dijkstra genesis file
     totals:
       description: Array of supply/reserves/utxo/fees/treasury stats
       type: array
