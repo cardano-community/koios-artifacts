@@ -163,6 +163,18 @@
             - type: "null"
           description: Pool's registration deposit in number
           example: "500000000"
+        bls_key:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: BLS public key (96 bytes, hex) declared by the pool's current registration, which Leios and Peras voting use. Null if the current registration declares none, even if an earlier one did
+          example: null
+        bls_key_pop:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Proof of possession (48 bytes, hex) for bls_key, already verified by the ledger
+          example: null
         reward_addr:
           anyOf:
             - type: string
@@ -364,8 +376,81 @@
           type: string
           description: Latest transaction hash used for delegation by the account
           example: 368d08fe86804d637649341d3aec4a9baa7dffa6d00f16de2ba9dba814f1c948
+  pool_bls_coverage:
+    description: BLS key coverage of an epoch's active stake
+    type: array
+    items:
+      type: object
+      properties:
+        epoch_no:
+          $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+        active_stake:
+          type: string
+          description: Total active stake of the epoch (in numbers)
+          example: "21250000000000000"
+        pool_count:
+          type: number
+          description: Number of pools with active stake in the epoch
+          example: 2900
+        bls_pool_count:
+          type: number
+          description: Number of those pools whose registration in force for the epoch declares a BLS key
+          example: 640
+        bls_stake:
+          type: string
+          description: Active stake held by pools with a BLS key (in numbers)
+          example: "18062500000000000"
+        bls_stake_share:
+          anyOf:
+            - type: number
+            - type: "null"
+          description: Share of the epoch's active stake held by pools with a BLS key, from 0 to 1
+          example: 0.85
+        leios_committee_size:
+          $ref: "#/components/schemas/epoch_params/items/properties/leios_committee_size"
+        leios_quorum_stake_threshold:
+          $ref: "#/components/schemas/epoch_params/items/properties/leios_quorum_stake_threshold"
+        committee_bls_pool_count:
+          type: number
+          description: >-
+            Number of keyed pools within the estimated Leios committee, which is the leios_committee_size pools
+            with the most active stake, ties broken by ascending pool id. This follows the committee rule on
+            cardano-ledger master, which has not been released, and does not model key expiry
+          example: 610
+        committee_bls_stake_share:
+          anyOf:
+            - type: number
+            - type: "null"
+          description: >-
+            Share of the epoch's active stake held by keyed pools within the estimated Leios committee, from 0 to 1.
+            Leios certificates need this to reach leios_quorum_stake_threshold
+          example: 0.82
   pool_registrations:
-    description: Array of pool registrations/retirements
+    description: Array of pool registrations
+    type: array
+    items:
+      type: object
+      properties:
+        pool_id_bech32:
+          $ref: "#/components/schemas/pool_info/items/properties/pool_id_bech32"
+        tx_hash:
+          $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+        block_hash:
+          $ref: "#/components/schemas/blocks/items/properties/hash"
+        block_height:
+          $ref: "#/components/schemas/blocks/items/properties/block_height"
+        epoch_no:
+          $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+        epoch_slot:
+          $ref: "#/components/schemas/blocks/items/properties/epoch_slot"
+        active_epoch_no:
+          $ref: "#/components/schemas/pool_updates/items/properties/active_epoch_no"
+        bls_key:
+          $ref: "#/components/schemas/pool_updates/items/properties/bls_key"
+        bls_key_pop:
+          $ref: "#/components/schemas/pool_updates/items/properties/bls_key_pop"
+  pool_retirements:
+    description: Array of pool retirements
     type: array
     items:
       type: object
@@ -458,6 +543,27 @@
           $ref: "#/components/schemas/pool_info/items/properties/pledge"
         reward_addr:
           $ref: "#/components/schemas/pool_info/items/properties/reward_addr"
+        deposit:
+          anyOf:
+            - type: string
+            - type: "null"
+          type: string
+          description: Pool Deposit (if registering) associated with this pool Update
+          example: "500000000"
+        bls_key:
+          anyOf:
+            - type: string
+            - type: "null"
+          type: string
+          description: BLS Verification key associated with pool registration, if present
+          example: "null"
+        bls_key_pop:
+          anyOf:
+            - type: string
+            - type: "null"
+          type: string
+          description: Proof of BLS Verification key ownership already verified by ledger
+          example: "null"
         owners:
           $ref: "#/components/schemas/pool_info/items/properties/owners"
         relays:

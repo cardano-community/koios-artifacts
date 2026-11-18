@@ -78,7 +78,8 @@ CREATE TABLE grest.genesis (
   maxkesrevolutions varchar,
   securityparam varchar,
   alonzogenesis varchar,
-  conwaygenesis varchar
+  conwaygenesis varchar,
+  dijkstragenesis varchar
 );
 
 -- Era mapping TABLE --
@@ -110,7 +111,10 @@ VALUES
 ('Goguen', 'Babbage', 8, 0, 'Praos', 'Ouroboros Praos', 'Valentine HF'),
 ('Voltaire', 'Conway', 9, 0, 'Praos', 'Ouroboros Genesis/Praos', 'Chang HF'),
 ('Voltaire', 'Conway', 10, 0, 'Praos', 'Ouroboros Genesis/Praos', 'Plomin HF'),
-('Voltaire', 'Conway', 11, 0, 'Praos', 'Ouroboros Genesis/Praos', 'Van Rossem HF');
+('Voltaire', 'Conway', 11, 0, 'Praos', 'Ouroboros Genesis/Praos', 'Van Rossem HF'),
+('Basho', 'Dijkstra', 12, 0, 'Leios', 'Ouroboros Linear Leios', 'Dijkstra HF'),
+('Basho', 'Dijkstra', 13, 0, 'Peras', 'Ouroboros Peras', 'Peras Activation') -- placeholder
+;
 
 -- POOL_GROUPS TABLE --
 DROP TABLE IF EXISTS grest.pool_groups;
@@ -142,7 +146,7 @@ BEGIN
       ),
       E'\n'
     )
-  FROM 
+  FROM
     pg_proc
   WHERE
     pronamespace = 'grest'::regnamespace  -- schema name here
@@ -151,7 +155,7 @@ BEGIN
   IF _sql IS NOT NULL THEN
     RAISE NOTICE '%', _sql; -- debug
     EXECUTE _sql;
-  ELSE 
+  ELSE
     RAISE NOTICE 'No fuctions found in schema %', quote_ident('grest');
   END IF;
 END

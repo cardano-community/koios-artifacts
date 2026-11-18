@@ -6,7 +6,9 @@ RETURNS TABLE (
   block_height word31type,
   epoch_no word31type,
   epoch_slot word31type,
-  active_epoch_no bigint
+  active_epoch_no bigint,
+  bls_key text,
+  bls_key_pop text
 )
 LANGUAGE sql STABLE
 AS $$
@@ -17,7 +19,9 @@ AS $$
     b.block_no,
     b.epoch_no,
     b.epoch_slot_no,
-    pu.active_epoch_no
+    pu.active_epoch_no,
+    ENCODE(pu.bls_key, 'hex'),
+    ENCODE(pu.bls_key_pop, 'hex')
   FROM pool_update AS pu
     LEFT JOIN tx ON pu.registered_tx_id = tx.id
     INNER JOIN block AS b ON tx.block_id = b.id

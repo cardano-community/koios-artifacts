@@ -59,6 +59,14 @@ AS $$
       FROM withdrawal
       WHERE addr_id IN (SELECT id FROM sa_id_list)
     )
+    UNION (
+      SELECT
+        'direct_deposit' AS action_type,
+        tx_id,
+        addr_id
+      FROM direct_deposit
+      WHERE addr_id IN (SELECT id FROM sa_id_list)
+    )
   )
   SELECT
     sa.stake_address,
@@ -75,4 +83,4 @@ AS $$
   ORDER BY sa.stake_address, b.slot_no DESC;
 $$;
 
-COMMENT ON FUNCTION grest.account_update_history IS 'Get historical updates (registration, deregistration, delegation and withdrawals) for given stake addresses'; -- noqa: LT01
+COMMENT ON FUNCTION grest.account_update_history IS 'Get historical updates (registration, deregistration, delegation, withdrawals and direct deposits) for given stake addresses'; -- noqa: LT01

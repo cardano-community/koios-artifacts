@@ -9,6 +9,8 @@ RETURNS TABLE (
   block_size word31type,
   block_time integer,
   tx_count bigint,
+  sub_tx_count bigint,
+  has_leios_cert boolean,
   vrf_key varchar,
   op_cert text,
   op_cert_counter word63type,
@@ -58,6 +60,8 @@ BEGIN
     b.size AS block_size,
     EXTRACT(EPOCH FROM b.time)::integer AS block_time,
     b.tx_count,
+    COALESCE(block_data.sub_tx_count, 0),
+    b.has_leios_cert,
     b.vrf_key,
     ENCODE(b.op_cert::bytea, 'hex') AS op_cert,
     b.op_cert_counter,
@@ -86,7 +90,9 @@ BEGIN
     LEFT JOIN LATERAL (
       SELECT
         SUM(tx_data.total_output) AS total_output,
-        SUM(tx.fee) AS total_fees
+        SUM(tx.fee) AS total_fees,
+        -- Dijkstra sub-transactions (CIP-118), which block.tx_count leaves out
+        COUNT(tx.id) FILTER (WHERE tx.parent_tx_id IS NOT NULL) AS sub_tx_count
       FROM public.tx
         JOIN LATERAL (
           SELECT SUM(tx_out.value) AS total_output

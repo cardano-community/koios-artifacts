@@ -134,6 +134,17 @@ info:
 
     Yet, there may be cases where the above restrictions may need exceptions (for example, an explorer or a wallet might need more connections than above - going beyond the Burst Limit). For such cases, it is best to approach the team and we can work towards a solution.
 
+    ## Dijkstra sub-transactions
+
+    From the Dijkstra era, a transaction can carry sub-transactions (CIP-118), which succeed or fail together with it as one batch. Koios returns each sub-transaction as a transaction of its own, which affects how results read:
+
+      - Any transaction hash can be a sub-transaction. Its `parent_tx_hash` gives the top-level transaction, and `sub_tx_hashes` on `/tx_info` lists the sub-transactions a top-level transaction carries.
+      - A sub-transaction has a `fee` of 0 and a null `deposit`, because both are recorded once on the top-level transaction. It shares that transaction's `tx_block_index`, so the index is no longer unique within a block.
+      - The `tx_size` of a top-level transaction includes its sub-transactions, so adding the sizes of both counts them twice.
+      - A block's `tx_count` counts only top-level transactions, while an epoch's `tx_count` counts sub-transactions too. `/block_info` gives the difference as `sub_tx_count`.
+      - Only a top-level transaction can be submitted again. The CBOR of a sub-transaction is already part of its parent's.
+      - When a batch fails script validation, only the top-level transaction is stored, so `/tx_status` never finds its sub-transactions.
+
     # Authentication
 
     While Koios public tier remains unauthenticated and allows queries without any authentication, it has low limits to prevent actions against an erroraneous query/loop from a consumer. There is also a Free tier which requires setting up Bearer Auth token that is linked to the owner's wallet account (which can be connected to via [Koios website](https://koios.rest/pricing/Pricing.html) ).
@@ -781,7 +792,9 @@ paths:
         "413":
           $ref: "#/components/responses/PayloadTooLarge"
       summary: Transaction Status
-      description: Get the number of block confirmations for a given transaction hash list
+      description: >-
+        Get the number of block confirmations for a given transaction hash list.
+        A Dijkstra sub-transaction from a batch that failed script validation is never found, because only its top-level transaction is stored
       operationId: tx_status
   /tx_outs_epoch: #RPC
     get:
@@ -1288,9 +1301,37 @@ paths:
           $ref: "#/components/responses/PayloadTooLarge"
       summary: Account Update History
       description: >-
-        Get the account updates (registration, deregistration, delegation and
-        withdrawals) for given stake addresses
+        Get the account updates (registration, deregistration, delegation,
+        withdrawals and direct deposits) for given stake addresses
       operationId: account_update_history
+  /account_direct_deposits: #RPC
+    post:
+      tags:
+        - Stake Account
+      requestBody:
+        $ref: "#/components/requestBodies/stake_addresses"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account_direct_deposits"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "413":
+          $ref: "#/components/responses/PayloadTooLarge"
+      summary: Account Direct Deposits
+      description: >-
+        Get the direct deposits (Dijkstra, CIP-159) paid into given stake addresses, newest first.
+        A deposit made in a sub-transaction also gives the batch's top-level transaction
+      operationId: account_direct_deposits
   /account_addresses: #RPC
     post:
       tags:
@@ -2440,6 +2481,36 @@ paths:
       summary: Pool Updates (History)
       description: Return all pool updates for all pools or only updates for specific pool if specified
       operationId: pool_updates
+  /pool_bls_coverage: #RPC
+    get:
+      tags:
+        - Pool
+      parameters:
+        - $ref: "#/components/parameters/_epoch_no"
+      responses:
+        "200":
+          description: Success!!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pool_bls_coverage"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "413":
+          $ref: "#/components/responses/PayloadTooLarge"
+      summary: Pool BLS Key Coverage
+      description: >-
+        Shows how much of an epoch's active stake is held by pools whose registration declares a BLS key,
+        overall and within the estimated Leios voting committee. Leios certificates only count stake from
+        committee seats with a usable key, so keyed stake below the quorum threshold means no certificate
+        can pass. Defaults to the current epoch
+      operationId: pool_bls_coverage
   /pool_registrations: #RPC
     get:
       tags:
@@ -2478,7 +2549,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/pool_registrations"
+                $ref: "#/components/schemas/pool_retirements"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -3123,7 +3194,7 @@ components:
               _withdrawals:
                 format: boolean
                 type: boolean
-                description: Controls whether to include any stake account reward withdrawals in the result
+                description: Controls whether to include stake account withdrawals, direct deposits and account balance intervals in the result
               _certs:
                 format: boolean
                 type: boolean
@@ -3131,7 +3202,7 @@ components:
               _scripts:
                 format: boolean
                 type: boolean
-                description: Controls whether to include any details regarding collateral/reference/datum/script objects in the result
+                description: Controls whether to include any details regarding collateral/reference/datum/script objects, guards and required guards in the result
               _bytecode:
                 format: boolean
                 type: boolean
@@ -3397,7 +3468,7 @@ components:
               _withdrawals:
                 format: boolean
                 type: boolean
-                description: Controls whether to include any stake account reward withdrawals in the result
+                description: Controls whether to include stake account withdrawals, direct deposits and account balance intervals in the result
               _certs:
                 format: boolean
                 type: boolean
@@ -3405,7 +3476,7 @@ components:
               _scripts:
                 format: boolean
                 type: boolean
-                description: Controls whether to include any details regarding collateral/reference/datum/script objects in the result
+                description: Controls whether to include any details regarding collateral/reference/datum/script objects, guards and required guards in the result
               _bytecode:
                 format: boolean
                 type: boolean
@@ -3835,6 +3906,12 @@ components:
               - type: "null"
             example: '{\"poolVotingThresholds\":{\"committeeNormal\":0.51,...},\"govActionLifetime\":6,\"dRepDeposit\":500000000,...}'
             description: A JSON dump of Conway Genesis. Null on an instance whose setup script predates it
+          dijkstragenesis:
+            anyOf:
+              - type: string
+              - type: "null"
+            example: '{\"leiosCommitteeSize\":900,\"minPoolMargin\":0.015,\"perasCertBoost\":15,...}'
+            description: A JSON dump of Dijkstra Genesis, which sets the initial values of the Dijkstra protocol parameters. Null when the node configuration has no Dijkstra genesis file
     totals:
       description: Array of supply/reserves/utxo/fees/treasury stats
       type: array
@@ -3907,7 +3984,7 @@ components:
             $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
           data:
             type: object
-            description: JSON encoded data with details about the parameter update
+            description: JSON encoded data with details about the parameter update. Parameters the update leaves unchanged are left out. On Dijkstra, a max_pledge_leverage or peras_bootstrap_round that is cleared is also left out, because db-sync stores it as NULL like an unchanged one
             example: { "decentralisation": 0.9 }
     cli_protocol_params:
       description: Get Current Protocol Parameters from node as published by cardano-cli in JSON format
@@ -4128,6 +4205,18 @@ components:
               - type: "null"
             description: Pool's registration deposit in number
             example: "500000000"
+          bls_key:
+            anyOf:
+              - type: string
+              - type: "null"
+            description: BLS public key (96 bytes, hex) declared by the pool's current registration, which Leios and Peras voting use. Null if the current registration declares none, even if an earlier one did
+            example: null
+          bls_key_pop:
+            anyOf:
+              - type: string
+              - type: "null"
+            description: Proof of possession (48 bytes, hex) for bls_key, already verified by the ledger
+            example: null
           reward_addr:
             anyOf:
               - type: string
@@ -4329,8 +4418,81 @@ components:
             type: string
             description: Latest transaction hash used for delegation by the account
             example: 368d08fe86804d637649341d3aec4a9baa7dffa6d00f16de2ba9dba814f1c948
+    pool_bls_coverage:
+      description: BLS key coverage of an epoch's active stake
+      type: array
+      items:
+        type: object
+        properties:
+          epoch_no:
+            $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+          active_stake:
+            type: string
+            description: Total active stake of the epoch (in numbers)
+            example: "21250000000000000"
+          pool_count:
+            type: number
+            description: Number of pools with active stake in the epoch
+            example: 2900
+          bls_pool_count:
+            type: number
+            description: Number of those pools whose registration in force for the epoch declares a BLS key
+            example: 640
+          bls_stake:
+            type: string
+            description: Active stake held by pools with a BLS key (in numbers)
+            example: "18062500000000000"
+          bls_stake_share:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Share of the epoch's active stake held by pools with a BLS key, from 0 to 1
+            example: 0.85
+          leios_committee_size:
+            $ref: "#/components/schemas/epoch_params/items/properties/leios_committee_size"
+          leios_quorum_stake_threshold:
+            $ref: "#/components/schemas/epoch_params/items/properties/leios_quorum_stake_threshold"
+          committee_bls_pool_count:
+            type: number
+            description: >-
+              Number of keyed pools within the estimated Leios committee, which is the leios_committee_size pools
+              with the most active stake, ties broken by ascending pool id. This follows the committee rule on
+              cardano-ledger master, which has not been released, and does not model key expiry
+            example: 610
+          committee_bls_stake_share:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: >-
+              Share of the epoch's active stake held by keyed pools within the estimated Leios committee, from 0 to 1.
+              Leios certificates need this to reach leios_quorum_stake_threshold
+            example: 0.82
     pool_registrations:
-      description: Array of pool registrations/retirements
+      description: Array of pool registrations
+      type: array
+      items:
+        type: object
+        properties:
+          pool_id_bech32:
+            $ref: "#/components/schemas/pool_info/items/properties/pool_id_bech32"
+          tx_hash:
+            $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+          block_hash:
+            $ref: "#/components/schemas/blocks/items/properties/hash"
+          block_height:
+            $ref: "#/components/schemas/blocks/items/properties/block_height"
+          epoch_no:
+            $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+          epoch_slot:
+            $ref: "#/components/schemas/blocks/items/properties/epoch_slot"
+          active_epoch_no:
+            $ref: "#/components/schemas/pool_updates/items/properties/active_epoch_no"
+          bls_key:
+            $ref: "#/components/schemas/pool_updates/items/properties/bls_key"
+          bls_key_pop:
+            $ref: "#/components/schemas/pool_updates/items/properties/bls_key_pop"
+    pool_retirements:
+      description: Array of pool retirements
       type: array
       items:
         type: object
@@ -4423,6 +4585,27 @@ components:
             $ref: "#/components/schemas/pool_info/items/properties/pledge"
           reward_addr:
             $ref: "#/components/schemas/pool_info/items/properties/reward_addr"
+          deposit:
+            anyOf:
+              - type: string
+              - type: "null"
+            type: string
+            description: Pool Deposit (if registering) associated with this pool Update
+            example: "500000000"
+          bls_key:
+            anyOf:
+              - type: string
+              - type: "null"
+            type: string
+            description: BLS Verification key associated with pool registration, if present
+            example: "null"
+          bls_key_pop:
+            anyOf:
+              - type: string
+              - type: "null"
+            type: string
+            description: Proof of BLS Verification key ownership already verified by ledger
+            example: "null"
           owners:
             $ref: "#/components/schemas/pool_info/items/properties/owners"
           relays:
@@ -4551,7 +4734,7 @@ components:
             example: "74325855210"
           tx_count:
             type: number
-            description: Number of transactions submitted in epoch
+            description: Number of transactions submitted in epoch, counting each Dijkstra sub-transaction (CIP-118) as its own transaction
             example: 357919
           blk_count:
             type: number
@@ -4924,6 +5107,150 @@ components:
               - type: "null"
             description: Minimum Fee for Reference Script cost pre byte
             example: 15
+          max_ref_script_size_per_block:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Maximum total size in bytes of reference scripts across all transactions in a block. Null before Dijkstra
+            example: 1048576
+          max_ref_script_size_per_tx:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Maximum total size in bytes of reference scripts in a transaction, counted over the whole batch of a Dijkstra transaction. Null before Dijkstra
+            example: 204800
+          ref_script_cost_stride:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Size step in bytes of the tiered reference script fee. Null before Dijkstra
+            example: 25600
+          ref_script_cost_multiplier:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Factor by which the reference script fee per byte grows at each step. Null before Dijkstra
+            example: 1.2
+          max_pledge_leverage:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: CIP-50 cap on reward-eligible stake as a multiple of a pool's pledge. Null means no cap. Null before Dijkstra
+            example: null
+          min_pool_margin:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: CIP-50 floor on the margin used when calculating pool rewards. It does not limit the margin a pool registers. Null before Dijkstra
+            example: 0.015
+          leios_announcement_period_length:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Leios: time in milliseconds for an endorser block announcement to spread. Null before Dijkstra
+            example: 1000
+          leios_vote_period_length:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Leios: time in milliseconds for the committee to vote on an endorser block. Null before Dijkstra
+            example: 4000
+          leios_diffusion_period_length:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Leios: time in milliseconds after voting for a certified endorser block to become widely available. Null before Dijkstra
+            example: 7000
+          leios_committee_size:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Leios: number of pools, by stake, seated on the voting committee each epoch. Null before Dijkstra
+            example: 900
+          leios_quorum_stake_threshold:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Leios: share of active stake a certificate must represent. Null before Dijkstra
+            example: 0.75
+          leios_max_eb_references_size:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Leios: maximum size in bytes of an endorser block's transaction references. Null before Dijkstra
+            example: 40000
+          leios_max_eb_txs_size:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Leios: maximum total size in bytes of the transactions an endorser block endorses. Null before Dijkstra
+            example: 260000
+          leios_max_eb_ex_mem:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Leios: memory half of the execution unit limit for an endorser block. Null before Dijkstra
+            example: 720000000
+          leios_max_eb_ex_steps:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Leios: steps half of the execution unit limit for an endorser block. Null before Dijkstra
+            example: 200000000000
+          leios_max_ref_script_size_per_eb:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Leios: maximum total size in bytes of reference scripts in an endorser block. Null before Dijkstra
+            example: 1048576
+          peras_min_candidate_block_age:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Peras: minimum age in slots of a block that can be voted on. Null before Dijkstra
+            example: 90
+          peras_healing_factor:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Peras: healing factor. Null before Dijkstra
+            example: 0.5
+          peras_cert_boost:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Peras: chain weight boost a certificate gives. Null before Dijkstra
+            example: 15
+          peras_target_committee_size:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Peras: target number of seats on the voting committee. Null before Dijkstra
+            example: 800
+          peras_bootstrap_round:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Peras: round from which Peras is active. Null means not set. Null before Dijkstra
+            example: 0
+          peras_quorum_threshold_safety_margin:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Peras: safety margin added to the quorum threshold. Null before Dijkstra
+            example: 0.05
+          ref_inputs_cost_per_multi_asset_policy:
+            anyOf:
+              - type: string
+              - type: "null"
+            description: Fee in lovelace per multi-asset policy in reference inputs. Defined in the ledger but not yet charged. Null before Dijkstra
+            example: "0"
+          ref_inputs_cost_per_datum_byte:
+            anyOf:
+              - type: string
+              - type: "null"
+            description: Fee in lovelace per datum byte in reference inputs. Defined in the ledger but not yet charged. Null before Dijkstra
+            example: "0"
     epoch_block_protocols:
       description: Array of distinct block protocol versions counts in epoch
       type: array
@@ -4976,8 +5303,12 @@ components:
             example: 1704757130
           tx_count:
             type: number
-            description: Number of transactions in the block
+            description: Number of top-level transactions in the block. Dijkstra sub-transactions (CIP-118) are not counted, see sub_tx_count on /block_info
             example: 2
+          has_leios_cert:
+            type: boolean
+            description: True if the block body carries a Leios certificate, which certifies an endorser block. Always false until Leios is active
+            example: false
           vrf_key:
             type: string
             description: VRF key of the block producer
@@ -5028,6 +5359,12 @@ components:
             $ref: "#/components/schemas/blocks/items/properties/block_time"
           tx_count:
             $ref: "#/components/schemas/blocks/items/properties/tx_count"
+          sub_tx_count:
+            type: number
+            description: Number of Dijkstra sub-transactions (CIP-118) carried by the block's transactions. The block holds tx_count plus sub_tx_count transaction rows
+            example: 0
+          has_leios_cert:
+            $ref: "#/components/schemas/blocks/items/properties/has_leios_cert"
           vrf_key:
             $ref: "#/components/schemas/blocks/items/properties/vrf_key"
           op_cert:
@@ -5076,6 +5413,8 @@ components:
             $ref: "#/components/schemas/blocks/items/properties/hash"
           tx_hash:
             $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+          parent_tx_hash:
+            $ref: "#/components/schemas/tx_info/items/properties/parent_tx_hash"
           epoch_no:
             $ref: "#/components/schemas/blocks/items/properties/epoch_no"
           block_height:
@@ -5090,6 +5429,8 @@ components:
         properties:
           tx_hash:
             $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+          parent_tx_hash:
+            $ref: "#/components/schemas/tx_info/items/properties/parent_tx_hash"
           block_hash:
             $ref: "#/components/schemas/blocks/items/properties/hash"
           block_height:
@@ -5112,6 +5453,8 @@ components:
         properties:
           tx_hash:
             $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+          parent_tx_hash:
+            $ref: "#/components/schemas/tx_info/items/properties/parent_tx_hash"
           block_hash:
             $ref: "#/components/schemas/blocks/items/properties/hash"
           block_height:
@@ -5140,6 +5483,8 @@ components:
             $ref: "#/components/schemas/tx_info/items/properties/invalid_before"
           invalid_after:
             $ref: "#/components/schemas/tx_info/items/properties/invalid_after"
+          sub_tx_hashes:
+            $ref: "#/components/schemas/tx_info/items/properties/sub_tx_hashes"
           collateral_inputs:
             $ref: "#/components/schemas/tx_info/items/properties/collateral_inputs"
           collateral_output:
@@ -5155,6 +5500,10 @@ components:
             $ref: "#/components/schemas/tx_info/items/properties/outputs"
           withdrawals:
             $ref: "#/components/schemas/tx_info/items/properties/withdrawals"
+          direct_deposits:
+            $ref: "#/components/schemas/tx_info/items/properties/direct_deposits"
+          account_balance_intervals:
+            $ref: "#/components/schemas/tx_info/items/properties/account_balance_intervals"
           assets_minted:
             $ref: "#/components/schemas/tx_info/items/properties/assets_minted"
           metadata:
@@ -5165,6 +5514,10 @@ components:
             $ref: "#/components/schemas/tx_info/items/properties/native_scripts"
           plutus_contracts:
             $ref: "#/components/schemas/tx_info/items/properties/plutus_contracts"
+          guards:
+            $ref: "#/components/schemas/tx_info/items/properties/guards"
+          required_guards:
+            $ref: "#/components/schemas/tx_info/items/properties/required_guards"
 
     address_list:
       description: Array of information for address(es)
@@ -5335,8 +5688,12 @@ components:
               - type: "null"
           total_balance:
             type: string
-            description: Total balance of the account including UTxO, rewards, MIRs and proposal refunds (in number)
+            description: Total balance of the account including UTxO, rewards, MIRs, proposal refunds and direct deposits (in number)
             example: "207116800428"
+          withdrawable_balance:
+            type: string
+            description: Amount the account can withdraw now, which is its rewards, MIRs, proposal refunds and direct deposits less its withdrawals
+            example: "44352623297"
           utxo:
             type: string
             description: Total UTxO balance of the account
@@ -5351,12 +5708,17 @@ components:
             example: "12105104750"
           rewards_available:
             type: string
-            description: Total rewards available for withdrawal
+            deprecated: true
+            description: Deprecated, use withdrawable_balance, which holds the same figure. This field will be removed in a later release
             example: "44352623297"
           deposit:
             type: string
-            description: Total deposit available for withdrawal
+            description: Stake Registration deposit for the account
             example: "2000000"
+          direct_deposit:
+            type: string
+            description: Total lovelace paid straight into the account by direct deposits (CIP-159)
+            example: "1000000000"
           reserves:
             type: string
             description: Total reserves MIR value of the account
@@ -5467,13 +5829,14 @@ components:
             $ref: "#/components/schemas/account_history/items/properties/stake_address"
           action_type:
             type: string
-            description: Type of certificate submitted
+            description: Type of update. direct_deposit is a Dijkstra direct deposit (CIP-159) into the account, which may come from a sub-transaction
             enum:
               [
                 "registration",
                 "delegation_pool",
                 "delegation_drep",
                 "withdrawal",
+                "direct_deposit",
                 "deregistration",
               ]
             example: "registration"
@@ -5485,6 +5848,28 @@ components:
             $ref: "#/components/schemas/blocks/items/properties/epoch_slot"
           absolute_slot:
             $ref: "#/components/schemas/blocks/items/properties/abs_slot"
+          block_time:
+            $ref: "#/components/schemas/blocks/items/properties/block_time"
+    account_direct_deposits:
+      description: Array of direct deposits into stake accounts (Dijkstra, CIP-159)
+      type: array
+      items:
+        type: object
+        properties:
+          stake_address:
+            $ref: "#/components/schemas/account_history/items/properties/stake_address"
+          tx_hash:
+            $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+          parent_tx_hash:
+            $ref: "#/components/schemas/tx_info/items/properties/parent_tx_hash"
+          amount:
+            type: string
+            description: Deposited amount (in numbers)
+            example: "1000000000"
+          epoch_no:
+            $ref: "#/components/schemas/blocks/items/properties/epoch_no"
+          block_height:
+            $ref: "#/components/schemas/blocks/items/properties/block_height"
           block_time:
             $ref: "#/components/schemas/blocks/items/properties/block_time"
     account_addresses:
@@ -5573,6 +5958,12 @@ components:
         properties:
           tx_hash:
             $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+          parent_tx_hash:
+            anyOf:
+              - type: string
+              - type: "null"
+            description: Hash of the top-level transaction that carries this one as a Dijkstra sub-transaction (CIP-118), or null for a top-level transaction
+            example: null
           block_hash:
             $ref: "#/components/schemas/blocks/items/properties/hash"
           block_height:
@@ -5608,8 +5999,10 @@ components:
             description: Total Donation to on-chain treasury (in numbers)
             example: "0"
           deposit:
-            type: string
-            description: Total Deposits included in transaction (for example, if it is registering a pool/key)
+            anyOf:
+              - type: string
+              - type: "null"
+            description: Total Deposits included in transaction (for example, if it is registering a pool/key). Null for a Dijkstra sub-transaction, because the deposit for the whole batch is recorded on its top-level transaction
             example: "0"
           invalid_before:
             anyOf:
@@ -5626,6 +6019,12 @@ components:
           valid_contract:
             description: True if the contract is valid or there is no contract
             example: true
+          sub_tx_hashes:
+            type: array
+            description: Hashes of the Dijkstra sub-transactions (CIP-118) this transaction carries, in the order the ledger applies them. Empty when it carries none, or when it is itself a sub-transaction
+            items:
+              type: string
+            example: []
           collateral_inputs:
             description: An array of collateral inputs needed for smart contracts in case of contract failure
             anyOf:
@@ -5756,6 +6155,52 @@ components:
                   type: string
                   description: A Cardano staking address (reward account, bech32 encoded)
                   example: stake1uxggf4shfvpghcangm67ky0q4zlc3xn7gezy0auhxczu3pslm9wrj
+          direct_deposits:
+            anyOf:
+              - type: array
+              - type: "null"
+            description: Array of Dijkstra direct deposits (CIP-159), which pay lovelace straight into a registered stake account without an output
+            items:
+              type: object
+              properties:
+                amount:
+                  type: string
+                  description: Deposited amount (in numbers)
+                  example: "1000000000"
+                stake_addr:
+                  $ref: "#/components/schemas/tx_info/items/properties/withdrawals/items/properties/stake_addr"
+          account_balance_intervals:
+            anyOf:
+              - type: array
+              - type: "null"
+            description: Array of Dijkstra account balance assertions (CIP-159). The transaction is only valid if each account balance is in its range, so every row held when the block was applied. These are conditions, not balances
+            items:
+              type: object
+              properties:
+                stake_addr:
+                  $ref: "#/components/schemas/tx_info/items/properties/withdrawals/items/properties/stake_addr"
+                starting:
+                  type: boolean
+                  description: True if the range was checked against the balance before the whole batch, false if against the balance at the point this body applies
+                  example: false
+                lower_bound:
+                  anyOf:
+                    - type: string
+                    - type: "null"
+                  description: Inclusive lower bound (in numbers), or null for none
+                  example: "5000000"
+                upper_bound:
+                  anyOf:
+                    - type: string
+                    - type: "null"
+                  description: Exclusive upper bound (in numbers), or null for none
+                  example: null
+                exact_value:
+                  anyOf:
+                    - type: string
+                    - type: "null"
+                  description: Exact balance required (in numbers), set only when both bounds are null
+                  example: null
           assets_minted:
             anyOf:
               - type: array
@@ -5899,6 +6344,50 @@ components:
                           $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_hash"
                         value:
                           $ref: "#/components/schemas/script_redeemers/items/properties/redeemers/items/properties/datum_value"
+          guards:
+            anyOf:
+              - type: array
+              - type: "null"
+            description: Array of Dijkstra guards (CIP-112), the credentials that authorise this transaction body. They replace required signers, and can be key hashes or scripts
+            items:
+              type: object
+              properties:
+                index:
+                  type: number
+                  description: Position in the body's ordered guard set, counting key and script credentials. A Plutus guard's redeemer uses this index
+                  example: 0
+                credential:
+                  type: string
+                  description: Key hash or script hash, in hex
+                  example: bf357f5de69e4aad71954bebd64357a4813ea5233df12fce4a9de582
+                has_script:
+                  type: boolean
+                  description: True if the credential is a script hash
+                  example: true
+                redeemer:
+                  anyOf:
+                    - type: object
+                    - type: "null"
+                  description: The redeemer that ran a Plutus guard script (fee, execution units and datum), or null for a key or native script guard
+                  example: null
+          required_guards:
+            anyOf:
+              - type: array
+              - type: "null"
+            description: Array of credentials this body requires among the guards of its top-level transaction (Dijkstra, CIP-112). A sub-transaction uses this to demand another party's approval of the whole batch
+            items:
+              type: object
+              properties:
+                credential:
+                  $ref: "#/components/schemas/tx_info/items/properties/guards/items/properties/credential"
+                has_script:
+                  $ref: "#/components/schemas/tx_info/items/properties/guards/items/properties/has_script"
+                datum:
+                  anyOf:
+                    - type: object
+                    - type: "null"
+                  description: Datum supplied for a Plutus credential (hash and value), or null for a key or native script credential
+                  example: null
           voting_procedures:
             anyOf:
               - type: array
@@ -5951,6 +6440,8 @@ components:
         properties:
           tx_hash:
             $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+          parent_tx_hash:
+            $ref: "#/components/schemas/tx_info/items/properties/parent_tx_hash"
           block_hash:
             $ref: "#/components/schemas/blocks/items/properties/hash"
           block_height:
@@ -5963,7 +6454,7 @@ components:
             $ref: "#/components/schemas/tx_info/items/properties/tx_timestamp"
           cbor:
             type: string
-            description: CBOR encoded raw transaction.
+            description: CBOR encoded raw transaction. For a Dijkstra sub-transaction this is only its own part of the top-level transaction, which cannot be submitted alone
           valid_contract:
             type: boolean
             description: Whether contract is valid (or if there is no contract)
@@ -7227,7 +7718,7 @@ components:
           type:
             type: string
             description: Type of the script
-            enum: ["plutusV1", "plutusV2", "plutusV3", "timelock", "multisig"]
+            enum: ["plutusV1", "plutusV2", "plutusV3", "plutusV4", "timelock", "multisig"]
             example: plutusV1
           value:
             anyOf:
@@ -7298,7 +7789,7 @@ components:
                 purpose:
                   type: string
                   description: What kind of validation this redeemer is used for
-                  enum: ["spend", "mint", "cert", "reward", "vote", "propose"]
+                  enum: ["spend", "mint", "cert", "reward", "vote", "propose", "guard"]
                   example: spend
                 datum_hash:
                   anyOf:

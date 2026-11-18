@@ -11,6 +11,7 @@ CREATE OR REPLACE FUNCTION grest.block_tx_info(
 )
 RETURNS TABLE (
   tx_hash text,
+  parent_tx_hash text,
   block_hash text,
   block_height word31type,
   epoch_no word31type,
@@ -26,17 +27,22 @@ RETURNS TABLE (
   invalid_before text,
   invalid_after text,
   valid_contract boolean,
+  sub_tx_hashes jsonb,
   collateral_inputs jsonb,
   collateral_output jsonb,
   reference_inputs jsonb,
   inputs jsonb,
   outputs jsonb,
   withdrawals jsonb,
+  direct_deposits jsonb,
+  account_balance_intervals jsonb,
   assets_minted jsonb,
   metadata jsonb,
   certificates jsonb,
   native_scripts jsonb,
   plutus_contracts jsonb,
+  guards jsonb,
+  required_guards jsonb,
   voting_procedures jsonb,
   proposal_procedures jsonb
 )

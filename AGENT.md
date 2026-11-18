@@ -174,6 +174,7 @@ Stake account queries. These functions query by stake address (not payment addre
 |----------|-------------|
 | `grest.account_addresses()` | Get all payment addresses associated with stake address |
 | `grest.account_assets()` | Get native asset holdings |
+| `grest.account_direct_deposits()` | Get direct deposits into stake addresses (Dijkstra) |
 | `grest.account_history()` | **[DEPRECATED]** Get active stake history |
 | `grest.account_info()` | Get full account details (balance, delegation, rewards) |
 | `grest.account_info_cached()` | Get account info from cache (faster) |
@@ -380,6 +381,7 @@ Stake pool queries.
 | Function | Description |
 |----------|-------------|
 | `grest.pool_blocks()` | Get blocks minted by pool |
+| `grest.pool_bls_coverage()` | Get the share of active stake held by pools with a BLS key (Leios) |
 | `grest.pool_calidus_keys()` | List valid Calidus keys |
 | `grest.pool_delegators()` | Get current delegators |
 | `grest.pool_delegators_list()` | Get delegator list (brief) |

@@ -2,6 +2,7 @@ CREATE OR REPLACE FUNCTION grest.block_txs(_block_hashes text [])
 RETURNS TABLE (
   block_hash text,
   tx_hash text,
+  parent_tx_hash text,
   epoch_no word31type,
   block_height word31type,
   block_time integer
@@ -26,11 +27,13 @@ BEGIN
     SELECT
       ENCODE(b.hash, 'hex'),
       ENCODE(tx.hash, 'hex') AS tx_hash,
+      ENCODE(ptx.hash, 'hex') AS parent_tx_hash,
       b.epoch_no,
       b.block_no AS block_height,
       EXTRACT(EPOCH FROM b.time)::integer AS block_time
     FROM public.block AS b
     INNER JOIN public.tx ON tx.block_id = b.id
+    LEFT JOIN public.tx AS ptx ON ptx.id = tx.parent_tx_id
     WHERE b.id = ANY(_block_ids)
   ;
 END;

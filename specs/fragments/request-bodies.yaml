@@ -44,7 +44,7 @@ requestBodies:
             _withdrawals:
               format: boolean
               type: boolean
-              description: Controls whether to include any stake account reward withdrawals in the result
+              description: Controls whether to include stake account withdrawals, direct deposits and account balance intervals in the result
             _certs:
               format: boolean
               type: boolean
@@ -52,7 +52,7 @@ requestBodies:
             _scripts:
               format: boolean
               type: boolean
-              description: Controls whether to include any details regarding collateral/reference/datum/script objects in the result
+              description: Controls whether to include any details regarding collateral/reference/datum/script objects, guards and required guards in the result
             _bytecode:
               format: boolean
               type: boolean
@@ -318,7 +318,7 @@ requestBodies:
             _withdrawals:
               format: boolean
               type: boolean
-              description: Controls whether to include any stake account reward withdrawals in the result
+              description: Controls whether to include stake account withdrawals, direct deposits and account balance intervals in the result
             _certs:
               format: boolean
               type: boolean
@@ -326,7 +326,7 @@ requestBodies:
             _scripts:
               format: boolean
               type: boolean
-              description: Controls whether to include any details regarding collateral/reference/datum/script objects in the result
+              description: Controls whether to include any details regarding collateral/reference/datum/script objects, guards and required guards in the result
             _bytecode:
               format: boolean
               type: boolean

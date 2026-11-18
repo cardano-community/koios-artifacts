@@ -10,6 +10,9 @@ RETURNS TABLE (
   fixed_cost text,
   pledge text,
   reward_addr varchar,
+  deposit text,
+  bls_key text,
+  bls_key_pop text,
   owners jsonb,
   relays jsonb,
   meta_url varchar,
@@ -38,6 +41,9 @@ BEGIN
         pu.fixed_cost::text,
         pu.pledge::text,
         grest.cip5_hex_to_stake_addr(sa.hash_raw)::varchar AS reward_addr,
+        COALESCE(pu.deposit,NULL)::text AS deposit,
+        ENCODE(pu.bls_key,'hex') AS bls_key,
+        ENCODE(pu.bls_key_pop,'hex') AS bls_key_pop,
         JSONB_AGG(po.stake_address) AS owners,
         JSONB_AGG(JSONB_BUILD_OBJECT (
             'ipv4', pr.ipv4,
@@ -66,7 +72,7 @@ BEGIN
         LEFT JOIN public.off_chain_pool_data AS ocpd ON pu.meta_id = ocpd.pmr_id
       WHERE _pool_bech32 IS NULL
         OR ph.hash_raw = cardano.bech32_decode_data(_pool_bech32)
-      GROUP BY tx.hash, b.time, ph.hash_raw, ph.hash_raw, pu.active_epoch_no, pu.vrf_key_hash, pu.margin, pu.fixed_cost, pu.pledge, sa.hash_raw, pmr.url, pmr.hash, ocpd.json),
+      GROUP BY tx.hash, b.time, ph.hash_raw, ph.hash_raw, pu.active_epoch_no, pu.vrf_key_hash, pu.margin, pu.fixed_cost, pu.pledge, sa.hash_raw, pu.deposit, pu.bls_key, pu.bls_key_pop, pmr.url, pmr.hash, ocpd.json),
     pool_dereg AS (
         SELECT
           ENCODE(tx.hash::bytea, 'hex') AS tx_hash,
@@ -79,6 +85,9 @@ BEGIN
           NULL as fixed_cost,
           NULL AS pledge,
           NULL AS reward_addr,
+          NULL AS deposit,
+          NULL AS bls_key,
+          NULL AS bls_key_pop,
           NULL::jsonb AS owners,
           NULL::jsonb AS relays,
           NULL AS meta_url,

@@ -34,8 +34,12 @@
           example: 1704757130
         tx_count:
           type: number
-          description: Number of transactions in the block
+          description: Number of top-level transactions in the block. Dijkstra sub-transactions (CIP-118) are not counted, see sub_tx_count on /block_info
           example: 2
+        has_leios_cert:
+          type: boolean
+          description: True if the block body carries a Leios certificate, which certifies an endorser block. Always false until Leios is active
+          example: false
         vrf_key:
           type: string
           description: VRF key of the block producer
@@ -86,6 +90,12 @@
           $ref: "#/components/schemas/blocks/items/properties/block_time"
         tx_count:
           $ref: "#/components/schemas/blocks/items/properties/tx_count"
+        sub_tx_count:
+          type: number
+          description: Number of Dijkstra sub-transactions (CIP-118) carried by the block's transactions. The block holds tx_count plus sub_tx_count transaction rows
+          example: 0
+        has_leios_cert:
+          $ref: "#/components/schemas/blocks/items/properties/has_leios_cert"
         vrf_key:
           $ref: "#/components/schemas/blocks/items/properties/vrf_key"
         op_cert:
@@ -134,6 +144,8 @@
           $ref: "#/components/schemas/blocks/items/properties/hash"
         tx_hash:
           $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+        parent_tx_hash:
+          $ref: "#/components/schemas/tx_info/items/properties/parent_tx_hash"
         epoch_no:
           $ref: "#/components/schemas/blocks/items/properties/epoch_no"
         block_height:
@@ -148,6 +160,8 @@
       properties:
         tx_hash:
           $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+        parent_tx_hash:
+          $ref: "#/components/schemas/tx_info/items/properties/parent_tx_hash"
         block_hash:
           $ref: "#/components/schemas/blocks/items/properties/hash"
         block_height:
@@ -170,6 +184,8 @@
       properties:
         tx_hash:
           $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+        parent_tx_hash:
+          $ref: "#/components/schemas/tx_info/items/properties/parent_tx_hash"
         block_hash:
           $ref: "#/components/schemas/blocks/items/properties/hash"
         block_height:
@@ -198,6 +214,8 @@
           $ref: "#/components/schemas/tx_info/items/properties/invalid_before"
         invalid_after:
           $ref: "#/components/schemas/tx_info/items/properties/invalid_after"
+        sub_tx_hashes:
+          $ref: "#/components/schemas/tx_info/items/properties/sub_tx_hashes"
         collateral_inputs:
           $ref: "#/components/schemas/tx_info/items/properties/collateral_inputs"
         collateral_output:
@@ -213,6 +231,10 @@
           $ref: "#/components/schemas/tx_info/items/properties/outputs"
         withdrawals:
           $ref: "#/components/schemas/tx_info/items/properties/withdrawals"
+        direct_deposits:
+          $ref: "#/components/schemas/tx_info/items/properties/direct_deposits"
+        account_balance_intervals:
+          $ref: "#/components/schemas/tx_info/items/properties/account_balance_intervals"
         assets_minted:
           $ref: "#/components/schemas/tx_info/items/properties/assets_minted"
         metadata:
@@ -223,3 +245,7 @@
           $ref: "#/components/schemas/tx_info/items/properties/native_scripts"
         plutus_contracts:
           $ref: "#/components/schemas/tx_info/items/properties/plutus_contracts"
+        guards:
+          $ref: "#/components/schemas/tx_info/items/properties/guards"
+        required_guards:
+          $ref: "#/components/schemas/tx_info/items/properties/required_guards"

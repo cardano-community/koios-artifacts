@@ -120,6 +120,12 @@
             - type: "null"
           example: '{\"poolVotingThresholds\":{\"committeeNormal\":0.51,...},\"govActionLifetime\":6,\"dRepDeposit\":500000000,...}'
           description: A JSON dump of Conway Genesis. Null on an instance whose setup script predates it
+        dijkstragenesis:
+          anyOf:
+            - type: string
+            - type: "null"
+          example: '{\"leiosCommitteeSize\":900,\"minPoolMargin\":0.015,\"perasCertBoost\":15,...}'
+          description: A JSON dump of Dijkstra Genesis, which sets the initial values of the Dijkstra protocol parameters. Null when the node configuration has no Dijkstra genesis file
   totals:
     description: Array of supply/reserves/utxo/fees/treasury stats
     type: array
@@ -192,7 +198,7 @@
           $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
         data:
           type: object
-          description: JSON encoded data with details about the parameter update
+          description: JSON encoded data with details about the parameter update. Parameters the update leaves unchanged are left out. On Dijkstra, a max_pledge_leverage or peras_bootstrap_round that is cleared is also left out, because db-sync stores it as NULL like an unchanged one
           example: { "decentralisation": 0.9 }
   cli_protocol_params:
     description: Get Current Protocol Parameters from node as published by cardano-cli in JSON format
