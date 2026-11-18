@@ -3901,7 +3901,7 @@ components:
             $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
           data:
             type: object
-            description: JSON encoded data with details about the parameter update
+            description: JSON encoded data with details about the parameter update. Parameters the update leaves unchanged are left out. On Dijkstra, a max_pledge_leverage or peras_bootstrap_round that is cleared is also left out, because db-sync stores it as NULL like an unchanged one
             example: { "decentralisation": 0.9 }
     cli_protocol_params:
       description: Get Current Protocol Parameters from node as published by cardano-cli in JSON format
@@ -4939,6 +4939,150 @@ components:
               - type: "null"
             description: Minimum Fee for Reference Script cost pre byte
             example: 15
+          max_ref_script_size_per_block:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Maximum total size in bytes of reference scripts across all transactions in a block. Null before Dijkstra
+            example: 1048576
+          max_ref_script_size_per_tx:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Maximum total size in bytes of reference scripts in a transaction, counted over the whole batch of a Dijkstra transaction. Null before Dijkstra
+            example: 204800
+          ref_script_cost_stride:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Size step in bytes of the tiered reference script fee. Null before Dijkstra
+            example: 25600
+          ref_script_cost_multiplier:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Factor by which the reference script fee per byte grows at each step. Null before Dijkstra
+            example: 1.2
+          max_pledge_leverage:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: CIP-50 cap on reward-eligible stake as a multiple of a pool's pledge. Null means no cap. Null before Dijkstra
+            example: null
+          min_pool_margin:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: CIP-50 floor on the margin used when calculating pool rewards. It does not limit the margin a pool registers. Null before Dijkstra
+            example: 0.015
+          leios_announcement_period_length:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Leios: time in milliseconds for an endorser block announcement to spread. Null before Dijkstra
+            example: 1000
+          leios_vote_period_length:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Leios: time in milliseconds for the committee to vote on an endorser block. Null before Dijkstra
+            example: 4000
+          leios_diffusion_period_length:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Leios: time in milliseconds after voting for a certified endorser block to become widely available. Null before Dijkstra
+            example: 7000
+          leios_committee_size:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Leios: number of pools, by stake, seated on the voting committee each epoch. Null before Dijkstra
+            example: 900
+          leios_quorum_stake_threshold:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Leios: share of active stake a certificate must represent. Null before Dijkstra
+            example: 0.75
+          leios_max_eb_references_size:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Leios: maximum size in bytes of an endorser block's transaction references. Null before Dijkstra
+            example: 40000
+          leios_max_eb_txs_size:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Leios: maximum total size in bytes of the transactions an endorser block endorses. Null before Dijkstra
+            example: 260000
+          leios_max_eb_ex_mem:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Leios: memory half of the execution unit limit for an endorser block. Null before Dijkstra
+            example: 720000000
+          leios_max_eb_ex_steps:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Leios: steps half of the execution unit limit for an endorser block. Null before Dijkstra
+            example: 200000000000
+          leios_max_ref_script_size_per_eb:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Leios: maximum total size in bytes of reference scripts in an endorser block. Null before Dijkstra
+            example: 1048576
+          peras_min_candidate_block_age:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Peras: minimum age in slots of a block that can be voted on. Null before Dijkstra
+            example: 90
+          peras_healing_factor:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Peras: healing factor. Null before Dijkstra
+            example: 0.5
+          peras_cert_boost:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Peras: chain weight boost a certificate gives. Null before Dijkstra
+            example: 15
+          peras_target_committee_size:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Peras: target number of seats on the voting committee. Null before Dijkstra
+            example: 800
+          peras_bootstrap_round:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Peras: round from which Peras is active. Null means not set. Null before Dijkstra
+            example: 0
+          peras_quorum_threshold_safety_margin:
+            anyOf:
+              - type: number
+              - type: "null"
+            description: Peras: safety margin added to the quorum threshold. Null before Dijkstra
+            example: 0.05
+          ref_inputs_cost_per_multi_asset_policy:
+            anyOf:
+              - type: string
+              - type: "null"
+            description: Fee in lovelace per multi-asset policy in reference inputs. Defined in the ledger but not yet charged. Null before Dijkstra
+            example: "0"
+          ref_inputs_cost_per_datum_byte:
+            anyOf:
+              - type: string
+              - type: "null"
+            description: Fee in lovelace per datum byte in reference inputs. Defined in the ledger but not yet charged. Null before Dijkstra
+            example: "0"
     epoch_block_protocols:
       description: Array of distinct block protocol versions counts in epoch
       type: array

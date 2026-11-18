@@ -54,7 +54,31 @@ RETURNS TABLE (
   drep_deposit text,
   drep_activity word64type,
   pvtpp_security_group double precision,
-  min_fee_ref_script_cost_per_byte double precision
+  min_fee_ref_script_cost_per_byte double precision,
+  max_ref_script_size_per_block word64type,
+  max_ref_script_size_per_tx word64type,
+  ref_script_cost_stride word64type,
+  ref_script_cost_multiplier double precision,
+  max_pledge_leverage double precision,
+  min_pool_margin double precision,
+  leios_announcement_period_length word64type,
+  leios_vote_period_length word64type,
+  leios_diffusion_period_length word64type,
+  leios_committee_size word64type,
+  leios_quorum_stake_threshold double precision,
+  leios_max_eb_references_size word64type,
+  leios_max_eb_txs_size word64type,
+  leios_max_eb_ex_mem word64type,
+  leios_max_eb_ex_steps word64type,
+  leios_max_ref_script_size_per_eb word64type,
+  peras_min_candidate_block_age word64type,
+  peras_healing_factor double precision,
+  peras_cert_boost word64type,
+  peras_target_committee_size word64type,
+  peras_bootstrap_round word64type,
+  peras_quorum_threshold_safety_margin double precision,
+  ref_inputs_cost_per_multi_asset_policy text,
+  ref_inputs_cost_per_datum_byte text
 )
 LANGUAGE plpgsql
 AS $$
@@ -115,7 +139,32 @@ BEGIN
       ep.drep_deposit::text,
       ep.drep_activity,
       ep.pvtpp_security_group,
-      ep.min_fee_ref_script_cost_per_byte
+      ep.min_fee_ref_script_cost_per_byte,
+      -- Dijkstra parameters, NULL before Dijkstra
+      ep.max_ref_script_size_per_block,
+      ep.max_ref_script_size_per_tx,
+      ep.ref_script_cost_stride,
+      ep.ref_script_cost_multiplier,
+      ep.max_pledge_leverage,
+      ep.min_pool_margin,
+      ep.leios_announcement_period_length,
+      ep.leios_vote_period_length,
+      ep.leios_diffusion_period_length,
+      ep.leios_committee_size,
+      ep.leios_quorum_stake_threshold,
+      ep.leios_max_eb_references_size,
+      ep.leios_max_eb_txs_size,
+      ep.leios_max_eb_ex_mem,
+      ep.leios_max_eb_ex_steps,
+      ep.leios_max_ref_script_size_per_eb,
+      ep.peras_min_candidate_block_age,
+      ep.peras_healing_factor,
+      ep.peras_cert_boost,
+      ep.peras_target_committee_size,
+      ep.peras_bootstrap_round,
+      ep.peras_quorum_threshold_safety_margin,
+      ep.ref_inputs_cost_per_multi_asset_policy::text,
+      ep.ref_inputs_cost_per_datum_byte::text
     FROM public.epoch_param AS ep
     LEFT JOIN grest.era_map AS em ON ep.protocol_major::text = em.protocol_major::text AND ep.protocol_minor::text = em.protocol_minor::text
     LEFT JOIN grest.epoch_info_cache AS ei ON ei.epoch_no = ep.epoch_no

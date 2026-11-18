@@ -13,7 +13,34 @@ AS $$
     b.block_no AS block_height,
     EXTRACT(EPOCH FROM b.time)::integer AS block_time,
     b.epoch_no,
-    JSONB_STRIP_NULLS(JSONB_BUILD_OBJECT(
+    JSONB_STRIP_NULLS(
+      -- Dijkstra parameters (db-sync dijkstra-0-0). A NULL means the proposal leaves the parameter as it is.
+      JSONB_BUILD_OBJECT(
+        'max_ref_script_size_per_block', pp.max_ref_script_size_per_block,
+        'max_ref_script_size_per_tx', pp.max_ref_script_size_per_tx,
+        'ref_script_cost_stride', pp.ref_script_cost_stride,
+        'ref_script_cost_multiplier', pp.ref_script_cost_multiplier,
+        'max_pledge_leverage', pp.max_pledge_leverage,
+        'min_pool_margin', pp.min_pool_margin,
+        'leios_announcement_period_length', pp.leios_announcement_period_length,
+        'leios_vote_period_length', pp.leios_vote_period_length,
+        'leios_diffusion_period_length', pp.leios_diffusion_period_length,
+        'leios_committee_size', pp.leios_committee_size,
+        'leios_quorum_stake_threshold', pp.leios_quorum_stake_threshold,
+        'leios_max_eb_references_size', pp.leios_max_eb_references_size,
+        'leios_max_eb_txs_size', pp.leios_max_eb_txs_size,
+        'leios_max_eb_ex_mem', pp.leios_max_eb_ex_mem,
+        'leios_max_eb_ex_steps', pp.leios_max_eb_ex_steps,
+        'leios_max_ref_script_size_per_eb', pp.leios_max_ref_script_size_per_eb,
+        'peras_min_candidate_block_age', pp.peras_min_candidate_block_age,
+        'peras_healing_factor', pp.peras_healing_factor,
+        'peras_cert_boost', pp.peras_cert_boost,
+        'peras_target_committee_size', pp.peras_target_committee_size,
+        'peras_bootstrap_round', pp.peras_bootstrap_round,
+        'peras_quorum_threshold_safety_margin', pp.peras_quorum_threshold_safety_margin,
+        'ref_inputs_cost_per_multi_asset_policy', pp.ref_inputs_cost_per_multi_asset_policy,
+        'ref_inputs_cost_per_datum_byte', pp.ref_inputs_cost_per_datum_byte
+      ) || JSONB_BUILD_OBJECT(
         'min_fee_a', pp.min_fee_a,
         'min_fee_b', pp.min_fee_b,
         'max_block_size', pp.max_block_size,

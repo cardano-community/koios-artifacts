@@ -186,7 +186,7 @@
           $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
         data:
           type: object
-          description: JSON encoded data with details about the parameter update
+          description: JSON encoded data with details about the parameter update. Parameters the update leaves unchanged are left out. On Dijkstra, a max_pledge_leverage or peras_bootstrap_round that is cleared is also left out, because db-sync stores it as NULL like an unchanged one
           example: { "decentralisation": 0.9 }
   cli_protocol_params:
     description: Get Current Protocol Parameters from node as published by cardano-cli in JSON format
