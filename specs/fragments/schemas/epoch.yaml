@@ -543,13 +543,9 @@
     items:
       properties:
         proto_major:
-          type: number
-          description: Protocol major version
-          example: 6
+          $ref: "#/components/schemas/blocks/items/properties/proto_major"
         proto_minor:
-          type: number
-          description: Protocol major version
-          example: 2
+          $ref: "#/components/schemas/blocks/items/properties/proto_minor"
         era:
           $ref: "#/components/schemas/era_summaries/items/properties/era"
         blocks:

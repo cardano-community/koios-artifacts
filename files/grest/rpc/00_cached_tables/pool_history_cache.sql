@@ -197,6 +197,7 @@ AS $$
 DECLARE
   _curr_epoch bigint;
   _latest_epoch_no_in_cache bigint;
+  _max_epoch_to_cache bigint;
   _insert_epoch bigint;
   _batch_end_epoch bigint;
 BEGIN
@@ -213,35 +214,41 @@ BEGIN
     RAISE EXCEPTION 'Active stake cache not yet populated! Exiting...';
   END IF;
 
-  SELECT COALESCE(MAX(epoch_no), 0) INTO _latest_epoch_no_in_cache FROM grest.pool_history_cache;
   SELECT MAX(epoch_param.epoch_no) INTO _curr_epoch FROM public.epoch_param;
+
+  _max_epoch_to_cache := _curr_epoch - 2;
+
+  SELECT COALESCE(MAX(epoch_no), 0) INTO _latest_epoch_no_in_cache FROM grest.pool_history_cache;
+
+  IF _latest_epoch_no_in_cache >= _curr_epoch THEN
+    DELETE FROM grest.pool_history_cache WHERE epoch_no >= _curr_epoch;
+    SELECT COALESCE(MAX(epoch_no), 0) INTO _latest_epoch_no_in_cache FROM grest.pool_history_cache;
+  END IF;
 
   IF _epoch_no_to_insert_from IS NULL THEN
     IF _latest_epoch_no_in_cache = 0 THEN
       RAISE NOTICE 'Pool history cache table is empty, starting initial population...';
       _epoch_no_to_insert_from := 0;
     ELSE
-      -- no-op IF we already have data up until second most recent epoch
-      IF _latest_epoch_no_in_cache >= _curr_epoch - 1 THEN
-        INSERT INTO grest.control_table (key, last_value)
-          VALUES ('pool_history_cache_last_updated', NOW() AT TIME ZONE 'utc')
-        ON CONFLICT (key)
-          DO UPDATE SET last_value = NOW() AT TIME ZONE 'utc';
-          
-        PERFORM pg_advisory_unlock(hashtext('pool_history_cache_update'::text));
-        RETURN;
-      END IF;
-      
-      -- IF current epoch is at least 2 ahead of latest in cache, repopulate FROM latest in cache
-      _epoch_no_to_insert_from := _latest_epoch_no_in_cache;
+      _epoch_no_to_insert_from := LEAST(_latest_epoch_no_in_cache, GREATEST(_max_epoch_to_cache, 0));
     END IF;
+  END IF;
+
+  IF _max_epoch_to_cache < 0 OR _epoch_no_to_insert_from > _max_epoch_to_cache THEN
+    INSERT INTO grest.control_table (key, last_value)
+      VALUES ('pool_history_cache_last_updated', NOW() AT TIME ZONE 'utc')
+    ON CONFLICT (key)
+      DO UPDATE SET last_value = NOW() AT TIME ZONE 'utc';
+
+    PERFORM pg_advisory_unlock(hashtext('pool_history_cache_update'::text));
+    RETURN;
   END IF;
 
   -- Process in batches of 50 epochs (smaller batch) to avoid huge transactions
   _insert_epoch := _epoch_no_to_insert_from;
-  
-  WHILE _insert_epoch <= _curr_epoch LOOP
-    _batch_end_epoch := LEAST(_insert_epoch + 50, _curr_epoch + 1);
+
+  WHILE _insert_epoch <= _max_epoch_to_cache LOOP
+    _batch_end_epoch := LEAST(_insert_epoch + 50, _max_epoch_to_cache + 1);
     
     RAISE NOTICE 'inserting data from % to %', _insert_epoch, _batch_end_epoch;
 
@@ -276,4 +283,4 @@ BEGIN
 END;
 $$;
 
-COMMENT ON PROCEDURE grest.pool_history_cache_update IS 'Internal procedure to update pool history for data FROM specified epoch until current-epoch-minus-one. Invoke WITH non-empty param for initial population, WITH empty for subsequent updates'; --noqa: LT01
+COMMENT ON PROCEDURE grest.pool_history_cache_update IS 'Internal procedure to update pool history for data FROM specified epoch until current-epoch-minus-two (the latest epoch with complete reward data). Invoke WITH non-empty param for initial population, WITH empty for subsequent updates'; --noqa: LT01

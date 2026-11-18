@@ -12,6 +12,7 @@ RETURNS TABLE (
   maxkesrevolutions varchar,
   securityparam varchar,
   alonzogenesis varchar,
+  conwaygenesis varchar,
   dijkstragenesis varchar
 )
 LANGUAGE sql STABLE
@@ -29,6 +30,7 @@ AS $$
     g.maxkesrevolutions,
     g.securityparam,
     g.alonzogenesis,
+    g.conwaygenesis,
     g.dijkstragenesis
   FROM grest.genesis AS g;
 $$;

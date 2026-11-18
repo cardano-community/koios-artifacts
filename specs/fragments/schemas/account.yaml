@@ -41,7 +41,7 @@
             - type: "null"
         total_balance:
           type: string
-          description: Total balance of the account including UTxO, rewards, MIRs and direct deposits (in number)
+          description: Total balance of the account including UTxO, rewards, MIRs, proposal refunds and direct deposits (in number)
           example: "207116800428"
         withdrawable_balance:
           type: string
@@ -80,7 +80,7 @@
           type: string
           description: Total treasury MIR value of the account
           example: "0"
-        proposal-refund:
+        proposal_refund:
           type: string
           description: Total proposal refund for this account
           example: "0"
