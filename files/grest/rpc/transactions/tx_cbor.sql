@@ -1,6 +1,7 @@
 CREATE OR REPLACE FUNCTION grest.tx_cbor(_tx_hashes text [])
 RETURNS TABLE (
   tx_hash text,
+  parent_tx_hash text,
   block_hash text,
   block_height word31type,
   epoch_no word31type,
@@ -13,6 +14,7 @@ LANGUAGE sql STABLE
 AS $$
   SELECT
     ENCODE(tx.hash::bytea, 'hex'),
+    ENCODE(ptx.hash, 'hex'),
     ENCODE(block.hash, 'hex'),
     block.block_no,
     block.epoch_no,
@@ -22,6 +24,7 @@ AS $$
     tx.valid_contract
   FROM public.tx
     INNER JOIN block ON block.id = tx.block_id
+    LEFT JOIN public.tx AS ptx ON ptx.id = tx.parent_tx_id
     LEFT JOIN public.tx_cbor ON tx.id = tx_cbor.tx_id
   WHERE tx.hash::bytea = ANY(
       SELECT
@@ -37,6 +40,7 @@ COMMENT ON FUNCTION grest.tx_cbor IS 'Get raw transaction(s) in CBOR format'; --
 CREATE OR REPLACE FUNCTION grest.block_tx_cbor(_block_hashes text [])
 RETURNS TABLE (
   tx_hash text,
+  parent_tx_hash text,
   block_hash text,
   block_height word31type,
   epoch_no word31type,

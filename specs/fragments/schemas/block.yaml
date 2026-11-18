@@ -130,6 +130,8 @@
           $ref: "#/components/schemas/blocks/items/properties/hash"
         tx_hash:
           $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+        parent_tx_hash:
+          $ref: "#/components/schemas/tx_info/items/properties/parent_tx_hash"
         epoch_no:
           $ref: "#/components/schemas/blocks/items/properties/epoch_no"
         block_height:
@@ -144,6 +146,8 @@
       properties:
         tx_hash:
           $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+        parent_tx_hash:
+          $ref: "#/components/schemas/tx_info/items/properties/parent_tx_hash"
         block_hash:
           $ref: "#/components/schemas/blocks/items/properties/hash"
         block_height:
@@ -166,6 +170,8 @@
       properties:
         tx_hash:
           $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+        parent_tx_hash:
+          $ref: "#/components/schemas/tx_info/items/properties/parent_tx_hash"
         block_hash:
           $ref: "#/components/schemas/blocks/items/properties/hash"
         block_height:
@@ -194,6 +200,8 @@
           $ref: "#/components/schemas/tx_info/items/properties/invalid_before"
         invalid_after:
           $ref: "#/components/schemas/tx_info/items/properties/invalid_after"
+        sub_tx_hashes:
+          $ref: "#/components/schemas/tx_info/items/properties/sub_tx_hashes"
         collateral_inputs:
           $ref: "#/components/schemas/tx_info/items/properties/collateral_inputs"
         collateral_output:

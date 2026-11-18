@@ -6,6 +6,12 @@
       properties:
         tx_hash:
           $ref: "#/components/schemas/utxo_infos/items/properties/tx_hash"
+        parent_tx_hash:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Hash of the top-level transaction that carries this one as a Dijkstra sub-transaction (CIP-118), or null for a top-level transaction
+          example: null
         block_hash:
           $ref: "#/components/schemas/blocks/items/properties/hash"
         block_height:
@@ -61,6 +67,12 @@
         valid_contract:
           description: True if the contract is valid or there is no contract
           example: true
+        sub_tx_hashes:
+          type: array
+          description: Hashes of the Dijkstra sub-transactions (CIP-118) this transaction carries, in the order the ledger applies them. Empty when it carries none, or when it is itself a sub-transaction
+          items:
+            type: string
+          example: []
         collateral_inputs:
           description: An array of collateral inputs needed for smart contracts in case of contract failure
           anyOf:
@@ -386,6 +398,8 @@
       properties:
         tx_hash:
           $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+        parent_tx_hash:
+          $ref: "#/components/schemas/tx_info/items/properties/parent_tx_hash"
         block_hash:
           $ref: "#/components/schemas/blocks/items/properties/hash"
         block_height:

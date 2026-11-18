@@ -11,6 +11,7 @@ CREATE OR REPLACE FUNCTION grest.tx_info(
 )
 RETURNS TABLE (
   tx_hash text,
+  parent_tx_hash text,
   block_hash text,
   block_height word31type,
   epoch_no word31type,
@@ -26,6 +27,7 @@ RETURNS TABLE (
   invalid_before text,
   invalid_after text,
   valid_contract boolean,
+  sub_tx_hashes jsonb,
   collateral_inputs jsonb,
   collateral_output jsonb,
   reference_inputs jsonb,
@@ -67,6 +69,7 @@ BEGIN
         SELECT
           tx.id,
           tx.hash               AS tx_hash,
+          ptx.hash              AS parent_tx_hash,
           b.hash                AS block_hash,
           b.block_no            AS block_height,
           b.epoch_no            AS epoch_no,
@@ -84,6 +87,8 @@ BEGIN
           tx.valid_contract
         FROM tx
           INNER JOIN block AS b ON tx.block_id = b.id
+          -- Dijkstra sub-transactions (CIP-118) point at the top-level transaction that carries them
+          LEFT JOIN tx AS ptx ON ptx.id = tx.parent_tx_id
         WHERE tx.id = ANY(_tx_id_list)
       ),
 
@@ -914,6 +919,7 @@ BEGIN
 
     SELECT
       ENCODE(atx.tx_hash, 'hex'),
+      ENCODE(atx.parent_tx_hash, 'hex'),
       ENCODE(atx.block_hash, 'hex'),
       atx.block_height,
       atx.epoch_no,
@@ -929,6 +935,8 @@ BEGIN
       atx.invalid_before::text,
       atx.invalid_after::text,
       atx.valid_contract,
+      -- in ledger order, which is also the order db-sync inserts them
+      COALESCE((SELECT JSONB_AGG(ENCODE(stx.hash, 'hex') ORDER BY stx.id) FROM tx AS stx WHERE stx.parent_tx_id = atx.id), JSONB_BUILD_ARRAY()),
       COALESCE((
         SELECT JSONB_AGG(tx_collateral_inputs)
         FROM (
