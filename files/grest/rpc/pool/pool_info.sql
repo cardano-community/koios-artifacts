@@ -8,6 +8,8 @@ RETURNS TABLE (
   fixed_cost text,
   pledge text,
   deposit text,
+  bls_key text,
+  bls_key_pop text,
   reward_addr varchar,
   reward_addr_delegated_drep text,
   owners varchar [],
@@ -68,6 +70,9 @@ BEGIN
       pu.fixed_cost::text,
       pu.pledge::text,
       pool_reg_data.deposit::text,
+      -- from the current registration only: re-registering without a BLS key removes it
+      ENCODE(pu.bls_key, 'hex') AS bls_key,
+      ENCODE(pu.bls_key_pop, 'hex') AS bls_key_pop,
       grest.cip5_hex_to_stake_addr(sa.hash_raw)::varchar AS reward_addr,
       COALESCE(grest.cip129_hex_to_drep_id(dh.raw, dh.has_script), dh.view::text) AS reward_addr_delegated_drep,
       ARRAY(

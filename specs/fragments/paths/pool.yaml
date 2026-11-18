@@ -204,7 +204,7 @@
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/pool_registrations"
+                $ref: "#/components/schemas/pool_retirements"
         #!macro:koios_errors!#
       summary: Pool Retirements
       description: Return all pool retirements initiated in the requested epoch

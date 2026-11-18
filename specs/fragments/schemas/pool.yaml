@@ -163,6 +163,18 @@
             - type: "null"
           description: Pool's registration deposit in number
           example: "500000000"
+        bls_key:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: BLS public key (96 bytes, hex) declared by the pool's current registration, which Leios and Peras voting use. Null if the current registration declares none, even if an earlier one did
+          example: null
+        bls_key_pop:
+          anyOf:
+            - type: string
+            - type: "null"
+          description: Proof of possession (48 bytes, hex) for bls_key, already verified by the ledger
+          example: null
         reward_addr:
           anyOf:
             - type: string
@@ -365,7 +377,31 @@
           description: Latest transaction hash used for delegation by the account
           example: 368d08fe86804d637649341d3aec4a9baa7dffa6d00f16de2ba9dba814f1c948
   pool_registrations:
-    description: Array of pool registrations/retirements
+    description: Array of pool registrations
+    type: array
+    items:
+      type: object
+      properties:
+        pool_id_bech32:
+          $ref: "#/components/schemas/pool_info/items/properties/pool_id_bech32"
+        tx_hash:
+          $ref: "#/components/schemas/tx_info/items/properties/tx_hash"
+        block_hash:
+          $ref: "#/components/schemas/blocks/items/properties/hash"
+        block_height:
+          $ref: "#/components/schemas/blocks/items/properties/block_height"
+        epoch_no:
+          $ref: "#/components/schemas/epoch_info/items/properties/epoch_no"
+        epoch_slot:
+          $ref: "#/components/schemas/blocks/items/properties/epoch_slot"
+        active_epoch_no:
+          $ref: "#/components/schemas/pool_updates/items/properties/active_epoch_no"
+        bls_key:
+          $ref: "#/components/schemas/pool_updates/items/properties/bls_key"
+        bls_key_pop:
+          $ref: "#/components/schemas/pool_updates/items/properties/bls_key_pop"
+  pool_retirements:
+    description: Array of pool retirements
     type: array
     items:
       type: object
